@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>962828708485-pu3uqbhm9r8dm65khtjb2dc92f14a4o0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.962828708485-pu3uqbhm9r8dm65khtjb2dc92f14a4o0</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>962828708485-4luos7db9sokjp48npuptl617g52aaq4.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAKCjfvFna8L9KiOS8aF38neUD9KfYYtgY</string>
+	<key>GCM_SENDER_ID</key>
+	<string>962828708485</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.samtech.ampify</string>
+	<key>PROJECT_ID</key>
+	<string>ampify-samtech</string>
+	<key>STORAGE_BUCKET</key>
+	<string>ampify-samtech.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:962828708485:ios:26b7dd048d0c96efe097ec</string>
+</dict>
+</plist>
