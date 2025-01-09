@@ -4,13 +4,14 @@ import '../../config/theme_services.dart';
 
 class BaseWidget extends StatelessWidget {
   final PreferredSizeWidget? appBar;
+  final BoxDecoration? decoration;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
   final Color? color;
-  final BoxDecoration? decoration;
-  final Widget child;
+  final bool? extendBody;
+  final bool? safeAreaBottom;
   final bool? resizeBottom;
-  final bool safeAreaBottom;
+  final Widget child;
 
   const BaseWidget({
     super.key,
@@ -19,8 +20,9 @@ class BaseWidget extends StatelessWidget {
     this.margin,
     this.color,
     this.decoration,
+    this.extendBody,
+    this.safeAreaBottom,
     this.resizeBottom,
-    this.safeAreaBottom = false,
     required this.child,
   });
 
@@ -30,12 +32,13 @@ class BaseWidget extends StatelessWidget {
 
     return Scaffold(
       appBar: appBar,
-      resizeToAvoidBottomInset: resizeBottom,
       backgroundColor: color ?? scheme.background,
+      extendBody: extendBody ?? false,
+      resizeToAvoidBottomInset: resizeBottom,
       body: Container(
         decoration: decoration,
         child: SafeArea(
-            bottom: safeAreaBottom,
+            bottom: safeAreaBottom ?? false,
             child: Container(
               margin: margin,
               padding: padding ??

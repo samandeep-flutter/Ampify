@@ -76,6 +76,7 @@ class MyBottomSheet extends StatelessWidget {
                 const SizedBox(width: 75),
                 Text(title,
                     style: const TextStyle(
+                      fontSize: Dimens.fontExtraLarge,
                       fontWeight: FontWeight.w600,
                     )),
                 Padding(
@@ -84,7 +85,10 @@ class MyBottomSheet extends StatelessWidget {
                     onPressed: onClose ?? () => Navigator.pop(context),
                     style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact),
-                    child: const Text('Close'),
+                    child: const Text(
+                      StringRes.close,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ],

@@ -1,8 +1,10 @@
 import 'dart:math';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/presentation/widgets/my_cached_image.dart';
+import 'package:ampify/presentation/widgets/top_widgets.dart';
 import '../../../buisness_logic/player_bloc/player_events.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/data/utils/dimens.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
 import '../../widgets/loading_widgets.dart';
+import 'queue_view.dart';
 
 class PlayerScreen extends StatelessWidget {
   const PlayerScreen({super.key});
@@ -19,6 +22,7 @@ class PlayerScreen extends StatelessWidget {
     final scheme = context.scheme;
     final bloc = context.read<PlayerBloc>();
     return Scaffold(
+      extendBodyBehindAppBar: true,
       body: CustomScrollView(slivers: [
         const SliverSafeArea(
           sliver: SliverToBoxAdapter(
@@ -51,20 +55,9 @@ class PlayerScreen extends StatelessWidget {
                       builder: (context, state) {
                         final fgColor = state.track.bgColor?.withOpacity(.4);
                         const bgColor = Colors.white;
-                        return Container(
+                        return ShadowWidget(
                           margin: const EdgeInsets.all(Dimens.sizeMedium),
-                          decoration: BoxDecoration(boxShadow: [
-                            BoxShadow(
-                                color: Color.alphaBlend(
-                                    fgColor ?? bgColor, bgColor),
-                                offset: const Offset(0, 50),
-                                spreadRadius: context.width * .35,
-                                blurRadius: context.width * .35),
-                            const BoxShadow(
-                                color: Colors.black12,
-                                spreadRadius: Dimens.sizeSmall,
-                                blurRadius: Dimens.sizeExtraDoubleLarge)
-                          ]),
+                          color: Color.alphaBlend(fgColor ?? bgColor, bgColor),
                           child: MyCachedImage(
                             state.track.image,
                             borderRadius: Dimens.sizeExtraSmall,
@@ -268,6 +261,24 @@ class PlayerScreen extends StatelessWidget {
                             }),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: Dimens.sizeDefault),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton.icon(
+                        onPressed: () {
+                          showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              enableDrag: true,
+                              builder: (_) =>
+                                  const SafeArea(child: QueueView()));
+                        },
+                        label: const Text(StringRes.queue),
+                        icon: const Icon(Icons.queue_music_rounded),
+                      )
+                    ],
                   )
                 ],
               )),

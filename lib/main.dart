@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:ampify/buisness_logic/player_bloc/player_queue.dart';
+import 'package:ampify/buisness_logic/player_bloc/queue_bloc.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/extension_services.dart';
@@ -17,6 +17,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'buisness_logic/home_bloc/home_bloc.dart';
 import 'buisness_logic/library_bloc/library_bloc.dart';
+import 'buisness_logic/library_bloc/playlist_bloc.dart';
 import 'buisness_logic/player_bloc/player_bloc.dart';
 import 'buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'buisness_logic/root_bloc/root_bloc.dart';
@@ -75,6 +76,7 @@ class MyApp extends StatelessWidget {
               BlocProvider(create: (_) => PlayerBloc()),
               BlocProvider(create: (_) => PlayerSliderBloc()),
               BlocProvider(create: (_) => QueueBloc()),
+              BlocProvider(create: (_) => PlaylistBloc()),
               BlocProvider(create: (_) => HomeBloc()),
               BlocProvider(create: (_) => SearchBloc()),
               BlocProvider(create: (_) => LibraryBloc()),

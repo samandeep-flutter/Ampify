@@ -1,8 +1,8 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
-import 'package:ampify/data/utils/color_resources.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,10 +25,7 @@ class HomeScreen extends StatelessWidget {
             backgroundColor: context.background,
             title: const Text(StringRes.appName),
             centerTitle: false,
-            titleTextStyle: TextStyle(
-                color: scheme.textColor,
-                fontWeight: FontWeight.w600,
-                fontSize: Dimens.fontExtraDoubleLarge),
+            titleTextStyle: Utils.defTitleStyle,
             bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(30),
                 child: Row(
@@ -50,26 +47,6 @@ class HomeScreen extends StatelessWidget {
                     height: Dimens.sizeLarge,
                   ),
                 ),
-              ),
-              const SizedBox(width: Dimens.sizeSmall),
-              PopupMenuButton(
-                position: PopupMenuPosition.under,
-                menuPadding: EdgeInsets.zero,
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                      onTap: () => bloc.logout(context),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(width: Dimens.sizeSmall),
-                          Icon(Icons.logout, color: ColorRes.error),
-                          SizedBox(width: Dimens.sizeDefault),
-                          Text(StringRes.logout),
-                        ],
-                      ))
-                ],
-                child: const Icon(Icons.settings_outlined,
-                    size: Dimens.sizeLarge + 4),
               ),
               const SizedBox(width: Dimens.sizeDefault),
             ],

@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 sealed class AppConstants {
-  static const String baseUrl = 'https://api.spotify.com';
+  static const String baseUrl = 'https://api.spotify.com/v1/';
   static const String token = 'https://accounts.spotify.com/api/token';
-  static const String search = '$baseUrl/v1/search';
+  static const String search = 'search';
+  static const String profile = 'me';
+  static const String myPlaylists = 'me/playlists';
+  static String userPlaylists(String id) => 'users/$id/playlists';
+  static String playlistDetails(String id) => 'playlists/$id';
 }
 
 sealed class BoxKeys {
@@ -15,6 +19,7 @@ sealed class BoxKeys {
   static const String theme = '$boxName:theme';
   static const String token = '$boxName:token';
   static const String refreshToken = '$boxName:refresh-token';
+  static const String profile = '$boxName:profile';
 }
 
 void logPrint(String? value, {Object? error}) {
@@ -38,6 +43,9 @@ class MyColoredBox extends StatelessWidget {
   }
 }
 
-showToast(String text, {int? timeInSec}) {
-  Fluttertoast.showToast(msg: text, timeInSecForIosWeb: timeInSec ?? 1);
+showToast(String text, {int? timeInSec}) async {
+  await Fluttertoast.cancel();
+  Future.delayed(const Duration(milliseconds: 300)).then((_) {
+    Fluttertoast.showToast(msg: text, timeInSecForIosWeb: timeInSec ?? 1);
+  });
 }

@@ -1,11 +1,15 @@
-import 'dart:math';
 import 'package:ampify/data/utils/dimens.dart';
+import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
+import 'package:palette_generator/palette_generator.dart';
+
+import '../../buisness_logic/player_bloc/player_state.dart';
+import '../data_models/common/tracks_model.dart';
 
 sealed class Utils {
   static TextStyle get defTitleStyle {
     return const TextStyle(
-      fontSize: Dimens.fontExtraLarge,
+      fontSize: Dimens.fontExtraDoubleLarge,
       fontWeight: FontWeight.w600,
       color: Colors.black87,
     );
@@ -19,14 +23,30 @@ sealed class Utils {
     );
   }
 
-  static String generateString(int length) {
-    String result = '';
-    const char = 'qwertyuioplkjhgfdsazxcvbnm';
+  static Future<TrackDetails> getTrackDetails(Track track) async {
+    final palete = await PaletteGenerator.fromImageProvider(
+        NetworkImage(track.album?.image?.url ?? ''),
+        size: const Size(200, 200));
+    final color = palete.mutedColor?.color;
 
-    for (int i = 0; i < length; i++) {
-      result += char[Random().nextInt(char.length)];
+    return TrackDetails(
+        id: track.id,
+        uri: track.uri,
+        title: track.name,
+        bgColor: color,
+        image: track.album?.image?.url,
+        subtitle: track.artists?.asString);
+  }
+
+  static Future<Color?> getImageColor(String? image) async {
+    try {
+      final palete = await PaletteGenerator.fromImageProvider(
+          NetworkImage(image!),
+          size: const Size(200, 200));
+      return palete.mutedColor?.color;
+    } catch (_) {
+      return null;
     }
-    return result;
   }
 
 //   static String timeFromNow(DateTime? date, DateTime now) {

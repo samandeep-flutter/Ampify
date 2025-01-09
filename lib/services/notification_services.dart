@@ -7,15 +7,18 @@ class MyNotifications {
   static final messaging = FirebaseMessaging.instance;
 
   static Future<void> initialize() async {
-    await messaging.requestPermission();
-    await messaging.setForegroundNotificationPresentationOptions(
-        alert: true, badge: true, sound: true);
+    try {
+      await messaging.requestPermission();
+      await messaging.setForegroundNotificationPresentationOptions(
+          alert: true, badge: true, sound: true);
 
-    final initialMessage = await messaging.getInitialMessage();
-    if (initialMessage != null) {
-      logPrint('notification: init ${initialMessage.notification!.body}');
+      final initialMessage = await messaging.getInitialMessage();
+      if (initialMessage != null) {
+        logPrint('notification: init ${initialMessage.notification!.body}');
+      }
+    } catch (e) {
+      logPrint('fb init: $e');
     }
-
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       logPrint("notification: dataMap ${message.toMap()}");
     });

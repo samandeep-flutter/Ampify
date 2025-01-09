@@ -23,9 +23,7 @@ class PlayerSliderState extends Equatable {
   const PlayerSliderState.init() : current = 0;
 
   PlayerSliderState copyWith([int? current]) {
-    return PlayerSliderState(
-      current ?? this.current,
-    );
+    return PlayerSliderState(current ?? this.current);
   }
 
   @override

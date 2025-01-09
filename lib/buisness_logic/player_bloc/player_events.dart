@@ -1,5 +1,5 @@
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:ampify/data/data_models/tracks_model.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:equatable/equatable.dart';
 
 class PlayerEvent extends Equatable {

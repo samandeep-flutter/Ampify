@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:ampify/data/repository/auth_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/config/routes/app_routes.dart';
@@ -14,35 +13,32 @@ class AuthServices {
 
   final box = BoxServices.to;
   final AuthRepo auth = getIt();
-
   late String minVersion;
 
   Future<AuthServices> init() async {
-    // _getFirebaseToken();
-    final AppLinks appLinks = getIt();
-    appLinks.uriLinkStream.listen((uri) {
-      logPrint('app_links: ${uri.toString()}');
-      switch (uri.authority) {
-        case 'spotify-login':
-          if (Platform.isIOS) return;
-          final AuthRepo authRepo = getIt();
-          final code = uri.queryParameters['code'];
-          authRepo.getToken(code!);
-
-          break;
-        default:
-          break;
-      }
-    });
+    getIt<AppLinks>().uriLinkStream.listen(_dynamicLinks);
     return this;
+  }
+
+  void _dynamicLinks(Uri uri) {
+    logPrint('app_links: ${uri.toString()}');
+    switch (uri.authority) {
+      case 'spotify-login':
+        if (Platform.isIOS) return;
+        final AuthRepo authRepo = getIt();
+        final code = uri.queryParameters['code'];
+        authRepo.getToken(code!);
+
+        break;
+      default:
+        break;
+    }
   }
 
   String navigate() {
     try {
       box.read(BoxKeys.token) as String;
-      dprint('refreshing token...');
-      auth.refreshToken();
-      return AppRoutes.rootView;
+      return AppRoutes.homeView;
     } catch (_) {
       return AppRoutes.auth;
     }

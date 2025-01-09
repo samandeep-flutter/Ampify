@@ -1,9 +1,9 @@
 import 'package:ampify/services/box_services.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../services/getit_instance.dart';
 import '../repository/auth_repo.dart';
 import '../utils/app_constants.dart';
-import '../utils/string.dart';
 import 'api_response.dart';
 
 class DioClient {
@@ -12,7 +12,8 @@ class DioClient {
 
   DioClient({Dio? dio, required this.interceptor}) {
     this.dio = dio ?? Dio();
-    this.dio.interceptors.add(interceptor);
+    this.dio.options.baseUrl = AppConstants.baseUrl;
+    if (kDebugMode) this.dio.interceptors.add(interceptor);
   }
   Future<Response> _get(String url, {Options? options}) async {
     final response = await dio.get(url, options: options);
@@ -26,33 +27,47 @@ class DioClient {
 
   Future<ApiResponse> get(String url,
       {Options? options, required DioClient client}) async {
+    final token = BoxServices.to.read(BoxKeys.token);
+    final Map<String, dynamic> headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer $token'
+    };
     try {
-      final token = BoxServices.to.read(BoxKeys.token);
-      final Map<String, dynamic> headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer $token'
-      };
       Response response =
           await client._get(url, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
-    } catch (error) {
-      return ApiResponse.withError(error);
+    } catch (_) {
+      await getIt<AuthRepo>().refreshToken();
+      try {
+        Response response = await client._get(url,
+            options: options ?? Options(headers: headers));
+        return ApiResponse.withSuccess(response);
+      } catch (e) {
+        return ApiResponse.withError(e);
+      }
     }
   }
 
   Future<ApiResponse> post(String url,
       {required data, Options? options, required DioClient client}) async {
+    final token = BoxServices.to.read(BoxKeys.token);
+    final Map<String, dynamic> headers = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Authorization': 'Bearer $token'
+    };
     try {
-      final token = BoxServices.to.read(BoxKeys.token);
-      final Map<String, dynamic> headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer $token'
-      };
       Response response = await client._post(url,
           data: data, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
-    } catch (error) {
-      return ApiResponse.withError(error);
+    } catch (_) {
+      await getIt<AuthRepo>().refreshToken();
+      try {
+        Response response = await client._post(url,
+            data: data, options: options ?? Options(headers: headers));
+        return ApiResponse.withSuccess(response);
+      } catch (e) {
+        return ApiResponse.withError(e);
+      }
     }
   }
 }
@@ -61,16 +76,15 @@ class LoggingInterceptor extends InterceptorsWrapper {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final options = response.requestOptions;
-    logPrint('${response.statusCode} | ${options.method} | ${options.path}');
-    logPrint('<--------------------------END HTTP-------------------------->');
+    dprint('${response.statusCode} | ${options.method} | ${options.path}\n'
+        // '${response.data.toString()}\n'
+        '<--------------------------END HTTP-------------------------->');
     super.onResponse(response, handler);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     logPrint('ERROR [${err.response?.statusCode}] ${err.requestOptions.path}');
-    if (err.response?.statusCode == 401) getIt<AuthRepo>().refreshToken();
-    showToast(StringRes.errorUnknown);
     super.onError(err, handler);
   }
 }

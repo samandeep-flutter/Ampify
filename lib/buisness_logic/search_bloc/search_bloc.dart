@@ -1,5 +1,5 @@
 import '../../data/data_models/search_model.dart';
-import 'package:ampify/data/data_models/tracks_model.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/repository/search_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/services/getit_instance.dart';
@@ -63,13 +63,13 @@ class SearchState extends Equatable {
   List<Object?> get props => [query, isLoading, isError];
 }
 
-EventTransformer<T> debounce<T>(Duration duration) {
+EventTransformer<T> _debounce<T>(Duration duration) {
   return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
 }
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc() : super(const SearchState.init()) {
-    on<SearchTrigerred>(_onSearchTrigerred, transformer: debounce(_duration));
+    on<SearchTrigerred>(_onSearchTrigerred, transformer: _debounce(_duration));
     on<SearchInputChanged>(_onInputChanged);
     on<SearchInitial>(_onInit);
     on<SearchCleared>(_onSearchClear);

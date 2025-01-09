@@ -18,13 +18,13 @@ class MyCachedImage extends StatelessWidget {
   const MyCachedImage(this.image,
       {super.key,
       this.isAvatar = false,
+      this.loading = false,
       this.avatarRadius,
       this.height,
       this.width,
       this.foregroundColor,
       this.borderRadius,
-      this.fit})
-      : loading = false;
+      this.fit});
 
   const MyCachedImage.error(
       {super.key,
@@ -69,7 +69,7 @@ class MyCachedImage extends StatelessWidget {
           ));
     }
 
-    if (image == null) {
+    if (image?.isEmpty ?? true) {
       Image image = Image.asset(
         ImageRes.thumbnail,
         color: Colors.grey[400],

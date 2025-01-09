@@ -6,6 +6,9 @@ sealed class ImageRes {
   static final String shuffle = _toIcons('shuffle.png');
   static final String musicAlt = _toIcons('music-alt.png');
   static final String music = _toIcons('music.png');
+  static final String sort = _toIcons('sort.png');
+  static final String musicWave = _toIcons('music-wave.gif');
+  static final String musicWavePaused = _toIcons('music-wave-paused.png');
 
   static String _toIcons(String icon) => 'assets/icons/$icon';
   static String _toImages(String icon) => 'assets/images/$icon';

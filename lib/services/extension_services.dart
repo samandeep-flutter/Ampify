@@ -1,6 +1,7 @@
 import 'package:ampify/config/theme_services.dart';
-import 'package:ampify/data/data_models/artist_model.dart';
+import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:flutter/material.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 extension MyContext on BuildContext {
   ThemeServiceState get scheme => ThemeServices.of(this);
@@ -98,6 +99,7 @@ extension MyString on String {
   bool get isEmail => _emailRegExp(this);
   bool get isStringPass => _passRegExp(this);
   String get capitalize => _capitilize(this);
+  String get unescape => _unescape(this);
 
   DateTime _formJson(String datetime) {
     int year = int.parse(datetime.substring(0, 4));
@@ -127,6 +129,8 @@ extension MyString on String {
       return match.group(0)!.toUpperCase();
     });
   }
+
+  String _unescape(String text) => HtmlUnescape().convert(text);
 }
 
 extension MyInt on int {

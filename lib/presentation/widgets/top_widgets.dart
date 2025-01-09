@@ -194,3 +194,89 @@ class MyAvatar extends StatelessWidget {
     );
   }
 }
+
+class SubtitleWidget extends StatelessWidget {
+  final TextStyle? style;
+  final String type;
+  final String subtitle;
+  final bool expanded;
+  const SubtitleWidget({
+    super.key,
+    this.style,
+    this.expanded = true,
+    required this.type,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+
+    final sub = Text(
+      subtitle,
+      style: TextStyle(
+        color: style?.color ?? scheme.textColorLight,
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+
+    return DefaultTextStyle.merge(
+      style: style,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(type,
+              style: TextStyle(
+                color: style?.color ?? scheme.textColorLight,
+              )),
+          PaginationDots(
+            current: true,
+            margin: Dimens.sizeSmall,
+            color: style?.color ?? scheme.textColorLight,
+          ),
+          if (expanded) Expanded(child: sub) else sub,
+        ],
+      ),
+    );
+  }
+}
+
+class ShadowWidget extends StatelessWidget {
+  final Color color;
+  final EdgeInsets? margin;
+  final double? spread;
+  final bool darkShadow;
+  final double? borderRadius;
+  final Widget child;
+
+  const ShadowWidget({
+    super.key,
+    this.margin,
+    this.spread,
+    this.borderRadius,
+    this.darkShadow = true,
+    required this.color,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(Dimens.sizeMedium),
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+            color: color,
+            offset: const Offset(0, 50),
+            spreadRadius: spread ?? context.width * .35,
+            blurRadius: spread ?? context.width * .35),
+        if (darkShadow)
+          const BoxShadow(
+              color: Colors.black12,
+              spreadRadius: Dimens.sizeSmall,
+              blurRadius: Dimens.sizeExtraDoubleLarge)
+      ]),
+      child: child,
+    );
+  }
+}

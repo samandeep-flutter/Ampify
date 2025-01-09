@@ -1,0 +1,268 @@
+import 'dart:math';
+import 'package:ampify/buisness_logic/player_bloc/queue_bloc.dart';
+import 'package:ampify/data/utils/dimens.dart';
+import 'package:ampify/data/utils/image_resources.dart';
+import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/presentation/widgets/base_widget.dart';
+import 'package:ampify/services/extension_services.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../buisness_logic/player_bloc/player_bloc.dart';
+import '../../../buisness_logic/player_bloc/player_state.dart';
+import '../../widgets/loading_widgets.dart';
+import '../../widgets/my_cached_image.dart';
+
+class QueueView extends StatelessWidget {
+  const QueueView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final bloc = context.read<QueueBloc>();
+    final playerBloc = context.read<PlayerBloc>();
+    final scheme = context.scheme;
+    return Container(
+      color: scheme.background,
+      padding: const EdgeInsets.only(top: kToolbarHeight),
+      child: BaseWidget(
+        padding: EdgeInsets.zero,
+        color: scheme.background,
+        extendBody: true,
+        resizeBottom: false,
+        appBar: AppBar(
+          backgroundColor: scheme.background,
+          automaticallyImplyLeading: false,
+          title: const Text(StringRes.queueTitle),
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontSize: Dimens.fontDefault,
+            fontWeight: FontWeight.w600,
+            color: scheme.textColor,
+          ),
+          leading: Align(
+            alignment: Alignment.topCenter,
+            child: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: Transform.rotate(
+                  angle: 3 * pi / 2,
+                  child: const Icon(Icons.arrow_back_ios),
+                )),
+          ),
+        ),
+        child: Column(
+          children: [
+            const Row(
+              children: [
+                SizedBox(width: Dimens.sizeDefault),
+                Text(
+                  StringRes.nowPlaying,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: Dimens.fontLarge,
+                  ),
+                ),
+              ],
+            ),
+            BlocBuilder<PlayerBloc, PlayerState>(
+              buildWhen: (pr, cr) => pr.track != cr.track,
+              builder: (_, state) {
+                return Padding(
+                  padding: const EdgeInsets.all(Dimens.sizeDefault),
+                  child: Row(
+                    children: [
+                      MyCachedImage(
+                        state.track.image,
+                        borderRadius: 2,
+                        height: 40,
+                        width: 40,
+                      ),
+                      const SizedBox(width: Dimens.sizeDefault),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            RichText(
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                text: TextSpan(
+                                    style: TextStyle(
+                                        color: scheme.primary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: Dimens.fontLarge),
+                                    children: [
+                                      WidgetSpan(
+                                        child: SizedBox.square(
+                                            dimension: 20,
+                                            child: BlocBuilder<PlayerBloc,
+                                                    PlayerState>(
+                                                buildWhen: (pr, cr) =>
+                                                    pr.playerState !=
+                                                    cr.playerState,
+                                                builder: (_, state) {
+                                                  if (state.playerState ==
+                                                      MusicState.playing) {
+                                                    return Image.asset(
+                                                      ImageRes.musicWave,
+                                                      fit: BoxFit.cover,
+                                                      color: scheme.primary,
+                                                    );
+                                                  }
+
+                                                  return Image.asset(
+                                                    ImageRes.musicWavePaused,
+                                                    fit: BoxFit.cover,
+                                                    color: scheme.primary,
+                                                  );
+                                                })),
+                                      ),
+                                      const WidgetSpan(
+                                          child: SizedBox(width: 6)),
+                                      TextSpan(text: state.track.title ?? ''),
+                                    ])),
+                            Text(
+                              state.track.subtitle ?? '',
+                              style: TextStyle(color: scheme.textColorLight),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            Expanded(
+              child: BlocBuilder<QueueBloc, QueueState>(
+                buildWhen: (pr, cr) => pr.queue != cr.queue,
+                builder: (context, state) {
+                  if (state.queue.isEmpty) return const SizedBox.shrink();
+
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          const SizedBox(width: Dimens.sizeDefault),
+                          const Text(
+                            StringRes.nextQueue,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: Dimens.fontLarge),
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                                foregroundColor: scheme.disabled,
+                                textStyle: TextStyle(
+                                    color: scheme.textColorLight,
+                                    fontWeight: FontWeight.bold)),
+                            child: const Text(StringRes.clearQueue),
+                          ),
+                          const SizedBox(width: Dimens.sizeDefault),
+                        ],
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: state.queue.length,
+                          itemBuilder: (context, index) {
+                            final item = state.queue[index];
+                            return ListTile(
+                              leading: BlocBuilder<QueueBloc, QueueState>(
+                                buildWhen: (pr, cr) {
+                                  return pr.selected[index] !=
+                                      cr.selected[index];
+                                },
+                                builder: (context, state) {
+                                  return Checkbox(
+                                    value: state.selected[index],
+                                    onChanged: (_) => bloc.onSelected(index),
+                                  );
+                                },
+                              ),
+                              title: Text(
+                                item.title ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              titleTextStyle: TextStyle(
+                                color: scheme.textColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: Dimens.fontLarge,
+                              ),
+                              subtitle: Text(
+                                item.subtitle ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              subtitleTextStyle: TextStyle(
+                                color: scheme.textColorLight,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: scheme.background,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    offset: Offset(0, -20),
+                    blurRadius: 20,
+                  )
+                ],
+              ),
+              margin: EdgeInsets.zero,
+              padding: const EdgeInsets.symmetric(vertical: Dimens.sizeSmall),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(width: Dimens.sizeDefault),
+                  IconButton(
+                    onPressed: playerBloc.onPrevious,
+                    color: scheme.textColor,
+                    iconSize: Dimens.sizeMidLarge + 4,
+                    icon: const Icon(Icons.skip_previous_rounded),
+                  ),
+                  const SizedBox(width: Dimens.sizeDefault),
+                  BlocBuilder<PlayerBloc, PlayerState>(
+                    buildWhen: (pr, cr) {
+                      return pr.playerState != cr.playerState;
+                    },
+                    builder: (context, state) {
+                      return LoadingIcon(
+                        onPressed: playerBloc.onPlayPause,
+                        iconSize: Dimens.sizeMidLarge,
+                        loaderSize: Dimens.sizeMidLarge,
+                        loading: state.playerState == MusicState.loading,
+                        isSelected: state.playerState == MusicState.playing,
+                        selectedIcon: const Icon(Icons.pause),
+                        style: IconButton.styleFrom(
+                            backgroundColor: scheme.textColor,
+                            foregroundColor: scheme.surface,
+                            splashFactory: NoSplash.splashFactory),
+                        icon: const Icon(Icons.play_arrow),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: Dimens.sizeDefault),
+                  IconButton(
+                    onPressed: playerBloc.onNext,
+                    iconSize: Dimens.sizeMidLarge + 4,
+                    color: scheme.textColor,
+                    icon: const Icon(Icons.skip_next_rounded),
+                  ),
+                  const SizedBox(width: Dimens.sizeDefault),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

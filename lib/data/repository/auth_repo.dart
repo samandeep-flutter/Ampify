@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:ampify/data/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth/flutter_web_auth.dart';
@@ -15,21 +14,13 @@ class AuthRepo {
   static final _box = BoxServices.to;
 
   Future<String?> auth() async {
-    final scopes = [
-      'playlist-read-private',
-      'playlist-read-collaborative',
-      'playlist-modify-private',
-      'playlist-modify-public',
-      'user-read-recently-played',
-      'user-library-modify',
-      'user-library-read',
-    ];
+    const scopes =
+        'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read';
     try {
       final data = {
         'response_type': 'code',
         'client_id': dotenv.get('CLIENT_ID'),
         'redirect_uri': dotenv.get('REDIRECT'),
-        'state': Utils.generateString(16),
         'scope': scopes,
       };
       final url = Uri.https('accounts.spotify.com', '/authorize', data);
@@ -58,6 +49,7 @@ class AuthRepo {
     final response = await dio.post(AppConstants.token,
         options: Options(headers: header), data: data, client: dio);
     ApiResponse.verify(response, onSuccess: (json) {
+      dprint('token: ${json['access_token']}');
       _box.write(BoxKeys.refreshToken, json['refresh_token']);
       _box.write(BoxKeys.token, json['access_token']);
     }, onError: (errorMap) {
@@ -78,6 +70,7 @@ class AuthRepo {
     final response = await dio.post(AppConstants.token,
         data: data, client: dio, options: Options(headers: header));
     ApiResponse.verify(response, onSuccess: (json) {
+      dprint('refresh: ${json['access_token']}');
       _box.write(BoxKeys.token, json['access_token']);
     }, onError: (errorMap) {
       logPrint('token: $errorMap');

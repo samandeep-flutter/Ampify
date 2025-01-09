@@ -6,14 +6,9 @@ import 'package:ampify/presentation/widgets/top_widgets.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 
-class ListeningHistory extends StatefulWidget {
+class ListeningHistory extends StatelessWidget {
   const ListeningHistory({super.key});
 
-  @override
-  State<ListeningHistory> createState() => _ListeningHistoryState();
-}
-
-class _ListeningHistoryState extends State<ListeningHistory> {
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;

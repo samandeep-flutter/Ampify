@@ -1,16 +1,12 @@
 import 'dart:async';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:ampify/data/data_models/tracks_model.dart';
 import 'package:ampify/data/repository/music_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/getit_instance.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart' hide PlayerState;
-import 'package:palette_generator/palette_generator.dart';
 import 'player_events.dart';
 
 class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
@@ -136,22 +132,6 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     emit(state.copyWith(playerState: MusicState.pause));
   }
 
-  Future<TrackDetails> _getTrackDetails(Track track) async {
-    final image = track.album?.images?.first.url;
-    final palete = await PaletteGenerator.fromImageProvider(
-        NetworkImage(image ?? ''),
-        size: const Size(200, 200));
-    final color = palete.dominantColor?.color;
-
-    return TrackDetails(
-        id: track.id,
-        uri: track.uri,
-        image: image,
-        title: track.name,
-        bgColor: color,
-        subtitle: track.artists?.asString);
-  }
-
   _onQueueAdded(PlayerQueueAdded event, Emitter<PlayerState> emit) async {
     try {
       // final track = event.track;
@@ -167,7 +147,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   _onTrackChange(PlayerTrackChanged event, Emitter<PlayerState> emit) async {
     _player.pause();
-    final track = await _getTrackDetails(event.track);
+    final track = await Utils.getTrackDetails(event.track);
     emit(state.copyWith(
         track: track,
         length: 0,

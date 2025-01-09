@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:io';
-
 import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/repository/auth_repo.dart';
+import 'package:ampify/data/repository/library_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/box_services.dart';
@@ -47,6 +48,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthFinished>(_onFinish);
   }
   final AuthRepo _authRepo = getIt();
+  final LibraryRepo _libRepo = getIt();
+  final _box = BoxServices.to;
 
   _onInit(AuthInitial event, Emitter<AuthState> emit) async {
     emit(state.copyWith(isLoading: true));
@@ -69,10 +72,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void onSuccess(BuildContext context, AuthState state) {
-    if (state.isSuccess) context.goNamed(AppRoutes.rootView);
+    if (state.isSuccess) context.goNamed(AppRoutes.homeView);
   }
 
   _onFinish(AuthFinished event, Emitter<AuthState> emit) async {
-    emit(state.copyWith(isLoading: false, isSuccess: true));
+    final completer = Completer<bool>();
+    await _libRepo.getProfile(onSuccess: (json) async {
+      await _box.write(BoxKeys.profile, json);
+      completer.complete(true);
+      emit(state.copyWith(isLoading: false, isSuccess: true));
+    }, onError: (json) {
+      emit(state.copyWith(isLoading: false));
+      showToast(StringRes.somethingWrong);
+      logPrint('profile: $json');
+    });
+    await completer.future;
   }
 }

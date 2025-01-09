@@ -1,10 +1,11 @@
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:ampify/data/repository/library_repo.dart';
 import 'package:ampify/data/repository/search_repo.dart';
 import 'package:ampify/services/auth_services.dart';
 import 'package:app_links/app_links.dart';
 import 'package:dart_ytmusic_api/yt_music.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../data/repository/auth_repo.dart';
 import '../data/data_provider/dio_client.dart';
 import '../data/repository/music_repo.dart';
@@ -22,6 +23,7 @@ Future<void> getInit() async {
       () => DioClient(dio: getIt(), interceptor: getIt()));
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepo(dio: getIt()));
   getIt.registerLazySingleton<SearchRepo>(() => SearchRepo(dio: getIt()));
+  getIt.registerLazySingleton<LibraryRepo>(() => LibraryRepo(dio: getIt()));
   getIt.registerLazySingleton(
       () => MusicRepo(ytMusic: getIt(), ytExplode: getIt(), dio: getIt()));
 }

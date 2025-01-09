@@ -49,7 +49,7 @@ class PlayerCompact extends StatelessWidget {
 
         return AnimatedSlide(
           duration: duration,
-          offset: Offset(0.0, state.showPlayer ?? false ? 0.02 : 1),
+          offset: Offset(0.0, state.showPlayer ?? false ? 0.07 : 1),
           child: Container(
             height: playerHeight,
             width: double.infinity,

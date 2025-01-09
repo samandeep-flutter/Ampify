@@ -59,6 +59,7 @@ dependencies:
   fluttertoast: ^8.2.8
   cached_network_image: ^3.4.1
   flutter_dotenv: ^5.2.1
+  html_unescape: ^2.0.0
 
 
 dev_dependencies:

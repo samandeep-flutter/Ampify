@@ -5,14 +5,28 @@ sealed class StringRes {
   static const String submit = 'Submit';
   static const String success = 'Success';
   static const String home = 'Home';
+  static const String search = 'Search';
+  static const String library = 'Library';
+  static const String playlist = 'Playlist';
   static const String profile = 'Profile';
   static const String logout = 'Logout';
   static const String cancel = 'Cancel';
+  static const String close = 'Close';
+  static const String create = 'Create';
   static const String settings = 'Settings';
   static const String refresh = 'Refresh';
+  static const String queue = 'Queue';
   static const String goBack = 'go back';
+  static const String sortOrder = 'Sort Order';
+  static const String sortBy = 'Sort by';
+  static const String nowPlaying = 'Now Playing';
+  static const String nextQueue = 'Next in Queue';
+  static const String clearQueue = 'Clear Queue';
+  static const String queueTitle = 'Playing from play queue';
+  static const String myLibrary = 'My Library';
   static const String somethingWrong = 'Something went wrong';
   static const String listenHistory = 'Listening History';
+  static const String queueAdded = 'Added to you queue';
   static const String noResults = 'No results found, '
       'try using different keyword.';
 
