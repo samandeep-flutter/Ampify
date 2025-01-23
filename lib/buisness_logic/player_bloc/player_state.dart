@@ -10,6 +10,8 @@ class PlayerState extends Equatable {
   final MusicLoopMode loopMode;
   final bool? showPlayer;
   final MusicState? playerState;
+  final List<TrackDetails> queue;
+  final List<bool> queueSelected;
 
   const PlayerState({
     required this.track,
@@ -19,6 +21,8 @@ class PlayerState extends Equatable {
     required this.loopMode,
     required this.showPlayer,
     required this.playerState,
+    required this.queue,
+    required this.queueSelected,
   });
 
   const PlayerState.init()
@@ -27,6 +31,8 @@ class PlayerState extends Equatable {
         shuffle = false,
         liked = false,
         length = 0,
+        queue = const [],
+        queueSelected = const [],
         loopMode = MusicLoopMode.off,
         playerState = MusicState.loading;
 
@@ -35,8 +41,10 @@ class PlayerState extends Equatable {
     int? length,
     bool? liked,
     bool? shuffle,
-    MusicLoopMode? loopMode,
     bool? showPlayer,
+    List<TrackDetails>? queue,
+    List<bool>? queueSelected,
+    MusicLoopMode? loopMode,
     MusicState? playerState,
   }) {
     return PlayerState(
@@ -45,13 +53,24 @@ class PlayerState extends Equatable {
         liked: liked ?? this.liked,
         shuffle: shuffle ?? this.shuffle,
         loopMode: loopMode ?? this.loopMode,
+        queue: queue ?? this.queue,
+        queueSelected: queueSelected ?? this.queueSelected,
         showPlayer: showPlayer ?? this.showPlayer,
         playerState: playerState ?? this.playerState);
   }
 
   @override
-  List<Object?> get props =>
-      [track, length, shuffle, loopMode, liked, showPlayer, playerState];
+  List<Object?> get props => [
+        track,
+        length,
+        shuffle,
+        loopMode,
+        liked,
+        queue,
+        queueSelected,
+        showPlayer,
+        playerState
+      ];
 }
 
 class TrackDetails extends Equatable {
@@ -105,11 +124,11 @@ enum MusicState { playing, pause, loading }
 
 enum MusicLoopMode {
   off(icon: CupertinoIcons.repeat),
-  all(color: Colors.white, icon: CupertinoIcons.repeat),
-  once(color: Colors.white, icon: CupertinoIcons.repeat_1);
+  all(icon: CupertinoIcons.repeat, color: Colors.white),
+  once(icon: CupertinoIcons.repeat_1, color: Colors.white);
 
   final Color? color;
   final IconData icon;
 
-  const MusicLoopMode({this.color, required this.icon});
+  const MusicLoopMode({required this.icon, this.color});
 }

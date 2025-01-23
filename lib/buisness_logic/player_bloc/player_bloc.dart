@@ -7,18 +7,26 @@ import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart' hide PlayerState;
+import 'package:rxdart/transformers.dart';
 import 'player_events.dart';
+
+EventTransformer<T> _debounce<T>(Duration duration) {
+  return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
+}
 
 class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   PlayerBloc() : super(const PlayerState.init()) {
     on<PlayerInitial>(_onInit);
     on<PlayerStatusChanged>(_onStateChanged);
-    on<PlayerTrackChanged>(_onTrackChange);
-    on<PlayerQueueAdded>(_onQueueAdded);
-    on<PlayerTrackEnded>(_onTrackEnd);
     on<PlayerTrackLiked>(_onTrackLiked);
     on<PlayerShuffleToggle>(_shuffleToggle);
-    on<PlayerRepeatToggle>(_repeatToggle);
+    // on<PlayerRepeatToggle>(_repeatToggle);
+    on<PlayerQueueAdded>(_onQueueAdded, transformer: _debounce(duration));
+    on<PlayerNextTrack>(_onNextTrack);
+    on<PlayerPreTrack>(_onPreTrack);
+    on<QueueItemSelected>(_onItemSelected);
+    on<PlayerQueueCleared>(_onQueueCleared);
+    on<PlayerTrackChanged>(_onTrackChange);
   }
 
   @override
@@ -27,6 +35,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     return super.close();
   }
 
+  final duration = const Duration(milliseconds: 500);
   final _player = AudioPlayer();
   final MusicRepo _musicRepo = getIt();
   int? get current => _player.currentIndex;
@@ -38,20 +47,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     await _player.setAudioSource(queue);
   }
 
-  _onStateChanged(PlayerStatusChanged event, Emitter<PlayerState> emit) async {
-    switch (state.playerState) {
-      case MusicState.pause:
-        emit(state.copyWith(playerState: MusicState.playing));
-        await _player.play();
-        break;
-      case MusicState.playing:
-        emit(state.copyWith(playerState: MusicState.pause));
-        await _player.pause();
-        break;
-      default:
-        return;
-    }
-  }
+  void onSelected(int index) => add(QueueItemSelected(index));
 
   void onSliderChange(double value) async {
     final pos = Duration(seconds: value.round());
@@ -66,9 +62,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   void onRepeat() => add(PlayerRepeatToggle());
 
+  void clearQueue() => add(PlayerQueueCleared());
+
   void onPrevious() {}
 
   void onNext() {}
+
+  void onTrackEnded() => add(PlayerNextTrack());
 
   _createPosition(Duration? duration) {
     positionStream = _player.createPositionStream(
@@ -98,6 +98,21 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
+  _onStateChanged(PlayerStatusChanged event, Emitter<PlayerState> emit) async {
+    switch (state.playerState) {
+      case MusicState.pause:
+        emit(state.copyWith(playerState: MusicState.playing));
+        await _player.play();
+        break;
+      case MusicState.playing:
+        emit(state.copyWith(playerState: MusicState.pause));
+        await _player.pause();
+        break;
+      default:
+        return;
+    }
+  }
+
   _onTrackLiked(PlayerTrackLiked event, Emitter<PlayerState> emit) {
     // TODO: add song liked logic.
     emit(state.copyWith(liked: !state.liked));
@@ -105,7 +120,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   _shuffleToggle(PlayerShuffleToggle event, Emitter<PlayerState> emit) async {
     emit(state.copyWith(shuffle: !state.shuffle));
-    await _player.setShuffleModeEnabled(!state.shuffle);
+    // await _player.setShuffleModeEnabled(!state.shuffle);
   }
 
   _repeatToggle(PlayerRepeatToggle event, Emitter<PlayerState> emit) async {
@@ -126,23 +141,75 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  _onTrackEnd(PlayerTrackEnded event, Emitter<PlayerState> emit) {
-    if (state.loopMode != MusicLoopMode.off) return;
-    _reset();
-    emit(state.copyWith(playerState: MusicState.pause));
-  }
-
   _onQueueAdded(PlayerQueueAdded event, Emitter<PlayerState> emit) async {
     try {
-      // final track = event.track;
-      // final artist = track.subtitle?.split(',').first;
-      // final uri = await _musicRepo.searchSongs('${track.title} $artist');
-      // final source = AudioSource.uri(uri);
-      // await queue.add(source);
-      // _createPosition(duration);
+      showToast(StringRes.queueAdded);
+      final track = await Utils.getTrackDetails(event.track);
+      final selected = List.generate(state.queue.length + 1, (_) => false);
+      emit(state
+          .copyWith(queue: [...state.queue, track], queueSelected: selected));
+      if (_player.hasNext) return;
+      logPrint('song added instaneously...');
+      final artist = track.subtitle?.split(',').first;
+      final uri = await _musicRepo.searchSongs('${track.title} $artist');
+      final source = AudioSource.uri(uri!);
+      await queue.add(source);
     } catch (e) {
-      logPrint('Queue: $e');
+      logPrint('Queue instaneous: $e');
     }
+  }
+
+  _onNextTrack(PlayerNextTrack event, Emitter<PlayerState> emit) async {
+    if (!_player.hasNext) {
+      logPrint('empty queue...');
+      emit(state.copyWith(
+        playerState: MusicState.loading,
+        showPlayer: false,
+      ));
+      return;
+    }
+    TrackDetails track = state.queue.first;
+    logPrint('next from queue: ${track.title}');
+    final newQueue = state.queue..skip(1);
+    emit(state.copyWith(
+      track: track,
+      queue: newQueue,
+      playerState: MusicState.loading,
+    ));
+    try {
+      final duration = await _getDuration();
+      _createPosition(duration);
+      emit(state.copyWith(playerState: MusicState.playing));
+    } catch (e) {
+      emit(state.copyWith(playerState: MusicState.pause));
+      logPrint('Duration: $e');
+    }
+
+    if (state.queue.isEmpty) return;
+    track = state.queue.first;
+    final artist = track.subtitle?.split(',').first;
+    try {
+      final uri = await _musicRepo.searchSongs('${track.title} $artist');
+      final source = AudioSource.uri(uri!);
+      await queue.add(source);
+    } catch (e) {
+      logPrint('Queue next: $e');
+    }
+  }
+
+  _onPreTrack(PlayerPreTrack event, Emitter<PlayerState> emit) async {
+    // TODO: previous song logic.
+  }
+
+  void _onItemSelected(QueueItemSelected event, Emitter<PlayerState> emit) {
+    List<bool> selected = state.queueSelected;
+    selected[event.index] = !selected[event.index];
+    emit(state.copyWith(queueSelected: selected));
+  }
+
+  void _onQueueCleared(PlayerQueueCleared event, Emitter<PlayerState> emit) {
+    queue.clear();
+    emit(state.copyWith(queue: [], queueSelected: []));
   }
 
   _onTrackChange(PlayerTrackChanged event, Emitter<PlayerState> emit) async {
@@ -155,9 +222,10 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         playerState: MusicState.loading));
     try {
       await queue.clear();
+      emit(state.copyWith(queue: []));
       final artist = track.subtitle?.split(',').first;
       final uri = await _musicRepo.searchSongs('${track.title} $artist');
-      final source = AudioSource.uri(uri);
+      final source = AudioSource.uri(uri!);
       await queue.add(source);
       final duration = await _getDuration();
       _createPosition(duration);

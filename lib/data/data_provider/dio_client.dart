@@ -38,6 +38,8 @@ class DioClient {
       return ApiResponse.withSuccess(response);
     } catch (_) {
       await getIt<AuthRepo>().refreshToken();
+      String token = BoxServices.to.read(BoxKeys.token);
+      headers.update('Authorization', (_) => 'Bearer $token');
       try {
         Response response = await client._get(url,
             options: options ?? Options(headers: headers));
@@ -55,12 +57,15 @@ class DioClient {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization': 'Bearer $token'
     };
+
     try {
       Response response = await client._post(url,
           data: data, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
     } catch (_) {
       await getIt<AuthRepo>().refreshToken();
+      String token = BoxServices.to.read(BoxKeys.token);
+      headers.update('Authorization', (_) => 'Bearer $token');
       try {
         Response response = await client._post(url,
             data: data, options: options ?? Options(headers: headers));

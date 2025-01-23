@@ -105,8 +105,11 @@ class LoadingIcon extends StatelessWidget {
               height: loaderSize,
               width: loaderSize,
               alignment: Alignment.center,
-              child: const SizedBox.square(
-                  dimension: 24, child: CircularProgressIndicator()),
+              child: SizedBox.square(
+                  dimension: 24,
+                  child: CircularProgressIndicator(
+                    color: scheme.primary,
+                  )),
             )
           : icon,
     );

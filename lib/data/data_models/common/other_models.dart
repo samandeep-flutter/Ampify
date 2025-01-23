@@ -52,3 +52,19 @@ class OwnerModel extends Equatable {
   @override
   List<Object?> get props => [displayName, href, id, type, uri];
 }
+
+class Copyrights extends Equatable {
+  final String? text;
+  final String? type;
+
+  const Copyrights({this.text, this.type});
+
+  factory Copyrights.fromJson(Map<String, dynamic> json) {
+    return Copyrights(text: json['text'], type: json['type']);
+  }
+
+  Map<String, dynamic> toJson() => {'text': text, 'type': type};
+
+  @override
+  List<Object?> get props => [text, type];
+}

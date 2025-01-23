@@ -1,6 +1,6 @@
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:equatable/equatable.dart';
-import 'images_models.dart';
+import 'other_models.dart';
 
 class Playlist extends Equatable {
   final bool? collaborative;
@@ -12,7 +12,7 @@ class Playlist extends Equatable {
   final OwnerModel? owner;
   final bool? public;
   final String? snapshotId;
-  final List<TrackItems>? tracks;
+  final List<PLitemDetails>? tracks;
   final String? type;
   final String? uri;
 
@@ -43,9 +43,10 @@ class Playlist extends Equatable {
       owner: json['owner'] != null ? OwnerModel.fromJson(json['owner']) : null,
       public: json['public'],
       snapshotId: json['snapshot_id'],
-      tracks: (json['tracks']?['items'] as List?)
-          ?.map((e) => TrackItems.fromJson(e))
-          .toList(),
+      tracks: List<PLitemDetails>.from(json['tracks']?['items']?.map((e) {
+            return PLitemDetails.fromJson(e);
+          }) ??
+          []),
       type: json['type'],
       uri: json['uri'],
     );
@@ -83,84 +84,62 @@ class Playlist extends Equatable {
       ];
 }
 
-// class TracksDetails {
-//   String? href;
-//   List<TrackItems>? items;
-//   int? limit;
-//   dynamic next;
-//   int? offset;
-//   dynamic previous;
-//   int? total;
+class PLtracksItems extends Equatable {
+  final String? href;
+  final List<PLitemDetails>? track;
+  final int? limit;
+  final int? offset;
+  final int? total;
 
-//   TracksDetails(
-//       {this.href,
-//       this.items,
-//       this.limit,
-//       this.next,
-//       this.offset,
-//       this.previous,
-//       this.total});
+  const PLtracksItems(
+      {this.href, this.track, this.limit, this.offset, this.total});
 
-//   TracksDetails.fromJson(Map<String, dynamic> json) {
-//     href = json['href'];
-//     if (json['items'] != null) {
-//       items = <TrackItems>[];
-//       json['items'].forEach((v) {
-//         items!.add(TrackItems.fromJson(v));
-//       });
-//     }
-//     limit = json['limit'];
-//     next = json['next'];
-//     offset = json['offset'];
-//     previous = json['previous'];
-//     total = json['total'];
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data['href'] = href;
-//     if (items != null) {
-//       data['items'] = items!.map((v) => v.toJson()).toList();
-//     }
-//     data['limit'] = limit;
-//     data['next'] = next;
-//     data['offset'] = offset;
-//     data['previous'] = previous;
-//     data['total'] = total;
-//     return data;
-//   }
-// }
-
-class TrackItems {
-  String? addedAt;
-  String? addedBy;
-  bool? isLocal;
-  dynamic primaryColor;
-  Track? track;
-
-  TrackItems({
-    this.addedAt,
-    this.addedBy,
-    this.isLocal,
-    this.primaryColor,
-    this.track,
-  });
-
-  TrackItems.fromJson(Map<String, dynamic> json) {
-    addedAt = json['added_at'];
-    addedBy = json['added_by']?['id'];
-    isLocal = json['is_local'];
-    primaryColor = json['primary_color'];
-    track = json['track'] != null ? Track.fromJson(json['track']) : null;
+  factory PLtracksItems.fromJson(Map<String, dynamic> json) {
+    return PLtracksItems(
+        href: json['href'],
+        track: List<PLitemDetails>.from(
+            json['items']?.map((e) => PLitemDetails.fromJson(e)) ?? []),
+        limit: json['limit'],
+        offset: json['offset'],
+        total: json['total']);
   }
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['added_at'] = addedAt;
-    data['added_by'] = addedBy;
-    data['is_local'] = isLocal;
-    data['primary_color'] = primaryColor;
-    data['track'] = track?.toJson();
-    return data;
+  Map<String, dynamic> toJson() => {
+        'href': href,
+        'items': track?.map((e) => e.toJson()).toList(),
+        'limit': limit,
+        'offset': offset,
+        'total': total,
+      };
+
+  @override
+  List<Object?> get props => [href, track, limit, offset, total];
+}
+
+class PLitemDetails extends Equatable {
+  final String? addedAt;
+  final String? addedBy;
+  final bool? isLocal;
+  final Track? track;
+
+  const PLitemDetails({this.addedAt, this.addedBy, this.isLocal, this.track});
+
+  factory PLitemDetails.fromJson(Map<String, dynamic> json) {
+    return PLitemDetails(
+      addedAt: json['added_at'],
+      addedBy: json['added_by']?['id'],
+      isLocal: json['is_local'],
+      track: json['track'] != null ? Track.fromJson(json['track']) : null,
+    );
   }
+
+  Map<String, dynamic> toJson() => {
+        'added_at': addedAt,
+        'added_by': addedBy,
+        'is_local': isLocal,
+        'track': track?.toJson(),
+      };
+
+  @override
+  List<Object?> get props => [addedAt, addedBy, isLocal, track];
 }

@@ -10,11 +10,8 @@ class Track extends Equatable {
   final bool? explicit;
   final String? href;
   final String? id;
-  final bool? isLocal;
-  final bool? isPlayable;
   final String? name;
   final int? popularity;
-  final String? previewUrl;
   final int? trackNumber;
   final String? type;
   final String? uri;
@@ -27,11 +24,8 @@ class Track extends Equatable {
       this.explicit,
       this.href,
       this.id,
-      this.isLocal,
-      this.isPlayable,
       this.name,
       this.popularity,
-      this.previewUrl,
       this.trackNumber,
       this.type,
       this.uri});
@@ -46,11 +40,8 @@ class Track extends Equatable {
       explicit: json['explicit'],
       href: json['href'],
       id: json['id'],
-      isLocal: json['is_local'],
-      isPlayable: json['is_playable'],
       name: json['name'],
       popularity: json['popularity'],
-      previewUrl: json['preview_url'],
       trackNumber: json['track_number'],
       type: json['type'],
       uri: json['uri'],
@@ -65,11 +56,8 @@ class Track extends Equatable {
         'explicit': explicit,
         'href': href,
         'id': id,
-        'is_local': isLocal,
-        'is_playable': isPlayable,
         'name': name,
         'popularity': popularity,
-        'preview_url': previewUrl,
         'track_number': trackNumber,
         'type': type,
         'uri': uri,
@@ -84,11 +72,8 @@ class Track extends Equatable {
         explicit,
         href,
         id,
-        isLocal,
-        isPlayable,
         name,
         popularity,
-        previewUrl,
         trackNumber,
         type,
         uri,

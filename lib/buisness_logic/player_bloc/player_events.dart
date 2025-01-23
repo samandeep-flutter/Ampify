@@ -17,17 +17,36 @@ class PlayerShuffleToggle extends PlayerEvent {}
 
 class PlayerRepeatToggle extends PlayerEvent {}
 
-class PlayerTrackEnded extends PlayerEvent {}
-
 class PlayerInitial extends PlayerEvent {}
 
 class PlayerQueueAdded extends PlayerEvent {
-  final TrackDetails track;
+  final Track track;
 
   const PlayerQueueAdded(this.track);
 
   @override
   List<Object?> get props => [track, super.props];
+}
+
+class QueueItemSelected extends PlayerEvent {
+  final int index;
+  const QueueItemSelected(this.index);
+
+  @override
+  List<Object?> get props => [index, super.props];
+}
+
+class PlayerQueueCleared extends PlayerEvent {}
+
+class PlayerNextTrack extends PlayerEvent {}
+
+class PlayerPreTrack extends PlayerEvent {
+  final List<TrackDetails> items;
+
+  const PlayerPreTrack(this.items);
+
+  @override
+  List<Object?> get props => [items, super.props];
 }
 
 class PlayerTrackChanged extends PlayerEvent {

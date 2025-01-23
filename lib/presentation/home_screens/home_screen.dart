@@ -6,7 +6,6 @@ import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../buisness_logic/home_bloc/listn_history_bloc.dart';
 import '../widgets/base_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -38,14 +37,11 @@ class HomeScreen extends StatelessWidget {
                   ],
                 )),
             actions: [
-              BlocProvider(
-                create: (_) => ListnHistoryBloc(),
-                child: IconButton(
-                  onPressed: () => bloc.toHistory(context),
-                  icon: Image.asset(
-                    ImageRes.history,
-                    height: Dimens.sizeLarge,
-                  ),
+              IconButton(
+                onPressed: () => bloc.toHistory(context),
+                icon: Image.asset(
+                  ImageRes.history,
+                  height: Dimens.sizeLarge,
                 ),
               ),
               const SizedBox(width: Dimens.sizeDefault),

@@ -5,7 +5,6 @@ import 'package:ampify/presentation/widgets/loading_widgets.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/services/extension_services.dart';
 import '../../../buisness_logic/player_bloc/player_bloc.dart';
-import '../../../buisness_logic/player_bloc/player_events.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
 import 'player_screen.dart';
@@ -25,10 +24,10 @@ class PlayerCompact extends StatelessWidget {
 
     return BlocConsumer<PlayerBloc, PlayerState>(
       buildWhen: (pr, cr) {
-        final id = pr.track.id != cr.track.id;
+        final track = pr.track != cr.track;
         final isShow = pr.showPlayer != cr.showPlayer;
         final isStateChange = pr.playerState != cr.playerState;
-        return id || isShow || isStateChange;
+        return track || isShow || isStateChange;
       },
       listener: (context, state) {
         if (state.playerState == MusicState.loading) {
@@ -49,7 +48,7 @@ class PlayerCompact extends StatelessWidget {
 
         return AnimatedSlide(
           duration: duration,
-          offset: Offset(0.0, state.showPlayer ?? false ? 0.07 : 1),
+          offset: Offset(0.0, state.showPlayer ?? false ? 0.1 : 1),
           child: Container(
             height: playerHeight,
             width: double.infinity,
@@ -136,6 +135,14 @@ class PlayerCompact extends StatelessWidget {
                     ],
                   ),
                 ),
+                BlocListener<PlayerSliderBloc, PlayerSliderState>(
+                  listenWhen: (pr, cr) {
+                    final ended = cr.current == state.length;
+                    return ended && state.length != 0;
+                  },
+                  listener: (_, slider) => bloc.onTrackEnded(),
+                  child: const SizedBox.shrink(),
+                ),
                 const SizedBox(height: Dimens.sizeExtraSmall),
                 LayoutBuilder(builder: (context, constraints) {
                   return ClipRRect(
@@ -145,13 +152,8 @@ class PlayerCompact extends StatelessWidget {
                       height: Dimens.sizeExtraSmall - 1,
                       alignment: AlignmentDirectional.centerStart,
                       color: Color.alphaBlend(bgColor, Colors.grey[100]!),
-                      child: BlocConsumer<PlayerSliderBloc, PlayerSliderState>(
-                          listener: (context, slider) {
-                        if (slider.current == state.length &&
-                            state.length != 0) {
-                          bloc.add(PlayerTrackEnded());
-                        }
-                      }, builder: (context, slider) {
+                      child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
+                          builder: (context, slider) {
                         Duration duration = Duration.zero;
                         double width = 0;
                         if (state.length != 0) {

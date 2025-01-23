@@ -13,6 +13,7 @@ class AuthServices {
 
   final box = BoxServices.to;
   final AuthRepo auth = getIt();
+  // final navigator = GlobalKey<NavigatorState>();
   late String minVersion;
 
   Future<AuthServices> init() async {
@@ -28,9 +29,6 @@ class AuthServices {
         final AuthRepo authRepo = getIt();
         final code = uri.queryParameters['code'];
         authRepo.getToken(code!);
-
-        break;
-      default:
         break;
     }
   }

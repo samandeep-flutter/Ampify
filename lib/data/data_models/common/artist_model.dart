@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'images_models.dart';
+import 'other_models.dart';
 
 class Artist extends Equatable {
   final int? followers;

@@ -40,7 +40,7 @@ class SongTileShimmer extends StatelessWidget {
       child: Row(
         children: [
           SizedBox.square(
-            dimension: iconSize ?? 50,
+            dimension: iconSize ?? 40,
             child: Shimmer.box,
           ),
           const SizedBox(width: Dimens.sizeDefault),
@@ -48,10 +48,10 @@ class SongTileShimmer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(height: 15, width: 200, child: Shimmer.box),
+              SizedBox(height: 12, width: 200, child: Shimmer.box),
               const SizedBox(height: Dimens.sizeMedSmall),
               SizedBox(
-                  height: 15, width: context.width * .7, child: Shimmer.box),
+                  height: 8, width: context.width * .7, child: Shimmer.box),
             ],
           )
         ],
@@ -60,19 +60,27 @@ class SongTileShimmer extends StatelessWidget {
   }
 }
 
-class PlaylistShimmer extends StatelessWidget {
+class CollectionShimmer extends StatelessWidget {
+  final bool isLikedSongs;
   final double? imageSize;
-  const PlaylistShimmer({super.key, this.imageSize});
+  final int? itemCount;
+  const CollectionShimmer({
+    super.key,
+    this.imageSize,
+    this.itemCount,
+    this.isLikedSongs = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         AppBar(backgroundColor: Colors.white),
-        SizedBox.square(
-          dimension: imageSize ?? context.height * .3,
-          child: Shimmer.box,
-        ),
+        if (!isLikedSongs)
+          SizedBox.square(
+            dimension: imageSize ?? context.height * .3,
+            child: Shimmer.box,
+          ),
         Container(
           margin: const EdgeInsets.all(Dimens.sizeDefault),
           child: Column(
@@ -84,16 +92,21 @@ class PlaylistShimmer extends StatelessWidget {
                 child: Shimmer.box,
               ),
               const SizedBox(height: Dimens.sizeSmall),
-              SizedBox(height: 15, width: double.infinity, child: Shimmer.box),
-              const SizedBox(height: Dimens.sizeSmall),
-              SizedBox(height: 15, width: double.infinity, child: Shimmer.box),
-              const SizedBox(height: Dimens.sizeSmall),
+              if (!isLikedSongs) ...[
+                SizedBox(
+                    height: 15, width: double.infinity, child: Shimmer.box),
+                const SizedBox(height: Dimens.sizeSmall),
+                SizedBox(
+                    height: 15, width: double.infinity, child: Shimmer.box),
+                const SizedBox(height: Dimens.sizeSmall),
+              ],
               Row(
                 children: [
-                  SizedBox(
-                      height: 30,
-                      width: context.width * .4,
-                      child: Shimmer.avatar),
+                  if (!isLikedSongs)
+                    SizedBox(
+                        height: 30,
+                        width: context.width * .4,
+                        child: Shimmer.avatar),
                   const SizedBox(width: Dimens.sizeSmall),
                   SizedBox(
                       height: 15,
@@ -106,18 +119,20 @@ class PlaylistShimmer extends StatelessWidget {
         ),
         Row(
           children: [
-            const SizedBox(width: Dimens.sizeDefault),
-            const Icon(
-              Icons.add_circle_outline,
-              size: Dimens.sizeMidLarge + 4,
-              color: ColorRes.shimmer,
-            ),
-            const SizedBox(width: Dimens.sizeDefault),
-            const Icon(
-              Icons.more_vert,
-              size: Dimens.sizeMidLarge,
-              color: ColorRes.shimmer,
-            ),
+            if (!isLikedSongs) ...[
+              const SizedBox(width: Dimens.sizeDefault),
+              const Icon(
+                Icons.add_circle_outline,
+                size: Dimens.sizeMidLarge + 4,
+                color: ColorRes.shimmer,
+              ),
+              const SizedBox(width: Dimens.sizeDefault),
+              const Icon(
+                Icons.more_vert,
+                size: Dimens.sizeMidLarge,
+                color: ColorRes.shimmer,
+              ),
+            ],
             const Spacer(),
             SizedBox.square(dimension: 50, child: Shimmer.avatar),
             const SizedBox(width: Dimens.sizeDefault),
@@ -125,7 +140,7 @@ class PlaylistShimmer extends StatelessWidget {
         ),
         Expanded(
           child: ListView.builder(
-              itemCount: 5,
+              itemCount: itemCount ?? 5,
               padding: const EdgeInsets.only(top: Dimens.sizeDefault),
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (_, index) {

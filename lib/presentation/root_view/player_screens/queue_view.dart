@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:ampify/buisness_logic/player_bloc/queue_bloc.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/data/utils/string.dart';
@@ -8,6 +7,7 @@ import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_bloc.dart';
+import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
 import '../../widgets/loading_widgets.dart';
 import '../../widgets/my_cached_image.dart';
@@ -17,8 +17,7 @@ class QueueView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<QueueBloc>();
-    final playerBloc = context.read<PlayerBloc>();
+    final bloc = context.read<PlayerBloc>();
     final scheme = context.scheme;
     return Container(
       color: scheme.background,
@@ -131,7 +130,7 @@ class QueueView extends StatelessWidget {
               },
             ),
             Expanded(
-              child: BlocBuilder<QueueBloc, QueueState>(
+              child: BlocBuilder<PlayerBloc, PlayerState>(
                 buildWhen: (pr, cr) => pr.queue != cr.queue,
                 builder: (context, state) {
                   if (state.queue.isEmpty) return const SizedBox.shrink();
@@ -149,7 +148,7 @@ class QueueView extends StatelessWidget {
                           ),
                           const Spacer(),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: bloc.clearQueue,
                             style: TextButton.styleFrom(
                                 foregroundColor: scheme.disabled,
                                 textStyle: TextStyle(
@@ -166,14 +165,14 @@ class QueueView extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final item = state.queue[index];
                             return ListTile(
-                              leading: BlocBuilder<QueueBloc, QueueState>(
+                              leading: BlocBuilder<PlayerBloc, PlayerState>(
                                 buildWhen: (pr, cr) {
-                                  return pr.selected[index] !=
-                                      cr.selected[index];
+                                  return pr.queueSelected[index] !=
+                                      cr.queueSelected[index];
                                 },
                                 builder: (context, state) {
                                   return Checkbox(
-                                    value: state.selected[index],
+                                    value: state.queueSelected[index],
                                     onChanged: (_) => bloc.onSelected(index),
                                   );
                                 },
@@ -217,46 +216,84 @@ class QueueView extends StatelessWidget {
                 ],
               ),
               margin: EdgeInsets.zero,
-              padding: const EdgeInsets.symmetric(vertical: Dimens.sizeSmall),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              padding: const EdgeInsets.only(bottom: Dimens.sizeSmall),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(width: Dimens.sizeDefault),
-                  IconButton(
-                    onPressed: playerBloc.onPrevious,
-                    color: scheme.textColor,
-                    iconSize: Dimens.sizeMidLarge + 4,
-                    icon: const Icon(Icons.skip_previous_rounded),
-                  ),
-                  const SizedBox(width: Dimens.sizeDefault),
                   BlocBuilder<PlayerBloc, PlayerState>(
-                    buildWhen: (pr, cr) {
-                      return pr.playerState != cr.playerState;
-                    },
-                    builder: (context, state) {
-                      return LoadingIcon(
-                        onPressed: playerBloc.onPlayPause,
-                        iconSize: Dimens.sizeMidLarge,
-                        loaderSize: Dimens.sizeMidLarge,
-                        loading: state.playerState == MusicState.loading,
-                        isSelected: state.playerState == MusicState.playing,
-                        selectedIcon: const Icon(Icons.pause),
-                        style: IconButton.styleFrom(
-                            backgroundColor: scheme.textColor,
-                            foregroundColor: scheme.surface,
-                            splashFactory: NoSplash.splashFactory),
-                        icon: const Icon(Icons.play_arrow),
-                      );
-                    },
+                      buildWhen: (pr, cr) => pr.track != cr.track,
+                      builder: (context, state) {
+                        return LayoutBuilder(builder: (context, constraints) {
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(2),
+                            child: Container(
+                              width: constraints.maxWidth,
+                              height: Dimens.sizeExtraSmall,
+                              alignment: AlignmentDirectional.centerStart,
+                              color: Colors.grey[400],
+                              child: BlocBuilder<PlayerSliderBloc,
+                                      PlayerSliderState>(
+                                  builder: (context, slider) {
+                                Duration duration = Duration.zero;
+                                double width = 0;
+                                if (state.length != 0) {
+                                  duration = const Duration(seconds: 1);
+                                  width =
+                                      (slider.current / (state.length ?? 0)) *
+                                          constraints.maxWidth;
+                                }
+                                return AnimatedContainer(
+                                  duration: duration,
+                                  color: scheme.primary,
+                                  width: width,
+                                );
+                              }),
+                            ),
+                          );
+                        });
+                      }),
+                  const SizedBox(height: Dimens.sizeDefault),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(width: Dimens.sizeDefault),
+                      IconButton(
+                        onPressed: bloc.onPrevious,
+                        color: scheme.textColor,
+                        iconSize: Dimens.sizeMidLarge + 4,
+                        icon: const Icon(Icons.skip_previous_rounded),
+                      ),
+                      const SizedBox(width: Dimens.sizeDefault),
+                      BlocBuilder<PlayerBloc, PlayerState>(
+                        buildWhen: (pr, cr) {
+                          return pr.playerState != cr.playerState;
+                        },
+                        builder: (context, state) {
+                          return LoadingIcon(
+                            onPressed: bloc.onPlayPause,
+                            iconSize: Dimens.sizeMidLarge,
+                            loaderSize: Dimens.sizeMidLarge,
+                            loading: state.playerState == MusicState.loading,
+                            isSelected: state.playerState == MusicState.playing,
+                            selectedIcon: const Icon(Icons.pause),
+                            style: IconButton.styleFrom(
+                                backgroundColor: scheme.textColor,
+                                foregroundColor: scheme.surface,
+                                splashFactory: NoSplash.splashFactory),
+                            icon: const Icon(Icons.play_arrow),
+                          );
+                        },
+                      ),
+                      const SizedBox(width: Dimens.sizeDefault),
+                      IconButton(
+                        onPressed: bloc.onNext,
+                        iconSize: Dimens.sizeMidLarge + 4,
+                        color: scheme.textColor,
+                        icon: const Icon(Icons.skip_next_rounded),
+                      ),
+                      const SizedBox(width: Dimens.sizeDefault),
+                    ],
                   ),
-                  const SizedBox(width: Dimens.sizeDefault),
-                  IconButton(
-                    onPressed: playerBloc.onNext,
-                    iconSize: Dimens.sizeMidLarge + 4,
-                    color: scheme.textColor,
-                    icon: const Icon(Icons.skip_next_rounded),
-                  ),
-                  const SizedBox(width: Dimens.sizeDefault),
                 ],
               ),
             ),

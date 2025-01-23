@@ -1,4 +1,4 @@
-import 'package:ampify/data/data_models/common/images_models.dart';
+import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:equatable/equatable.dart';
 
 class ProfileModel extends Equatable {

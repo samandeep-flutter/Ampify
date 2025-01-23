@@ -52,14 +52,10 @@ class _RootViewState extends State<RootView> {
         bottomNavigationBar: DecoratedBox(
           decoration: const BoxDecoration(
               gradient: LinearGradient(
-            colors: [
-              Colors.white10,
-              Colors.white,
-              Colors.white,
-              Colors.white,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            stops: [.8, 1],
+            colors: [Colors.white, Colors.white12],
+            begin: Alignment.bottomCenter,
+            end: Alignment.topCenter,
           )),
           child: BlocBuilder<RootBloc, RootState>(
             builder: (context, state) {

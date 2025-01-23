@@ -8,12 +8,14 @@ sealed class StringRes {
   static const String search = 'Search';
   static const String library = 'Library';
   static const String playlist = 'Playlist';
+  static const String album = 'Album';
   static const String profile = 'Profile';
   static const String logout = 'Logout';
   static const String cancel = 'Cancel';
   static const String close = 'Close';
   static const String create = 'Create';
   static const String settings = 'Settings';
+  static const String likedSongs = 'Liked Songs';
   static const String refresh = 'Refresh';
   static const String queue = 'Queue';
   static const String goBack = 'go back';

@@ -1,48 +1,37 @@
+import 'package:ampify/data/data_models/common/artist_model.dart';
+import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:equatable/equatable.dart';
-import 'common/playlist_model.dart';
 
 class LibraryModel extends Equatable {
-  final String? href;
-  final int? limit;
-  final dynamic next;
-  final int? offset;
-  final dynamic previous;
-  final int? total;
-  final List<Playlist>? items;
+  final String? id;
+  final ImagesModel? image;
+  final String? name;
+  final LibItemType? type;
+  final String? owner;
 
-  const LibraryModel(
-      {this.href,
-      this.limit,
-      this.next,
-      this.offset,
-      this.previous,
-      this.total,
-      this.items});
+  const LibraryModel({this.id, this.image, this.name, this.type, this.owner});
 
   factory LibraryModel.fromJson(Map<String, dynamic> json) {
+    String? owner;
+    if (json['type'] == 'playlist') {
+      owner = OwnerModel.fromJson(json['owner']).displayName;
+    }
+    if (json['type'] == 'album') {
+      owner = Artist.fromJson((json['artists'] as List?)?.first).name;
+    }
     return LibraryModel(
-      href: json['href'],
-      limit: json['limit'],
-      next: json['next'],
-      offset: json['offset'],
-      previous: json['previous'],
-      total: json['total'],
-      items: List<Playlist>.from(
-          json['items']?.map((e) => Playlist.fromJson(e)) ?? []),
+      id: json['id'],
+      image: (json['images'] as List?)?.isNotEmpty ?? false
+          ? ImagesModel.fromJson((json['images'] as List?)?.first)
+          : null,
+      name: json['name'],
+      type: LibItemType.values.firstWhere((e) => e.name == json['type']),
+      owner: owner ?? '',
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'href': href,
-        'limit': limit,
-        'next': next,
-        'offset': offset,
-        'previous': previous,
-        'total': total,
-        'items': items?.map((v) => v.toJson()).toList(),
-      };
-
   @override
-  List<Object?> get props =>
-      [href, limit, next, offset, previous, total, items];
+  List<Object?> get props => [id, image, name, type, owner];
 }
+
+enum LibItemType { playlist, album }

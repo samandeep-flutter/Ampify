@@ -1,4 +1,7 @@
+import 'package:ampify/data/data_models/library_model.dart';
+import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/dimens.dart';
+import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
@@ -47,6 +50,16 @@ sealed class Utils {
     } catch (_) {
       return null;
     }
+  }
+
+  static LibraryModel likedSongs({required int? count}) {
+    return LibraryModel(
+      image: null,
+      id: UniqueIds.likedSongs,
+      type: LibItemType.playlist,
+      name: StringRes.likedSongs,
+      owner: '$count songs',
+    );
   }
 
 //   static String timeFromNow(DateTime? date, DateTime now) {

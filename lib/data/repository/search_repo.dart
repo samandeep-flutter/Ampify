@@ -10,12 +10,16 @@ class SearchRepo {
     String query, {
     int? limit,
     required Function(Map<String, dynamic> map) onSuccess,
-    required Function(Map<String, dynamic> errorMap) onError,
+    Function(Map<String, dynamic> errorMap)? onError,
   }) async {
     if (query.isEmpty) return;
     final url = '${AppConstants.search}?q=$query'
         '&type=album%2Cplaylist%2Ctrack%2Cartist&limit=${limit ?? 5}';
     final response = await dio.get(url, client: dio);
-    ApiResponse.verify(response, onSuccess: onSuccess, onError: onError);
+    ApiResponse.verify(
+      response,
+      onSuccess: onSuccess,
+      onError: onError ?? (json) => logPrint('search: $json'),
+    );
   }
 }

@@ -1,12 +1,9 @@
 import 'package:ampify/config/routes/app_routes.dart';
-import 'package:ampify/data/repository/auth_repo.dart';
 import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../data/utils/string.dart';
 
 sealed class RootEvent extends Equatable {
@@ -77,7 +74,7 @@ class RootBloc extends Bloc<RootEvent, RootState> {
   }
 
   void _onInit(RootInitial event, Emitter<RootState> emit) async {
-    await getIt<AuthRepo>().refreshToken();
+    // await getIt<AuthRepo>().refreshToken();
   }
 
   void _onTap(RootTabChanged event, Emitter<RootState> emit) {

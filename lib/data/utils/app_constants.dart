@@ -10,8 +10,11 @@ sealed class AppConstants {
   static const String search = 'search';
   static const String profile = 'me';
   static const String myPlaylists = 'me/playlists';
+  static const String myAlbums = 'me/albums';
   static String userPlaylists(String id) => 'users/$id/playlists';
   static String playlistDetails(String id) => 'playlists/$id';
+  static String albumDetails(String id) => 'albums/$id';
+  static String likedSongs(int offset) => 'me/tracks?offset=$offset';
 }
 
 sealed class BoxKeys {
@@ -20,6 +23,10 @@ sealed class BoxKeys {
   static const String token = '$boxName:token';
   static const String refreshToken = '$boxName:refresh-token';
   static const String profile = '$boxName:profile';
+}
+
+sealed class UniqueIds {
+  static const String likedSongs = '00-liked-songs';
 }
 
 void logPrint(String? value, {Object? error}) {

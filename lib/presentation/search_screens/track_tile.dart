@@ -1,6 +1,7 @@
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
+import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
@@ -8,16 +9,15 @@ import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
-import '../../buisness_logic/player_bloc/queue_bloc.dart';
 
 class TrackTile extends StatelessWidget {
   final Track track;
-  const TrackTile({super.key, required this.track});
+  final LibItemType? type;
+  const TrackTile({super.key, required this.track, this.type});
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<PlayerBloc>();
-    final queue = context.read<QueueBloc>();
     final sliderBloc = context.read<PlayerSliderBloc>();
     final scheme = context.scheme;
 
@@ -27,7 +27,7 @@ class TrackTile extends StatelessWidget {
       confirmDismiss: (_) async => false,
       onUpdate: (details) {
         if (details.progress < .25) return;
-        queue.add(QueueTrackAdded(track));
+        bloc.add(PlayerQueueAdded(track));
       },
       dismissThresholds: const {DismissDirection.startToEnd: 1},
       background: Container(
@@ -50,13 +50,15 @@ class TrackTile extends StatelessWidget {
           ),
           child: Row(
             children: [
-              MyCachedImage(
-                track.album?.image?.url,
-                borderRadius: 2,
-                height: 40,
-                width: 40,
-              ),
-              const SizedBox(width: Dimens.sizeDefault),
+              if (type == LibItemType.playlist) ...[
+                MyCachedImage(
+                  track.album?.image?.url,
+                  borderRadius: 2,
+                  height: 40,
+                  width: 40,
+                ),
+                const SizedBox(width: Dimens.sizeDefault)
+              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

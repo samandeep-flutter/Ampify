@@ -1,6 +1,7 @@
 import 'package:ampify/data/data_models/common/artist_model.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:equatable/equatable.dart';
-import 'images_models.dart';
+import 'other_models.dart';
 
 class Album extends Equatable {
   final String? albumType;
@@ -13,18 +14,29 @@ class Album extends Equatable {
   final String? type;
   final String? uri;
   final List<Artist>? artists;
+  final List<Track>? tracks;
+  final List<Copyrights>? copyrights;
+  final List<String>? genres;
+  final String? label;
+  final int? popularity;
 
-  const Album(
-      {this.albumType,
-      this.totalTracks,
-      this.href,
-      this.id,
-      this.image,
-      this.name,
-      this.releaseDate,
-      this.type,
-      this.uri,
-      this.artists});
+  const Album({
+    this.albumType,
+    this.totalTracks,
+    this.href,
+    this.id,
+    this.image,
+    this.name,
+    this.releaseDate,
+    this.type,
+    this.uri,
+    this.artists,
+    this.tracks,
+    this.copyrights,
+    this.genres,
+    this.label,
+    this.popularity,
+  });
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
@@ -41,6 +53,17 @@ class Album extends Equatable {
       uri: json['uri'],
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
+      tracks: List<Track>.from(json['tracks']?['items']?.map((e) {
+            return Track.fromJson(e);
+          }) ??
+          []),
+      copyrights: List<Copyrights>.from(json['copyrights']?.map((e) {
+            return Copyrights.fromJson(e);
+          }) ??
+          []),
+      genres: List<String>.from(json['genres'] ?? []),
+      label: json['label'],
+      popularity: json['popularity'],
     );
   }
 
@@ -55,6 +78,11 @@ class Album extends Equatable {
         'type': type,
         'uri': uri,
         'artists': artists?.map((v) => v.toJson()).toList(),
+        'tracks': tracks?.map((e) => e.toJson()),
+        'copyrights': copyrights?.map((v) => v.toJson()).toList(),
+        'genres': genres,
+        'label': label,
+        'popularity': popularity,
       };
 
   @override
@@ -69,5 +97,10 @@ class Album extends Equatable {
         type,
         uri,
         artists,
+        tracks,
+        copyrights,
+        genres,
+        label,
+        popularity
       ];
 }

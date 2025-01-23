@@ -2,7 +2,6 @@ import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/common/playlist_model.dart';
 import 'package:equatable/equatable.dart';
-
 import 'common/tracks_model.dart';
 
 class SearchModel extends Equatable {
@@ -41,28 +40,18 @@ class SearchModel extends Equatable {
 class AlbumModel extends Equatable {
   final String? href;
   final int? limit;
-  final String? next;
   final int? offset;
-  final dynamic previous;
   final int? total;
   final List<Album>? items;
 
   const AlbumModel(
-      {this.href,
-      this.limit,
-      this.next,
-      this.offset,
-      this.previous,
-      this.total,
-      this.items});
+      {this.href, this.limit, this.offset, this.total, this.items});
 
   factory AlbumModel.fromJson(Map<String, dynamic> json) {
     return AlbumModel(
       href: json['href'],
       limit: json['limit'],
-      next: json['next'],
       offset: json['offset'],
-      previous: json['previous'],
       total: json['total'],
       items:
           List<Album>.from(json['items']?.map((e) => Album.fromJson(e)) ?? []),
@@ -72,43 +61,30 @@ class AlbumModel extends Equatable {
   Map<String, dynamic> toJson() => {
         'href': href,
         'limit': limit,
-        'next': next,
         'offset': offset,
-        'previous': previous,
         'total': total,
         'items': items?.map((v) => v.toJson()).toList(),
       };
 
   @override
-  List<Object?> get props =>
-      [href, limit, next, offset, previous, total, items];
+  List<Object?> get props => [href, limit, offset, total, items];
 }
 
 class ArtistModel extends Equatable {
   final String? href;
   final int? limit;
-  final String? next;
   final int? offset;
-  final dynamic previous;
   final int? total;
   final List<Artist>? items;
 
   const ArtistModel(
-      {this.href,
-      this.limit,
-      this.next,
-      this.offset,
-      this.previous,
-      this.total,
-      this.items});
+      {this.href, this.limit, this.offset, this.total, this.items});
 
   factory ArtistModel.fromJson(Map<String, dynamic> json) {
     return ArtistModel(
       href: json['href'],
       limit: json['limit'],
-      next: json['next'],
       offset: json['offset'],
-      previous: json['previous'],
       total: json['total'],
       items: List<Artist>.from(
           json['items']?.map((e) => Artist.fromJson(e)) ?? []),
@@ -118,35 +94,24 @@ class ArtistModel extends Equatable {
   Map<String, dynamic> toJson() => {
         'href': href,
         'limit': limit,
-        'next': next,
         'offset': offset,
-        'previous': previous,
         'total': total,
         'items': items?.map((v) => v.toJson()).toList(),
       };
 
   @override
-  List<Object?> get props =>
-      [href, limit, next, offset, previous, total, items];
+  List<Object?> get props => [href, limit, offset, total, items];
 }
 
 class PlaylistModel extends Equatable {
   final String? href;
   final int? limit;
-  final String? next;
   final int? offset;
-  final dynamic previous;
   final int? total;
   final List<Playlist>? items;
 
   const PlaylistModel(
-      {this.href,
-      this.limit,
-      this.next,
-      this.offset,
-      this.previous,
-      this.total,
-      this.items});
+      {this.href, this.limit, this.offset, this.total, this.items});
 
   factory PlaylistModel.fromJson(Map<String, dynamic> json) {
     final List<Playlist> items = [];
@@ -157,9 +122,7 @@ class PlaylistModel extends Equatable {
     return PlaylistModel(
       href: json['href'],
       limit: json['limit'],
-      next: json['next'],
       offset: json['offset'],
-      previous: json['previous'],
       total: json['total'],
       items: items,
     );
@@ -168,44 +131,30 @@ class PlaylistModel extends Equatable {
   Map<String, dynamic> toJson() => {
         'href': href,
         'limit': limit,
-        'next': next,
         'offset': offset,
-        'previous': previous,
         'total': total,
         'items': items?.map((v) => v.toJson()).toList(),
       };
 
   @override
-  List<Object?> get props =>
-      [href, limit, next, offset, previous, total, items];
+  List<Object?> get props => [href, limit, offset, total, items];
 }
 
 class TrackModel extends Equatable {
   final String? href;
   final int? limit;
-  final String? next;
   final int? offset;
-  final dynamic previous;
   final int? total;
   final List<Track>? items;
 
-  const TrackModel({
-    this.href,
-    this.limit,
-    this.next,
-    this.offset,
-    this.previous,
-    this.total,
-    this.items,
-  });
+  const TrackModel(
+      {this.href, this.limit, this.offset, this.total, this.items});
 
   factory TrackModel.fromJson(Map<String, dynamic> json) {
     return TrackModel(
         href: json['href'],
         limit: json['limit'],
-        next: json['next'],
         offset: json['offset'],
-        previous: json['previous'],
         total: json['total'],
         items: List<Track>.from(
             json['items']?.map((v) => Track.fromJson(v)) ?? []));
@@ -214,14 +163,11 @@ class TrackModel extends Equatable {
   Map<String, dynamic> toJson() => {
         'href': href,
         'limit': limit,
-        'next': next,
         'offset': offset,
-        'previous': previous,
         'total': total,
         'items': items?.map((v) => v.toJson()).toList(),
       };
 
   @override
-  List<Object?> get props =>
-      [href, limit, next, offset, previous, total, items];
+  List<Object?> get props => [href, limit, offset, total, items];
 }

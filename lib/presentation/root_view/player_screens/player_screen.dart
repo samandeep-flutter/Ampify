@@ -3,7 +3,6 @@ import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
-import '../../../buisness_logic/player_bloc/player_events.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/services/extension_services.dart';
@@ -51,7 +50,7 @@ class PlayerScreen extends StatelessWidget {
                 children: [
                   const SizedBox(height: Dimens.sizeLarge),
                   BlocBuilder<PlayerBloc, PlayerState>(
-                      buildWhen: (pre, cur) => pre.track.id != cur.track.id,
+                      buildWhen: (pre, cur) => pre.track != cur.track,
                       builder: (context, state) {
                         final fgColor = state.track.bgColor?.withOpacity(.4);
                         const bgColor = Colors.white;
@@ -71,7 +70,7 @@ class PlayerScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: BlocBuilder<PlayerBloc, PlayerState>(
-                              buildWhen: (pr, cr) => pr.track.id != cr.track.id,
+                              buildWhen: (pr, cr) => pr.track != cr.track,
                               builder: (context, state) {
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,67 +113,66 @@ class PlayerScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: Dimens.sizeDefault),
-                  BlocBuilder<PlayerBloc, PlayerState>(buildWhen: (pre, cur) {
-                    final id = pre.track.id != cur.track.id;
-                    final length = pre.length != cur.length;
-                    return id || length;
-                  }, builder: (context, state) {
-                    final loading = state.playerState == MusicState.loading;
-                    return BlocConsumer<PlayerSliderBloc, PlayerSliderState>(
-                        listener: (context, slider) {
-                      if (slider.current == state.length && state.length != 0) {
-                        bloc.add(PlayerTrackEnded());
-                      }
-                    }, builder: (context, slider) {
-                      double current = 0;
-                      int length = 1;
-                      if (!loading && state.length != 0) {
-                        current = slider.current.toDouble();
-                        length = state.length ?? 1;
-                      }
-                      final currLength = Duration(seconds: slider.current);
-                      final maxLength = Duration(seconds: state.length ?? 0);
+                  BlocBuilder<PlayerBloc, PlayerState>(
+                    buildWhen: (pre, cur) {
+                      final track = pre.track != cur.track;
+                      final length = pre.length != cur.length;
+                      return track || length;
+                    },
+                    builder: (context, state) {
+                      final loading = state.playerState == MusicState.loading;
+                      return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
+                          builder: (context, slider) {
+                        double current = 0;
+                        int length = 1;
+                        if (!loading && state.length != 0) {
+                          current = slider.current.toDouble();
+                          length = state.length ?? 1;
+                        }
+                        final currLength = Duration(seconds: slider.current);
+                        final maxLength = Duration(seconds: state.length ?? 0);
 
-                      return SliderTheme(
-                        data: const SliderThemeData(
-                            trackHeight: Dimens.sizeExtraSmall,
-                            thumbShape: RoundSliderThumbShape(
-                              enabledThumbRadius: 5,
-                            )),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: Dimens.sizeMedium,
-                              child: Slider(
-                                value: current,
-                                divisions: length,
-                                inactiveColor: scheme.primaryContainer,
-                                max: length.toDouble(),
-                                onChanged: bloc.onSliderChange,
+                        return SliderTheme(
+                          data: const SliderThemeData(
+                              trackHeight: Dimens.sizeExtraSmall,
+                              thumbShape: RoundSliderThumbShape(
+                                enabledThumbRadius: 5,
+                              )),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: Dimens.sizeMedium,
+                                child: Slider(
+                                  value: current,
+                                  divisions: length,
+                                  inactiveColor: scheme.primaryContainer,
+                                  max: length.toDouble(),
+                                  onChanged: bloc.onSliderChange,
+                                ),
                               ),
-                            ),
-                            DefaultTextStyle.merge(
-                              style: TextStyle(
-                                color: scheme.textColorLight,
-                                fontSize: Dimens.fontDefault,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const SizedBox(width: Dimens.sizeMedium),
-                                  Text(currLength.format()),
-                                  const Spacer(),
-                                  Text(maxLength.format()),
-                                  const SizedBox(width: Dimens.sizeLarge),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    });
-                  }),
+                              DefaultTextStyle.merge(
+                                style: TextStyle(
+                                  color: scheme.textColorLight,
+                                  fontSize: Dimens.fontDefault,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const SizedBox(width: Dimens.sizeMedium),
+                                    Text(currLength.format()),
+                                    const Spacer(),
+                                    Text(maxLength.format()),
+                                    const SizedBox(width: Dimens.sizeLarge),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      });
+                    },
+                  ),
                   const SizedBox(height: Dimens.sizeDefault),
                   Padding(
                     padding: const EdgeInsets.symmetric(

@@ -3,7 +3,8 @@ abstract class AppRoutes {
   static const String homeView = 'home-view';
   static const String searchView = 'search-view';
   static const String libraryView = 'library-view';
-  static const String playlistView = 'playlist-view';
+  static const String collectionView = 'collection-view';
+  static const String likedSongs = 'liked-songs';
   static const String listnHistory = 'listening-history';
 }
 

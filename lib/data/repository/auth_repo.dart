@@ -15,7 +15,7 @@ class AuthRepo {
 
   Future<String?> auth() async {
     const scopes =
-        'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read';
+        'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read user-top-read';
     try {
       final data = {
         'response_type': 'code',
@@ -48,13 +48,13 @@ class AuthRepo {
     };
     final response = await dio.post(AppConstants.token,
         options: Options(headers: header), data: data, client: dio);
-    ApiResponse.verify(response, onSuccess: (json) {
-      dprint('token: ${json['access_token']}');
-      _box.write(BoxKeys.refreshToken, json['refresh_token']);
-      _box.write(BoxKeys.token, json['access_token']);
-    }, onError: (errorMap) {
-      logPrint('token: $errorMap');
-    });
+    ApiResponse.verify(response,
+        onSuccess: (json) {
+          dprint('token: ${json['access_token']}');
+          _box.write(BoxKeys.refreshToken, json['refresh_token']);
+          _box.write(BoxKeys.token, json['access_token']);
+        },
+        onError: (errorMap) => logPrint('token: $errorMap'));
   }
 
   Future<void> refreshToken() async {
