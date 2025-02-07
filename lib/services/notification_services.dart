@@ -14,17 +14,17 @@ class MyNotifications {
 
       final initialMessage = await messaging.getInitialMessage();
       if (initialMessage != null) {
-        logPrint('notification: init ${initialMessage.notification!.body}');
+        logPrint('init ${initialMessage.notification!.body}', 'notification');
       }
     } catch (e) {
-      logPrint('fb init: $e');
+      logPrint(e, 'fb init');
     }
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      logPrint("notification: dataMap ${message.toMap()}");
+      logPrint('dataMap ${message.toMap()}', 'notification');
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      logPrint("notification: onAppOpen ${message.toMap()}");
+      logPrint('onAppOpen ${message.toMap()}', 'notification');
     });
   }
 }
@@ -34,6 +34,6 @@ Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
   try {
     await Firebase.initializeApp(options: DefaultFBOptions.currentPlatform);
   } catch (e) {
-    logPrint(e.toString());
+    logPrint(e, 'notification');
   }
 }

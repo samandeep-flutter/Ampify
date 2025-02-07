@@ -129,7 +129,7 @@ class MyCachedImage extends StatelessWidget {
               ));
         },
         errorWidget: (context, url, error) {
-          logPrint('CachedImage: $error');
+          logPrint(error, 'CachedImage');
           Image image = Image.asset(ImageRes.thumbnail,
               color: const Color(0xFFBDBDBD), fit: fit ?? BoxFit.cover);
 

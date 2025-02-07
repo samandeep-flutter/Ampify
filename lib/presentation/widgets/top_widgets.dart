@@ -9,7 +9,14 @@ class MyDivider extends StatelessWidget {
   final double? width;
   final double? thickness;
   final double? margin;
-  const MyDivider({super.key, this.width, this.thickness, this.margin});
+  final Color? color;
+  const MyDivider({
+    super.key,
+    this.width,
+    this.thickness,
+    this.margin,
+    this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +24,7 @@ class MyDivider extends StatelessWidget {
         margin: EdgeInsets.symmetric(horizontal: margin ?? 0),
         width: width,
         child: Divider(
-          color: Colors.grey[300],
+          color: color ?? Colors.grey[350],
           thickness: thickness,
         ));
   }
@@ -90,9 +97,10 @@ class ToolTipWidget extends StatelessWidget {
     if (_placeHolder) {
       final widget = Container(
         alignment: Alignment.center,
-        margin: EdgeInsets.symmetric(
-          vertical: context.height * .15,
-          horizontal: Dimens.sizeLarge,
+        margin: EdgeInsets.only(
+          top: context.height * .15,
+          left: Dimens.sizeDefault,
+          right: Dimens.sizeDefault,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -126,7 +134,11 @@ class ToolTipWidget extends StatelessWidget {
     }
 
     return Container(
-      margin: margin ?? EdgeInsets.only(top: context.height * .1),
+      margin: margin ??
+          EdgeInsets.only(
+              top: context.height * .1,
+              left: Dimens.sizeDefault,
+              right: Dimens.sizeDefault),
       alignment: alignment ?? Alignment.topCenter,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -146,12 +158,24 @@ class ToolTipWidget extends StatelessWidget {
   }
 }
 
+class SliverSizedBox extends StatelessWidget {
+  final double? height;
+  final double? width;
+  const SliverSizedBox({super.key, this.height, this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(child: SizedBox(height: height, width: width));
+  }
+}
+
 class MyAvatar extends StatelessWidget {
   final String? image;
   final bool? isAvatar;
   final EdgeInsets? padding;
   final double? avatarRadius;
   final double? borderRadius;
+  final Color? bgColor;
   final double? height;
   final double? width;
   final BoxFit? fit;
@@ -163,6 +187,7 @@ class MyAvatar extends StatelessWidget {
     this.onTap,
     this.padding,
     this.avatarRadius,
+    this.bgColor,
     this.isAvatar,
     this.fit,
     this.borderRadius,
@@ -179,8 +204,11 @@ class MyAvatar extends StatelessWidget {
       borderRadius: BorderRadius.circular(borderRadius ?? 40),
       splashColor: scheme.disabled.withOpacity(.5),
       splashFactory: InkRipple.splashFactory,
-      child: Padding(
+      child: Container(
         padding: padding ?? const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(borderRadius ?? 40),
+            color: bgColor),
         child: MyCachedImage(
           image,
           isAvatar: isAvatar ?? false,
@@ -246,6 +274,7 @@ class ShadowWidget extends StatelessWidget {
   final Color color;
   final EdgeInsets? margin;
   final double? spread;
+  final Offset? offset;
   final bool darkShadow;
   final double? borderRadius;
   final Widget child;
@@ -254,6 +283,7 @@ class ShadowWidget extends StatelessWidget {
     super.key,
     this.margin,
     this.spread,
+    this.offset,
     this.borderRadius,
     this.darkShadow = true,
     required this.color,
@@ -263,20 +293,81 @@ class ShadowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(Dimens.sizeMedium),
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(
-            color: color,
-            offset: const Offset(0, 50),
-            spreadRadius: spread ?? context.width * .35,
-            blurRadius: spread ?? context.width * .35),
-        if (darkShadow)
-          const BoxShadow(
-              color: Colors.black12,
-              spreadRadius: Dimens.sizeSmall,
-              blurRadius: Dimens.sizeExtraDoubleLarge)
-      ]),
+      margin: margin ?? const EdgeInsets.all(Dimens.sizeMedium),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(borderRadius ?? 0),
+        boxShadow: [
+          BoxShadow(
+              color: color,
+              offset: offset ?? Offset.zero,
+              spreadRadius: spread ?? context.width * .35,
+              blurRadius: spread ?? context.width * .35),
+          if (darkShadow)
+            const BoxShadow(
+                color: Colors.black12,
+                spreadRadius: Dimens.sizeSmall,
+                blurRadius: Dimens.sizeExtraDoubleLarge)
+        ],
+      ),
       child: child,
+    );
+  }
+}
+
+class LikedSongsCover extends StatelessWidget {
+  final double size;
+  final double? iconSize;
+  const LikedSongsCover({required this.size, this.iconSize, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+    return Container(
+      height: size,
+      width: size,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(2),
+        gradient: LinearGradient(
+          colors: [scheme.primary, scheme.primaryContainer],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Icon(
+        Icons.favorite,
+        color: scheme.background,
+        size: iconSize,
+      ),
+    );
+  }
+}
+
+class BottomSheetListTile extends StatelessWidget {
+  final String title;
+  final Widget? leading;
+  final bool? enable;
+  final VoidCallback? onTap;
+  const BottomSheetListTile({
+    super.key,
+    required this.title,
+    this.leading,
+    this.onTap,
+    this.enable,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+    return ListTile(
+      enabled: enable ?? true,
+      onTap: onTap,
+      leading: leading,
+      title: Text(title),
+      horizontalTitleGap: Dimens.sizeLarge,
+      titleTextStyle: TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: Dimens.fontLarge + 1,
+          color: scheme.textColor),
     );
   }
 }

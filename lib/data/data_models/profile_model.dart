@@ -1,4 +1,3 @@
-import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:equatable/equatable.dart';
 
 class ProfileModel extends Equatable {
@@ -7,7 +6,7 @@ class ProfileModel extends Equatable {
   final String? email;
   final String? href;
   final int? followers;
-  final ImagesModel? image;
+  final String? image;
   final String? product;
   final String? type;
 
@@ -30,7 +29,7 @@ class ProfileModel extends Equatable {
       href: json['href'],
       id: json['id'],
       image: (json['images'] as List?)?.isNotEmpty ?? false
-          ? ImagesModel.fromJson((json['images'] as List).first)
+          ? (json['images'] as List).first['url']
           : null,
       product: json['product'],
       type: json['type'],

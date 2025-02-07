@@ -1,5 +1,7 @@
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/presentation/search_screens/track_tile.dart';
+import 'package:ampify/data/utils/image_resources.dart';
+import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/presentation/widgets/shimmer_widget.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
@@ -8,27 +10,30 @@ import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../buisness_logic/library_bloc/collection_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../buisness_logic/root_bloc/music_group_bloc.dart';
 import '../widgets/loading_widgets.dart';
+import 'playlist_bottom_sheet.dart';
 
-class CollectionView extends StatelessWidget {
-  const CollectionView({super.key});
+class MusicGroupScreen extends StatelessWidget {
+  const MusicGroupScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final bloc = context.read<CollectionBloc>();
+    final bloc = context.read<MusicGroupBloc>();
     final scheme = context.scheme;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
-      body: BlocBuilder<CollectionBloc, CollectionState>(
+      body: BlocBuilder<MusicGroupBloc, MusicGroupState>(
         buildWhen: (pr, cr) => pr.loading != cr.loading,
         builder: (context, state) {
           final fgColor = state.color?.withOpacity(.4) ?? Colors.grey[300]!;
           final date = state.details?.releaseDate;
+          final isPlaylist = state.type == LibItemType.playlist;
 
-          if (state.loading) return const CollectionShimmer();
+          if (state.loading) return const MusicGroupShimmer();
 
           return CustomScrollView(
             controller: bloc.scrollController,
@@ -37,7 +42,7 @@ class CollectionView extends StatelessWidget {
                 expandedHeight: context.height * .35,
                 pinned: true,
                 centerTitle: false,
-                title: BlocBuilder<CollectionBloc, CollectionState>(
+                title: BlocBuilder<MusicGroupBloc, MusicGroupState>(
                     buildWhen: (pr, cr) => pr.titileOpacity != cr.titileOpacity,
                     builder: (context, state) {
                       return AnimatedOpacity(
@@ -46,6 +51,10 @@ class CollectionView extends StatelessWidget {
                         child: Text(state.title ?? ''),
                       );
                     }),
+                leading: IconButton(
+                  onPressed: () => context.pop(bloc.libRefresh),
+                  icon: const Icon(Icons.arrow_back_outlined),
+                ),
                 backgroundColor: Color.alphaBlend(fgColor, Colors.white),
                 titleTextStyle: Utils.defTitleStyle,
                 flexibleSpace: FlexibleSpaceBar(
@@ -120,18 +129,19 @@ class CollectionView extends StatelessWidget {
                                           fontWeight: FontWeight.w500,
                                           color: scheme.textColorLight),
                                       children: [
-                                        if (state.type == LibItemType.playlist)
+                                        if (isPlaylist)
                                           const TextSpan(text: 'by '),
-                                        TextSpan(text: state.details?.owner),
+                                        TextSpan(
+                                            text: state.details?.owner?.name),
                                       ]),
                                 ),
-                                if (state.type == LibItemType.album) ...[
+                                if (!isPlaylist) ...[
                                   PaginationDots(
                                     current: true,
                                     margin: Dimens.sizeSmall,
                                     color: scheme.textColorLight,
                                   ),
-                                  Text(date?.split('-').first ?? '',
+                                  Text('${date?.year ?? ''}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w500,
                                           color: scheme.textColorLight)),
@@ -139,13 +149,14 @@ class CollectionView extends StatelessWidget {
                               ],
                             ),
                           ),
-                          if (state.type == LibItemType.playlist)
+                          if (isPlaylist)
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.track_changes,
                                   color: scheme.textColorLight,
+                                  size: Dimens.sizeMedium,
                                 ),
                                 const SizedBox(width: Dimens.sizeExtraSmall),
                                 Text('${state.tracks.length} tracks',
@@ -153,44 +164,79 @@ class CollectionView extends StatelessWidget {
                                         fontWeight: FontWeight.w500,
                                         color: scheme.textColorLight))
                               ],
-                            )
+                            ),
                         ],
                       ),
                       const SizedBox(height: Dimens.sizeDefault),
                       Row(
                         children: [
-                          BlocBuilder<CollectionBloc, CollectionState>(
+                          BlocBuilder<MusicGroupBloc, MusicGroupState>(
                             buildWhen: (pr, cr) => pr.isFav != cr.isFav,
                             builder: (context, state) {
-                              return IconButton(
-                                style: IconButton.styleFrom(
-                                    visualDensity: VisualDensity.compact,
-                                    shape: CircleBorder(
-                                        side: BorderSide(
-                                      width: 2,
-                                      color: state.isFav
+                              return SizedBox(
+                                height: Dimens.sizeLarge,
+                                child: IconButton(
+                                  tooltip: StringRes.addtoLiked,
+                                  style: IconButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                      shape: CircleBorder(
+                                          side: BorderSide(
+                                        width: 2,
+                                        color: state.isFav ?? false
+                                            ? scheme.primary
+                                            : scheme.textColorLight,
+                                      )),
+                                      backgroundColor: state.isFav ?? false
                                           ? scheme.primary
-                                          : scheme.textColorLight,
-                                    )),
-                                    backgroundColor: state.isFav
-                                        ? scheme.primary
-                                        : Colors.transparent),
-                                onPressed: bloc.onFav,
-                                isSelected: state.isFav,
-                                iconSize: Dimens.sizeLarge,
-                                selectedIcon:
-                                    Icon(Icons.check, color: scheme.onPrimary),
-                                icon: const Icon(Icons.add),
+                                          : null),
+                                  iconSize: Dimens.sizeDefault,
+                                  onPressed: () => bloc.onFav(state.id!,
+                                      type: state.type!,
+                                      liked: state.isFav ?? false),
+                                  isSelected: state.isFav ?? false,
+                                  selectedIcon: Icon(Icons.check,
+                                      color: scheme.onPrimary),
+                                  icon: const Icon(Icons.add),
+                                ),
                               );
                             },
                           ),
+                          if (bloc.profile?.id! ==
+                              state.details?.owner?.id) ...[
+                            const SizedBox(width: Dimens.sizeSmall),
+                            IconButton(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                    context: context,
+                                    showDragHandle: true,
+                                    useRootNavigator: true,
+                                    builder: (context) {
+                                      return PlaylistBottomSheet(
+                                        image: state.image,
+                                        title: state.title,
+                                        owner: state.details?.owner,
+                                        public: state.details?.public,
+                                      );
+                                    });
+                              },
+                              style: IconButton.styleFrom(
+                                  visualDensity: VisualDensity.compact),
+                              iconSize: Dimens.sizeLarge,
+                              icon: Image.asset(
+                                ImageRes.editMusic,
+                                height: Dimens.sizeLarge + 4,
+                                color: scheme.textColorLight,
+                              ),
+                            )
+                          ],
                           const SizedBox(width: Dimens.sizeSmall),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: null,
+                            color: scheme.textColorLight,
                             style: IconButton.styleFrom(
                                 visualDensity: VisualDensity.compact),
-                            iconSize: Dimens.sizeMedium,
-                            icon: const Icon(Icons.more_vert),
+                            iconSize: Dimens.sizeLarge,
+                            icon: const Icon(Icons.ios_share),
                           ),
                           const Spacer(),
                           LoadingIcon(
@@ -212,13 +258,82 @@ class CollectionView extends StatelessWidget {
                   ),
                 ),
               ),
+              if (state.tracks.isEmpty)
+                SliverToBoxAdapter(
+                    child: ToolTipWidget(
+                        margin: EdgeInsets.only(top: context.height * .05),
+                        title: StringRes.emptyPlaylists)),
               SliverList.builder(
                   itemCount: state.tracks.length,
                   itemBuilder: (context, index) {
                     final track = state.tracks[index];
-                    return TrackTile(track: track, type: state.type);
+                    return TrackTile(track, showImage: isPlaylist);
                   }),
-              SliverToBoxAdapter(child: SizedBox(height: context.height * .18))
+              const SliverSizedBox(height: Dimens.sizeLarge),
+              if (state.details?.releaseDate != null)
+                SliverToBoxAdapter(
+                  child: DefaultTextStyle.merge(
+                    style: TextStyle(
+                      color: scheme.textColorLight,
+                      fontSize: Dimens.fontLarge,
+                    ),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: Dimens.sizeDefault),
+                        Icon(
+                          Icons.track_changes,
+                          color: scheme.textColorLight,
+                          size: Dimens.sizeMedium,
+                        ),
+                        const SizedBox(width: Dimens.sizeExtraSmall),
+                        Text('${state.tracks.length} songs'),
+                        PaginationDots(
+                          current: true,
+                          margin: Dimens.sizeSmall,
+                          color: scheme.textColorLight,
+                        ),
+                        Text(state.details?.releaseDate?.formatDate ?? ''),
+                      ],
+                    ),
+                  ),
+                ),
+              const SliverSizedBox(height: Dimens.sizeSmall),
+              if (!isPlaylist)
+                SliverToBoxAdapter(child: Builder(builder: (context) {
+                  final rights = state.details?.copyrights;
+                  final symbols = rights?.map((e) => e.type!).toList().asString;
+                  return Padding(
+                      padding: const EdgeInsets.only(left: Dimens.sizeDefault),
+                      child: RichText(
+                          text: TextSpan(
+                              style: TextStyle(
+                                color: scheme.textColorLight,
+                                fontSize: Dimens.fontLarge - 1,
+                              ),
+                              children: [
+                            if (symbols?.contains(RegExp(r'C')) ?? false) ...[
+                              WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: Image.asset(
+                                    ImageRes.copyrightC,
+                                    color: scheme.textColorLight,
+                                    height: Dimens.sizeMedSmall,
+                                  )),
+                              const WidgetSpan(child: SizedBox(width: 8)),
+                            ],
+                            if (symbols?.contains(RegExp(r'P')) ?? false)
+                              WidgetSpan(
+                                  alignment: PlaceholderAlignment.middle,
+                                  child: Image.asset(
+                                    ImageRes.copyrightP,
+                                    color: scheme.textColorLight,
+                                    height: Dimens.sizeMedSmall,
+                                  )),
+                            const WidgetSpan(child: SizedBox(width: 8)),
+                            TextSpan(text: rights?.first.text?.removeCoprights),
+                          ])));
+                })),
+              SliverSizedBox(height: context.height * .18),
             ],
           );
         },

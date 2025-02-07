@@ -12,9 +12,18 @@ sealed class AppConstants {
   static const String myPlaylists = 'me/playlists';
   static const String myAlbums = 'me/albums';
   static String userPlaylists(String id) => 'users/$id/playlists';
+  static String addtoPlaylist(String id, {required String uris}) =>
+      'playlists/$id/tracks?uris=$uris';
+  static String removeFromPlaylist(String id) => 'playlists/$id/tracks';
   static String playlistDetails(String id) => 'playlists/$id';
   static String albumDetails(String id) => 'albums/$id';
   static String likedSongs(int offset) => 'me/tracks?offset=$offset';
+  static String savetoLiked(String id) => 'me/tracks?ids=$id';
+  static String saveAlbum(String id) => 'me/albums?ids=$id';
+  static String savePlaylist(String id) => 'playlists/$id/followers';
+  static String isFollowAlbum(String id) => 'me/albums/contains?ids=$id';
+  static String isFollowPlaylist(String id) =>
+      'playlists/$id/followers/contains';
 }
 
 sealed class BoxKeys {
@@ -29,9 +38,10 @@ sealed class UniqueIds {
   static const String likedSongs = '00-liked-songs';
 }
 
-void logPrint(String? value, {Object? error}) {
+void logPrint(Object? value, [String? name]) {
   if (kReleaseMode) return;
-  dev.log(value ?? 'null', error: error, name: StringRes.appName);
+  final log = value is String? ? value : value.toString();
+  dev.log(log ?? 'null', name: name ?? StringRes.appName);
 }
 
 void dprint(String? value) {

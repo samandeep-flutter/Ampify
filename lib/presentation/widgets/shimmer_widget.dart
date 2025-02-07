@@ -60,11 +60,11 @@ class SongTileShimmer extends StatelessWidget {
   }
 }
 
-class CollectionShimmer extends StatelessWidget {
+class MusicGroupShimmer extends StatelessWidget {
   final bool isLikedSongs;
   final double? imageSize;
   final int? itemCount;
-  const CollectionShimmer({
+  const MusicGroupShimmer({
     super.key,
     this.imageSize,
     this.itemCount,
@@ -75,7 +75,7 @@ class CollectionShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AppBar(backgroundColor: Colors.white),
+        AppBar(backgroundColor: Colors.white, toolbarHeight: 40),
         if (!isLikedSongs)
           SizedBox.square(
             dimension: imageSize ?? context.height * .3,
@@ -119,20 +119,13 @@ class CollectionShimmer extends StatelessWidget {
         ),
         Row(
           children: [
-            if (!isLikedSongs) ...[
-              const SizedBox(width: Dimens.sizeDefault),
+            const SizedBox(width: Dimens.sizeDefault),
+            if (!isLikedSongs)
               const Icon(
                 Icons.add_circle_outline,
-                size: Dimens.sizeMidLarge + 4,
-                color: ColorRes.shimmer,
-              ),
-              const SizedBox(width: Dimens.sizeDefault),
-              const Icon(
-                Icons.more_vert,
                 size: Dimens.sizeMidLarge,
                 color: ColorRes.shimmer,
               ),
-            ],
             const Spacer(),
             SizedBox.square(dimension: 50, child: Shimmer.avatar),
             const SizedBox(width: Dimens.sizeDefault),

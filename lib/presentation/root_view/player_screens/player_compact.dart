@@ -26,11 +26,12 @@ class PlayerCompact extends StatelessWidget {
       buildWhen: (pr, cr) {
         final track = pr.track != cr.track;
         final isShow = pr.showPlayer != cr.showPlayer;
+        final isDuration = pr.durationLoading != cr.durationLoading;
         final isStateChange = pr.playerState != cr.playerState;
-        return track || isShow || isStateChange;
+        return track || isShow || isStateChange || isDuration;
       },
       listener: (context, state) {
-        if (state.playerState == MusicState.loading) {
+        if (state.playerState == MusicState.loading || state.durationLoading) {
           sliderBloc.add(const PlayerSliderChange(0));
           return;
         }
@@ -48,7 +49,7 @@ class PlayerCompact extends StatelessWidget {
 
         return AnimatedSlide(
           duration: duration,
-          offset: Offset(0.0, state.showPlayer ?? false ? 0.1 : 1),
+          offset: Offset(0.0, state.showPlayer ?? false ? 0.08 : 1),
           child: Container(
             height: playerHeight,
             width: double.infinity,
@@ -138,9 +139,10 @@ class PlayerCompact extends StatelessWidget {
                 BlocListener<PlayerSliderBloc, PlayerSliderState>(
                   listenWhen: (pr, cr) {
                     final ended = cr.current == state.length;
-                    return ended && state.length != 0;
+                    final length = state.length != 0 && cr.current != 0;
+                    return ended && length;
                   },
-                  listener: (_, slider) => bloc.onTrackEnded(),
+                  listener: (_, slider) => bloc.onTrackEnded(slider),
                   child: const SizedBox.shrink(),
                 ),
                 const SizedBox(height: Dimens.sizeExtraSmall),
@@ -157,9 +159,12 @@ class PlayerCompact extends StatelessWidget {
                         Duration duration = Duration.zero;
                         double width = 0;
                         if (state.length != 0) {
-                          duration = const Duration(seconds: 1);
                           width = (slider.current / (state.length ?? 0)) *
                               constraints.maxWidth;
+                        }
+
+                        if (state.length != 0 && slider.current != 0) {
+                          duration = const Duration(seconds: 1);
                         }
                         return AnimatedContainer(
                           duration: duration,

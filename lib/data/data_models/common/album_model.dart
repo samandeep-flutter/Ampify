@@ -8,7 +8,7 @@ class Album extends Equatable {
   final int? totalTracks;
   final String? href;
   final String? id;
-  final ImagesModel? image;
+  final String? image;
   final String? name;
   final String? releaseDate;
   final String? type;
@@ -39,14 +39,16 @@ class Album extends Equatable {
   });
 
   factory Album.fromJson(Map<String, dynamic> json) {
+    final albumImage = (json['images'] as List?)?.isNotEmpty ?? false
+        ? (json['images'] as List?)?.first['url']
+        : null;
+
     return Album(
       albumType: json['album_type'],
       totalTracks: json['total_tracks'],
       href: json['href'],
       id: json['id'],
-      image: (json['images'] as List?)?.isNotEmpty ?? false
-          ? ImagesModel.fromJson((json['images'] as List).first)
-          : null,
+      image: albumImage,
       name: json['name'],
       releaseDate: json['release_date'],
       type: json['type'],
@@ -54,7 +56,7 @@ class Album extends Equatable {
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
       tracks: List<Track>.from(json['tracks']?['items']?.map((e) {
-            return Track.fromJson(e);
+            return Track.fromJson(e, image: albumImage);
           }) ??
           []),
       copyrights: List<Copyrights>.from(json['copyrights']?.map((e) {
@@ -72,7 +74,7 @@ class Album extends Equatable {
         'total_tracks': totalTracks,
         'href': href,
         'id': id,
-        'images': image?.toJson(),
+        'images': image,
         'name': name,
         'release_date': releaseDate,
         'type': type,

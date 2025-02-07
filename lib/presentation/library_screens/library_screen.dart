@@ -1,13 +1,15 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
+import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/library_screens/collection_tile.dart';
+import 'package:ampify/presentation/library_screens/music_group_tile.dart';
 import 'package:ampify/presentation/widgets/my_alert_dialog.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../data/utils/color_resources.dart';
 import '../../data/utils/dimens.dart';
 import '../../data/utils/string.dart';
@@ -52,10 +54,22 @@ class _LibraryScreenState extends State<LibraryScreen>
                           ],
                         )),
                   ],
-                  child: MyAvatar(
-                    state.profile?.image?.url,
-                    isAvatar: true,
-                    avatarRadius: Dimens.sizeDefault,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: state.profile?.product == 'premium'
+                        ? const BoxDecoration(
+                            gradient: SweepGradient(colors: ColorRes.primaries),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(Dimens.borderLarge),
+                            ))
+                        : null,
+                    child: MyAvatar(
+                      padding: const EdgeInsets.all(2),
+                      bgColor: scheme.background,
+                      state.profile?.image,
+                      isAvatar: true,
+                      avatarRadius: Dimens.sizeMedium,
+                    ),
                   ),
                 );
               },
@@ -71,10 +85,11 @@ class _LibraryScreenState extends State<LibraryScreen>
             child: BlocBuilder<LibraryBloc, LibraryState>(
               buildWhen: (pr, cr) => pr.filterSel != cr.filterSel,
               builder: (context, state) {
+                final items = [LibItemType.playlist, LibItemType.album];
                 return Row(
                   children: [
                     const SizedBox(width: Dimens.sizeDefault),
-                    ...LibItemType.values.map((e) {
+                    ...items.map((e) {
                       return Padding(
                         padding: const EdgeInsets.only(right: Dimens.sizeSmall),
                         child: TextButton(
@@ -88,18 +103,25 @@ class _LibraryScreenState extends State<LibraryScreen>
                 );
               },
             )),
-        // actions: [
-        // TextButton.icon(
-        //   onPressed: bloc.createPlaylist,
-        //   label: const Text(StringRes.create),
-        //   iconAlignment: IconAlignment.end,
-        //   icon: const Icon(
-        //     Icons.library_add_outlined,
-        //     size: Dimens.sizeLarge,
-        //   ),
-        // ),
-        //   const SizedBox(width: Dimens.sizeSmall)
-        // ],
+        actions: [
+          BlocBuilder<LibraryBloc, LibraryState>(
+            builder: (context, state) {
+              return TextButton.icon(
+                onPressed: () {
+                  context.pushNamed(AppRoutes.createPlaylist,
+                      pathParameters: {'userId': state.profile!.id!});
+                },
+                label: const Text(StringRes.create),
+                iconAlignment: IconAlignment.end,
+                icon: const Icon(
+                  Icons.library_add_outlined,
+                  size: Dimens.sizeLarge,
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: Dimens.sizeSmall)
+        ],
       ),
       padding: EdgeInsets.zero,
       child: ListView(
@@ -129,9 +151,10 @@ class _LibraryScreenState extends State<LibraryScreen>
               final sort = pr.sortby != cr.sortby;
               final loading = pr.loading != cr.loading;
               final filtered = pr.filterSel != cr.filterSel;
+              final items = pr.items != cr.items;
               final moreLoading = pr.moreLoading != cr.moreLoading;
 
-              return loading || sort || filtered || moreLoading;
+              return loading || items || sort || filtered || moreLoading;
             },
             builder: (context, state) {
               if (state.loading) {
@@ -139,7 +162,6 @@ class _LibraryScreenState extends State<LibraryScreen>
                   itemCount: 10,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(top: Dimens.sizeDefault),
                   itemBuilder: (_, __) => const SongTileShimmer(iconSize: 55),
                 );
               }
@@ -150,7 +172,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                 itemCount: state.items.length,
                 itemBuilder: (context, index) {
                   final item = state.items[index];
-                  return CollectionTile(item);
+                  return MusicGroupTile(item);
                 },
               );
             },
@@ -189,6 +211,7 @@ class _LibraryScreenState extends State<LibraryScreen>
     showModalBottomSheet(
         context: context,
         showDragHandle: true,
+        useRootNavigator: true,
         builder: (context) {
           return MyBottomSheet(
             title: StringRes.sortOrder,

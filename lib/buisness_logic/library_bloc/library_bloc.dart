@@ -148,8 +148,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         break;
       case SortOrder.owner:
         final items = state.items
-          ..sort((a, b) => a.owner?.compareTo(b.owner ?? '') ?? 0);
-
+          ..sort((a, b) => a.owner?.name?.compareTo(b.owner?.name ?? '') ?? 0);
         emit(state.copyWith(items: items, sortby: SortOrder.owner));
         break;
       case SortOrder.custom:
@@ -191,7 +190,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     List<LibraryModel> items = state.items;
 
     final plOffset = items.where((e) => e.type == LibItemType.playlist);
-    final alOffset = items.where((e) => e.type == LibItemType.album);
+    final alOffset = items.where((e) => e.type != LibItemType.playlist);
 
     if (plOffset.length < state.playlistCount) {
       _repo.getMyPlaylists(
@@ -255,7 +254,9 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final plCount = await playlistCount.future;
     final alCount = await albumCount.future;
 
-    items.add(Utils.likedSongs(count: state.totalLiked));
+    if ((state.totalLiked ?? 0) > 0) {
+      items.add(Utils.likedSongs(count: state.totalLiked));
+    }
     items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
     emit(state.copyWith(
         items: items,

@@ -9,6 +9,16 @@ sealed class ColorRes {
   static const Color onError = Color(0xFFFFEBEE);
   static const Color onTeritary = Color(0xFFF1E3BE);
   static const Color teritary = Color(0xFFC68F04);
+
+  static const List<Color> primaries = [
+    Color(0xFF6A2E8B), // Darker Purple
+    Color(0xFF5271FF), // Bright Blue
+    Color(0xFF00C2FF), // Cyan Blue
+    Color(0xFF2D3A68), // Dark Blue
+    Color(0xFF7EC8FF), // Light Blue
+    Color(0xFFFFB84D), // Golden Yellow
+    Color(0xFF833AB4), // Loop back to Purple
+  ];
 }
 
 enum MyTheme {

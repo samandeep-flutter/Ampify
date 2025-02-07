@@ -1,5 +1,6 @@
+import 'package:ampify/data/data_models/library_model.dart';
+import 'package:ampify/services/extension_services.dart';
 import '../../data/data_models/search_model.dart';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/repository/search_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/services/getit_instance.dart';
@@ -37,20 +38,25 @@ class SearchState extends Equatable {
   final String query;
   final bool isError;
   final bool isLoading;
-  final List<Track>? results;
-  const SearchState(
-      {required this.query,
-      this.isError = false,
-      required this.isLoading,
-      this.results = const []});
+  final List<LibraryModel>? results;
+  const SearchState({
+    required this.query,
+    this.isError = false,
+    required this.isLoading,
+    required this.results,
+  });
   const SearchState.init()
       : query = '',
+        results = null,
         isError = false,
-        isLoading = false,
-        results = null;
+        isLoading = false;
 
-  SearchState copyWith(
-      {String? query, bool? isError, bool? isLoading, List<Track>? results}) {
+  SearchState copyWith({
+    String? query,
+    bool? isError,
+    bool? isLoading,
+    final List<LibraryModel>? results,
+  }) {
     return SearchState(
       query: query ?? this.query,
       isError: isError ?? this.isError,
@@ -60,7 +66,7 @@ class SearchState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [query, isLoading, isError];
+  List<Object?> get props => [query, isLoading, isError, results];
 }
 
 EventTransformer<T> _debounce<T>(Duration duration) {
@@ -108,13 +114,27 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       return;
     }
 
-    await _searchRepo.searchSongs(searchContr.text, limit: 20,
-        onSuccess: (json) {
+    await _searchRepo.search(searchContr.text, onSuccess: (json) {
       final response = SearchModel.fromJson(json);
-      final results = response.tracks?.items;
-      emit(state.copyWith(isLoading: false, results: results));
-    }, onError: (errorMap) {
-      logPrint('search: $errorMap');
+      final List<LibraryModel> musicGroups = [];
+      final tracks = response.tracks?.items?.map((e) {
+        return LibraryModel.fromJson(e.toJson());
+      });
+      final albums = response.albums?.items?.map((e) {
+        return LibraryModel.fromJson(e.toJson());
+      });
+      final playlists = response.playlists?.items?.map((e) {
+        return LibraryModel.fromJson(e.toJson());
+      });
+      musicGroups.addAll([
+        ...tracks ?? [],
+        ...albums ?? [],
+        ...playlists ?? [],
+      ]);
+      musicGroups.sortLibrary(searchContr.text);
+      emit(state.copyWith(isLoading: false, results: musicGroups));
+    }, onError: (e) {
+      logPrint(e, 'search');
       emit(state.copyWith(isLoading: false, isError: true));
     });
   }

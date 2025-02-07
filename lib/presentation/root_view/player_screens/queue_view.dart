@@ -10,7 +10,7 @@ import '../../../buisness_logic/player_bloc/player_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
 import '../../widgets/loading_widgets.dart';
-import '../../widgets/my_cached_image.dart';
+import '../../track_widgets/track_tile.dart';
 
 class QueueView extends StatelessWidget {
   const QueueView({super.key});
@@ -64,68 +64,43 @@ class QueueView extends StatelessWidget {
             BlocBuilder<PlayerBloc, PlayerState>(
               buildWhen: (pr, cr) => pr.track != cr.track,
               builder: (_, state) {
-                return Padding(
-                  padding: const EdgeInsets.all(Dimens.sizeDefault),
-                  child: Row(
-                    children: [
-                      MyCachedImage(
-                        state.track.image,
-                        borderRadius: 2,
-                        height: 40,
-                        width: 40,
-                      ),
-                      const SizedBox(width: Dimens.sizeDefault),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                return TrackDetailsTile(
+                  track: state.track,
+                  title: RichText(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      text: TextSpan(
+                          style: TextStyle(
+                              color: scheme.primary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.fontLarge),
                           children: [
-                            RichText(
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                text: TextSpan(
-                                    style: TextStyle(
-                                        color: scheme.primary,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: Dimens.fontLarge),
-                                    children: [
-                                      WidgetSpan(
-                                        child: SizedBox.square(
-                                            dimension: 20,
-                                            child: BlocBuilder<PlayerBloc,
-                                                    PlayerState>(
-                                                buildWhen: (pr, cr) =>
-                                                    pr.playerState !=
-                                                    cr.playerState,
-                                                builder: (_, state) {
-                                                  if (state.playerState ==
-                                                      MusicState.playing) {
-                                                    return Image.asset(
-                                                      ImageRes.musicWave,
-                                                      fit: BoxFit.cover,
-                                                      color: scheme.primary,
-                                                    );
-                                                  }
+                            WidgetSpan(
+                              child: SizedBox.square(
+                                  dimension: 20,
+                                  child: BlocBuilder<PlayerBloc, PlayerState>(
+                                      buildWhen: (pr, cr) =>
+                                          pr.playerState != cr.playerState,
+                                      builder: (_, state) {
+                                        if (state.playerState ==
+                                            MusicState.playing) {
+                                          return Image.asset(
+                                            ImageRes.musicWave,
+                                            fit: BoxFit.cover,
+                                            color: scheme.primary,
+                                          );
+                                        }
 
-                                                  return Image.asset(
-                                                    ImageRes.musicWavePaused,
-                                                    fit: BoxFit.cover,
-                                                    color: scheme.primary,
-                                                  );
-                                                })),
-                                      ),
-                                      const WidgetSpan(
-                                          child: SizedBox(width: 6)),
-                                      TextSpan(text: state.track.title ?? ''),
-                                    ])),
-                            Text(
-                              state.track.subtitle ?? '',
-                              style: TextStyle(color: scheme.textColorLight),
+                                        return Image.asset(
+                                          ImageRes.musicWavePaused,
+                                          fit: BoxFit.cover,
+                                          color: scheme.primary,
+                                        );
+                                      })),
                             ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                            const WidgetSpan(child: SizedBox(width: 6)),
+                            TextSpan(text: state.track.title ?? ''),
+                          ])),
                 );
               },
             ),
@@ -160,43 +135,20 @@ class QueueView extends StatelessWidget {
                         ],
                       ),
                       Expanded(
-                        child: ListView.builder(
+                        child: ReorderableListView.builder(
                           itemCount: state.queue.length,
                           itemBuilder: (context, index) {
                             final item = state.queue[index];
-                            return ListTile(
-                              leading: BlocBuilder<PlayerBloc, PlayerState>(
-                                buildWhen: (pr, cr) {
-                                  return pr.queueSelected[index] !=
-                                      cr.queueSelected[index];
-                                },
-                                builder: (context, state) {
-                                  return Checkbox(
-                                    value: state.queueSelected[index],
-                                    onChanged: (_) => bloc.onSelected(index),
-                                  );
-                                },
-                              ),
-                              title: Text(
-                                item.title ?? '',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              titleTextStyle: TextStyle(
-                                color: scheme.textColor,
-                                fontWeight: FontWeight.w500,
-                                fontSize: Dimens.fontLarge,
-                              ),
-                              subtitle: Text(
-                                item.subtitle ?? '',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitleTextStyle: TextStyle(
-                                color: scheme.textColorLight,
+                            return TrackDetailsTile(
+                              track: item,
+                              key: ValueKey(item.id),
+                              trailing: const Icon(
+                                Icons.menu_outlined,
+                                size: Dimens.sizeMedium,
                               ),
                             );
                           },
+                          onReorder: bloc.onQueueReorder,
                         ),
                       ),
                     ],

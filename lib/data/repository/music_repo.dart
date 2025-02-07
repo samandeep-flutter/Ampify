@@ -17,13 +17,13 @@ class MusicRepo {
     if (Platform.isIOS) YoutubeApiClient.ios,
   ];
 
-  Future<Uri?> searchSongs(String query) async {
+  Future<Uri?> searchSong(String query) async {
     String? id;
     try {
       List<SongDetailed> songs = await ytMusic.searchSongs(query);
       id = songs.first.videoId;
     } catch (e) {
-      logPrint('YT: $e');
+      logPrint(e, 'YT');
     }
     try {
       final manifest = await ytExplode.videos.streams
@@ -31,7 +31,7 @@ class MusicRepo {
       final stream = manifest.audioOnly.withHighestBitrate();
       return stream.url;
     } catch (e) {
-      logPrint('ytExplode: $e');
+      logPrint(e, 'ytExplode');
       return null;
     }
   }

@@ -2,10 +2,11 @@ import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../buisness_logic/library_bloc/liked_songs_bloc.dart';
 import '../../data/utils/dimens.dart';
 import '../../data/utils/utils.dart';
-import '../search_screens/track_tile.dart';
+import '../track_widgets/track_tile.dart';
 import '../widgets/loading_widgets.dart';
 import '../widgets/shimmer_widget.dart';
 
@@ -34,15 +35,19 @@ class _LikedSongsState extends State<LikedSongs> {
       body: BlocBuilder<LikedSongsBloc, LikedSongsState>(
         buildWhen: (pr, cr) {
           final loading = pr.loading != cr.loading;
+          final items = pr.totalTracks != cr.totalTracks;
           final moreLoading = pr.moreLoading != cr.moreLoading;
 
-          return loading || moreLoading;
+          return loading || moreLoading || items;
         },
         builder: (context, state) {
           final fgColor = scheme.primary.withOpacity(.6);
 
           if (state.loading) {
-            return const CollectionShimmer(isLikedSongs: true, itemCount: 10);
+            return const MusicGroupShimmer(
+              isLikedSongs: true,
+              itemCount: 10,
+            );
           }
 
           return CustomScrollView(
@@ -61,6 +66,10 @@ class _LikedSongsState extends State<LikedSongs> {
                         child: const Text(StringRes.likedSongs),
                       );
                     }),
+                leading: IconButton(
+                  onPressed: () => context.pop(bloc.libRefresh),
+                  icon: const Icon(Icons.arrow_back_outlined),
+                ),
                 backgroundColor: Color.alphaBlend(fgColor, Colors.white),
                 titleTextStyle: Utils.defTitleStyle,
               ),
@@ -119,7 +128,7 @@ class _LikedSongsState extends State<LikedSongs> {
                   itemCount: state.tracks.length,
                   itemBuilder: (context, index) {
                     final track = state.tracks[index];
-                    return TrackTile(track: track);
+                    return TrackTile(track, liked: true);
                   }),
               if (state.moreLoading)
                 SliverToBoxAdapter(

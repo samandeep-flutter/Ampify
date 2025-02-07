@@ -30,7 +30,7 @@ class AuthRepo {
       );
       return Uri.parse(response).queryParameters['code'];
     } catch (e) {
-      logPrint('auth:: $e');
+      logPrint(e, 'auth');
       return null;
     }
   }
@@ -54,7 +54,7 @@ class AuthRepo {
           _box.write(BoxKeys.refreshToken, json['refresh_token']);
           _box.write(BoxKeys.token, json['access_token']);
         },
-        onError: (errorMap) => logPrint('token: $errorMap'));
+        onError: (e) => logPrint(e, 'token'));
   }
 
   Future<void> refreshToken() async {
@@ -72,8 +72,8 @@ class AuthRepo {
     ApiResponse.verify(response, onSuccess: (json) {
       dprint('refresh: ${json['access_token']}');
       _box.write(BoxKeys.token, json['access_token']);
-    }, onError: (errorMap) {
-      logPrint('token: $errorMap');
+    }, onError: (e) {
+      logPrint(e, 'token');
     });
   }
 }

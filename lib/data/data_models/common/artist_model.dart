@@ -1,12 +1,11 @@
 import 'package:equatable/equatable.dart';
-import 'other_models.dart';
 
 class Artist extends Equatable {
   final int? followers;
   final List<String>? genres;
   final String? href;
   final String? id;
-  final ImagesModel? image;
+  final String? image;
   final String? name;
   final int? popularity;
   final String? type;
@@ -31,7 +30,7 @@ class Artist extends Equatable {
         href: json['href'],
         id: json['id'],
         image: (json['images'] as List?)?.isNotEmpty ?? false
-            ? ImagesModel.fromJson((json['images'] as List).first)
+            ? (json['images'] as List).first['url']
             : null,
         name: json['name'],
         popularity: json['popularity'],
@@ -44,7 +43,7 @@ class Artist extends Equatable {
         'genres': genres,
         'href': href,
         'id': id,
-        'images': image?.toJson(),
+        'images': image,
         'name': name,
         'popularity': popularity,
         'type': type,

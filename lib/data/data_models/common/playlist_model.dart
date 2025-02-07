@@ -7,7 +7,7 @@ class Playlist extends Equatable {
   final String? description;
   final String? href;
   final String? id;
-  final ImagesModel? image;
+  final String? image;
   final String? name;
   final OwnerModel? owner;
   final bool? public;
@@ -16,19 +16,20 @@ class Playlist extends Equatable {
   final String? type;
   final String? uri;
 
-  const Playlist(
-      {this.collaborative,
-      this.description,
-      this.href,
-      this.id,
-      this.image,
-      this.name,
-      this.owner,
-      this.public,
-      this.snapshotId,
-      this.tracks,
-      this.type,
-      this.uri});
+  const Playlist({
+    this.collaborative,
+    this.description,
+    this.href,
+    this.id,
+    this.image,
+    this.name,
+    this.owner,
+    this.public,
+    this.snapshotId,
+    this.tracks,
+    this.type,
+    this.uri,
+  });
 
   factory Playlist.fromJson(Map<String, dynamic> json) {
     return Playlist(
@@ -37,7 +38,7 @@ class Playlist extends Equatable {
       href: json['href'],
       id: json['id'],
       image: (json['images'] as List?)?.isNotEmpty ?? false
-          ? ImagesModel.fromJson((json['images'] as List).first)
+          ? (json['images'] as List).first['url']
           : null,
       name: json['name'],
       owner: json['owner'] != null ? OwnerModel.fromJson(json['owner']) : null,
@@ -57,7 +58,7 @@ class Playlist extends Equatable {
         'description': description,
         'href': href,
         'id': id,
-        'images': image?.toJson(),
+        'images': image,
         'name': name,
         'owner': owner?.toJson(),
         'public': public,

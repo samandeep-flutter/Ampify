@@ -1,3 +1,6 @@
+import 'package:ampify/data/data_models/common/album_model.dart';
+import 'package:ampify/data/data_models/common/artist_model.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,11 +10,11 @@ class PlayerState extends Equatable {
   final int? length;
   final bool shuffle;
   final bool liked;
-  final MusicLoopMode loopMode;
   final bool? showPlayer;
+  final MusicLoopMode loopMode;
   final MusicState? playerState;
   final List<TrackDetails> queue;
-  final List<bool> queueSelected;
+  final bool durationLoading;
 
   const PlayerState({
     required this.track,
@@ -22,7 +25,7 @@ class PlayerState extends Equatable {
     required this.showPlayer,
     required this.playerState,
     required this.queue,
-    required this.queueSelected,
+    required this.durationLoading,
   });
 
   const PlayerState.init()
@@ -32,7 +35,7 @@ class PlayerState extends Equatable {
         liked = false,
         length = 0,
         queue = const [],
-        queueSelected = const [],
+        durationLoading = false,
         loopMode = MusicLoopMode.off,
         playerState = MusicState.loading;
 
@@ -42,8 +45,8 @@ class PlayerState extends Equatable {
     bool? liked,
     bool? shuffle,
     bool? showPlayer,
+    bool? durationLoading,
     List<TrackDetails>? queue,
-    List<bool>? queueSelected,
     MusicLoopMode? loopMode,
     MusicState? playerState,
   }) {
@@ -51,10 +54,10 @@ class PlayerState extends Equatable {
         track: track ?? this.track,
         length: length ?? this.length,
         liked: liked ?? this.liked,
+        queue: queue ?? this.queue,
         shuffle: shuffle ?? this.shuffle,
         loopMode: loopMode ?? this.loopMode,
-        queue: queue ?? this.queue,
-        queueSelected: queueSelected ?? this.queueSelected,
+        durationLoading: durationLoading ?? this.durationLoading,
         showPlayer: showPlayer ?? this.showPlayer,
         playerState: playerState ?? this.playerState);
   }
@@ -67,15 +70,15 @@ class PlayerState extends Equatable {
         loopMode,
         liked,
         queue,
-        queueSelected,
         showPlayer,
+        durationLoading,
         playerState
       ];
 }
 
 class TrackDetails extends Equatable {
   final String? id;
-  final String? uri;
+  final String? albumId;
   final String? image;
   final String? title;
   final String? subtitle;
@@ -83,7 +86,7 @@ class TrackDetails extends Equatable {
 
   const TrackDetails({
     required this.id,
-    required this.uri,
+    required this.albumId,
     required this.image,
     required this.title,
     required this.subtitle,
@@ -92,7 +95,7 @@ class TrackDetails extends Equatable {
 
   const TrackDetails.init()
       : id = null,
-        uri = null,
+        albumId = null,
         image = null,
         title = null,
         subtitle = null,
@@ -101,6 +104,7 @@ class TrackDetails extends Equatable {
   TrackDetails copyWith({
     String? id,
     String? uri,
+    String? albumId,
     String? image,
     String? title,
     String? subtitle,
@@ -108,7 +112,7 @@ class TrackDetails extends Equatable {
   }) {
     return TrackDetails(
       id: id ?? this.id,
-      uri: uri ?? this.uri,
+      albumId: albumId ?? this.albumId,
       image: image ?? this.image,
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
@@ -116,8 +120,18 @@ class TrackDetails extends Equatable {
     );
   }
 
+  Track toTrack() {
+    return Track(
+        id: id,
+        name: title,
+        album: Album(id: albumId, image: image),
+        artists: subtitle?.split(',').map((e) {
+          return Artist(name: e);
+        }).toList());
+  }
+
   @override
-  List<Object?> get props => [id, uri, image, title, subtitle, bgColor];
+  List<Object?> get props => [id, image, title, subtitle, bgColor];
 }
 
 enum MusicState { playing, pause, loading }

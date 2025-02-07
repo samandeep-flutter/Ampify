@@ -1,7 +1,12 @@
 import 'package:ampify/buisness_logic/search_bloc/search_bloc.dart';
+import 'package:ampify/data/data_models/common/album_model.dart';
+import 'package:ampify/data/data_models/common/artist_model.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
+import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/presentation/search_screens/track_tile.dart';
+import 'package:ampify/presentation/library_screens/music_group_tile.dart';
+import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/presentation/widgets/base_widget.dart';
 import 'package:ampify/presentation/widgets/my_text_field_widget.dart';
 import 'package:ampify/presentation/widgets/shimmer_widget.dart';
@@ -78,11 +83,29 @@ class SearchPage extends StatelessWidget {
 
               return Expanded(
                 child: ListView.builder(
-                    padding: const EdgeInsets.only(top: Dimens.sizeDefault),
+                    padding: EdgeInsets.only(
+                      top: Dimens.sizeDefault,
+                      bottom: context.height * .18,
+                    ),
                     itemCount: state.results?.length ?? 0,
                     itemBuilder: (context, index) {
-                      final track = state.results![index];
-                      return TrackTile(track: track);
+                      final item = state.results![index];
+
+                      if (item.type == LibItemType.track) {
+                        final artists = item.owner?.name?.split(',') ?? [];
+
+                        final track = Track(
+                            id: item.id,
+                            name: item.name,
+                            type: item.type?.name,
+                            album: Album(image: item.image, id: item.albumId),
+                            artists: List<Artist>.from(artists.map((e) {
+                              return Artist(name: e);
+                            })));
+                        return TrackTile(track);
+                      }
+
+                      return MusicGroupTile(item, imageHeight: 40);
                     }),
               );
             },

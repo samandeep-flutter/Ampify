@@ -4,7 +4,7 @@ import '../../config/theme_services.dart';
 
 class LoadingButton extends StatelessWidget {
   final Widget child;
-  final bool isLoading;
+  final bool? isLoading;
   final bool enable;
   final Color? loaderColor;
   final EdgeInsets? padding;
@@ -28,7 +28,7 @@ class LoadingButton extends StatelessWidget {
     this.foregroundColor,
     this.loaderColor,
     this.border,
-    required this.isLoading,
+    this.isLoading,
     required this.onPressed,
     required this.child,
   });
@@ -52,13 +52,13 @@ class LoadingButton extends StatelessWidget {
                 : null,
             padding: padding ??
                 const EdgeInsets.symmetric(vertical: Dimens.sizeDefault)),
-        onPressed: enable && !isLoading ? onPressed : null,
-        child: isLoading
+        onPressed: enable && !(isLoading ?? false) ? onPressed : null,
+        child: enable && (isLoading ?? false)
             ? SizedBox(
                 height: 24,
                 width: 24,
                 child: CircularProgressIndicator(
-                    color: loaderColor ?? scheme.onPrimary))
+                    color: loaderColor ?? scheme.primary))
             : child,
       ),
     );

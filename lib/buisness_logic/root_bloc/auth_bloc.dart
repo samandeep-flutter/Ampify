@@ -81,10 +81,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _box.write(BoxKeys.profile, json);
       completer.complete(true);
       emit(state.copyWith(isLoading: false, isSuccess: true));
-    }, onError: (json) {
+    }, onError: (e) {
       emit(state.copyWith(isLoading: false));
       showToast(StringRes.somethingWrong);
-      logPrint('profile: $json');
+      logPrint(e, 'profile');
     });
     await completer.future;
   }

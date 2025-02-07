@@ -1,14 +1,12 @@
-import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
-import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ampify/services/extension_services.dart';
 import '../../buisness_logic/player_bloc/player_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import '../../buisness_logic/root_bloc/root_bloc.dart';
 import '../../buisness_logic/search_bloc/search_bloc.dart';
-import '../../data/utils/dimens.dart';
 import 'player_screens/player_compact.dart';
+import '../../data/utils/dimens.dart';
 
 class RootView extends StatefulWidget {
   final Widget tabBar;
@@ -21,11 +19,8 @@ class RootView extends StatefulWidget {
 class _RootViewState extends State<RootView> {
   @override
   void initState() {
-    context.read<RootBloc>().add(RootInitial());
-    context.read<HomeBloc>().add(HomeInitial());
     context.read<PlayerBloc>().add(PlayerInitial());
     context.read<SearchBloc>().add(SearchInitial());
-    context.read<LibraryBloc>().add(LibraryInitial());
     super.initState();
   }
 

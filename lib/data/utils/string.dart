@@ -13,6 +13,7 @@ sealed class StringRes {
   static const String logout = 'Logout';
   static const String cancel = 'Cancel';
   static const String close = 'Close';
+  static const String share = 'Share';
   static const String create = 'Create';
   static const String settings = 'Settings';
   static const String likedSongs = 'Liked Songs';
@@ -21,16 +22,29 @@ sealed class StringRes {
   static const String goBack = 'go back';
   static const String sortOrder = 'Sort Order';
   static const String sortBy = 'Sort by';
+  static const String createPlaylist = 'Create Playlist';
+  static const String pubPlaylist = 'Public Playlist';
+  static const String priPlaylist = 'Private Playlist';
   static const String nowPlaying = 'Now Playing';
   static const String nextQueue = 'Next in Queue';
   static const String clearQueue = 'Clear Queue';
   static const String queueTitle = 'Playing from play queue';
   static const String myLibrary = 'My Library';
+  static const String editCover = 'Edit Cover';
+  static const String editDetails = 'Edit Details';
   static const String somethingWrong = 'Something went wrong';
   static const String listenHistory = 'Listening History';
   static const String queueAdded = 'Added to you queue';
+  static const String playlistName = 'Give your playlist a name';
+  static const String noQueue = 'Play a track in order to add to queue';
   static const String noResults = 'No results found, '
       'try using different keyword.';
+
+  static const String addtoLiked = 'Add to Liked Songs';
+  static const String removeLiked = 'Remove from Liked Songs';
+  static const String addtoPlaylist = 'Add to Playlist';
+  static const String gotoAlbum = 'Go to Album';
+  static const String addtoQueue = 'Add to Queue';
 
   // errors
   static const String errorEmail = 'Invalid Email';
@@ -58,4 +72,8 @@ sealed class StringRes {
       ' or playlists—start typing to explore!';
   static const String emptySearchResults = 'No matches found—try refining '
       'your search or explore something new!';
+  static const String noPlaylists = 'No playlists available. '
+      'Create a playlist to get started!';
+  static const String emptyPlaylists = 'Your playlist is empty, \nstart '
+      'adding some tracks to set the vibe!';
 }

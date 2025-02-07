@@ -1,3 +1,4 @@
+import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/dimens.dart';
@@ -22,22 +23,22 @@ sealed class Utils {
     return TextStyle(
       fontSize: Dimens.fontTitle,
       fontWeight: FontWeight.bold,
-      color: color,
+      color: color ?? const Color(0xFF1B1C1E),
     );
   }
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
     final palete = await PaletteGenerator.fromImageProvider(
-        NetworkImage(track.album?.image?.url ?? ''),
+        NetworkImage(track.album?.image ?? ''),
         size: const Size(200, 200));
     final color = palete.mutedColor?.color;
 
     return TrackDetails(
         id: track.id,
-        uri: track.uri,
+        albumId: track.album?.id,
         title: track.name,
         bgColor: color,
-        image: track.album?.image?.url,
+        image: track.album?.image,
         subtitle: track.artists?.asString);
   }
 
@@ -58,7 +59,7 @@ sealed class Utils {
       id: UniqueIds.likedSongs,
       type: LibItemType.playlist,
       name: StringRes.likedSongs,
-      owner: '$count songs',
+      owner: OwnerModel(name: '$count songs'),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/utils/string.dart';
+import '../library_bloc/library_bloc.dart';
 
 sealed class RootEvent extends Equatable {
   const RootEvent();
@@ -58,24 +59,27 @@ class RootBloc extends Bloc<RootEvent, RootState> {
         tooltip: StringRes.library),
   ];
 
-  onIndexChange(BuildContext context, {required int index}) {
+  void onIndexChange(BuildContext context, {required int index}) {
+    final String path = GoRouterState.of(context).uri.path;
     switch (index) {
       case 0:
+        if (path.startsWith(AppRoutePaths.homeView)) break;
         context.goNamed(AppRoutes.homeView);
         break;
       case 1:
+        if (path.startsWith(AppRoutePaths.searchView)) break;
         context.goNamed(AppRoutes.searchView);
         break;
       case 2:
+        if (path.startsWith(AppRoutePaths.libraryView)) break;
+        context.read<LibraryBloc>().add(LibraryInitial());
         context.goNamed(AppRoutes.libraryView);
         break;
     }
     add(RootTabChanged(index));
   }
 
-  void _onInit(RootInitial event, Emitter<RootState> emit) async {
-    // await getIt<AuthRepo>().refreshToken();
-  }
+  void _onInit(RootInitial event, Emitter<RootState> emit) async {}
 
   void _onTap(RootTabChanged event, Emitter<RootState> emit) {
     emit(state.copyWith(event.index));

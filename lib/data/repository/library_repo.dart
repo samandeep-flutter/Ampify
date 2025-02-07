@@ -14,7 +14,7 @@ class LibraryRepo {
     ApiResponse.verify(
       response,
       onSuccess: onSuccess,
-      onError: onError ?? (json) => logPrint('profile: $json'),
+      onError: onError ?? (e) => logPrint(e, 'profile'),
     );
   }
 
@@ -29,7 +29,7 @@ class LibraryRepo {
     ApiResponse.verify(
       response,
       onSuccess: onSuccess,
-      onError: onError ?? (json) => logPrint('playlist: $json'),
+      onError: onError ?? (e) => logPrint(e, 'playlist'),
     );
   }
 
@@ -44,25 +44,9 @@ class LibraryRepo {
     ApiResponse.verify(
       response,
       onSuccess: onSuccess,
-      onError: onError ?? (json) => logPrint('albums: $json'),
+      onError: onError ?? (e) => logPrint(e, 'albums'),
     );
   }
-
-  // Future<void> getUserPlaylists(
-  //   String? id, {
-  //   int? limit,
-  //   required Function(Map<String, dynamic> map) onSuccess,
-  //   Function(Map<String, dynamic> errorMap)? onError,
-  // }) async {
-  //   if (id == null) return;
-  //   final url = AppConstants.userPlaylists(id);
-  //   final response = await dio.get(url, client: dio);
-  //   ApiResponse.verify(
-  //     response,
-  //     onSuccess: onSuccess,
-  //     onError: onError ?? (json) => logPrint('user playlist: $json'),
-  //   );
-  // }
 
   /// Get current user's liked songs
   ///
@@ -78,35 +62,19 @@ class LibraryRepo {
     ApiResponse.verify(
       response,
       onSuccess: onSuccess,
-      onError: onError ?? (json) => logPrint('liked songs: $json'),
+      onError: onError ?? (e) => logPrint(e, 'liked songs'),
     );
   }
 
-  Future<void> playlistDetails(
-    String id, {
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
-  }) async {
-    final url = AppConstants.playlistDetails(id);
-    final response = await dio.get(url, client: dio);
-    ApiResponse.verify(
-      response,
-      onSuccess: onSuccess,
-      onError: onError ?? (json) => logPrint('playlist details: $json'),
-    );
+  Future<bool> addtoLikedSongs(String id) async {
+    final url = AppConstants.savetoLiked(id);
+    final response = await dio.put(url, client: dio);
+    return response.response?.statusCode == 200;
   }
 
-  Future<void> albumDetails(
-    String id, {
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
-  }) async {
-    final url = AppConstants.albumDetails(id);
-    final response = await dio.get(url, client: dio);
-    ApiResponse.verify(
-      response,
-      onSuccess: onSuccess,
-      onError: onError ?? (json) => logPrint('album details: $json'),
-    );
+  Future<bool> removefromLikedSongs(String id) async {
+    final url = AppConstants.savetoLiked(id);
+    final response = await dio.delete(url, client: dio);
+    return response.response?.statusCode == 200;
   }
 }

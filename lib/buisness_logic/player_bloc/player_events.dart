@@ -1,4 +1,3 @@
-import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -9,15 +8,32 @@ class PlayerEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class PlayerInitial extends PlayerEvent {}
+
 class PlayerStatusChanged extends PlayerEvent {}
 
-class PlayerTrackLiked extends PlayerEvent {}
+class PlayerTrackLiked extends PlayerEvent {
+  final String id;
+  final bool? liked;
+  const PlayerTrackLiked(this.id, {this.liked});
+
+  @override
+  List<Object?> get props => [id, liked, super.props];
+}
 
 class PlayerShuffleToggle extends PlayerEvent {}
 
 class PlayerRepeatToggle extends PlayerEvent {}
 
-class PlayerInitial extends PlayerEvent {}
+class PlayerQueueReordered extends PlayerEvent {
+  final int previous;
+  final int current;
+
+  const PlayerQueueReordered({required this.previous, required this.current});
+
+  @override
+  List<Object?> get props => [previous, current, super.props];
+}
 
 class PlayerQueueAdded extends PlayerEvent {
   final Track track;
@@ -28,32 +44,16 @@ class PlayerQueueAdded extends PlayerEvent {
   List<Object?> get props => [track, super.props];
 }
 
-class QueueItemSelected extends PlayerEvent {
-  final int index;
-  const QueueItemSelected(this.index);
-
-  @override
-  List<Object?> get props => [index, super.props];
-}
-
 class PlayerQueueCleared extends PlayerEvent {}
 
-class PlayerNextTrack extends PlayerEvent {}
-
-class PlayerPreTrack extends PlayerEvent {
-  final List<TrackDetails> items;
-
-  const PlayerPreTrack(this.items);
-
-  @override
-  List<Object?> get props => [items, super.props];
-}
+class PlayerTrackEnded extends PlayerEvent {}
 
 class PlayerTrackChanged extends PlayerEvent {
   final Track track;
+  final bool? liked;
 
-  const PlayerTrackChanged(this.track);
+  const PlayerTrackChanged(this.track, {this.liked});
 
   @override
-  List<Object?> get props => [track, super.props];
+  List<Object?> get props => [track, liked, super.props];
 }

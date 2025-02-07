@@ -16,6 +16,14 @@ class LikedSongsEvent extends Equatable {
 
 class LikedSongsInitial extends LikedSongsEvent {}
 
+class SongRemoved extends LikedSongsEvent {
+  final String id;
+  const SongRemoved(this.id);
+
+  @override
+  List<Object?> get props => [id, super.props];
+}
+
 class LoadMoreSongs extends LikedSongsEvent {}
 
 class LoadMoreTrigger extends LikedSongsEvent {}
@@ -78,6 +86,7 @@ EventTransformer<T> _debounce<T>(Duration duration) {
 class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   LikedSongsBloc() : super(const LikedSongsState.init()) {
     on<LikedSongsInitial>(_onInit);
+    on<SongRemoved>(_onRemoved);
     on<LoadMoreSongs>(_onLoadMore);
     on<LikedSongsTitleFade>(_titleFade);
     on<LoadMoreTrigger>(_onLoadTrigger, transformer: _debounce(duration));
@@ -87,6 +96,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   final scrollController = ScrollController();
 
   final duration = const Duration(milliseconds: 200);
+  bool libRefresh = false;
 
   _titleFadeListener() {
     if (!scrollController.hasClients) return;
@@ -101,15 +111,26 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   _loadMoreSongs() {
     if (!scrollController.hasClients || state.moreLoading) return;
     if (state.tracks.length >= state.totalTracks) return;
-    if (scrollController.position.extentAfter < 300) {
+    final pos = scrollController.position;
+    if (pos.extentAfter < pos.maxScrollExtent * .3) {
       add(LoadMoreSongs());
     }
+  }
+
+  void songRemoved(String id) => add(SongRemoved(id));
+
+  _onRemoved(SongRemoved event, Emitter<LikedSongsState> emit) async {
+    libRefresh = true;
+    List<Track> tracks = state.tracks;
+    tracks.removeWhere((e) => e.id == event.id);
+    emit(state.copyWith(tracks: tracks, totalTracks: state.totalTracks - 1));
   }
 
   _onInit(LikedSongsInitial event, Emitter<LikedSongsState> emit) async {
     emit(state.copyWith(loading: true, titileOpacity: 0));
     scrollController.addListener(_titleFadeListener);
     scrollController.addListener(_loadMoreSongs);
+    libRefresh = false;
 
     await _repo.getLikedSongs(
       onSuccess: (json) {

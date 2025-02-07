@@ -1,4 +1,5 @@
 import 'package:ampify/services/box_services.dart';
+import 'package:ampify/services/extension_services.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../services/getit_instance.dart';
@@ -25,6 +26,16 @@ class DioClient {
     return response;
   }
 
+  Future<Response> _put(String url, {data, Options? options}) async {
+    final response = await dio.put(url, data: data, options: options);
+    return response;
+  }
+
+  Future<Response> _delete(String url, {data, Options? options}) async {
+    final response = await dio.delete(url, data: data, options: options);
+    return response;
+  }
+
   Future<ApiResponse> get(String url,
       {Options? options, required DioClient client}) async {
     final token = BoxServices.to.read(BoxKeys.token);
@@ -36,7 +47,14 @@ class DioClient {
       Response response =
           await client._get(url, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
-    } catch (_) {
+    } catch (error) {
+      try {
+        error as DioException;
+        final status = error.response?.data['error']['status'];
+        if (status != 401) {
+          return ApiResponse.withError(error);
+        }
+      } catch (_) {}
       await getIt<AuthRepo>().refreshToken();
       String token = BoxServices.to.read(BoxKeys.token);
       headers.update('Authorization', (_) => 'Bearer $token');
@@ -62,7 +80,14 @@ class DioClient {
       Response response = await client._post(url,
           data: data, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
-    } catch (_) {
+    } catch (error) {
+      try {
+        error as DioException;
+        final status = error.response?.data['error']['status'];
+        if (status != 401) {
+          return ApiResponse.withError(error);
+        }
+      } catch (_) {}
       await getIt<AuthRepo>().refreshToken();
       String token = BoxServices.to.read(BoxKeys.token);
       headers.update('Authorization', (_) => 'Bearer $token');
@@ -75,13 +100,89 @@ class DioClient {
       }
     }
   }
+
+  Future<ApiResponse> put(String url,
+      {dynamic data, Options? options, required DioClient client}) async {
+    final token = BoxServices.to.read(BoxKeys.token);
+    final Map<String, dynamic> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+
+    try {
+      Response response = await client._put(url,
+          data: data, options: options ?? Options(headers: headers));
+      return ApiResponse.withSuccess(response);
+    } catch (error) {
+      try {
+        error as DioException;
+        final status = error.response?.data['error']['status'];
+        if (status != 401) {
+          return ApiResponse.withError(error);
+        }
+      } catch (_) {}
+      await getIt<AuthRepo>().refreshToken();
+      String token = BoxServices.to.read(BoxKeys.token);
+      headers.update('Authorization', (_) => 'Bearer $token');
+      try {
+        Response response = await client._put(url,
+            data: data, options: options ?? Options(headers: headers));
+        return ApiResponse.withSuccess(response);
+      } catch (e) {
+        return ApiResponse.withError(e);
+      }
+    }
+  }
+
+  Future<ApiResponse> delete(String url,
+      {dynamic data, Options? options, required DioClient client}) async {
+    final token = BoxServices.to.read(BoxKeys.token);
+    final Map<String, dynamic> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+
+    try {
+      Response response = await client._delete(url,
+          data: data, options: options ?? Options(headers: headers));
+      return ApiResponse.withSuccess(response);
+    } catch (error) {
+      try {
+        error as DioException;
+        final status = error.response?.data['error']['status'];
+        if (status != 401) {
+          return ApiResponse.withError(error);
+        }
+      } catch (_) {}
+      await getIt<AuthRepo>().refreshToken();
+      String token = BoxServices.to.read(BoxKeys.token);
+      headers.update('Authorization', (_) => 'Bearer $token');
+      try {
+        Response response = await client._delete(url,
+            data: data, options: options ?? Options(headers: headers));
+        return ApiResponse.withSuccess(response);
+      } catch (e) {
+        return ApiResponse.withError(e);
+      }
+    }
+  }
 }
 
 class LoggingInterceptor extends InterceptorsWrapper {
+  // @override
+  // void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  //   final path = options.uri.path;
+  //   dprint('$path\n ${options.data}');
+  //   super.onRequest(options, handler);
+  // }
+
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final options = response.requestOptions;
-    dprint('${response.statusCode} | ${options.method} | ${options.path}\n'
+    final status = response.statusCode;
+
+    final time = DateTime.now().formatTime;
+    dprint('$status | ${options.method} [$time] | ${options.path}\n'
         // '${response.data.toString()}\n'
         '<--------------------------END HTTP-------------------------->');
     super.onResponse(response, handler);
@@ -89,7 +190,12 @@ class LoggingInterceptor extends InterceptorsWrapper {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    logPrint('ERROR [${err.response?.statusCode}] ${err.requestOptions.path}');
+    final options = err.requestOptions;
+    final status = err.response?.statusCode;
+    logPrint(
+        'ERROR [$status] ${options.method} | ${options.path}'
+            '\n${err.response?.data}',
+        'DIO');
     super.onError(err, handler);
   }
 }

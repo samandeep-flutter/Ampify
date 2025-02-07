@@ -22,7 +22,7 @@ class AuthServices {
   }
 
   void _dynamicLinks(Uri uri) {
-    logPrint('app_links: ${uri.toString()}');
+    logPrint(uri, 'app_links');
     switch (uri.authority) {
       case 'spotify-login':
         if (Platform.isIOS) return;

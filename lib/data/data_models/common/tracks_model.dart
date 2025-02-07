@@ -16,23 +16,26 @@ class Track extends Equatable {
   final String? type;
   final String? uri;
 
-  const Track(
-      {this.album,
-      this.artists,
-      this.discNumber,
-      this.durationMs,
-      this.explicit,
-      this.href,
-      this.id,
-      this.name,
-      this.popularity,
-      this.trackNumber,
-      this.type,
-      this.uri});
+  const Track({
+    this.album,
+    this.artists,
+    this.discNumber,
+    this.durationMs,
+    this.explicit,
+    this.href,
+    this.id,
+    this.name,
+    this.popularity,
+    this.trackNumber,
+    this.type,
+    this.uri,
+  });
 
-  factory Track.fromJson(Map<String, dynamic> json) {
+  factory Track.fromJson(Map<String, dynamic> json, {String? image}) {
+    final defAlbum = Album(image: image, name: json['name'], id: json['id']);
+
     return Track(
-      album: json['album'] != null ? Album.fromJson(json['album']) : null,
+      album: json['album'] != null ? Album.fromJson(json['album']) : defAlbum,
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
       discNumber: json['disc_number'],

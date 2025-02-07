@@ -16,7 +16,7 @@ class ApiResponse {
     final response = apiResponse.response;
     if (response != null) {
       Map<String, dynamic> json = response.data;
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         onSuccess(json);
         return;
       }

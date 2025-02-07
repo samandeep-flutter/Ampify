@@ -1,5 +1,6 @@
-import 'package:ampify/buisness_logic/library_bloc/collection_bloc.dart';
+import 'package:ampify/buisness_logic/root_bloc/music_group_bloc.dart';
 import 'package:ampify/buisness_logic/root_bloc/auth_bloc.dart';
+import 'package:ampify/buisness_logic/root_bloc/playlist_bloc.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/home_screens/home_screen.dart';
 import 'package:ampify/presentation/home_screens/listn_history.dart';
@@ -11,10 +12,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../buisness_logic/home_bloc/listn_history_bloc.dart';
-import '../../buisness_logic/library_bloc/liked_songs_bloc.dart';
 import '../../presentation/library_screens/liked_songs.dart';
-import '../../presentation/library_screens/collection_view.dart';
+import '../../presentation/library_screens/music_group_screen.dart';
 import '../../presentation/root_view/root_view.dart';
+import '../../presentation/track_widgets/create_playlist.dart';
 import '../../services/auth_services.dart';
 import 'app_routes.dart';
 
@@ -36,6 +37,17 @@ abstract class AppPage {
           );
         },
       ),
+      GoRoute(
+        name: AppRoutes.createPlaylist,
+        path: AppRoutePaths.createPlaylist,
+        builder: (_, state) {
+          final id = state.pathParameters['userId'] as String;
+          return BlocProvider(
+            create: (_) => PlaylistBloc(),
+            child: CreatePlaylistView(userId: id),
+          );
+        },
+      ),
       ShellRoute(
           builder: (_, state, navigator) => RootView(navigator),
           routes: [
@@ -54,6 +66,18 @@ abstract class AppPage {
                       }),
                 ]),
             GoRoute(
+                name: AppRoutes.musicGroup,
+                path: '${AppRoutePaths.musicGroup}/:type/:id',
+                builder: (context, state) {
+                  String id = state.pathParameters['id']!;
+                  final type = LibItemType.values.firstWhere((e) {
+                    return e.name == state.pathParameters['type'];
+                  });
+                  final bloc = context.read<MusicGroupBloc>();
+                  bloc.add(MusicGroupInitial(id: id, type: type));
+                  return const MusicGroupScreen();
+                }),
+            GoRoute(
               name: AppRoutes.searchView,
               path: AppRoutePaths.searchView,
               builder: (_, state) => const SearchPage(),
@@ -64,25 +88,9 @@ abstract class AppPage {
                 builder: (_, state) => const LibraryScreen(),
                 routes: [
                   GoRoute(
-                      name: AppRoutes.collectionView,
-                      path: '${AppRoutes.collectionView}/:id/:type',
-                      builder: (context, state) {
-                        String id = state.pathParameters['id']!;
-                        final type = LibItemType.values.firstWhere((e) {
-                          return e.name == state.pathParameters['type'];
-                        });
-                        final bloc = context.read<CollectionBloc>();
-                        bloc.add(CollectionInitial(id: id, type: type));
-                        return const CollectionView();
-                      }),
-                  GoRoute(
                       name: AppRoutes.likedSongs,
                       path: AppRoutes.likedSongs,
-                      builder: (_, state) {
-                        return BlocProvider(
-                            create: (_) => LikedSongsBloc(),
-                            child: const LikedSongs());
-                      }),
+                      builder: (_, state) => const LikedSongs()),
                 ]),
           ]),
     ],

@@ -10,6 +10,7 @@ import 'package:ampify/data/utils/dimens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
+import '../../track_widgets/track_bottom_sheet.dart';
 import '../../widgets/loading_widgets.dart';
 import 'queue_view.dart';
 
@@ -23,10 +24,10 @@ class PlayerScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: CustomScrollView(slivers: [
-        const SliverSafeArea(
-          sliver: SliverToBoxAdapter(
-            child: SizedBox(height: Dimens.sizeDefault),
-          ),
+        const SliverAppBar(
+          forceMaterialTransparency: true,
+          automaticallyImplyLeading: false,
+          toolbarHeight: 45,
         ),
         SliverAppBar(
           forceMaterialTransparency: true,
@@ -37,7 +38,23 @@ class PlayerScreen extends StatelessWidget {
                 child: const Icon(Icons.arrow_back_ios),
               )),
           actions: [
-            IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
+            BlocBuilder<PlayerBloc, PlayerState>(
+              builder: (context, state) {
+                return IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        showDragHandle: true,
+                        useRootNavigator: true,
+                        builder: (_) => TrackBottomSheet(
+                              state.track.toTrack(),
+                              liked: state.liked,
+                            ));
+                  },
+                  icon: const Icon(Icons.more_vert),
+                );
+              },
+            ),
             const SizedBox(width: Dimens.sizeSmall),
           ],
         ),
@@ -55,6 +72,7 @@ class PlayerScreen extends StatelessWidget {
                         final fgColor = state.track.bgColor?.withOpacity(.4);
                         const bgColor = Colors.white;
                         return ShadowWidget(
+                          offset: const Offset(0, 50),
                           margin: const EdgeInsets.all(Dimens.sizeMedium),
                           color: Color.alphaBlend(fgColor ?? bgColor, bgColor),
                           child: MyCachedImage(
@@ -63,7 +81,14 @@ class PlayerScreen extends StatelessWidget {
                           ),
                         );
                       }),
-                  SizedBox(height: context.height * .05),
+                  BlocListener<PlayerBloc, PlayerState>(
+                    listener: (context, state) {
+                      if (!(state.showPlayer ?? true)) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: SizedBox(height: context.height * .05),
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
@@ -101,7 +126,10 @@ class PlayerScreen extends StatelessWidget {
                           buildWhen: (pr, cr) => pr.liked != cr.liked,
                           builder: (context, state) {
                             return IconButton(
-                              onPressed: bloc.onTrackLiked,
+                              onPressed: () {
+                                final id = state.track.id;
+                                bloc.onTrackLiked(id!, state.liked);
+                              },
                               isSelected: state.liked,
                               selectedIcon: const Icon(Icons.favorite),
                               iconSize: Dimens.sizeMidLarge,
@@ -134,7 +162,7 @@ class PlayerScreen extends StatelessWidget {
 
                         return SliderTheme(
                           data: const SliderThemeData(
-                              trackHeight: Dimens.sizeExtraSmall,
+                              trackHeight: 2,
                               thumbShape: RoundSliderThumbShape(
                                 enabledThumbRadius: 5,
                               )),

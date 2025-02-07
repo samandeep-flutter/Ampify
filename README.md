@@ -1,4 +1,4 @@
-# ![App Icon](https://github.com/samanjhutty/ampify/blob/main/android/app/src/main/res/mipmap-hdpi/ic_launcher.png) Ampify
+# <img src="https://github.com/samanjhutty/ampify/blob/main/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" width="30" height="30"> Ampify
 
 ![Version](https://img.shields.io/github/v/release/samanjhutty/ampify)
 ![License](https://img.shields.io/github/license/samanjhutty/ampify)

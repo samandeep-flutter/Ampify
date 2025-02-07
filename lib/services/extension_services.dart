@@ -1,5 +1,6 @@
 import 'package:ampify/config/theme_services.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
+import 'package:ampify/data/data_models/library_model.dart';
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
 
@@ -81,16 +82,47 @@ extension MyDateTime on DateTime {
   }
 
   String _formatedDate(DateTime time) {
-    String month = _format(time.month);
     String day = _format(time.day);
 
-    return '$month:$day';
+    return '${_formatMonth(time.month)} $day, ${time.year}';
   }
 
   String _format(int number) {
     String int = number.toString();
     String result = int.length > 1 ? int : '0$int';
     return result;
+  }
+
+  String _formatMonth(int month) {
+    switch (month) {
+      case 1:
+        return 'January';
+      case 2:
+        return 'February';
+      case 3:
+        return 'March';
+      case 4:
+        return 'April';
+      case 5:
+        return 'May';
+      case 6:
+        return 'June';
+      case 7:
+        return 'July';
+      case 8:
+        return 'August';
+      case 9:
+        return 'September';
+      case 10:
+        return 'October';
+      case 11:
+        return 'November';
+      case 12:
+        return 'December';
+
+      default:
+        return '$month';
+    }
   }
 }
 
@@ -100,6 +132,8 @@ extension MyString on String {
   bool get isStringPass => _passRegExp(this);
   String get capitalize => _capitilize(this);
   String get unescape => _unescape(this);
+  String get removeCoprights => _removeCopyright(this);
+  int queryMatch(String query) => _calculateMatch(this, query);
 
   DateTime _formJson(String datetime) {
     int year = int.parse(datetime.substring(0, 4));
@@ -131,6 +165,40 @@ extension MyString on String {
   }
 
   String _unescape(String text) => HtmlUnescape().convert(text);
+
+  String _removeCopyright(String text) {
+    return text.replaceAll(RegExp(r'\b[CcPp]|\([CcPp]\)'), '');
+  }
+
+  int _calculateMatch(String item, String searchText) {
+    item = item.toLowerCase();
+    searchText = searchText.toLowerCase();
+    if (item == searchText) {
+      return 3;
+    } else if (item.startsWith(searchText)) {
+      return 2;
+    } else if (item.contains(searchText)) {
+      return 1;
+    }
+    return 0;
+  }
+}
+
+extension SortMusicGroup on List<LibraryModel> {
+  void sortLibrary(String query) => sort((a, b) {
+        int first = 0;
+        int second = 0;
+
+        final fName = a.name?.queryMatch(query) ?? 0;
+        final fArtist = a.owner?.name?.queryMatch(query) ?? 0;
+        first = fName.compareTo(fArtist);
+
+        final sName = b.name?.queryMatch(query) ?? 0;
+        final sArtist = b.owner?.name?.queryMatch(query) ?? 0;
+        second = sName.compareTo(sArtist);
+
+        return second.compareTo(first);
+      });
 }
 
 extension MyInt on int {
