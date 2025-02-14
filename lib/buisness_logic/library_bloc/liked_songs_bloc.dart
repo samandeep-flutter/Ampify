@@ -1,11 +1,14 @@
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/repository/library_repo.dart';
+import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/transformers.dart';
 import '../../data/data_models/common/playlist_model.dart';
+import '../player_bloc/player_bloc.dart';
+import '../player_bloc/player_events.dart';
 
 class LikedSongsEvent extends Equatable {
   const LikedSongsEvent();
@@ -97,6 +100,15 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
 
   final duration = const Duration(milliseconds: 200);
   bool libRefresh = false;
+
+  onPlay(BuildContext context) {
+    final player = context.read<PlayerBloc>();
+    player.add(MusicGroupPlayed(
+      id: UniqueIds.likedSongs,
+      tracks: state.tracks,
+      liked: true,
+    ));
+  }
 
   _titleFadeListener() {
     if (!scrollController.hasClients) return;

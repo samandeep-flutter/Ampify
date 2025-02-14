@@ -15,7 +15,7 @@ class AuthRepo {
 
   Future<String?> auth() async {
     const scopes =
-        'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read user-top-read';
+        'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read user-top-read ugc-image-upload';
     try {
       final data = {
         'response_type': 'code',

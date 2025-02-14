@@ -366,7 +366,7 @@ class BottomSheetListTile extends StatelessWidget {
       horizontalTitleGap: Dimens.sizeLarge,
       titleTextStyle: TextStyle(
           fontWeight: FontWeight.w500,
-          fontSize: Dimens.fontLarge + 1,
+          fontSize: Dimens.fontLarge,
           color: scheme.textColor),
     );
   }

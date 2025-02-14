@@ -91,6 +91,8 @@ class _MyTextFieldState extends State<MyTextField> {
     obscureText = widget.obscureText;
     if (widget.isEmail) {
       inputType = widget.keyboardType ?? TextInputType.emailAddress;
+    } else if (widget.isNumber) {
+      inputType = widget.keyboardType ?? TextInputType.phone;
     }
     super.initState();
   }

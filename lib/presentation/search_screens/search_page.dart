@@ -5,7 +5,7 @@ import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/presentation/library_screens/music_group_tile.dart';
+import 'package:ampify/presentation/music_groups/music_group_tile.dart';
 import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/presentation/widgets/base_widget.dart';
 import 'package:ampify/presentation/widgets/my_text_field_widget.dart';

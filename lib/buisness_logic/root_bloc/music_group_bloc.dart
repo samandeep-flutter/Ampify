@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
@@ -6,13 +10,15 @@ import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:ampify/data/repository/music_group_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/box_services.dart';
+import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../data/data_models/common/playlist_model.dart';
 import '../../data/utils/utils.dart';
+import '../../services/box_services.dart';
 
 class MusicGroupEvent extends Equatable {
   const MusicGroupEvent();
@@ -36,6 +42,22 @@ class PlaylistInitial extends MusicGroupEvent {
 
   @override
   List<Object?> get props => [id, super.props];
+}
+
+class PlaylistVisibility extends MusicGroupEvent {
+  final bool public;
+  const PlaylistVisibility(this.public);
+
+  @override
+  List<Object?> get props => [public, super.props];
+}
+
+class PlaylistCoverChanged extends MusicGroupEvent {
+  final File file;
+  const PlaylistCoverChanged(this.file);
+
+  @override
+  List<Object?> get props => [file, super.props];
 }
 
 class MusicGroupFav extends MusicGroupEvent {
@@ -121,8 +143,8 @@ class MusicGroupState extends Equatable {
       title: title ?? this.title,
       isFav: isFav,
       details: details,
-      type: type ?? this.type,
       titileOpacity: titileOpacity ?? this.titileOpacity,
+      type: type ?? this.type,
       tracks: tracks ?? this.tracks,
       loading: loading ?? this.loading,
     );
@@ -149,11 +171,41 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     on<MusicGroupFav>(_onFav);
     on<PlaylistInitial>(_onPlaylist);
     on<MusicGroupTitleFade>(_titleFade);
+    on<PlaylistVisibility>(_onVisibility);
+    on<PlaylistCoverChanged>(_onCoverChanged);
   }
   final MusicGroupRepo _repo = getIt();
   final scrollController = ScrollController();
+  final picker = ImagePicker();
   ProfileModel? profile;
   bool libRefresh = false;
+
+  // @override
+  // void add(MusicGroupEvent event) {
+  //   logPrint(event, 'Event');
+  //   super.add(event);
+  // }
+
+  onPlay(BuildContext context) {
+    final player = context.read<PlayerBloc>();
+    player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
+  }
+
+  Future<bool> pickImage(ImageSource source) async {
+    try {
+      final file =
+          await picker.pickImage(source: source, maxHeight: 500, maxWidth: 500);
+      if (file != null) {
+        add(PlaylistCoverChanged(File(file.path)));
+        return true;
+      }
+      throw Exception(StringRes.noImage);
+    } catch (e) {
+      showToast(StringRes.noImage);
+      logPrint(e, 'Image Picker');
+      return false;
+    }
+  }
 
   _scrollListener() {
     if (!scrollController.hasClients) return;
@@ -283,6 +335,30 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     } catch (_) {
       emit(state.copyWith(isFav: false));
     }
+  }
+
+  _onCoverChanged(
+      PlaylistCoverChanged event, Emitter<MusicGroupState> emit) async {
+    showToast(StringRes.uploading);
+    emit(state.copyWith(image: ''));
+    final image = await event.file.readAsBytes();
+    await _repo.changeCoverImage(id: state.id!, image: base64Encode(image));
+    add(PlaylistInitial(state.id!));
+  }
+
+  _onVisibility(PlaylistVisibility event, Emitter<MusicGroupState> emit) async {
+    await _repo.editPlaylist(
+      id: state.id!,
+      title: state.title!,
+      desc: state.details?.description ?? '',
+      public: event.public,
+    );
+    add(PlaylistInitial(state.id!));
+    if (event.public) {
+      showToast(StringRes.nowPublic);
+      return;
+    }
+    showToast(StringRes.nowPrivate);
   }
 
   _titleFade(MusicGroupTitleFade event, Emitter<MusicGroupState> emit) {

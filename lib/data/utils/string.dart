@@ -15,6 +15,8 @@ sealed class StringRes {
   static const String close = 'Close';
   static const String share = 'Share';
   static const String create = 'Create';
+  static const String gallery = 'via Gallery';
+  static const String camera = 'via Camera';
   static const String settings = 'Settings';
   static const String likedSongs = 'Liked Songs';
   static const String refresh = 'Refresh';
@@ -25,16 +27,22 @@ sealed class StringRes {
   static const String createPlaylist = 'Create Playlist';
   static const String pubPlaylist = 'Public Playlist';
   static const String priPlaylist = 'Private Playlist';
+  static const String nowPublic = 'Playlist is now Public';
+  static const String nowPrivate = 'Playlist is now Private';
   static const String nowPlaying = 'Now Playing';
   static const String nextQueue = 'Next in Queue';
   static const String clearQueue = 'Clear Queue';
   static const String queueTitle = 'Playing from play queue';
   static const String myLibrary = 'My Library';
   static const String editCover = 'Edit Cover';
+  static const String addTracks = 'Add Tracks to Playlist';
   static const String editDetails = 'Edit Details';
+  static const String noImage = 'No Image Selected';
+  static const String uploading = 'Uploading...';
   static const String somethingWrong = 'Something went wrong';
   static const String listenHistory = 'Listening History';
   static const String queueAdded = 'Added to you queue';
+  static const String detailsUpdated = 'Playlist details updated';
   static const String playlistName = 'Give your playlist a name';
   static const String noQueue = 'Play a track in order to add to queue';
   static const String noResults = 'No results found, '
@@ -76,4 +84,6 @@ sealed class StringRes {
       'Create a playlist to get started!';
   static const String emptyPlaylists = 'Your playlist is empty, \nstart '
       'adding some tracks to set the vibe!';
+  static const String playlistDesc = 'Add a short description to'
+      ' personalize your playlist.';
 }

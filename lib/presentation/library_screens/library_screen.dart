@@ -3,7 +3,7 @@ import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/library_screens/music_group_tile.dart';
+import 'package:ampify/presentation/music_groups/music_group_tile.dart';
 import 'package:ampify/presentation/widgets/my_alert_dialog.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
 import 'package:ampify/services/extension_services.dart';

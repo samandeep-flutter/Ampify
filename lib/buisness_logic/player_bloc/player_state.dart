@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PlayerState extends Equatable {
+  final String? musicGroupId;
   final TrackDetails track;
   final int? length;
   final bool shuffle;
@@ -14,9 +15,11 @@ class PlayerState extends Equatable {
   final MusicLoopMode loopMode;
   final MusicState? playerState;
   final List<TrackDetails> queue;
+  final List<TrackDetails> upNext;
   final bool durationLoading;
 
   const PlayerState({
+    required this.musicGroupId,
     required this.track,
     required this.length,
     required this.liked,
@@ -25,21 +28,25 @@ class PlayerState extends Equatable {
     required this.showPlayer,
     required this.playerState,
     required this.queue,
+    required this.upNext,
     required this.durationLoading,
   });
 
   const PlayerState.init()
       : track = const TrackDetails.init(),
+        musicGroupId = null,
         showPlayer = false,
         shuffle = false,
         liked = false,
         length = 0,
+        upNext = const [],
         queue = const [],
         durationLoading = false,
         loopMode = MusicLoopMode.off,
         playerState = MusicState.loading;
 
   PlayerState copyWith({
+    String? musicGroupId,
     TrackDetails? track,
     int? length,
     bool? liked,
@@ -47,14 +54,17 @@ class PlayerState extends Equatable {
     bool? showPlayer,
     bool? durationLoading,
     List<TrackDetails>? queue,
+    List<TrackDetails>? upNext,
     MusicLoopMode? loopMode,
     MusicState? playerState,
   }) {
     return PlayerState(
+        musicGroupId: musicGroupId ?? this.musicGroupId,
         track: track ?? this.track,
         length: length ?? this.length,
         liked: liked ?? this.liked,
         queue: queue ?? this.queue,
+        upNext: upNext ?? this.upNext,
         shuffle: shuffle ?? this.shuffle,
         loopMode: loopMode ?? this.loopMode,
         durationLoading: durationLoading ?? this.durationLoading,
@@ -64,12 +74,14 @@ class PlayerState extends Equatable {
 
   @override
   List<Object?> get props => [
+        musicGroupId,
         track,
         length,
         shuffle,
         loopMode,
         liked,
         queue,
+        upNext,
         showPlayer,
         durationLoading,
         playerState

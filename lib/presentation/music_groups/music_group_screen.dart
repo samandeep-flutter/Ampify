@@ -1,22 +1,38 @@
+import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/image_resources.dart';
-import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/presentation/widgets/shimmer_widget.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
+import '../../buisness_logic/root_bloc/music_group_bloc.dart';
+import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
+import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../buisness_logic/root_bloc/music_group_bloc.dart';
 import '../widgets/loading_widgets.dart';
 import 'playlist_bottom_sheet.dart';
 
-class MusicGroupScreen extends StatelessWidget {
-  const MusicGroupScreen({super.key});
+class MusicGroupScreen extends StatefulWidget {
+  final String id;
+  final LibItemType type;
+  const MusicGroupScreen({super.key, required this.id, required this.type});
+
+  @override
+  State<MusicGroupScreen> createState() => _MusicGroupScreenState();
+}
+
+class _MusicGroupScreenState extends State<MusicGroupScreen> {
+  @override
+  void initState() {
+    final bloc = context.read<MusicGroupBloc>();
+    bloc.add(MusicGroupInitial(id: widget.id, type: widget.type));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +78,17 @@ class MusicGroupScreen extends StatelessWidget {
                         horizontal: Dimens.sizeDefault),
                     background: Align(
                       alignment: Alignment.bottomCenter,
-                      child: MyCachedImage(
-                        state.image,
-                        loading: state.image?.isEmpty ?? true,
-                        height: context.height * .3,
-                        width: context.height * .3,
-                        borderRadius: Dimens.sizeExtraSmall,
+                      child: BlocBuilder<MusicGroupBloc, MusicGroupState>(
+                        buildWhen: (pr, cr) => pr.image != cr.image,
+                        builder: (context, state) {
+                          return MyCachedImage(
+                            state.image,
+                            loading: state.image?.isEmpty ?? true,
+                            height: context.height * .3,
+                            width: context.height * .3,
+                            borderRadius: Dimens.sizeExtraSmall,
+                          );
+                        },
                       ),
                     )),
               ),
@@ -212,45 +233,48 @@ class MusicGroupScreen extends StatelessWidget {
                                     useRootNavigator: true,
                                     builder: (context) {
                                       return PlaylistBottomSheet(
-                                        image: state.image,
-                                        title: state.title,
-                                        owner: state.details?.owner,
-                                        public: state.details?.public,
-                                      );
+                                          id: state.id,
+                                          image: state.image,
+                                          title: state.title,
+                                          details: state.details);
                                     });
                               },
                               style: IconButton.styleFrom(
                                   visualDensity: VisualDensity.compact),
                               iconSize: Dimens.sizeLarge,
-                              icon: Image.asset(
-                                ImageRes.editMusic,
-                                height: Dimens.sizeLarge + 4,
-                                color: scheme.textColorLight,
-                              ),
+                              icon: const Icon(Icons.more_vert),
+                            ),
+                          ] else ...[
+                            const SizedBox(width: Dimens.sizeSmall),
+                            IconButton(
+                              onPressed: null,
+                              color: scheme.textColorLight,
+                              style: IconButton.styleFrom(
+                                  visualDensity: VisualDensity.compact),
+                              iconSize: Dimens.sizeLarge,
+                              icon: const Icon(Icons.ios_share),
                             )
                           ],
-                          const SizedBox(width: Dimens.sizeSmall),
-                          IconButton(
-                            onPressed: null,
-                            color: scheme.textColorLight,
-                            style: IconButton.styleFrom(
-                                visualDensity: VisualDensity.compact),
-                            iconSize: Dimens.sizeLarge,
-                            icon: const Icon(Icons.ios_share),
-                          ),
                           const Spacer(),
-                          LoadingIcon(
-                            onPressed: () {},
-                            iconSize: Dimens.sizeMidLarge,
-                            loaderSize: Dimens.sizeMidLarge,
-                            loading: false,
-                            isSelected: false,
-                            selectedIcon: const Icon(Icons.pause),
-                            style: IconButton.styleFrom(
-                                backgroundColor: scheme.textColor,
-                                foregroundColor: scheme.surface,
-                                splashFactory: NoSplash.splashFactory),
-                            icon: const Icon(Icons.play_arrow),
+                          BlocBuilder<PlayerBloc, PlayerState>(
+                            builder: (context, pl) {
+                              final group = pl.musicGroupId == state.id;
+                              final loading =
+                                  pl.playerState == MusicState.loading;
+                              return LoadingIcon(
+                                onPressed: () => bloc.onPlay(context),
+                                iconSize: Dimens.sizeMidLarge,
+                                loaderSize: Dimens.sizeMidLarge,
+                                loading: group && loading,
+                                isSelected: group,
+                                selectedIcon: const Icon(Icons.pause),
+                                style: IconButton.styleFrom(
+                                    backgroundColor: scheme.textColor,
+                                    foregroundColor: scheme.surface,
+                                    splashFactory: NoSplash.splashFactory),
+                                icon: const Icon(Icons.play_arrow),
+                              );
+                            },
                           ),
                         ],
                       )

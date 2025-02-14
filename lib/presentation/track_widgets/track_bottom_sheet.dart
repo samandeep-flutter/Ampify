@@ -49,14 +49,14 @@ class TrackBottomSheet extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                         color: scheme.textColor,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                         fontSize: Dimens.fontLarge),
                   ),
                   const SizedBox(height: Dimens.sizeExtraSmall),
                   Text(track.artists?.asString ?? '',
                       style: TextStyle(
                         color: scheme.textColorLight,
-                        fontSize: Dimens.fontDefault,
+                        fontSize: Dimens.fontLarge - 1,
                       ))
                 ],
               ),

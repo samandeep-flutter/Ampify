@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ sealed class AppConstants {
   static String savetoLiked(String id) => 'me/tracks?ids=$id';
   static String saveAlbum(String id) => 'me/albums?ids=$id';
   static String savePlaylist(String id) => 'playlists/$id/followers';
+  static String changePlaylistCover(String id) => 'playlists/$id/images';
   static String isFollowAlbum(String id) => 'me/albums/contains?ids=$id';
   static String isFollowPlaylist(String id) =>
       'playlists/$id/followers/contains';
@@ -63,6 +65,21 @@ class MyColoredBox extends StatelessWidget {
 showToast(String text, {int? timeInSec}) async {
   await Fluttertoast.cancel();
   Future.delayed(const Duration(milliseconds: 300)).then((_) {
-    Fluttertoast.showToast(msg: text, timeInSecForIosWeb: timeInSec ?? 1);
+    Fluttertoast.showToast(
+        msg: text,
+        timeInSecForIosWeb: timeInSec ?? 1,
+        gravity: ToastGravity.SNACKBAR);
   });
+}
+
+showSnackBar(BuildContext context, {required String text}) {
+  final messenger = ScaffoldMessenger.of(context);
+  messenger.clearSnackBars();
+  messenger.showSnackBar(SnackBar(
+      content: Text(text),
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.symmetric(horizontal: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Dimens.borderSmall),
+      )));
 }

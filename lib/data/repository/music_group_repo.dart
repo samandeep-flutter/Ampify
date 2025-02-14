@@ -113,6 +113,36 @@ class MusicGroupRepo {
     );
   }
 
+  Future<bool> editPlaylist(
+      {required String id,
+      required String title,
+      required String desc,
+      required bool public}) async {
+    final token = BoxServices.to.read(BoxKeys.token);
+    final url = AppConstants.playlistDetails(id);
+    final body = {'name': title, 'description': desc, 'public': public};
+    final hearders = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+    final response = await dio.put(url,
+        options: Options(headers: hearders), data: body, client: dio);
+    return response.response?.statusCode == 200;
+  }
+
+  Future<bool> changeCoverImage(
+      {required String id, required String image}) async {
+    final token = BoxServices.to.read(BoxKeys.token);
+    final url = AppConstants.changePlaylistCover(id);
+    final hearders = {
+      'Content-Type': 'image/jpeg',
+      'Authorization': 'Bearer $token'
+    };
+    final response = await dio.put(url,
+        options: Options(headers: hearders), data: image, client: dio);
+    return response.response?.statusCode == 202;
+  }
+
   Future<void> addTracktoPlaylist(
     String id, {
     required List<String> trackUri,

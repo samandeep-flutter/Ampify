@@ -33,7 +33,7 @@ class AuthServices {
     }
   }
 
-  String navigate() {
+  String get initialRoute {
     try {
       box.read(BoxKeys.token) as String;
       return AppRoutes.homeView;

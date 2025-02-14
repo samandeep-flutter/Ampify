@@ -47,8 +47,8 @@ class PlaylistBloc extends Bloc<PlaylistEvents, PlaylistState> {
   }
 
   final titleController = TextEditingController();
-  final MusicGroupRepo _repo = getIt();
   final titleKey = GlobalKey<FormFieldState>();
+  final MusicGroupRepo _repo = getIt();
 
   void createPlaylist(String id) {
     if (!(titleKey.currentState?.validate() ?? false)) return;
@@ -60,6 +60,7 @@ class PlaylistBloc extends Bloc<PlaylistEvents, PlaylistState> {
     await _repo.createPlaylist(event.title, userId: event.userId,
         onSuccess: (json) {
       emit(state.copyWith(success: true, loading: false));
+      titleController.clear();
     });
   }
 }

@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../buisness_logic/library_bloc/liked_songs_bloc.dart';
+import '../../buisness_logic/player_bloc/player_bloc.dart';
+import '../../buisness_logic/player_bloc/player_state.dart';
+import '../../data/utils/app_constants.dart';
 import '../../data/utils/dimens.dart';
 import '../../data/utils/utils.dart';
 import '../track_widgets/track_tile.dart';
@@ -105,18 +108,26 @@ class _LikedSongsState extends State<LikedSongs> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          LoadingIcon(
-                            onPressed: () {},
-                            iconSize: Dimens.sizeMidLarge,
-                            loaderSize: Dimens.sizeMidLarge,
-                            loading: false,
-                            isSelected: false,
-                            selectedIcon: const Icon(Icons.pause),
-                            style: IconButton.styleFrom(
-                                backgroundColor: scheme.textColor,
-                                foregroundColor: scheme.surface,
-                                splashFactory: NoSplash.splashFactory),
-                            icon: const Icon(Icons.play_arrow),
+                          BlocBuilder<PlayerBloc, PlayerState>(
+                            builder: (context, pl) {
+                              final group =
+                                  pl.musicGroupId == UniqueIds.likedSongs;
+                              final loading =
+                                  pl.playerState == MusicState.loading;
+                              return LoadingIcon(
+                                onPressed: () => bloc.onPlay(context),
+                                iconSize: Dimens.sizeMidLarge,
+                                loaderSize: Dimens.sizeMidLarge,
+                                loading: group && loading,
+                                isSelected: group,
+                                selectedIcon: const Icon(Icons.pause),
+                                style: IconButton.styleFrom(
+                                    backgroundColor: scheme.textColor,
+                                    foregroundColor: scheme.surface,
+                                    splashFactory: NoSplash.splashFactory),
+                                icon: const Icon(Icons.play_arrow),
+                              );
+                            },
                           ),
                         ],
                       )

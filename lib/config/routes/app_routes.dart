@@ -7,6 +7,7 @@ abstract class AppRoutes {
   static const String musicGroup = 'music-group-screen';
   static const String listnHistory = 'listening-history';
   static const String createPlaylist = 'create-playlist';
+  static const String modifyPlaylist = 'modify-playlist';
 }
 
 abstract class AppRoutePaths {
@@ -16,4 +17,5 @@ abstract class AppRoutePaths {
   static const String searchView = '/${AppRoutes.searchView}';
   static const String libraryView = '/${AppRoutes.libraryView}';
   static const String createPlaylist = '/${AppRoutes.createPlaylist}/:userId';
+  static const String modifyPlaylist = '/${AppRoutes.modifyPlaylist}';
 }

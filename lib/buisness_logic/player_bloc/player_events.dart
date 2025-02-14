@@ -48,6 +48,17 @@ class PlayerQueueCleared extends PlayerEvent {}
 
 class PlayerTrackEnded extends PlayerEvent {}
 
+class MusicGroupPlayed extends PlayerEvent {
+  final String? id;
+  final List<Track> tracks;
+  final bool? liked;
+
+  const MusicGroupPlayed({required this.id, required this.tracks, this.liked});
+
+  @override
+  List<Object?> get props => [id, tracks, liked, super.props];
+}
+
 class PlayerTrackChanged extends PlayerEvent {
   final Track track;
   final bool? liked;
