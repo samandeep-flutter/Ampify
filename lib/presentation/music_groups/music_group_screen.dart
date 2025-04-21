@@ -45,7 +45,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
       body: BlocBuilder<MusicGroupBloc, MusicGroupState>(
         buildWhen: (pr, cr) => pr.loading != cr.loading,
         builder: (context, state) {
-          final fgColor = state.color?.withOpacity(.4) ?? Colors.grey[300]!;
+          final fgColor = state.color?.withAlpha(100) ?? Colors.grey[300]!;
           final date = state.details?.releaseDate;
           final isPlaylist = state.type == LibItemType.playlist;
 
@@ -74,8 +74,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                 backgroundColor: Color.alphaBlend(fgColor, Colors.white),
                 titleTextStyle: Utils.defTitleStyle,
                 flexibleSpace: FlexibleSpaceBar(
-                    titlePadding: const EdgeInsets.symmetric(
-                        horizontal: Dimens.sizeDefault),
+                    titlePadding: Utils.paddingHoriz(Dimens.sizeDefault),
                     background: Align(
                       alignment: Alignment.bottomCenter,
                       child: BlocBuilder<MusicGroupBloc, MusicGroupState>(

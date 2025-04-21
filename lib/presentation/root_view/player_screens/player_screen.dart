@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
@@ -90,7 +91,7 @@ class PlayerScreen extends StatelessWidget {
                     child: SizedBox(height: context.height * .05),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: Utils.paddingHoriz(Dimens.sizeMedium),
                     child: Row(
                       children: [
                         Expanded(
@@ -203,8 +204,7 @@ class PlayerScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: Dimens.sizeDefault),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: Dimens.sizeMedSmall),
+                    padding: Utils.paddingHoriz(Dimens.sizeMedSmall),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

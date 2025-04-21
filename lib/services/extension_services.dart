@@ -133,6 +133,7 @@ extension MyString on String {
   String get capitalize => _capitilize(this);
   String get unescape => _unescape(this);
   String get removeCoprights => _removeCopyright(this);
+  String get noSpace => replaceAll(' ', '');
   int queryMatch(String query) => _calculateMatch(this, query);
 
   DateTime _formJson(String datetime) {

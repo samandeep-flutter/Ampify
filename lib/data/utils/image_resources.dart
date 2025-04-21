@@ -1,4 +1,7 @@
 sealed class ImageRes {
+  static final String appIcon = _toImages('app-icon.png');
+  static final String spotify = _toImages('spotify.png');
+  static final String spotifyBanner = _toImages('spotify-banner.png');
   static final String thumbnail = _toImages('thumbnail.png');
   static final String userThumbnail = _toImages('user-thumbnail.png');
   static final String history = _toIcons('history.png');

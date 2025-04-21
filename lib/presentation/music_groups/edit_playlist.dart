@@ -1,5 +1,6 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/presentation/widgets/base_widget.dart';
 import 'package:ampify/presentation/widgets/loading_widgets.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
@@ -21,7 +22,7 @@ class EditPlaylistScreen extends StatelessWidget {
     final bloc = context.read<EditPlaylistBloc>();
     return BaseWidget(
       appBar: AppBar(),
-      padding: const EdgeInsets.symmetric(horizontal: Dimens.sizeExtraLarge),
+      padding: Utils.paddingHoriz(Dimens.sizeExtraLarge),
       child: BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
         buildWhen: (pr, cr) => pr.id != cr.id,
         builder: (context, state) {

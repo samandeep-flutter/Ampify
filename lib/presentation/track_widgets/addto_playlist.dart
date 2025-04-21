@@ -3,6 +3,7 @@ import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/presentation/widgets/loading_widgets.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
@@ -73,16 +74,12 @@ class AddtoPlaylistSheet extends StatelessWidget {
                   }
                   return Flexible(
                     child: GridView.builder(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: Dimens.sizeDefault),
+                      padding: Utils.paddingHoriz(Dimens.sizeDefault),
                       scrollDirection: playlists.length > 2
                           ? Axis.horizontal
                           : Axis.vertical,
                       gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: Dimens.sizeSmall,
-                              crossAxisSpacing: Dimens.sizeDefault),
+                          Utils.fixedCrossAxis(2, spacing: Dimens.sizeSmall),
                       itemCount: playlists.length,
                       itemBuilder: (context, index) {
                         final item = playlists[index];

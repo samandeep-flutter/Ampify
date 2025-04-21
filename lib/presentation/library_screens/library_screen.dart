@@ -200,7 +200,7 @@ class _LibraryScreenState extends State<LibraryScreen>
 
     return TextButton.styleFrom(
         visualDensity: VisualDensity.compact,
-        padding: const EdgeInsets.symmetric(horizontal: Dimens.sizeDefault),
+        padding: Utils.paddingHoriz(Dimens.sizeDefault),
         backgroundColor: sel ? scheme.primary : defBGcolor,
         foregroundColor: sel ? scheme.onPrimary : scheme.onPrimaryContainer);
   }

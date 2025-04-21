@@ -1,3 +1,4 @@
+import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ampify/services/extension_services.dart';
@@ -21,6 +22,7 @@ class _RootViewState extends State<RootView> {
   void initState() {
     context.read<PlayerBloc>().add(PlayerInitial());
     context.read<SearchBloc>().add(SearchInitial());
+    context.read<HomeBloc>().add(HomeInitial());
     super.initState();
   }
 

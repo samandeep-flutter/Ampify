@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import '../../services/box_services.dart';
 import '../data_provider/api_response.dart';
 import '../data_provider/dio_client.dart';
@@ -12,20 +12,19 @@ class AuthRepo {
   const AuthRepo({required this.dio});
 
   static final _box = BoxServices.to;
+  final _scopes =
+      'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read user-top-read ugc-image-upload';
 
   Future<String?> auth() async {
-    const scopes =
-        'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read user-top-read ugc-image-upload';
     try {
       final data = {
         'response_type': 'code',
         'client_id': dotenv.get('CLIENT_ID'),
         'redirect_uri': dotenv.get('REDIRECT'),
-        'scope': scopes,
+        'scope': _scopes,
       };
-      final url = Uri.https('accounts.spotify.com', '/authorize', data);
-      final response = await FlutterWebAuth.authenticate(
-        url: url.toString(),
+      final response = await FlutterWebAuth2.authenticate(
+        url: Uri.https('accounts.spotify.com', '/authorize', data).toString(),
         callbackUrlScheme: dotenv.get('REDIRECT').split(':').first,
       );
       return Uri.parse(response).queryParameters['code'];

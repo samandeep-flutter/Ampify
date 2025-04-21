@@ -1,3 +1,4 @@
+import 'package:ampify/data/utils/utils.dart';
 import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
 import '../../config/theme_services.dart';
@@ -41,10 +42,7 @@ class BaseWidget extends StatelessWidget {
             bottom: safeAreaBottom ?? false,
             child: Container(
               margin: margin,
-              padding: padding ??
-                  const EdgeInsets.symmetric(
-                    horizontal: Dimens.sizeLarge,
-                  ),
+              padding: padding ?? Utils.paddingHoriz(Dimens.sizeLarge),
               child: child,
             )),
       ),

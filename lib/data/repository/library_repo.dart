@@ -7,8 +7,8 @@ class LibraryRepo {
   const LibraryRepo({required this.dio});
 
   Future<void> getProfile({
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final response = await dio.get(AppConstants.profile, client: dio);
     ApiResponse.verify(
@@ -21,8 +21,8 @@ class LibraryRepo {
   /// limit default to 10.
   Future<void> getMyPlaylists({
     int? offset,
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final url = '${AppConstants.myPlaylists}?offset=${offset ?? 0}&limit=10';
     final response = await dio.get(url, client: dio);
@@ -36,8 +36,8 @@ class LibraryRepo {
   /// limit default to 10.
   Future<void> getMyAlbums({
     int? offset,
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final url = '${AppConstants.myAlbums}?offset=${offset ?? 0}&limit=10';
     final response = await dio.get(url, client: dio);
@@ -54,8 +54,8 @@ class LibraryRepo {
   Future<void> getLikedSongs({
     int? limit,
     int? offset,
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final url = '${AppConstants.likedSongs(offset ?? 0)}&limit=${limit ?? 20}';
     final response = await dio.get(url, client: dio);

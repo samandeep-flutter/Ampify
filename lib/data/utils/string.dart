@@ -24,6 +24,10 @@ sealed class StringRes {
   static const String goBack = 'go back';
   static const String sortOrder = 'Sort Order';
   static const String sortBy = 'Sort by';
+  static const String commingSoon = 'Comming Soon';
+  static const String newReleases = 'New Releases for you';
+  static const String recentlyPlayed = 'Recently played';
+  static const String spotifyRecent = 'Recently played on Spotify';
   static const String createPlaylist = 'Create Playlist';
   static const String pubPlaylist = 'Public Playlist';
   static const String priPlaylist = 'Private Playlist';
@@ -86,4 +90,6 @@ sealed class StringRes {
       'adding some tracks to set the vibe!';
   static const String playlistDesc = 'Add a short description to'
       ' personalize your playlist.';
+  static const String noSpotifyTracks = 'There are currenlty no tracks to show'
+      ', tracks will begin to appear as you listen to them!';
 }

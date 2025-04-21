@@ -1,3 +1,4 @@
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
@@ -21,7 +22,7 @@ class MyDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: EdgeInsets.symmetric(horizontal: margin ?? 0),
+        margin: Utils.paddingHoriz(margin ?? 0),
         width: width,
         child: Divider(
           color: color ?? Colors.grey[350],
@@ -47,7 +48,7 @@ class PaginationDots extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = ThemeServices.of(context);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: margin ?? 3),
+      padding: Utils.paddingHoriz(margin ?? 3),
       child: InkWell(
         borderRadius: BorderRadius.circular(Dimens.borderDefault),
         onTap: onTap,

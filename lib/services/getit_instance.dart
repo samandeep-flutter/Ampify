@@ -1,4 +1,7 @@
+import 'package:ampify/data/repository/home_repo.dart';
 import 'package:ampify/data/repository/music_group_repo.dart';
+import 'package:ampify/services/audio_services.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:ampify/data/repository/library_repo.dart';
 import 'package:ampify/data/repository/search_repo.dart';
@@ -17,12 +20,14 @@ Future<void> getInit() async {
   getIt.registerLazySingleton<AppLinks>(() => AppLinks());
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<YoutubeExplode>(() => YoutubeExplode());
-  getIt.registerSingletonAsync<AuthServices>(() => AuthServices.to.init());
+  getIt.registerLazySingletonAsync<AudioHandler>(audioServicesInit);
+  getIt.registerSingletonAsync<AuthServices>(AuthServices.to.init);
   getIt.registerLazySingleton<LoggingInterceptor>(() => LoggingInterceptor());
   getIt.registerLazySingleton<Dio>(() => Dio());
   getIt.registerLazySingleton<DioClient>(
       () => DioClient(dio: getIt(), interceptor: getIt()));
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepo(dio: getIt()));
+  getIt.registerLazySingleton<HomeRepo>(() => HomeRepo(dio: getIt()));
   getIt.registerLazySingleton<SearchRepo>(() => SearchRepo(dio: getIt()));
   getIt.registerLazySingleton<LibraryRepo>(() => LibraryRepo(dio: getIt()));
   getIt.registerLazySingleton<MusicGroupRepo>(

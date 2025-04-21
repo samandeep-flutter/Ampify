@@ -49,8 +49,8 @@ class MusicGroupRepo {
 
   Future<void> playlistDetails(
     String id, {
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final url = AppConstants.playlistDetails(id);
     final response = await dio.get(url, client: dio);
@@ -63,8 +63,8 @@ class MusicGroupRepo {
 
   Future<void> albumDetails(
     String id, {
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final url = AppConstants.albumDetails(id);
     final response = await dio.get(url, client: dio);
@@ -78,8 +78,8 @@ class MusicGroupRepo {
   Future<void> getUserPlaylists(
     String? id, {
     int? limit,
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     if (id == null) return;
     final url = AppConstants.userPlaylists(id);
@@ -94,8 +94,8 @@ class MusicGroupRepo {
   Future<void> createPlaylist(
     String title, {
     required String userId,
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final token = BoxServices.to.read(BoxKeys.token);
     final url = AppConstants.userPlaylists(userId);
@@ -146,8 +146,8 @@ class MusicGroupRepo {
   Future<void> addTracktoPlaylist(
     String id, {
     required List<String> trackUri,
-    Function(Map<String, dynamic> map)? onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    Function(Map<String, dynamic> json)? onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final uris = trackUri.map((e) => e.replaceAll(':', '%3A')).toList();
     final url = AppConstants.addtoPlaylist(id, uris: uris.asString);
@@ -164,8 +164,8 @@ class MusicGroupRepo {
   Future<void> removeTrackfromPlaylist(
     String id, {
     required List<String> trackId,
-    required Function(Map<String, dynamic> map) onSuccess,
-    Function(Map<String, dynamic> errorMap)? onError,
+    required Function(Map<String, dynamic> json) onSuccess,
+    Function(Map<String, dynamic> error)? onError,
   }) async {
     final url = AppConstants.removeFromPlaylist(id);
     final body = {"uris": trackId /* "snapshot_id": "" */};

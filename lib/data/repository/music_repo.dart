@@ -9,8 +9,11 @@ class MusicRepo {
   final YTMusic ytMusic;
   final YoutubeExplode ytExplode;
 
-  MusicRepo(
-      {required this.ytMusic, required this.ytExplode, required this.dio});
+  MusicRepo({
+    required this.ytMusic,
+    required this.ytExplode,
+    required this.dio,
+  });
 
   final _ytClients = [
     if (Platform.isAndroid) YoutubeApiClient.androidVr,

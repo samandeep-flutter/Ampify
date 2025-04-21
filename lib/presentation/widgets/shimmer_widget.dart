@@ -1,3 +1,4 @@
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import '../../data/utils/color_resources.dart';
@@ -19,6 +20,48 @@ class _Shimmer extends StatelessWidget {
           color: ColorRes.shimmer,
           borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 0))),
     );
+  }
+}
+
+class AlbumShimmer extends StatelessWidget {
+  const AlbumShimmer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+        padding: Utils.paddingHoriz(Dimens.sizeDefault),
+        scrollDirection: Axis.horizontal,
+        gridDelegate: Utils.fixedCrossAxis(1,
+            aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
+        itemCount: Dimens.sizeExtraSmall.toInt(),
+        itemBuilder: (_, index) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(Dimens.borderSmall),
+                child: AspectRatio(aspectRatio: 1, child: Shimmer.box),
+              ),
+              const SizedBox(height: Dimens.sizeSmall),
+              SizedBox(
+                  height: 12,
+                  child: FractionallySizedBox(
+                    heightFactor: 1,
+                    widthFactor: .5,
+                    child: Shimmer.box,
+                  )),
+              const SizedBox(height: Dimens.sizeSmall),
+              SizedBox(
+                  height: 12,
+                  child: FractionallySizedBox(
+                    heightFactor: 1,
+                    widthFactor: .8,
+                    child: Shimmer.box,
+                  )),
+            ],
+          );
+        });
   }
 }
 

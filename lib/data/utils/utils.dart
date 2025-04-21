@@ -27,6 +27,19 @@ sealed class Utils {
     );
   }
 
+  static EdgeInsets paddingHoriz(double padding) {
+    return EdgeInsets.symmetric(horizontal: padding);
+  }
+
+  static SliverGridDelegate fixedCrossAxis(int count,
+      {double? spacing, double? aspectRatio}) {
+    return SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: count,
+        childAspectRatio: aspectRatio ?? 1,
+        mainAxisSpacing: spacing ?? 0,
+        crossAxisSpacing: spacing ?? 0);
+  }
+
   static Future<TrackDetails> getTrackDetails(Track track) async {
     final palete = await PaletteGenerator.fromImageProvider(
         NetworkImage(track.album?.image ?? ''),

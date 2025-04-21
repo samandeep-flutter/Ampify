@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -12,6 +13,11 @@ sealed class AppConstants {
   static const String profile = 'me';
   static const String myPlaylists = 'me/playlists';
   static const String myAlbums = 'me/albums';
+  static const String recentlyPlayed = 'me/player/recently-played';
+  static String browse(String local) => 'browse/categories?locale=$local';
+  static String severalTracks(String ids) => 'tracks?ids=$ids';
+  static String severalAlbums(String ids) => 'albums?ids=$ids';
+  static String newReleases(int offset) => 'browse/new-releases?offset=$offset';
   static String userPlaylists(String id) => 'users/$id/playlists';
   static String addtoPlaylist(String id, {required String uris}) =>
       'playlists/$id/tracks?uris=$uris';
@@ -78,7 +84,7 @@ showSnackBar(BuildContext context, {required String text}) {
   messenger.showSnackBar(SnackBar(
       content: Text(text),
       behavior: SnackBarBehavior.floating,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
+      margin: Utils.paddingHoriz(Dimens.sizeSmall),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Dimens.borderSmall),
       )));

@@ -1,5 +1,6 @@
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
+import 'package:ampify/data/data_models/library_model.dart';
 import 'package:equatable/equatable.dart';
 import 'other_models.dart';
 
@@ -11,7 +12,7 @@ class Album extends Equatable {
   final String? image;
   final String? name;
   final String? releaseDate;
-  final String? type;
+  final LibItemType? type;
   final String? uri;
   final List<Artist>? artists;
   final List<Track>? tracks;
@@ -51,7 +52,7 @@ class Album extends Equatable {
       image: albumImage,
       name: json['name'],
       releaseDate: json['release_date'],
-      type: json['type'],
+      type: LibItemType.values.firstWhere((e) => e.name == json['type']),
       uri: json['uri'],
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
@@ -77,7 +78,7 @@ class Album extends Equatable {
         'images': image,
         'name': name,
         'release_date': releaseDate,
-        'type': type,
+        'type': type?.name,
         'uri': uri,
         'artists': artists?.map((v) => v.toJson()).toList(),
         'tracks': tracks?.map((e) => e.toJson()),
