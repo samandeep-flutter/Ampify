@@ -6,25 +6,20 @@ import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
-
 import '../../buisness_logic/player_bloc/player_state.dart';
 import '../data_models/common/tracks_model.dart';
 
 sealed class Utils {
-  static TextStyle get defTitleStyle {
-    return const TextStyle(
-      fontSize: Dimens.fontExtraDoubleLarge,
-      fontWeight: FontWeight.w600,
-      color: Colors.black87,
-    );
+  static TextStyle defTitleStyle(BuildContext context) {
+    return TextStyle(
+        fontSize: Dimens.fontExtraDoubleLarge,
+        fontWeight: FontWeight.w600,
+        color: context.scheme.textColor);
   }
 
   static TextStyle titleTextStyle([Color? color]) {
     return TextStyle(
-      fontSize: Dimens.fontTitle,
-      fontWeight: FontWeight.bold,
-      color: color ?? const Color(0xFF1B1C1E),
-    );
+        fontSize: Dimens.fontTitle, fontWeight: FontWeight.bold, color: color);
   }
 
   static EdgeInsets paddingHoriz(double padding) {
@@ -47,12 +42,13 @@ sealed class Utils {
     final color = palete.mutedColor?.color;
 
     return TrackDetails(
-        id: track.id,
-        albumId: track.album?.id,
-        title: track.name,
-        bgColor: color,
-        image: track.album?.image,
-        subtitle: track.artists?.asString);
+      id: track.id,
+      albumId: track.album?.id,
+      title: track.name,
+      bgColor: color,
+      image: track.album?.image,
+      subtitle: track.artists?.asString,
+    );
   }
 
   static Future<Color?> getImageColor(String? image) async {
@@ -76,7 +72,7 @@ sealed class Utils {
     );
   }
 
-//   static String timeFromNow(DateTime? date, DateTime now) {
+//   static String timeFromNow(DateTime? date) {
 //     if (date == null) return '';
 //     final diff = now.difference(date);
 //     if (diff.inDays > 0) {

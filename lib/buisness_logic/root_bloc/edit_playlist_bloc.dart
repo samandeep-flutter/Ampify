@@ -2,7 +2,7 @@ import 'package:ampify/services/extension_services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/repository/music_group_repo.dart';
+import '../../data/repositories/music_group_repo.dart';
 import '../../data/utils/app_constants.dart';
 import '../../data/utils/string.dart';
 import '../../services/getit_instance.dart';

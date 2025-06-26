@@ -1,7 +1,6 @@
 import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
-import '../../data/utils/color_resources.dart';
 import '../../data/utils/dimens.dart';
 
 class Shimmer {
@@ -17,7 +16,7 @@ class _Shimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-          color: ColorRes.shimmer,
+          color: context.scheme.shimmer,
           borderRadius: BorderRadius.all(Radius.circular(borderRadius ?? 0))),
     );
   }
@@ -118,7 +117,10 @@ class MusicGroupShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AppBar(backgroundColor: Colors.white, toolbarHeight: 40),
+        AppBar(
+          backgroundColor: context.scheme.background,
+          toolbarHeight: Dimens.sizeExtraLarge,
+        ),
         if (!isLikedSongs)
           SizedBox.square(
             dimension: imageSize ?? context.height * .3,
@@ -164,10 +166,10 @@ class MusicGroupShimmer extends StatelessWidget {
           children: [
             const SizedBox(width: Dimens.sizeDefault),
             if (!isLikedSongs)
-              const Icon(
+              Icon(
                 Icons.add_circle_outline,
                 size: Dimens.sizeMidLarge,
-                color: ColorRes.shimmer,
+                color: context.scheme.shimmer,
               ),
             const Spacer(),
             SizedBox.square(dimension: 50, child: Shimmer.avatar),

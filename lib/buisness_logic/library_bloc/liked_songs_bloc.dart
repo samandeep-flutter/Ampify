@@ -1,5 +1,5 @@
 import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:ampify/data/repository/library_repo.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';

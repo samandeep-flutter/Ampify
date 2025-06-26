@@ -21,7 +21,7 @@ class EditPlaylistScreen extends StatelessWidget {
     final width = context.width * .6;
     final bloc = context.read<EditPlaylistBloc>();
     return BaseWidget(
-      appBar: AppBar(),
+      appBar: AppBar(backgroundColor: scheme.background),
       padding: Utils.paddingHoriz(Dimens.sizeExtraLarge),
       child: BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
         buildWhen: (pr, cr) => pr.id != cr.id,
@@ -71,20 +71,15 @@ class EditPlaylistScreen extends StatelessWidget {
                     }
                   },
                   child: SizedBox(height: context.height * .1)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
-                      builder: (context, state) {
-                    return LoadingButton(
-                      isLoading: state.loading,
-                      width: width,
-                      onPressed: bloc.onEdited,
-                      child: const Text(StringRes.submit),
-                    );
-                  }),
-                ],
-              )
+              BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
+                  builder: (context, state) {
+                return LoadingButton(
+                  isLoading: state.loading,
+                  width: double.infinity,
+                  onPressed: bloc.onEdited,
+                  child: const Text(StringRes.submit),
+                );
+              })
             ],
           );
         },

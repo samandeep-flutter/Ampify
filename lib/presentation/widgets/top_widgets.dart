@@ -3,7 +3,7 @@ import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
 import '../../data/utils/string.dart';
-import '../../config/theme_services.dart';
+import '../../services/theme_services.dart';
 import 'my_cached_image.dart';
 
 class MyDivider extends StatelessWidget {
@@ -25,7 +25,7 @@ class MyDivider extends StatelessWidget {
         margin: Utils.paddingHoriz(margin ?? 0),
         width: width,
         child: Divider(
-          color: color ?? Colors.grey[350],
+          color: color ?? context.scheme.backgroundDark,
           thickness: thickness,
         ));
   }
@@ -55,7 +55,7 @@ class PaginationDots extends StatelessWidget {
         child: CircleAvatar(
           radius: 3,
           backgroundColor: color ??
-              (current ? scheme.primary : scheme.disabled.withOpacity(.3)),
+              (current ? scheme.primary : scheme.disabled.withAlpha(80)),
         ),
       ),
     );
@@ -203,7 +203,7 @@ class MyAvatar extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(borderRadius ?? 40),
-      splashColor: scheme.disabled.withOpacity(.5),
+      splashColor: scheme.disabled.withAlpha(120),
       splashFactory: InkRipple.splashFactory,
       child: Container(
         padding: padding ?? const EdgeInsets.all(4),
@@ -304,8 +304,8 @@ class ShadowWidget extends StatelessWidget {
               spreadRadius: spread ?? context.width * .35,
               blurRadius: spread ?? context.width * .35),
           if (darkShadow)
-            const BoxShadow(
-                color: Colors.black12,
+            BoxShadow(
+                color: context.scheme.textColor.withAlpha(50),
                 spreadRadius: Dimens.sizeSmall,
                 blurRadius: Dimens.sizeExtraDoubleLarge)
         ],

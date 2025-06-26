@@ -10,7 +10,7 @@ class LibraryRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final response = await dio.get(AppConstants.profile, client: dio);
+    final response = await dio.get(AppConstants.profile);
     ApiResponse.verify(
       response,
       onSuccess: onSuccess,
@@ -24,13 +24,11 @@ class LibraryRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final url = '${AppConstants.myPlaylists}?offset=${offset ?? 0}&limit=10';
-    final response = await dio.get(url, client: dio);
-    ApiResponse.verify(
-      response,
-      onSuccess: onSuccess,
-      onError: onError ?? (e) => logPrint(e, 'playlist'),
-    );
+    const url = AppConstants.myPlaylists;
+    final response = await dio.get('$url?offset=${offset ?? 0}&limit=10');
+    ApiResponse.verify(response,
+        onSuccess: onSuccess,
+        onError: onError ?? (e) => logPrint(e, 'playlist'));
   }
 
   /// limit default to 10.
@@ -39,13 +37,10 @@ class LibraryRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final url = '${AppConstants.myAlbums}?offset=${offset ?? 0}&limit=10';
-    final response = await dio.get(url, client: dio);
-    ApiResponse.verify(
-      response,
-      onSuccess: onSuccess,
-      onError: onError ?? (e) => logPrint(e, 'albums'),
-    );
+    const url = AppConstants.myAlbums;
+    final response = await dio.get('$url?offset=${offset ?? 0}&limit=10');
+    ApiResponse.verify(response,
+        onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'albums'));
   }
 
   /// Get current user's liked songs
@@ -57,24 +52,20 @@ class LibraryRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final url = '${AppConstants.likedSongs(offset ?? 0)}&limit=${limit ?? 20}';
-    final response = await dio.get(url, client: dio);
-    ApiResponse.verify(
-      response,
-      onSuccess: onSuccess,
-      onError: onError ?? (e) => logPrint(e, 'liked songs'),
-    );
+    final url = AppConstants.likedSongs(offset ?? 0);
+    final response = await dio.get('$url&limit=${limit ?? 20}');
+    ApiResponse.verify(response,
+        onSuccess: onSuccess,
+        onError: onError ?? (e) => logPrint(e, 'liked songs'));
   }
 
   Future<bool> addtoLikedSongs(String id) async {
-    final url = AppConstants.savetoLiked(id);
-    final response = await dio.put(url, client: dio);
+    final response = await dio.put(AppConstants.savetoLiked(id));
     return response.response?.statusCode == 200;
   }
 
   Future<bool> removefromLikedSongs(String id) async {
-    final url = AppConstants.savetoLiked(id);
-    final response = await dio.delete(url, client: dio);
+    final response = await dio.delete(AppConstants.savetoLiked(id));
     return response.response?.statusCode == 200;
   }
 }

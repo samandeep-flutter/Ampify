@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:ampify/config/routes/app_routes.dart';
-import 'package:ampify/data/repository/auth_repo.dart';
-import 'package:ampify/data/repository/library_repo.dart';
+import 'package:ampify/data/repositories/auth_repo.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/box_services.dart';
@@ -49,26 +48,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
   final AuthRepo _authRepo = getIt();
   final LibraryRepo _libRepo = getIt();
-  final _box = BoxServices.to;
+  final _box = BoxServices.instance;
 
   _onInit(AuthInitial event, Emitter<AuthState> emit) async {
     emit(state.copyWith(isLoading: true));
-    final code = await _authRepo.auth();
-    if (code != null) {
-      await _authRepo.getToken(code);
-      add(AuthFinished());
-      return;
-    }
-
-    if (Platform.isAndroid) {
-      await Future.delayed(const Duration(milliseconds: 800));
-      if (BoxServices.to.exist(BoxKeys.token)) {
+    try {
+      final code = await _authRepo.auth();
+      try {
+        await _authRepo.getToken(code!);
         add(AuthFinished());
         return;
-      }
+      } catch (_) {}
+      _box.listen(BoxKeys.token, (_) => add(AuthFinished()));
+    } catch (e) {
+      logPrint(e, 'auth init');
+    } finally {
+      emit(state.copyWith(isLoading: false));
     }
-    emit(state.copyWith(isLoading: false));
-    showToast(StringRes.somethingWrong);
   }
 
   void onSuccess(BuildContext context, AuthState state) {

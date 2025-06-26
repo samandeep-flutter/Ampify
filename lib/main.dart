@@ -13,9 +13,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'buisness_logic/home_bloc/home_bloc.dart';
 import 'buisness_logic/library_bloc/library_bloc.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'buisness_logic/library_bloc/liked_songs_bloc.dart';
 import 'buisness_logic/root_bloc/addto_playlist_bloc.dart';
 import 'buisness_logic/root_bloc/edit_playlist_bloc.dart';
@@ -24,9 +24,9 @@ import 'buisness_logic/player_bloc/player_bloc.dart';
 import 'buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'buisness_logic/root_bloc/root_bloc.dart';
 import 'buisness_logic/search_bloc/search_bloc.dart';
-import 'services/getit_instance.dart';
-import 'config/theme_services.dart';
 import 'services/notification_services.dart';
+import 'services/getit_instance.dart';
+import 'services/theme_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,13 +67,21 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = context.scheme;
+
     return MaterialApp.router(
       routerConfig: AppPage.routes,
       title: StringRes.appName,
-      builder: (context, child) => ResponsiveWrapper.builder(
-        ClampingScrollWrapper.builder(
-            context,
-            MultiBlocProvider(providers: [
+      debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return ResponsiveBreakpoints.builder(
+          breakpoints: [
+            const Breakpoint(start: 0, end: 450, name: MOBILE),
+            const Breakpoint(start: 451, end: 800, name: TABLET),
+            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+          ],
+          child: MultiBlocProvider(
+            providers: [
               BlocProvider(create: (_) => RootBloc()),
               BlocProvider(create: (_) => PlayerBloc()),
               BlocProvider(create: (_) => PlayerSliderBloc()),
@@ -84,23 +92,47 @@ class MyApp extends StatelessWidget {
               BlocProvider(create: (_) => LikedSongsBloc()),
               BlocProvider(create: (_) => AddtoPlaylistBloc()),
               BlocProvider(create: (_) => LibraryBloc()),
-            ], child: child!)),
-        breakpoints: [
-          const ResponsiveBreakpoint.resize(450, name: MOBILE),
-          const ResponsiveBreakpoint.autoScale(600, name: TABLET),
-          const ResponsiveBreakpoint.resize(800, name: DESKTOP),
-          const ResponsiveBreakpoint.autoScale(1700, name: '4K'),
-        ],
-      ),
+            ],
+            child: MaxWidthBox(
+              maxWidth: 1200,
+              backgroundColor: theme.disabled,
+              child: Builder(builder: (context) {
+                return ResponsiveScaledBox(
+                  width: ResponsiveValue<double?>(context, conditionalValues: [
+                    Condition.equals(name: MOBILE, value: 450),
+                    Condition.between(start: 800, end: 1100, value: 800),
+                    Condition.between(start: 1000, end: 1200, value: 1000),
+                  ]).value,
+                  child: ClampingScrollWrapper.builder(
+                      context, child ?? const SizedBox.shrink()),
+                );
+              }),
+            ),
+          ),
+        );
+      },
+      themeMode: theme.themeMode,
       theme: ThemeData(
-        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: theme.primary,
           primary: theme.primary,
           onPrimary: theme.onPrimary,
           primaryContainer: theme.primaryContainer,
           onPrimaryContainer: theme.onPrimaryContainer,
+          brightness: Brightness.light,
         ),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: theme.primary,
+          primary: theme.primary,
+          onPrimary: theme.onPrimary,
+          primaryContainer: theme.primaryContainer,
+          onPrimaryContainer: theme.onPrimaryContainer,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
       ),
     );
   }

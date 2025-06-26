@@ -53,37 +53,41 @@ class CreatePlaylistView extends StatelessWidget {
               child: SizedBox(height: context.height * .1),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: Dimens.sizeDefault,
-                          horizontal: Dimens.sizeMidLarge),
-                      foregroundColor: scheme.onPrimaryContainer,
-                      backgroundColor: scheme.background,
-                      shape: RoundedRectangleBorder(
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: Dimens.sizeDefault),
+                        foregroundColor: scheme.textColor,
+                        backgroundColor: scheme.background,
+                        shape: ContinuousRectangleBorder(
                           side: BorderSide(color: scheme.primary),
-                          borderRadius: BorderRadius.circular(
-                            Dimens.borderLarge,
-                          ))),
-                  onPressed: context.pop,
-                  child: const Text(StringRes.cancel),
+                          borderRadius:
+                              BorderRadius.circular(Dimens.borderLarge),
+                        )),
+                    onPressed: context.pop,
+                    child: const Text(
+                      StringRes.cancel,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: Dimens.fontLarge),
+                    ),
+                  ),
                 ),
-                BlocBuilder<PlaylistBloc, PlaylistState>(
-                  builder: (context, state) {
-                    return LoadingButton(
-                      isLoading: state.loading,
-                      loaderColor: scheme.primary,
-                      width: 110,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: Dimens.sizeDefault,
-                          horizontal: Dimens.sizeMidLarge),
-                      onPressed: () => bloc.createPlaylist(userId),
-                      child: const Text(StringRes.submit),
-                    );
-                  },
+                const SizedBox(width: Dimens.sizeDefault),
+                Expanded(
+                  child: BlocBuilder<PlaylistBloc, PlaylistState>(
+                    builder: (context, state) {
+                      return LoadingButton(
+                        isLoading: state.loading,
+                        loaderColor: scheme.primary,
+                        onPressed: () => bloc.createPlaylist(userId),
+                        child: const Text(StringRes.submit),
+                      );
+                    },
+                  ),
                 ),
               ],
             )

@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/data/utils/utils.dart';
@@ -35,11 +36,18 @@ sealed class AppConstants {
 }
 
 sealed class BoxKeys {
-  static const String boxName = 'ampify';
-  static const String theme = '$boxName:theme';
-  static const String token = '$boxName:token';
-  static const String refreshToken = '$boxName:refresh-token';
-  static const String profile = '$boxName:profile';
+  static const String boxName = 'Ampify';
+  static const String theme = 'theme';
+  static const String themeMode = 'theme-mode';
+  static const String token = 'token';
+  static const String refreshToken = 'refresh-token';
+  static const String profile = 'profile';
+}
+
+sealed class EnvKeys {
+  static const String id = 'CLIENT_ID';
+  static const String secret = 'CLIENT_SECRET';
+  static const String redirect = 'REDIRECT';
 }
 
 sealed class UniqueIds {
@@ -53,8 +61,7 @@ void logPrint(Object? value, [String? name]) {
 }
 
 void dprint(String? value) {
-  if (kReleaseMode) return;
-  debugPrint(value ?? 'null');
+  if (!kReleaseMode) debugPrint(value ?? 'null');
 }
 
 class MyColoredBox extends StatelessWidget {
@@ -64,7 +71,8 @@ class MyColoredBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(color: color ?? Colors.black12, child: child);
+    return ColoredBox(
+        color: color ?? context.scheme.textColor.withAlpha(50), child: child);
   }
 }
 

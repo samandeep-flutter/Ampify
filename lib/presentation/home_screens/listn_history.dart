@@ -14,8 +14,9 @@ class ListeningHistory extends StatelessWidget {
     final scheme = context.scheme;
     return BaseWidget(
       appBar: AppBar(
+        backgroundColor: scheme.background,
         title: const Text(StringRes.listenHistory),
-        titleTextStyle: Utils.defTitleStyle,
+        titleTextStyle: Utils.defTitleStyle(context),
         centerTitle: false,
       ),
       child: Column(

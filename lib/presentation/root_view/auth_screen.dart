@@ -18,35 +18,41 @@ class AuthScreen extends StatelessWidget {
     final bloc = context.read<AuthBloc>();
 
     return BaseWidget(
+      appBar: AppBar(
+        backgroundColor: scheme.background,
+        toolbarHeight: Dimens.sizeLarge,
+      ),
       child: Column(
         children: [
           const Spacer(),
           Text(
             StringRes.auth,
-            style: Utils.titleTextStyle(scheme.onPrimaryContainer),
+            style: Utils.titleTextStyle(scheme.textColor),
           ),
           const SizedBox(height: Dimens.sizeDefault),
           Text(StringRes.authDesc,
               textAlign: TextAlign.center,
               style: TextStyle(color: scheme.textColorLight)),
           const Spacer(),
-          Image.asset(ImageRes.spotifyBanner,
-              fit: BoxFit.cover, width: context.width * .5),
           const SizedBox(height: Dimens.sizeDefault),
           BlocConsumer<AuthBloc, AuthState>(
             listener: bloc.onSuccess,
             builder: (context, state) {
               return LoadingButton(
+                width: double.infinity,
                 enable: !state.isSuccess,
                 isLoading: state.isLoading,
                 loaderColor: Colors.white,
+                backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(vertical: Dimens.sizeLarge),
                 onPressed: () => bloc.add(AuthInitial()),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(StringRes.auth),
-                    const SizedBox(width: Dimens.sizeSmall),
-                    Icon(Icons.arrow_forward_rounded, color: scheme.onPrimary)
+                    Image.asset(ImageRes.spotify,
+                        height: Dimens.sizeLarge, color: scheme.onPrimary),
+                    const SizedBox(width: Dimens.sizeDefault),
+                    const Text(StringRes.authSpotify),
                   ],
                 ),
               );

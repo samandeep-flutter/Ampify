@@ -14,7 +14,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import '../../buisness_logic/player_bloc/player_slider_bloc.dart';
-import '../widgets/base_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -24,17 +23,17 @@ class HomeScreen extends StatelessWidget {
     final scheme = context.scheme;
     final bloc = context.read<HomeBloc>();
 
-    return BaseWidget(
-        padding: EdgeInsets.zero,
-        child: CustomScrollView(
+    return Scaffold(
+        backgroundColor: scheme.background,
+        body: CustomScrollView(
           slivers: [
             SliverAppBar(
               backgroundColor: context.background,
               title: const Text(StringRes.appName),
               centerTitle: false,
-              titleTextStyle: Utils.defTitleStyle,
+              titleTextStyle: Utils.defTitleStyle(context),
               bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(30),
+                  preferredSize: const Size.fromHeight(Dimens.sizeLarge),
                   child: Row(
                     children: [
                       const SizedBox(width: Dimens.sizeDefault),
@@ -47,10 +46,8 @@ class HomeScreen extends StatelessWidget {
               actions: [
                 IconButton(
                   onPressed: () => bloc.toHistory(context),
-                  icon: Image.asset(
-                    ImageRes.history,
-                    height: Dimens.sizeLarge,
-                  ),
+                  icon: Image.asset(ImageRes.history,
+                      height: Dimens.sizeLarge, color: scheme.textColor),
                 ),
                 const SizedBox(width: Dimens.sizeDefault),
               ],
@@ -74,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                       child: Row(
                         children: [
                           Image.asset(
-                            ImageRes.appIcon,
+                            ImageRes.thumbnail,
                             height: context.width * .2,
                             color: scheme.onPrimary,
                           ),

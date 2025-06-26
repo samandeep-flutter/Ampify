@@ -56,6 +56,9 @@ sealed class Dimens {
   /// size of 48
   static const double sizeExtraDoubleLarge = 48;
 
+  /// size of 60
+  static const double sizeUltraLarge = 60;
+
   /// size of .75
   static const double borderWidthDefault = .75;
 

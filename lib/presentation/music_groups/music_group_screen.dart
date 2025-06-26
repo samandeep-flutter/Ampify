@@ -41,11 +41,11 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: scheme.background,
       body: BlocBuilder<MusicGroupBloc, MusicGroupState>(
         buildWhen: (pr, cr) => pr.loading != cr.loading,
         builder: (context, state) {
-          final fgColor = state.color?.withAlpha(100) ?? Colors.grey[300]!;
+          final fgColor = state.color?.withAlpha(100) ?? scheme.backgroundDark;
           final date = state.details?.releaseDate;
           final isPlaylist = state.type == LibItemType.playlist;
 
@@ -71,8 +71,8 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   onPressed: () => context.pop(bloc.libRefresh),
                   icon: const Icon(Icons.arrow_back_outlined),
                 ),
-                backgroundColor: Color.alphaBlend(fgColor, Colors.white),
-                titleTextStyle: Utils.defTitleStyle,
+                backgroundColor: Color.alphaBlend(fgColor, scheme.background),
+                titleTextStyle: Utils.defTitleStyle(context),
                 flexibleSpace: FlexibleSpaceBar(
                     titlePadding: Utils.paddingHoriz(Dimens.sizeDefault),
                     background: Align(
@@ -99,13 +99,14 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                        Color.alphaBlend(fgColor, Colors.white),
-                        Colors.white,
+                        Color.alphaBlend(fgColor, scheme.background),
+                        scheme.background,
                       ])),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(state.title ?? '', style: Utils.defTitleStyle),
+                      Text(state.title ?? '',
+                          style: Utils.defTitleStyle(context)),
                       if (state.details?.description?.isNotEmpty ?? false)
                         Text(state.details!.description!.unescape,
                             style: TextStyle(color: scheme.textColorLight)),
@@ -124,7 +125,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             decoration: state.type == LibItemType.playlist
                                 ? BoxDecoration(
                                     border: Border.all(
-                                      color: state.color ?? Colors.grey,
+                                      color: state.color ?? scheme.disabled,
                                       width: 2,
                                     ),
                                     borderRadius: BorderRadius.circular(
@@ -137,17 +138,16 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                 Text(state.type?.name.capitalize ?? '',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
-                                        color: scheme.textColorLight)),
+                                        color: scheme.textColor)),
                                 PaginationDots(
-                                  current: true,
-                                  margin: Dimens.sizeSmall,
-                                  color: scheme.textColorLight,
-                                ),
+                                    current: true,
+                                    margin: Dimens.sizeSmall,
+                                    color: scheme.textColorLight),
                                 RichText(
                                   text: TextSpan(
                                       style: TextStyle(
                                           fontWeight: FontWeight.w500,
-                                          color: scheme.textColorLight),
+                                          color: scheme.textColor),
                                       children: [
                                         if (isPlaylist)
                                           const TextSpan(text: 'by '),
@@ -157,14 +157,13 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                 ),
                                 if (!isPlaylist) ...[
                                   PaginationDots(
-                                    current: true,
-                                    margin: Dimens.sizeSmall,
-                                    color: scheme.textColorLight,
-                                  ),
+                                      current: true,
+                                      margin: Dimens.sizeSmall,
+                                      color: scheme.textColor),
                                   Text('${date?.year ?? ''}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w500,
-                                          color: scheme.textColorLight)),
+                                          color: scheme.textColor)),
                                 ]
                               ],
                             ),
@@ -175,14 +174,14 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                               children: [
                                 Icon(
                                   Icons.track_changes,
-                                  color: scheme.textColorLight,
+                                  color: scheme.textColor,
                                   size: Dimens.sizeMedium,
                                 ),
                                 const SizedBox(width: Dimens.sizeExtraSmall),
                                 Text('${state.tracks.length} tracks',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
-                                        color: scheme.textColorLight))
+                                        color: scheme.textColor))
                               ],
                             ),
                         ],
@@ -216,7 +215,8 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                   isSelected: state.isFav ?? false,
                                   selectedIcon: Icon(Icons.check,
                                       color: scheme.onPrimary),
-                                  icon: const Icon(Icons.add),
+                                  icon: Icon(Icons.add,
+                                      color: scheme.textColorLight),
                                 ),
                               );
                             },

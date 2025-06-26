@@ -1,7 +1,7 @@
 import 'package:ampify/data/utils/utils.dart';
 import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
-import '../../config/theme_services.dart';
+import '../../services/theme_services.dart';
 
 class BaseWidget extends StatelessWidget {
   final PreferredSizeWidget? appBar;

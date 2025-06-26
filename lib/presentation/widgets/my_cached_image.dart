@@ -1,3 +1,4 @@
+import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -52,10 +53,11 @@ class MyCachedImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.all(Dimens.sizeSmall);
+    final scheme = context.scheme;
     if (loading) {
       if (isAvatar) {
         return CircleAvatar(
-            backgroundColor: Colors.grey[300],
+            backgroundColor: scheme.backgroundDark,
             radius: avatarRadius,
             child: Shimmer.avatar);
       }
@@ -72,13 +74,13 @@ class MyCachedImage extends StatelessWidget {
     if (image?.isEmpty ?? true) {
       Image image = Image.asset(
         ImageRes.thumbnail,
-        color: Colors.grey[400],
+        color: scheme.disabled,
         fit: fit ?? BoxFit.cover,
       );
       if (isAvatar) {
         image = Image.asset(ImageRes.userThumbnail, fit: BoxFit.cover);
         return CircleAvatar(
-            backgroundColor: Colors.grey[300],
+            backgroundColor: scheme.backgroundDark,
             radius: avatarRadius,
             child: Padding(padding: padding, child: image));
       }
@@ -86,7 +88,7 @@ class MyCachedImage extends StatelessWidget {
           borderRadius: BorderRadius.circular(borderRadius ?? 0),
           child: Container(
               padding: padding,
-              color: Colors.grey[300],
+              color: scheme.backgroundDark,
               height: height,
               width: width,
               child: image));
@@ -115,7 +117,7 @@ class MyCachedImage extends StatelessWidget {
         placeholder: (context, url) {
           if (isAvatar) {
             return CircleAvatar(
-                backgroundColor: Colors.grey[300],
+                backgroundColor: scheme.backgroundDark,
                 radius: avatarRadius,
                 child: Shimmer.avatar);
           }
@@ -136,7 +138,7 @@ class MyCachedImage extends StatelessWidget {
           if (isAvatar) {
             image = Image.asset(ImageRes.userThumbnail, fit: BoxFit.cover);
             return CircleAvatar(
-                backgroundColor: Colors.grey[300],
+                backgroundColor: scheme.backgroundDark,
                 radius: avatarRadius,
                 child: Padding(padding: padding, child: image));
           }
@@ -144,7 +146,7 @@ class MyCachedImage extends StatelessWidget {
               borderRadius: BorderRadius.circular(borderRadius ?? 0),
               child: Container(
                   padding: padding,
-                  color: Colors.grey[300],
+                  color: scheme.backgroundDark,
                   height: height,
                   width: width,
                   child: image));

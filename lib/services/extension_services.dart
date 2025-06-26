@@ -1,4 +1,4 @@
-import 'package:ampify/config/theme_services.dart';
+import 'package:ampify/services/theme_services.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:flutter/material.dart';
@@ -130,7 +130,7 @@ extension MyString on String {
   DateTime get toDateTime => _formJson(this);
   bool get isEmail => _emailRegExp(this);
   bool get isStringPass => _passRegExp(this);
-  String get capitalize => _capitilize(this);
+  String get capitalize => '${this[0].toUpperCase()}${substring(1)}';
   String get unescape => _unescape(this);
   String get removeCoprights => _removeCopyright(this);
   String get noSpace => replaceAll(' ', '');
@@ -158,13 +158,6 @@ extension MyString on String {
     return passExp.hasMatch(text);
   }
 
-  String _capitilize(String text) {
-    final RegExp regExp = RegExp(r'[a-zA-Z]');
-    return text.replaceFirstMapped(regExp, (match) {
-      return match.group(0)!.toUpperCase();
-    });
-  }
-
   String _unescape(String text) => HtmlUnescape().convert(text);
 
   String _removeCopyright(String text) {
@@ -182,6 +175,30 @@ extension MyString on String {
       return 1;
     }
     return 0;
+  }
+}
+
+extension MyBrightness on ThemeMode {
+  Brightness get brightness {
+    switch (this) {
+      case ThemeMode.dark:
+        return Brightness.dark;
+      case ThemeMode.light:
+        return Brightness.light;
+      default:
+        return Brightness.light;
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ThemeMode.light:
+        return Icons.light_mode;
+      case ThemeMode.dark:
+        return Icons.dark_mode;
+      case ThemeMode.system:
+        return Icons.contrast;
+    }
   }
 }
 

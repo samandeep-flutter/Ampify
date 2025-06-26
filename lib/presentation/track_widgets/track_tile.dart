@@ -41,9 +41,9 @@ class TrackTile extends StatelessWidget {
             if (showImage ?? true) ...[
               MyCachedImage(
                 track.album?.image,
-                borderRadius: 2,
-                height: 40,
-                width: 40,
+                borderRadius: Dimens.sizeExtraSmall - 2,
+                height: Dimens.sizeExtraLarge,
+                width: Dimens.sizeExtraLarge,
               ),
               const SizedBox(width: Dimens.sizeDefault),
             ],
@@ -121,9 +121,9 @@ class TrackDetailsTile extends StatelessWidget {
     return ListTile(
       leading: MyCachedImage(
         track.image,
-        borderRadius: 2,
-        height: 40,
-        width: 40,
+        borderRadius: Dimens.sizeExtraSmall - 2,
+        height: Dimens.sizeExtraLarge,
+        width: Dimens.sizeExtraLarge,
       ),
       title: title ??
           Text(

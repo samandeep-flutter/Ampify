@@ -44,7 +44,7 @@ class _LikedSongsState extends State<LikedSongs> {
           return loading || moreLoading || items;
         },
         builder: (context, state) {
-          final fgColor = scheme.primary.withOpacity(.6);
+          final fgColor = scheme.primary.withAlpha(150);
 
           if (state.loading) {
             return const MusicGroupShimmer(
@@ -74,7 +74,7 @@ class _LikedSongsState extends State<LikedSongs> {
                   icon: const Icon(Icons.arrow_back_outlined),
                 ),
                 backgroundColor: Color.alphaBlend(fgColor, Colors.white),
-                titleTextStyle: Utils.defTitleStyle,
+                titleTextStyle: Utils.defTitleStyle(context),
               ),
               SliverToBoxAdapter(
                 child: Container(
@@ -88,7 +88,8 @@ class _LikedSongsState extends State<LikedSongs> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(StringRes.likedSongs, style: Utils.defTitleStyle),
+                      Text(StringRes.likedSongs,
+                          style: Utils.defTitleStyle(context)),
                       const SizedBox(height: Dimens.sizeSmall),
                       Row(
                         mainAxisSize: MainAxisSize.min,

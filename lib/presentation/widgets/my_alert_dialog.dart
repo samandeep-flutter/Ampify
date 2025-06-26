@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
 import '../../data/utils/string.dart';
-import '../../config/theme_services.dart';
+import '../../services/theme_services.dart';
 import 'top_widgets.dart';
 
 class MyAlertDialog extends StatelessWidget {

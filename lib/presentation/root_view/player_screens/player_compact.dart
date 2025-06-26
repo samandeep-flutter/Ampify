@@ -43,7 +43,7 @@ class PlayerCompact extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        final bgColor = state.track.bgColor?.withOpacity(.15) ?? Colors.white;
+        final bgColor = state.track.bgColor?.withAlpha(30) ?? scheme.background;
         final selected = state.playerState == MusicState.playing;
         final loading = state.playerState == MusicState.loading;
 
@@ -59,13 +59,13 @@ class PlayerCompact extends StatelessWidget {
                 right: Dimens.sizeSmall),
             padding: const EdgeInsets.fromLTRB(padding, padding, padding, 0),
             decoration: BoxDecoration(
-              color: Color.alphaBlend(bgColor, Colors.white),
+              color: Color.alphaBlend(bgColor, scheme.surface),
               borderRadius: BorderRadius.circular(Dimens.sizeSmall - 2),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
-                  blurRadius: 20,
-                  spreadRadius: 5,
+                  blurRadius: Dimens.sizeMedium,
+                  spreadRadius: Dimens.sizeExtraSmall,
                 )
               ],
             ),
@@ -153,7 +153,7 @@ class PlayerCompact extends StatelessWidget {
                       width: constraints.maxWidth,
                       height: Dimens.sizeExtraSmall - 1,
                       alignment: AlignmentDirectional.centerStart,
-                      color: Color.alphaBlend(bgColor, Colors.grey[100]!),
+                      color: Color.alphaBlend(bgColor, scheme.disabled),
                       child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                           builder: (context, slider) {
                         Duration duration = Duration.zero;
@@ -167,10 +167,9 @@ class PlayerCompact extends StatelessWidget {
                           duration = const Duration(seconds: 1);
                         }
                         return AnimatedContainer(
-                          duration: duration,
-                          color: scheme.primary,
-                          width: width,
-                        );
+                            duration: duration,
+                            width: width,
+                            color: scheme.textColor);
                       }),
                     ),
                   );

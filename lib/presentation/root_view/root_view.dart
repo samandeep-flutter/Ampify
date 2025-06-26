@@ -47,23 +47,22 @@ class _RootViewState extends State<RootView> {
           ],
         ),
         bottomNavigationBar: DecoratedBox(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
               gradient: LinearGradient(
             stops: [.8, 1],
-            colors: [Colors.white, Colors.white12],
+            colors: [scheme.surface, scheme.surface.withAlpha(50)],
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
           )),
           child: BlocBuilder<RootBloc, RootState>(
+            buildWhen: (pr, cr) => pr.index != cr.index,
             builder: (context, state) {
               return BottomNavigationBar(
                 backgroundColor: Colors.transparent,
                 elevation: 40,
                 iconSize: Dimens.sizeMedium,
-                selectedFontSize: 0,
-                unselectedFontSize: 0,
                 unselectedItemColor: scheme.disabled,
-                selectedItemColor: scheme.onPrimaryContainer,
+                selectedItemColor: scheme.textColor,
                 onTap: (index) {
                   if (index != 1) searchBloc.onSearchClear();
                   bloc.onIndexChange(context, index: index);

@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:ampify/data/repository/library_repo.dart';
-import 'package:ampify/data/repository/music_repo.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
+import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:just_audio/just_audio.dart' hide PlayerState;
+import 'package:just_audio/just_audio.dart' hide PlayerState, PlayerEvent;
 import 'package:rxdart/transformers.dart';
 import 'player_events.dart';
 

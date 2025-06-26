@@ -27,7 +27,7 @@ class AddtoPlaylistSheet extends StatelessWidget {
           builder: (context, state) {
             final playlists = state.items.where((e) {
               final isPlaylist = e.type == LibItemType.playlist;
-              final myPlaylists = e.owner?.id == state.profile?.id;
+              final myPlaylists = e.owner?.id == bloc.box.profile!.id;
               return isPlaylist && myPlaylists;
             }).toList();
             return Column(
@@ -47,8 +47,9 @@ class AddtoPlaylistSheet extends StatelessWidget {
                     ElevatedButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
+                        final id = bloc.box.profile!.id!;
                         context.pushNamed(AppRoutes.createPlaylist,
-                            pathParameters: {'userId': state.profile!.id!});
+                            pathParameters: {'userId': id});
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: scheme.primary,
@@ -93,19 +94,20 @@ class AddtoPlaylistSheet extends StatelessWidget {
                                 Expanded(
                                     child: InkWell(
                                   onTap: () => bloc.onItemAdded(item.id!),
-                                  borderRadius: BorderRadius.circular(100),
+                                  borderRadius: BorderRadius.circular(
+                                      Dimens.circularBoder),
                                   child: LayoutBuilder(
                                     builder: (context, constraints) {
                                       return MyCachedImage(
                                         item.image,
                                         height: constraints.maxHeight,
                                         width: constraints.maxHeight,
-                                        borderRadius: 100,
+                                        borderRadius: Dimens.circularBoder,
                                       );
                                     },
                                   ),
                                 )),
-                                const SizedBox(height: Dimens.sizeExtraSmall),
+                                const SizedBox(height: Dimens.sizeSmall),
                                 Text(
                                   item.name ?? '',
                                   maxLines: 1,
@@ -116,25 +118,22 @@ class AddtoPlaylistSheet extends StatelessWidget {
                                       fontSize: Dimens.fontDefault,
                                       fontWeight: FontWeight.w500),
                                 ),
+                                const SizedBox(height: Dimens.sizeSmall),
                               ],
                             ),
                             if (state.playlists.contains(item.id))
-                              Align(
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    right: Dimens.sizeMedSmall,
+                                    top: Dimens.sizeSmall),
                                 alignment: Alignment.topRight,
-                                child: ShadowWidget(
-                                  borderRadius: Dimens.sizeLarge,
-                                  margin:
-                                      const EdgeInsets.all(Dimens.sizeMedSmall),
-                                  color: Colors.black26,
-                                  spread: Dimens.sizeExtraSmall,
-                                  child: CircleAvatar(
-                                    radius: Dimens.sizeMedSmall,
-                                    backgroundColor: scheme.primary,
-                                    child: Icon(
-                                      Icons.check_outlined,
-                                      color: scheme.onPrimary,
-                                      size: Dimens.sizeDefault,
-                                    ),
+                                child: CircleAvatar(
+                                  radius: Dimens.sizeMedSmall,
+                                  backgroundColor: scheme.primary,
+                                  child: Icon(
+                                    Icons.check_outlined,
+                                    color: scheme.onPrimary,
+                                    size: Dimens.sizeDefault,
                                   ),
                                 ),
                               )
@@ -159,19 +158,20 @@ class AddtoPlaylistSheet extends StatelessWidget {
                     return loading || ids;
                   },
                   builder: (context, state) {
-                    return SafeArea(
-                      child: LoadingButton(
-                        enable: state.playlists.isNotEmpty,
-                        isLoading: state.loading,
-                        loaderColor: scheme.primary,
-                        onPressed: () => bloc.add(AddTracktoPlaylists()),
-                        backgroundColor: scheme.primary,
-                        foregroundColor: scheme.onPrimary,
-                        child: const Text(StringRes.submit),
-                      ),
+                    return LoadingButton(
+                      margin: Utils.paddingHoriz(Dimens.sizeDefault),
+                      width: double.infinity,
+                      isLoading: state.loading,
+                      loaderColor: scheme.primary,
+                      enable: state.playlists.isNotEmpty,
+                      onPressed: () => bloc.add(AddTracktoPlaylists()),
+                      backgroundColor: scheme.primary,
+                      foregroundColor: scheme.onPrimary,
+                      child: const Text(StringRes.submit),
                     );
                   },
-                )
+                ),
+                const SafeArea(child: SizedBox(height: Dimens.sizeSmall))
               ],
             );
           }),

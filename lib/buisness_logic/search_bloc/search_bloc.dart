@@ -1,7 +1,7 @@
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/services/extension_services.dart';
 import '../../data/data_models/search_model.dart';
-import 'package:ampify/data/repository/search_repo.dart';
+import 'package:ampify/data/repositories/search_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';

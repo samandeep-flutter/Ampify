@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
-import '../../config/theme_services.dart';
+import '../../services/theme_services.dart';
 
 class LoadingButton extends StatelessWidget {
   final Widget child;
@@ -44,22 +44,25 @@ class LoadingButton extends StatelessWidget {
             backgroundColor: backgroundColor ?? scheme.primary,
             foregroundColor: foregroundColor ?? scheme.onPrimary,
             visualDensity: compact ? VisualDensity.compact : null,
-            shape: border != null
-                ? RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                    Radius.circular(border!),
-                  ))
-                : null,
+            shape: ContinuousRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(border ?? Dimens.borderLarge)),
             padding: padding ??
                 const EdgeInsets.symmetric(vertical: Dimens.sizeDefault)),
         onPressed: enable && !(isLoading ?? false) ? onPressed : null,
-        child: enable && (isLoading ?? false)
-            ? SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                    color: loaderColor ?? scheme.primary))
-            : child,
+        child: DefaultTextStyle.merge(
+          style: const TextStyle(
+              fontWeight: FontWeight.w600, fontSize: Dimens.fontLarge),
+          child: Builder(builder: (context) {
+            if (isLoading ?? false) {
+              return SizedBox.square(
+                  dimension: Dimens.sizeLarge,
+                  child: CircularProgressIndicator(
+                      color: loaderColor ?? scheme.primary));
+            }
+            return child;
+          }),
+        ),
       ),
     );
   }

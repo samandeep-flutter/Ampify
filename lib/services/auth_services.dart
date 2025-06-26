@@ -1,23 +1,26 @@
 import 'dart:io';
-import 'package:ampify/data/repository/auth_repo.dart';
+import 'package:ampify/data/repositories/auth_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/services/box_services.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:app_links/app_links.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AuthServices {
   AuthServices._init();
   static AuthServices? _to;
   static AuthServices get to => _to ??= AuthServices._init();
 
-  final box = BoxServices.to;
-  final AuthRepo auth = getIt();
-  // final navigator = GlobalKey<NavigatorState>();
-  late String minVersion;
+  final navigator = GlobalKey<NavigatorState>();
+  BuildContext? get context => navigator.currentContext;
+
+  final AppLinks _appLinks = getIt();
+  final box = BoxServices.instance;
 
   Future<AuthServices> init() async {
-    getIt<AppLinks>().uriLinkStream.listen(_dynamicLinks);
+    _appLinks.uriLinkStream.listen(_dynamicLinks);
     return this;
   }
 
@@ -40,5 +43,12 @@ class AuthServices {
     } catch (_) {
       return AppRoutes.auth;
     }
+  }
+
+  Future<void> logout() async {
+    await box.remove(BoxKeys.token);
+    await box.remove(BoxKeys.profile);
+    await box.remove(BoxKeys.refreshToken);
+    context?.goNamed(AppRoutes.auth);
   }
 }

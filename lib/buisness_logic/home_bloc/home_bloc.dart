@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:ampify/services/notification_services.dart';
 import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/playlist_model.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/data_models/search_model.dart';
-import 'package:ampify/data/repository/home_repo.dart';
+import 'package:ampify/data/repositories/home_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';
@@ -101,6 +102,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
     await getReleases.future;
     await getRecentlyPlayed.future;
+    Future(MyNotifications.initialize);
   }
 
   void toHistory(BuildContext context) {

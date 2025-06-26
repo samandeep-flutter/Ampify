@@ -9,11 +9,8 @@ class MusicRepo {
   final YTMusic ytMusic;
   final YoutubeExplode ytExplode;
 
-  MusicRepo({
-    required this.ytMusic,
-    required this.ytExplode,
-    required this.dio,
-  });
+  MusicRepo(
+      {required this.ytMusic, required this.ytExplode, required this.dio});
 
   final _ytClients = [
     if (Platform.isAndroid) YoutubeApiClient.androidVr,
@@ -21,16 +18,10 @@ class MusicRepo {
   ];
 
   Future<Uri?> searchSong(String query) async {
-    String? id;
     try {
       List<SongDetailed> songs = await ytMusic.searchSongs(query);
-      id = songs.first.videoId;
-    } catch (e) {
-      logPrint(e, 'YT');
-    }
-    try {
       final manifest = await ytExplode.videos.streams
-          .getManifest(id!, ytClients: _ytClients);
+          .getManifest(songs.first.videoId, ytClients: _ytClients);
       final stream = manifest.audioOnly.withHighestBitrate();
       return stream.url;
     } catch (e) {

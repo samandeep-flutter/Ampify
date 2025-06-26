@@ -30,18 +30,19 @@ class SearchPage extends StatelessWidget {
       appBar: AppBar(
         scrolledUnderElevation: 0,
         backgroundColor: scheme.background,
+        toolbarHeight: Dimens.circularBoder,
         title: BlocBuilder<SearchBloc, SearchState>(
           buildWhen: (previous, current) {
-            final searchText = bloc.searchContr.text;
-            return searchText.isEmpty || searchText.length == 1;
+            final query = bloc.searchContr.text.trim();
+            return query.isEmpty || query.length == 1;
           },
           builder: (context, state) {
-            final searchText = bloc.searchContr.text;
+            final query = bloc.searchContr.text;
             return SearchTextField(
               title: 'Search',
               controller: bloc.searchContr,
               focusNode: bloc.focusNode,
-              trailing: searchText.isNotEmpty
+              trailing: query.isNotEmpty
                   ? IconButton(
                       onPressed: bloc.onSearchClear,
                       color: scheme.disabled,
@@ -83,29 +84,26 @@ class SearchPage extends StatelessWidget {
 
               return Expanded(
                 child: ListView.builder(
-                    padding: EdgeInsets.only(
-                      top: Dimens.sizeDefault,
-                      bottom: context.height * .18,
-                    ),
+                    padding: EdgeInsets.only(bottom: context.height * .18),
                     itemCount: state.results?.length ?? 0,
                     itemBuilder: (context, index) {
                       final item = state.results![index];
 
                       if (item.type == LibItemType.track) {
                         final artists = item.owner?.name?.split(',') ?? [];
-
-                        final track = Track(
-                            id: item.id,
-                            name: item.name,
-                            type: item.type?.name,
-                            album: Album(image: item.image, id: item.albumId),
-                            artists: List<Artist>.from(artists.map((e) {
-                              return Artist(name: e);
-                            })));
-                        return TrackTile(track);
+                        return TrackTile(Track(
+                          id: item.id,
+                          name: item.name,
+                          type: item.type?.name,
+                          album: Album(image: item.image, id: item.albumId),
+                          artists: List<Artist>.from(artists.map((e) {
+                            return Artist(name: e);
+                          })),
+                        ));
                       }
 
-                      return MusicGroupTile(item, imageHeight: 40);
+                      return MusicGroupTile(item,
+                          imageHeight: Dimens.sizeExtraLarge);
                     }),
               );
             },

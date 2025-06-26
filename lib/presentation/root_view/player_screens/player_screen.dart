@@ -70,7 +70,7 @@ class PlayerScreen extends StatelessWidget {
                   BlocBuilder<PlayerBloc, PlayerState>(
                       buildWhen: (pre, cur) => pre.track != cur.track,
                       builder: (context, state) {
-                        final fgColor = state.track.bgColor?.withOpacity(.4);
+                        final fgColor = state.track.bgColor?.withAlpha(100);
                         const bgColor = Colors.white;
                         return ShadowWidget(
                           offset: const Offset(0, 50),

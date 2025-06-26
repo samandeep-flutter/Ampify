@@ -13,8 +13,8 @@ class HomeRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final url = '${AppConstants.newReleases(offset ?? 0)}&limit=${limit ?? 10}';
-    final response = await dio.get(url, client: dio);
+    final url = AppConstants.newReleases(offset ?? 0);
+    final response = await dio.get('$url&limit=${limit ?? 10}');
     ApiResponse.verify(response,
         onSuccess: onSuccess,
         onError: onError ?? (e) => logPrint(e, 'new Release'));
@@ -25,8 +25,8 @@ class HomeRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final url = AppConstants.severalTracks(ids.asString.noSpace);
-    final response = await dio.get(url, client: dio);
+    final _ids = ids.asString.noSpace;
+    final response = await dio.get(AppConstants.severalTracks(_ids));
     ApiResponse.verify(response,
         onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'tracks'));
   }
@@ -36,8 +36,8 @@ class HomeRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final url = AppConstants.severalTracks(ids.asString.noSpace);
-    final response = await dio.get(url, client: dio);
+    final _ids = ids.asString.noSpace;
+    final response = await dio.get(AppConstants.severalTracks(_ids));
     ApiResponse.verify(response,
         onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'tracks'));
   }
@@ -47,8 +47,8 @@ class HomeRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final url = '${AppConstants.browse('en_IN')}&limit=${limit ?? 10}';
-    final response = await dio.get(url, client: dio);
+    final url = AppConstants.browse('en_IN');
+    final response = await dio.get('$url&limit=${limit ?? 10}');
     ApiResponse.verify(response,
         onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'browse'));
   }
@@ -57,8 +57,7 @@ class HomeRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    const url = AppConstants.recentlyPlayed;
-    final response = await dio.get(url, client: dio);
+    final response = await dio.get(AppConstants.recentlyPlayed);
     ApiResponse.verify(response,
         onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'recent'));
   }

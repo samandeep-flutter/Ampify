@@ -10,7 +10,6 @@ import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/utils/color_resources.dart';
 import '../../data/utils/dimens.dart';
 import '../../data/utils/string.dart';
 import '../widgets/base_widget.dart';
@@ -33,52 +32,35 @@ class _LibraryScreenState extends State<LibraryScreen>
     return BaseWidget(
       appBar: AppBar(
         backgroundColor: scheme.background,
-        title: Row(
-          children: [
-            BlocBuilder<LibraryBloc, LibraryState>(
-              buildWhen: (pr, cr) => pr.profile != cr.profile,
-              builder: (context, state) {
-                return PopupMenuButton(
-                  position: PopupMenuPosition.under,
-                  splashRadius: 0,
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                        onTap: () => bloc.logout(context),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(width: Dimens.sizeSmall),
-                            Icon(Icons.logout, color: ColorRes.error),
-                            SizedBox(width: Dimens.sizeDefault),
-                            Text(StringRes.logout),
-                          ],
-                        )),
-                  ],
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: state.profile?.product == 'premium'
-                        ? const BoxDecoration(
-                            gradient: SweepGradient(colors: ColorRes.primaries),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(Dimens.borderLarge),
-                            ))
-                        : null,
-                    child: MyAvatar(
-                      padding: const EdgeInsets.all(2),
-                      bgColor: scheme.background,
-                      state.profile?.image,
-                      isAvatar: true,
-                      avatarRadius: Dimens.sizeMedium,
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(width: Dimens.sizeSmall),
-            const Text(StringRes.myLibrary),
-          ],
+        leading: Container(
+          margin: EdgeInsets.only(left: Dimens.sizeSmall),
+          padding: const EdgeInsets.all(3),
+          decoration: bloc.box.profile?.product == 'premium'
+              ? const BoxDecoration(
+                  gradient: SweepGradient(colors: [
+                    Color(0xFF6A2E8B),
+                    Color(0xFF5271FF),
+                    Color(0xFF00C2FF),
+                    Color(0xFF2D3A68),
+                    Color(0xFF7EC8FF),
+                    Color(0xFFFFB84D),
+                    Color(0xFF833AB4),
+                  ]),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(Dimens.borderLarge),
+                  ))
+              : null,
+          child: MyAvatar(
+            bloc.box.profile?.image,
+            isAvatar: true,
+            bgColor: scheme.background,
+            padding: const EdgeInsets.all(2),
+            onTap: () => context.pushNamed(AppRoutes.profile),
+            avatarRadius: Dimens.sizeMedium,
+          ),
         ),
-        titleTextStyle: Utils.defTitleStyle,
+        title: const Text(StringRes.myLibrary),
+        titleTextStyle: Utils.defTitleStyle(context),
         centerTitle: false,
         bottom: PreferredSize(
             preferredSize: const Size.fromHeight(Dimens.sizeExtraLarge),
@@ -104,21 +86,19 @@ class _LibraryScreenState extends State<LibraryScreen>
               },
             )),
         actions: [
-          BlocBuilder<LibraryBloc, LibraryState>(
-            builder: (context, state) {
-              return TextButton.icon(
-                onPressed: () {
-                  context.pushNamed(AppRoutes.createPlaylist,
-                      pathParameters: {'userId': state.profile!.id!});
-                },
-                label: const Text(StringRes.create),
-                iconAlignment: IconAlignment.end,
-                icon: const Icon(
-                  Icons.library_add_outlined,
-                  size: Dimens.sizeLarge,
-                ),
-              );
+          TextButton.icon(
+            style: TextButton.styleFrom(foregroundColor: scheme.textColor),
+            onPressed: () {
+              final id = bloc.box.profile!.id!;
+              context.pushNamed(AppRoutes.createPlaylist,
+                  pathParameters: {'userId': id});
             },
+            label: const Text(StringRes.create),
+            iconAlignment: IconAlignment.end,
+            icon: const Icon(
+              Icons.library_add_outlined,
+              size: Dimens.sizeLarge,
+            ),
           ),
           const SizedBox(width: Dimens.sizeSmall)
         ],
@@ -127,6 +107,7 @@ class _LibraryScreenState extends State<LibraryScreen>
       child: ListView(
         controller: bloc.scrollController,
         children: [
+          const SizedBox(height: Dimens.sizeSmall),
           Row(
             children: [
               const SizedBox(width: Dimens.sizeSmall),
@@ -141,7 +122,11 @@ class _LibraryScreenState extends State<LibraryScreen>
                         state.sortby?.name.capitalize ?? StringRes.sortBy,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      icon: Image.asset(ImageRes.sort, height: 16),
+                      icon: Image.asset(
+                        ImageRes.sort,
+                        height: Dimens.sizeDefault,
+                        color: scheme.textColor,
+                      ),
                     );
                   }),
             ],
@@ -196,13 +181,13 @@ class _LibraryScreenState extends State<LibraryScreen>
 
   ButtonStyle defTextButtonStyle(bool sel) {
     final scheme = context.scheme;
-    final defBGcolor = scheme.primaryContainer.withOpacity(.5);
+    final defBGcolor = scheme.backgroundDark;
 
     return TextButton.styleFrom(
         visualDensity: VisualDensity.compact,
         padding: Utils.paddingHoriz(Dimens.sizeDefault),
         backgroundColor: sel ? scheme.primary : defBGcolor,
-        foregroundColor: sel ? scheme.onPrimary : scheme.onPrimaryContainer);
+        foregroundColor: sel ? scheme.onPrimary : scheme.textColor);
   }
 
   void sortBy(BuildContext context) {

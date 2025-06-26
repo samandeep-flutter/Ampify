@@ -1,4 +1,4 @@
-import 'package:ampify/data/repository/music_group_repo.dart';
+import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/services/box_services.dart';
 import 'package:ampify/services/getit_instance.dart';
@@ -80,12 +80,13 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
     on<AddTracktoPlaylists>(_onAddTrigger);
   }
 
+  final box = BoxServices.instance;
   final MusicGroupRepo _repo = getIt();
 
   onItemAdded(String id) => add(PlaylistSelected(id));
 
   _onInit(PlaylistInitial event, Emitter<AddtoPlaylistState> emit) {
-    final json = BoxServices.to.read(BoxKeys.profile);
+    final json = BoxServices.instance.read(BoxKeys.profile);
     emit(state.copyWith(
       profile: ProfileModel.fromJson(json),
       trackUri: event.uri,

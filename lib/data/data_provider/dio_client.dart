@@ -3,7 +3,7 @@ import 'package:ampify/services/extension_services.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../../services/getit_instance.dart';
-import '../repository/auth_repo.dart';
+import '../repositories/auth_repo.dart';
 import '../utils/app_constants.dart';
 import 'api_response.dart';
 
@@ -16,6 +16,8 @@ class DioClient {
     this.dio.options.baseUrl = AppConstants.baseUrl;
     if (kDebugMode) this.dio.interceptors.add(interceptor);
   }
+  final _box = BoxServices.instance;
+
   Future<Response> _get(String url, {Options? options}) async {
     final response = await dio.get(url, options: options);
     return response;
@@ -36,16 +38,15 @@ class DioClient {
     return response;
   }
 
-  Future<ApiResponse> get(String url,
-      {Options? options, required DioClient client}) async {
-    final token = BoxServices.to.read(BoxKeys.token);
+  Future<ApiResponse> get(String url, {Options? options}) async {
+    final token = _box.read(BoxKeys.token);
     final Map<String, dynamic> headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization': 'Bearer $token'
     };
     try {
-      Response response =
-          await client._get(url, options: options ?? Options(headers: headers));
+      final response =
+          await _get(url, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
     } catch (error) {
       try {
@@ -56,11 +57,11 @@ class DioClient {
         }
       } catch (_) {}
       await getIt<AuthRepo>().refreshToken();
-      String token = BoxServices.to.read(BoxKeys.token);
+      String token = _box.read(BoxKeys.token);
       headers.update('Authorization', (_) => 'Bearer $token');
       try {
-        Response response = await client._get(url,
-            options: options ?? Options(headers: headers));
+        final response =
+            await _get(url, options: options ?? Options(headers: headers));
         return ApiResponse.withSuccess(response);
       } catch (e) {
         return ApiResponse.withError(e);
@@ -69,15 +70,15 @@ class DioClient {
   }
 
   Future<ApiResponse> post(String url,
-      {required data, Options? options, required DioClient client}) async {
-    final token = BoxServices.to.read(BoxKeys.token);
+      {required data, Options? options}) async {
+    final token = _box.read(BoxKeys.token);
     final Map<String, dynamic> headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Authorization': 'Bearer $token'
     };
 
     try {
-      Response response = await client._post(url,
+      final response = await _post(url,
           data: data, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
     } catch (error) {
@@ -89,10 +90,10 @@ class DioClient {
         }
       } catch (_) {}
       await getIt<AuthRepo>().refreshToken();
-      String token = BoxServices.to.read(BoxKeys.token);
+      String token = _box.read(BoxKeys.token);
       headers.update('Authorization', (_) => 'Bearer $token');
       try {
-        Response response = await client._post(url,
+        final response = await _post(url,
             data: data, options: options ?? Options(headers: headers));
         return ApiResponse.withSuccess(response);
       } catch (e) {
@@ -101,16 +102,15 @@ class DioClient {
     }
   }
 
-  Future<ApiResponse> put(String url,
-      {dynamic data, Options? options, required DioClient client}) async {
-    final token = BoxServices.to.read(BoxKeys.token);
+  Future<ApiResponse> put(String url, {dynamic data, Options? options}) async {
+    final token = _box.read(BoxKeys.token);
     final Map<String, dynamic> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     };
 
     try {
-      Response response = await client._put(url,
+      final response = await _put(url,
           data: data, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
     } catch (error) {
@@ -122,10 +122,10 @@ class DioClient {
         }
       } catch (_) {}
       await getIt<AuthRepo>().refreshToken();
-      String token = BoxServices.to.read(BoxKeys.token);
+      String token = _box.read(BoxKeys.token);
       headers.update('Authorization', (_) => 'Bearer $token');
       try {
-        Response response = await client._put(url,
+        Response response = await _put(url,
             data: data, options: options ?? Options(headers: headers));
         return ApiResponse.withSuccess(response);
       } catch (e) {
@@ -135,15 +135,15 @@ class DioClient {
   }
 
   Future<ApiResponse> delete(String url,
-      {dynamic data, Options? options, required DioClient client}) async {
-    final token = BoxServices.to.read(BoxKeys.token);
+      {dynamic data, Options? options}) async {
+    final token = _box.read(BoxKeys.token);
     final Map<String, dynamic> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     };
 
     try {
-      Response response = await client._delete(url,
+      final response = await _delete(url,
           data: data, options: options ?? Options(headers: headers));
       return ApiResponse.withSuccess(response);
     } catch (error) {
@@ -155,10 +155,10 @@ class DioClient {
         }
       } catch (_) {}
       await getIt<AuthRepo>().refreshToken();
-      String token = BoxServices.to.read(BoxKeys.token);
+      String token = _box.read(BoxKeys.token);
       headers.update('Authorization', (_) => 'Bearer $token');
       try {
-        Response response = await client._delete(url,
+        final response = await _delete(url,
             data: data, options: options ?? Options(headers: headers));
         return ApiResponse.withSuccess(response);
       } catch (e) {

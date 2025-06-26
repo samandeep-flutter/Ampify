@@ -1,23 +1,13 @@
 import 'dart:async';
-import 'package:ampify/data/data_models/profile_model.dart';
-import 'package:ampify/data/repository/library_repo.dart';
+import 'package:ampify/services/box_services.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:rxdart/rxdart.dart';
-import '../../config/routes/app_routes.dart';
 import '../../data/data_models/library_model.dart';
-import '../../data/utils/app_constants.dart';
-import '../../data/utils/color_resources.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
-import '../../presentation/widgets/my_alert_dialog.dart';
-import '../../services/box_services.dart';
-import '../../services/notification_services.dart';
 
 class LibraryEvent extends Equatable {
   const LibraryEvent();
@@ -49,7 +39,6 @@ class LibrarySorted extends LibraryEvent {
 }
 
 class LibraryState extends Equatable {
-  final ProfileModel? profile;
   final SortOrder? sortby;
   final List<LibraryModel> items;
   final LibItemType? filterSel;
@@ -60,7 +49,6 @@ class LibraryState extends Equatable {
   final int albumCount;
 
   const LibraryState({
-    required this.profile,
     required this.sortby,
     required this.items,
     required this.filterSel,
@@ -71,8 +59,7 @@ class LibraryState extends Equatable {
     required this.albumCount,
   });
   const LibraryState.init()
-      : profile = null,
-        sortby = SortOrder.custom,
+      : sortby = SortOrder.custom,
         items = const [],
         totalLiked = null,
         filterSel = null,
@@ -82,7 +69,6 @@ class LibraryState extends Equatable {
         playlistCount = 0;
 
   LibraryState copyWith({
-    ProfileModel? profile,
     SortOrder? sortby,
     List<LibraryModel>? items,
     LibItemType? filterSel,
@@ -93,7 +79,6 @@ class LibraryState extends Equatable {
     int? albumCount,
   }) {
     return LibraryState(
-      profile: profile ?? this.profile,
       sortby: sortby ?? this.sortby,
       items: items ?? this.items,
       filterSel: filterSel,
@@ -107,7 +92,6 @@ class LibraryState extends Equatable {
 
   @override
   List<Object?> get props => [
-        profile,
         items,
         sortby,
         filterSel,
@@ -134,7 +118,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<LibrarySorted>(_onSorted);
   }
   final LibraryRepo _repo = getIt();
-  final _box = BoxServices.to;
+  final box = BoxServices.instance;
   final duration = const Duration(milliseconds: 200);
   final scrollController = ScrollController();
   List<LibraryModel> _libItems = [];
@@ -221,9 +205,6 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   }
 
   _onInit(LibraryInitial event, Emitter<LibraryState> emit) async {
-    final json = _box.read(BoxKeys.profile);
-    final profile = ProfileModel.fromJson(json);
-    emit(state.copyWith(profile: profile));
     final playlistCount = Completer<int>();
     final albumCount = Completer<int>();
     scrollController.addListener(_loadMoreItems);
@@ -263,39 +244,5 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         loading: false,
         playlistCount: plCount,
         albumCount: alCount));
-
-    Future(MyNotifications.initialize);
-  }
-
-  void logout(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return MyAlertDialog(
-            title: '${StringRes.logout} ?',
-            content: const Text(StringRes.logoutDesc),
-            actionPadding: const EdgeInsets.only(
-                right: Dimens.sizeDefault, bottom: Dimens.sizeSmall),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: context.scheme.textColor,
-                ),
-                child: const Text(StringRes.cancel),
-              ),
-              TextButton(
-                onPressed: () {
-                  BoxServices.to.remove(BoxKeys.token);
-                  context.goNamed(AppRoutes.auth);
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: ColorRes.error,
-                ),
-                child: Text(StringRes.logout.toUpperCase()),
-              ),
-            ],
-          );
-        });
   }
 }

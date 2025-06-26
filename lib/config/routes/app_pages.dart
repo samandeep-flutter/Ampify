@@ -3,6 +3,7 @@ import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/home_screens/home_screen.dart';
 import 'package:ampify/presentation/home_screens/listn_history.dart';
 import 'package:ampify/presentation/library_screens/library_screen.dart';
+import 'package:ampify/presentation/library_screens/profile_view.dart';
 import 'package:ampify/presentation/music_groups/edit_playlist.dart';
 import 'package:ampify/presentation/search_screens/search_page.dart';
 import 'package:ampify/services/getit_instance.dart';
@@ -25,7 +26,7 @@ abstract class AppPage {
   static GoRouter routes = GoRouter(
     initialLocation: '/${_auth.initialRoute}',
     debugLogDiagnostics: kDebugMode,
-    // navigatorKey: _auth.navigator,
+    navigatorKey: _auth.navigator,
     routes: [
       GoRoute(
         name: AppRoutes.auth,
@@ -94,6 +95,10 @@ abstract class AppPage {
                       name: AppRoutes.likedSongs,
                       path: AppRoutes.likedSongs,
                       builder: (_, state) => const LikedSongs()),
+                  GoRoute(
+                      name: AppRoutes.profile,
+                      path: AppRoutes.profile,
+                      builder: (_, state) => const ProfileView()),
                 ]),
           ]),
     ],
