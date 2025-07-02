@@ -4,6 +4,7 @@ import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/config/firebase_options.dart';
 import 'package:ampify/config/routes/app_pages.dart';
+import 'package:ampify/services/responsive_font.dart';
 import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -73,6 +74,7 @@ class MyApp extends StatelessWidget {
       title: StringRes.appName,
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
+        ResponsiveFont.init(context);
         return ResponsiveBreakpoints.builder(
           breakpoints: [
             const Breakpoint(start: 0, end: 450, name: MOBILE),
@@ -117,8 +119,6 @@ class MyApp extends StatelessWidget {
           seedColor: theme.primary,
           primary: theme.primary,
           onPrimary: theme.onPrimary,
-          primaryContainer: theme.primaryContainer,
-          onPrimaryContainer: theme.onPrimaryContainer,
           brightness: Brightness.light,
         ),
         useMaterial3: true,
@@ -128,8 +128,6 @@ class MyApp extends StatelessWidget {
           seedColor: theme.primary,
           primary: theme.primary,
           onPrimary: theme.onPrimary,
-          primaryContainer: theme.primaryContainer,
-          onPrimaryContainer: theme.onPrimaryContainer,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,

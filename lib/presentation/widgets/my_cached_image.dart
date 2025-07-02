@@ -99,20 +99,19 @@ class MyCachedImage extends StatelessWidget {
         fit: fit ?? BoxFit.cover,
         height: height,
         width: width,
-        imageBuilder: (context, imageProvider) {
+        imageBuilder: (context, provider) {
           if (isAvatar) {
             return CircleAvatar(
-                backgroundImage: imageProvider, radius: avatarRadius);
+                backgroundImage: provider, radius: avatarRadius);
           }
 
           return ClipRRect(
               borderRadius: BorderRadius.circular(borderRadius ?? 0),
               child: Image(
-                image: imageProvider,
-                height: height,
-                width: width,
-                fit: fit ?? BoxFit.cover,
-              ));
+                  image: provider,
+                  height: height,
+                  width: width,
+                  fit: fit ?? BoxFit.cover));
         },
         placeholder: (context, url) {
           if (isAvatar) {
@@ -124,11 +123,8 @@ class MyCachedImage extends StatelessWidget {
 
           return ClipRRect(
               borderRadius: BorderRadius.circular(borderRadius ?? 0),
-              child: SizedBox(
-                height: height,
-                width: width,
-                child: Shimmer.box,
-              ));
+              child:
+                  SizedBox(height: height, width: width, child: Shimmer.box));
         },
         errorWidget: (context, url, error) {
           logPrint(error, 'CachedImage');

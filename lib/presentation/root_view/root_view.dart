@@ -1,4 +1,5 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ampify/services/extension_services.dart';
@@ -33,45 +34,62 @@ class _RootViewState extends State<RootView> {
     final searchBloc = context.read<SearchBloc>();
 
     return Scaffold(
-        extendBody: true,
-        resizeToAvoidBottomInset: false,
-        body: Stack(
-          fit: StackFit.expand,
-          alignment: Alignment.bottomCenter,
-          children: [
-            widget.tabBar,
-            const Align(
-              alignment: Alignment.bottomCenter,
-              child: PlayerCompact(),
-            ),
-          ],
-        ),
-        bottomNavigationBar: DecoratedBox(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-            stops: [.8, 1],
-            colors: [scheme.surface, scheme.surface.withAlpha(50)],
-            begin: Alignment.bottomCenter,
-            end: Alignment.topCenter,
-          )),
-          child: BlocBuilder<RootBloc, RootState>(
-            buildWhen: (pr, cr) => pr.index != cr.index,
-            builder: (context, state) {
-              return BottomNavigationBar(
-                backgroundColor: Colors.transparent,
-                elevation: 40,
-                iconSize: Dimens.sizeMedium,
-                unselectedItemColor: scheme.disabled,
-                selectedItemColor: scheme.textColor,
-                onTap: (index) {
-                  if (index != 1) searchBloc.onSearchClear();
-                  bloc.onIndexChange(context, index: index);
-                },
-                currentIndex: state.index,
-                items: bloc.tabs,
-              );
-            },
+      // extendBody: true,
+      resizeToAvoidBottomInset: false,
+      backgroundColor: scheme.background,
+      body: Stack(
+        fit: StackFit.expand,
+        alignment: Alignment.bottomCenter,
+        children: [
+          widget.tabBar,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              BlocBuilder<PlayerBloc, PlayerState>(
+                  buildWhen: (pr, cr) => pr.showPlayer != cr.showPlayer,
+                  builder: (context, state) {
+                    return AnimatedSlide(
+                        duration: Durations.medium2,
+                        offset: Offset(0, state.showPlayer ?? false ? 0.05 : 2),
+                        child: PlayerCompact());
+                  }),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                  stops: [.65, .85, 1],
+                  colors: [
+                    scheme.surface,
+                    scheme.surface.withAlpha(200),
+                    scheme.surface.withAlpha(0),
+                  ],
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                )),
+                child: BlocBuilder<RootBloc, RootState>(
+                  buildWhen: (pr, cr) => pr.index != cr.index,
+                  builder: (context, state) {
+                    return BottomNavigationBar(
+                      backgroundColor: Colors.transparent,
+                      elevation: Dimens.sizeExtraLarge,
+                      selectedFontSize: Dimens.fontDefault,
+                      unselectedFontSize: Dimens.fontMed,
+                      unselectedItemColor: scheme.disabled,
+                      selectedItemColor: scheme.textColor,
+                      onTap: (index) {
+                        if (index != 1) searchBloc.onSearchClear();
+                        bloc.onIndexChange(context, index: index);
+                      },
+                      currentIndex: state.index,
+                      items: bloc.tabs,
+                    );
+                  },
+                ),
+              )
+            ],
           ),
-        ));
+        ],
+      ),
+    );
   }
 }

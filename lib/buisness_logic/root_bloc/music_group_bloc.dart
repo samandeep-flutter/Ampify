@@ -91,7 +91,7 @@ class MusicGroupState extends Equatable {
   final String? id;
   final double titileOpacity;
   final String? image;
-  final Color? color;
+  final Color? bgColor;
   final String? title;
   final MusicGroupDetails? details;
   final List<Track> tracks;
@@ -102,7 +102,7 @@ class MusicGroupState extends Equatable {
   const MusicGroupState({
     required this.id,
     required this.image,
-    required this.color,
+    required this.bgColor,
     required this.title,
     required this.type,
     required this.details,
@@ -117,7 +117,7 @@ class MusicGroupState extends Equatable {
         image = null,
         titileOpacity = 0,
         type = null,
-        color = Colors.white,
+        bgColor = null,
         title = null,
         details = null,
         isFav = false,
@@ -127,7 +127,7 @@ class MusicGroupState extends Equatable {
   MusicGroupState copyWith({
     String? id,
     String? image,
-    Color? color,
+    Color? bgColor,
     String? title,
     MusicGroupDetails? details,
     List<Track>? tracks,
@@ -139,7 +139,7 @@ class MusicGroupState extends Equatable {
     return MusicGroupState(
       id: id ?? this.id,
       image: image ?? this.image,
-      color: color ?? this.color,
+      bgColor: bgColor ?? this.bgColor,
       title: title ?? this.title,
       isFav: isFav,
       details: details,
@@ -153,7 +153,7 @@ class MusicGroupState extends Equatable {
   @override
   List<Object?> get props => [
         image,
-        color,
+        bgColor,
         title,
         tracks,
         type,
@@ -264,7 +264,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         image: playlist.image,
         tracks: tracks,
         type: LibItemType.playlist,
-        color: color ?? Colors.grey[700],
+        bgColor: color,
         isFav: isFav,
         title: playlist.name,
         details: details,
@@ -293,7 +293,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
       emit(state.copyWith(
         loading: false,
-        color: color,
+        bgColor: color,
         title: album.name,
         tracks: album.tracks,
         isFav: isFav,

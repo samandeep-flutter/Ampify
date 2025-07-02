@@ -52,14 +52,15 @@ class AddtoPlaylistSheet extends StatelessWidget {
                             pathParameters: {'userId': id});
                       },
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: scheme.primary,
+                          backgroundColor: scheme.primaryAdaptive,
                           foregroundColor: scheme.onPrimary,
                           visualDensity: VisualDensity.compact,
                           padding: const EdgeInsets.only(
                               left: Dimens.sizeSmall,
                               right: Dimens.sizeDefault)),
-                      icon: const Icon(Icons.add_outlined),
-                      label: const Text(StringRes.playlist),
+                      icon: Icon(Icons.add_outlined, size: Dimens.iconMedSmall),
+                      label: Text(StringRes.playlist,
+                          style: TextStyle(fontSize: Dimens.fontDefault)),
                     ),
                     const SizedBox(width: Dimens.sizeDefault),
                   ],
@@ -75,7 +76,7 @@ class AddtoPlaylistSheet extends StatelessWidget {
                   }
                   return Flexible(
                     child: GridView.builder(
-                      padding: Utils.paddingHoriz(Dimens.sizeDefault),
+                      padding: Utils.insetsHoriz(Dimens.sizeDefault),
                       scrollDirection: playlists.length > 2
                           ? Axis.horizontal
                           : Axis.vertical,
@@ -128,13 +129,11 @@ class AddtoPlaylistSheet extends StatelessWidget {
                                     top: Dimens.sizeSmall),
                                 alignment: Alignment.topRight,
                                 child: CircleAvatar(
-                                  radius: Dimens.sizeMedSmall,
+                                  radius: Dimens.iconExtraSmall,
                                   backgroundColor: scheme.primary,
-                                  child: Icon(
-                                    Icons.check_outlined,
-                                    color: scheme.onPrimary,
-                                    size: Dimens.sizeDefault,
-                                  ),
+                                  child: Icon(Icons.check_outlined,
+                                      color: scheme.onPrimary,
+                                      size: Dimens.iconMedSmall),
                                 ),
                               )
                           ],
@@ -159,14 +158,11 @@ class AddtoPlaylistSheet extends StatelessWidget {
                   },
                   builder: (context, state) {
                     return LoadingButton(
-                      margin: Utils.paddingHoriz(Dimens.sizeDefault),
+                      margin: Utils.insetsHoriz(Dimens.sizeDefault),
                       width: double.infinity,
                       isLoading: state.loading,
-                      loaderColor: scheme.primary,
                       enable: state.playlists.isNotEmpty,
                       onPressed: () => bloc.add(AddTracktoPlaylists()),
-                      backgroundColor: scheme.primary,
-                      foregroundColor: scheme.onPrimary,
                       child: const Text(StringRes.submit),
                     );
                   },

@@ -2,6 +2,7 @@ import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/dimens.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/presentation/track_widgets/track_bottom_sheet.dart';
 import 'package:ampify/presentation/widgets/my_cached_image.dart';
 import 'package:ampify/presentation/widgets/top_widgets.dart';
@@ -30,21 +31,15 @@ class TrackTile extends StatelessWidget {
         sliderBloc.add(const PlayerSliderChange(0));
       },
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          Dimens.sizeDefault,
-          Dimens.sizeSmall,
-          Dimens.sizeSmall,
-          Dimens.sizeSmall,
-        ),
+        padding: Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
         child: Row(
           children: [
             if (showImage ?? true) ...[
-              MyCachedImage(
-                track.album?.image,
-                borderRadius: Dimens.sizeExtraSmall - 2,
-                height: Dimens.sizeExtraLarge,
-                width: Dimens.sizeExtraLarge,
-              ),
+              Builder(builder: (context) {
+                final dimen = Dimens.iconExtraLarge;
+                return MyCachedImage(track.album?.image,
+                    borderRadius: Dimens.sizeMini, height: dimen, width: dimen);
+              }),
               const SizedBox(width: Dimens.sizeDefault),
             ],
             Expanded(
@@ -54,14 +49,17 @@ class TrackTile extends StatelessWidget {
                   Text(
                     track.name ?? '',
                     style: TextStyle(
-                        color: scheme.textColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Dimens.fontLarge),
+                      color: scheme.textColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: Dimens.fontLarge,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SubtitleWidget(
-                    style: TextStyle(color: scheme.textColorLight),
+                    style: TextStyle(
+                        color: scheme.textColorLight,
+                        fontSize: Dimens.fontDefault),
                     type: track.type?.capitalize ?? '',
                     subtitle: track.artists?.asString ?? '',
                   ),
@@ -71,13 +69,15 @@ class TrackTile extends StatelessWidget {
             IconButton(
               onPressed: () {
                 showModalBottomSheet(
-                    context: context,
-                    showDragHandle: true,
-                    useRootNavigator: true,
-                    builder: (_) => TrackBottomSheet(track, liked: liked));
+                  context: context,
+                  showDragHandle: true,
+                  useRootNavigator: true,
+                  builder: (_) => TrackBottomSheet(track, liked: liked),
+                );
               },
+              iconSize: Dimens.iconDefault,
               icon: const Icon(Icons.more_vert_outlined),
-            )
+            ),
           ],
         ),
       ),
@@ -95,9 +95,10 @@ class TrackTile extends StatelessWidget {
       dismissThresholds: const {DismissDirection.startToEnd: .3},
       background: Container(
         alignment: Alignment.centerLeft,
-        color: scheme.primary,
+        color: scheme.primaryAdaptive,
         padding: const EdgeInsets.only(left: Dimens.sizeLarge),
-        child: Icon(Icons.add_to_queue, color: scheme.onPrimary),
+        child: Icon(Icons.add_to_queue,
+            color: scheme.onPrimary, size: Dimens.iconDefault),
       ),
       child: widget,
     );
@@ -119,31 +120,22 @@ class TrackDetailsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     return ListTile(
-      leading: MyCachedImage(
-        track.image,
-        borderRadius: Dimens.sizeExtraSmall - 2,
-        height: Dimens.sizeExtraLarge,
-        width: Dimens.sizeExtraLarge,
-      ),
+      leading: Builder(builder: (context) {
+        final dimen = Dimens.iconExtraLarge;
+        return MyCachedImage(track.image,
+            borderRadius: Dimens.sizeMini, height: dimen, width: dimen);
+      }),
       title: title ??
-          Text(
-            track.title ?? '',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
+          Text(track.title ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
       titleTextStyle: TextStyle(
         color: scheme.textColor,
         fontWeight: FontWeight.w500,
         fontSize: Dimens.fontLarge,
       ),
-      subtitle: Text(
-        track.subtitle ?? '',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitleTextStyle: TextStyle(
-        color: scheme.textColorLight,
-      ),
+      subtitle: Text(track.subtitle ?? '',
+          maxLines: 1, overflow: TextOverflow.ellipsis),
+      subtitleTextStyle:
+          TextStyle(color: scheme.textColorLight, fontSize: Dimens.fontDefault),
       trailing: trailing,
     );
   }

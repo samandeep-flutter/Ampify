@@ -12,6 +12,7 @@ class BaseWidget extends StatelessWidget {
   final bool? extendBody;
   final bool? safeAreaBottom;
   final bool? resizeBottom;
+  final Widget? bottom;
   final Widget child;
 
   const BaseWidget({
@@ -24,6 +25,7 @@ class BaseWidget extends StatelessWidget {
     this.extendBody,
     this.safeAreaBottom,
     this.resizeBottom,
+    this.bottom,
     required this.child,
   });
 
@@ -36,13 +38,14 @@ class BaseWidget extends StatelessWidget {
       backgroundColor: color ?? scheme.background,
       extendBody: extendBody ?? false,
       resizeToAvoidBottomInset: resizeBottom,
+      bottomNavigationBar: bottom,
       body: Container(
         decoration: decoration,
         child: SafeArea(
             bottom: safeAreaBottom ?? false,
             child: Container(
               margin: margin,
-              padding: padding ?? Utils.paddingHoriz(Dimens.sizeLarge),
+              padding: padding ?? Utils.insetsHoriz(Dimens.sizeLarge),
               child: child,
             )),
       ),

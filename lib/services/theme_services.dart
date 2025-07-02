@@ -32,9 +32,8 @@ class ThemeServiceState extends State<ThemeServices> {
 
   late String _text;
   late Color _primary;
+  late Color _primaryAdaptive;
   late Color _onPrimary;
-  late Color _primaryContainer;
-  late Color _onPrimaryContainer;
   late Color _background;
   late Color _backgroundDark;
   late Color _surface;
@@ -50,9 +49,8 @@ class ThemeServiceState extends State<ThemeServices> {
 
   String get text => _text;
   Color get primary => _primary;
+  Color get primaryAdaptive => _primaryAdaptive;
   Color get onPrimary => _onPrimary;
-  Color get primaryContainer => _primaryContainer;
-  Color get onPrimaryContainer => _onPrimaryContainer;
   Color get background => _background;
   Color get backgroundDark => _backgroundDark;
   Color get surface => _surface;
@@ -90,20 +88,20 @@ class ThemeServiceState extends State<ThemeServices> {
     _text = theme.title;
     _primary = theme.primary;
     _onPrimary = theme.onPrimary;
-    _primaryContainer = theme.primaryContainer;
-    _onPrimaryContainer = theme.onPrimaryContainer;
     switch (mode?.brightness ?? _box.themeMode.brightness) {
       case Brightness.dark:
+        _primaryAdaptive = theme.primaryDark;
         _background = const Color(0xFF212121);
         _backgroundDark = const Color(0xFF4F4F4F);
         _surface = const Color(0xFF303030);
         _textColor = const Color(0xFFEEEEEE);
-        _textColorLight = const Color(0xFF757575);
+        _textColorLight = const Color(0xFF9B9B9B);
         _onError = const Color(0xFF523C40);
         _onSuccess = const Color(0xFF4C5E4A);
         _shimmer = Color(0xFF404040);
         break;
       case Brightness.light:
+        _primaryAdaptive = theme.primary;
         _background = const Color(0xFFFAFAFA);
         _backgroundDark = const Color(0xFFE0E0E0);
         _surface = Colors.white;
@@ -129,23 +127,20 @@ class ThemeServiceState extends State<ThemeServices> {
 enum MyTheme {
   indigo(
     title: 'lavender-blue',
-    primary: Color(0xff7F7FD5),
-    onPrimary: Color(0xFFF1F0FF),
-    primaryContainer: Color(0xFFB4B5ED),
-    onPrimaryContainer: Color(0xFF0D0D21),
+    primary: Color(0xFF7F7FD5),
+    onPrimary: Color(0xFFF6F5FD),
+    primaryDark: Color(0xFF505088),
   );
 
   final String title;
   final Color primary;
   final Color onPrimary;
-  final Color primaryContainer;
-  final Color onPrimaryContainer;
+  final Color primaryDark;
 
   const MyTheme({
     required this.title,
     required this.primary,
     required this.onPrimary,
-    required this.primaryContainer,
-    required this.onPrimaryContainer,
+    required this.primaryDark,
   });
 }

@@ -39,7 +39,7 @@ class BoxServices {
     String? brightness = box.read(BoxKeys.themeMode);
     return ThemeMode.values.firstWhere(
       (element) => element.name == brightness,
-      orElse: () => ThemeMode.system,
+      orElse: () => ThemeMode.dark,
     );
   }
 

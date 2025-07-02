@@ -34,7 +34,7 @@ class _LikedSongsState extends State<LikedSongs> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: scheme.background,
       body: BlocBuilder<LikedSongsBloc, LikedSongsState>(
         buildWhen: (pr, cr) {
           final loading = pr.loading != cr.loading;
@@ -44,13 +44,10 @@ class _LikedSongsState extends State<LikedSongs> {
           return loading || moreLoading || items;
         },
         builder: (context, state) {
-          final fgColor = scheme.primary.withAlpha(150);
+          final fgColor = scheme.primaryAdaptive.withAlpha(150);
 
           if (state.loading) {
-            return const MusicGroupShimmer(
-              isLikedSongs: true,
-              itemCount: 10,
-            );
+            return const MusicGroupShimmer(isLikedSongs: true, itemCount: 12);
           }
 
           return CustomScrollView(
@@ -71,9 +68,10 @@ class _LikedSongsState extends State<LikedSongs> {
                     }),
                 leading: IconButton(
                   onPressed: () => context.pop(bloc.libRefresh),
+                  iconSize: Dimens.iconDefault,
                   icon: const Icon(Icons.arrow_back_outlined),
                 ),
-                backgroundColor: Color.alphaBlend(fgColor, Colors.white),
+                backgroundColor: Color.alphaBlend(fgColor, scheme.background),
                 titleTextStyle: Utils.defTitleStyle(context),
               ),
               SliverToBoxAdapter(
@@ -84,7 +82,7 @@ class _LikedSongsState extends State<LikedSongs> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           stops: const [0, 1],
-                          colors: [fgColor, Colors.white])),
+                          colors: [fgColor, scheme.background])),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -97,11 +95,13 @@ class _LikedSongsState extends State<LikedSongs> {
                           Icon(
                             Icons.track_changes,
                             color: scheme.textColorLight,
+                            size: Dimens.iconDefault,
                           ),
                           const SizedBox(width: Dimens.sizeExtraSmall),
                           Text('${state.totalTracks} tracks',
                               style: TextStyle(
                                   fontWeight: FontWeight.w500,
+                                  fontSize: Dimens.fontDefault,
                                   color: scheme.textColorLight))
                         ],
                       ),
@@ -117,8 +117,8 @@ class _LikedSongsState extends State<LikedSongs> {
                                   pl.playerState == MusicState.loading;
                               return LoadingIcon(
                                 onPressed: () => bloc.onPlay(context),
-                                iconSize: Dimens.sizeMidLarge,
-                                loaderSize: Dimens.sizeMidLarge,
+                                iconSize: Dimens.iconLarge,
+                                loaderSize: Dimens.iconLarge,
                                 loading: group && loading,
                                 isSelected: group,
                                 selectedIcon: const Icon(Icons.pause),

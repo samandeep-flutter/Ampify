@@ -28,7 +28,7 @@ class AlbumShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-        padding: Utils.paddingHoriz(Dimens.sizeDefault),
+        padding: Utils.insetsHoriz(Dimens.sizeDefault),
         scrollDirection: Axis.horizontal,
         gridDelegate: Utils.fixedCrossAxis(1,
             aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
@@ -44,7 +44,7 @@ class AlbumShimmer extends StatelessWidget {
               ),
               const SizedBox(height: Dimens.sizeSmall),
               SizedBox(
-                  height: 12,
+                  height: Dimens.sizeMedSmall,
                   child: FractionallySizedBox(
                     heightFactor: 1,
                     widthFactor: .5,
@@ -52,7 +52,7 @@ class AlbumShimmer extends StatelessWidget {
                   )),
               const SizedBox(height: Dimens.sizeSmall),
               SizedBox(
-                  height: 12,
+                  height: Dimens.sizeMedSmall,
                   child: FractionallySizedBox(
                     heightFactor: 1,
                     widthFactor: .8,
@@ -73,16 +73,11 @@ class SongTileShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: margin ??
-          const EdgeInsets.fromLTRB(
-            Dimens.sizeDefault,
-            Dimens.sizeSmall,
-            Dimens.sizeLarge,
-            Dimens.sizeSmall,
-          ),
+          Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
       child: Row(
         children: [
           SizedBox.square(
-            dimension: iconSize ?? 40,
+            dimension: iconSize ?? Dimens.iconExtraLarge,
             child: Shimmer.box,
           ),
           const SizedBox(width: Dimens.sizeDefault),
@@ -90,10 +85,13 @@ class SongTileShimmer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(height: 12, width: 200, child: Shimmer.box),
+              SizedBox(
+                  height: Dimens.sizeMedSmall, width: 200, child: Shimmer.box),
               const SizedBox(height: Dimens.sizeMedSmall),
               SizedBox(
-                  height: 8, width: context.width * .7, child: Shimmer.box),
+                  height: Dimens.sizeSmall,
+                  width: context.width * .7,
+                  child: Shimmer.box),
             ],
           )
         ],
@@ -132,29 +130,33 @@ class MusicGroupShimmer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 25,
+                height: Dimens.sizeLarge,
                 width: context.width * .6,
                 child: Shimmer.box,
               ),
               const SizedBox(height: Dimens.sizeSmall),
               if (!isLikedSongs) ...[
                 SizedBox(
-                    height: 15, width: double.infinity, child: Shimmer.box),
+                    height: Dimens.sizeDefault - 1,
+                    width: double.infinity,
+                    child: Shimmer.box),
                 const SizedBox(height: Dimens.sizeSmall),
                 SizedBox(
-                    height: 15, width: double.infinity, child: Shimmer.box),
+                    height: Dimens.sizeDefault - 1,
+                    width: double.infinity,
+                    child: Shimmer.box),
                 const SizedBox(height: Dimens.sizeSmall),
               ],
               Row(
                 children: [
                   if (!isLikedSongs)
                     SizedBox(
-                        height: 30,
+                        height: Dimens.sizeMidLarge,
                         width: context.width * .4,
                         child: Shimmer.avatar),
                   const SizedBox(width: Dimens.sizeSmall),
                   SizedBox(
-                      height: 15,
+                      height: Dimens.sizeDefault - 1,
                       width: context.width * .3,
                       child: Shimmer.box),
                 ],
@@ -168,11 +170,12 @@ class MusicGroupShimmer extends StatelessWidget {
             if (!isLikedSongs)
               Icon(
                 Icons.add_circle_outline,
-                size: Dimens.sizeMidLarge,
+                size: Dimens.iconLarge,
                 color: context.scheme.shimmer,
               ),
             const Spacer(),
-            SizedBox.square(dimension: 50, child: Shimmer.avatar),
+            SizedBox.square(
+                dimension: Dimens.iconExtraLarge, child: Shimmer.avatar),
             const SizedBox(width: Dimens.sizeDefault),
           ],
         ),

@@ -23,7 +23,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     on<PlayerTrackLiked>(_onTrackLiked);
     on<PlayerShuffleToggle>(_shuffleToggle);
     on<PlayerQueueReordered>(_onReorder);
-    // on<PlayerRepeatToggle>(_repeatToggle);
+    on<PlayerRepeatToggle>(_repeatToggle);
     on<PlayerQueueAdded>(_onQueueAdded, transformer: _debounce(duration));
     on<PlayerTrackEnded>(_onTrackEnded, transformer: _debounce(longDuration));
     on<PlayerQueueCleared>(_onQueueCleared);
@@ -196,23 +196,23 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     // await player.setShuffleModeEnabled(!state.shuffle);
   }
 
-  // _repeatToggle(PlayerRepeatToggle event, Emitter<PlayerState> emit) async {
-  //   switch (player.loopMode) {
-  //     case LoopMode.one:
-  //       emit(state.copyWith(loopMode: MusicLoopMode.all));
-  //       await player.setLoopMode(LoopMode.all);
-  //       break;
-  //     case LoopMode.all:
-  //       emit(state.copyWith(loopMode: MusicLoopMode.off));
-  //       await player.setLoopMode(LoopMode.off);
-  //       break;
+  _repeatToggle(PlayerRepeatToggle event, Emitter<PlayerState> emit) async {
+    switch (player.loopMode) {
+      case LoopMode.one:
+        emit(state.copyWith(loopMode: MusicLoopMode.all));
+        // await player.setLoopMode(LoopMode.all);
+        break;
+      case LoopMode.all:
+        emit(state.copyWith(loopMode: MusicLoopMode.off));
+        // await player.setLoopMode(LoopMode.off);
+        break;
 
-  //     default:
-  //       emit(state.copyWith(loopMode: MusicLoopMode.once));
-  //       await player.setLoopMode(LoopMode.one);
-  //       break;
-  //   }
-  // }
+      case LoopMode.off:
+        emit(state.copyWith(loopMode: MusicLoopMode.once));
+        // await player.setLoopMode(LoopMode.one);
+        break;
+    }
+  }
 
   _onQueueAdded(PlayerQueueAdded event, Emitter<PlayerState> emit) async {
     try {

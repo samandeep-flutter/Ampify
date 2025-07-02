@@ -33,7 +33,7 @@ class CreatePlaylistView extends StatelessWidget {
               key: bloc.titleKey,
               controller: bloc.titleController,
               textCapitalization: TextCapitalization.sentences,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: Dimens.fontExtraTripleLarge,
                   fontWeight: FontWeight.w500),
               validator: (value) {
@@ -57,18 +57,18 @@ class CreatePlaylistView extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                        elevation: 0,
+                        elevation: Dimens.zero,
                         padding: const EdgeInsets.symmetric(
                             vertical: Dimens.sizeDefault),
                         foregroundColor: scheme.textColor,
                         backgroundColor: scheme.background,
                         shape: ContinuousRectangleBorder(
-                          side: BorderSide(color: scheme.primary),
+                          side: BorderSide(color: scheme.primaryAdaptive),
                           borderRadius:
                               BorderRadius.circular(Dimens.borderLarge),
                         )),
                     onPressed: context.pop,
-                    child: const Text(
+                    child: Text(
                       StringRes.cancel,
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
@@ -82,7 +82,6 @@ class CreatePlaylistView extends StatelessWidget {
                     builder: (context, state) {
                       return LoadingButton(
                         isLoading: state.loading,
-                        loaderColor: scheme.primary,
                         onPressed: () => bloc.createPlaylist(userId),
                         child: const Text(StringRes.submit),
                       );

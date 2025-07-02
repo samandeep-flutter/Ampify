@@ -98,4 +98,4 @@ If you encounter any issues, feel free to reach out to my [email](mailto:samande
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [GNU GPL v3.0 License](https://github.com/samandeep-flutter/Ampify/blob/main/LICENCE).

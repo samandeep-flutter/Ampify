@@ -1,3 +1,4 @@
+import 'package:ampify/data/utils/dimens.dart';
 import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/data/utils/utils.dart';
@@ -23,7 +24,8 @@ class ListeningHistory extends StatelessWidget {
         children: [
           Text(
             StringRes.listnHisSubtitle,
-            style: TextStyle(color: scheme.textColorLight),
+            style: TextStyle(
+                color: scheme.textColorLight, fontSize: Dimens.fontDefault),
           ),
           ToolTipWidget.placeHolder(
             icon: ImageRes.musicAlt,

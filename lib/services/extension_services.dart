@@ -10,6 +10,7 @@ extension MyContext on BuildContext {
   double get height => MediaQuery.sizeOf(this).height;
   double get width => MediaQuery.sizeOf(this).width;
   Orientation get orientation => MediaQuery.orientationOf(this);
+  bool get isDarkMode => ThemeServices.of(this).themeMode == ThemeMode.dark;
 }
 
 extension MyList on List<String> {
@@ -161,7 +162,7 @@ extension MyString on String {
   String _unescape(String text) => HtmlUnescape().convert(text);
 
   String _removeCopyright(String text) {
-    return text.replaceAll(RegExp(r'\b[CcPp]|\([CcPp]\)'), '');
+    return text.replaceAll(RegExp(r'(?<!\w)[CcPp](?!\w)|\([CcPp]\)'), '');
   }
 
   int _calculateMatch(String item, String searchText) {

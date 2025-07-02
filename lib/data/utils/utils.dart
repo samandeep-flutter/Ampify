@@ -22,8 +22,14 @@ sealed class Utils {
         fontSize: Dimens.fontTitle, fontWeight: FontWeight.bold, color: color);
   }
 
-  static EdgeInsets paddingHoriz(double padding) {
+  static EdgeInsets insetsHoriz(double padding) {
     return EdgeInsets.symmetric(horizontal: padding);
+  }
+
+  static EdgeInsets insetsOnly(double padding,
+      {double? top, double? bottom, double? left, double? right}) {
+    return EdgeInsets.fromLTRB(
+        left ?? padding, top ?? padding, right ?? padding, bottom ?? padding);
   }
 
   static SliverGridDelegate fixedCrossAxis(int count,
@@ -39,13 +45,15 @@ sealed class Utils {
     final palete = await PaletteGenerator.fromImageProvider(
         NetworkImage(track.album?.image ?? ''),
         size: const Size(200, 200));
-    final color = palete.mutedColor?.color;
+    final color = palete.lightVibrantColor?.color;
+    final darkColor = palete.darkVibrantColor?.color;
 
     return TrackDetails(
       id: track.id,
       albumId: track.album?.id,
       title: track.name,
       bgColor: color,
+      darkBgColor: darkColor,
       image: track.album?.image,
       subtitle: track.artists?.asString,
     );
@@ -56,7 +64,7 @@ sealed class Utils {
       final palete = await PaletteGenerator.fromImageProvider(
           NetworkImage(image!),
           size: const Size(200, 200));
-      return palete.mutedColor?.color;
+      return palete.lightVibrantColor?.color;
     } catch (_) {
       return null;
     }

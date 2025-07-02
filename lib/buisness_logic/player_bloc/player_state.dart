@@ -3,7 +3,6 @@ import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class PlayerState extends Equatable {
   final String? musicGroupId;
@@ -95,6 +94,7 @@ class TrackDetails extends Equatable {
   final String? title;
   final String? subtitle;
   final Color? bgColor;
+  final Color? darkBgColor;
 
   const TrackDetails({
     required this.id,
@@ -103,6 +103,7 @@ class TrackDetails extends Equatable {
     required this.title,
     required this.subtitle,
     required this.bgColor,
+    required this.darkBgColor,
   });
 
   const TrackDetails.init()
@@ -111,6 +112,7 @@ class TrackDetails extends Equatable {
         image = null,
         title = null,
         subtitle = null,
+        darkBgColor = null,
         bgColor = null;
 
   TrackDetails copyWith({
@@ -121,6 +123,7 @@ class TrackDetails extends Equatable {
     String? title,
     String? subtitle,
     Color? bgColor,
+    Color? darkBgColor,
   }) {
     return TrackDetails(
       id: id ?? this.id,
@@ -129,6 +132,7 @@ class TrackDetails extends Equatable {
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
       bgColor: bgColor ?? this.bgColor,
+      darkBgColor: darkBgColor ?? this.darkBgColor,
     );
   }
 
@@ -143,18 +147,17 @@ class TrackDetails extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, image, title, subtitle, bgColor];
+  List<Object?> get props => [id, image, title, subtitle, bgColor, darkBgColor];
 }
 
 enum MusicState { playing, pause, loading }
 
 enum MusicLoopMode {
-  off(icon: CupertinoIcons.repeat),
-  all(icon: CupertinoIcons.repeat, color: Colors.white),
-  once(icon: CupertinoIcons.repeat_1, color: Colors.white);
+  off(CupertinoIcons.repeat),
+  all(CupertinoIcons.repeat),
+  once(CupertinoIcons.repeat_1);
 
-  final Color? color;
   final IconData icon;
 
-  const MusicLoopMode({required this.icon, this.color});
+  const MusicLoopMode(this.icon);
 }

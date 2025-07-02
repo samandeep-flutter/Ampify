@@ -29,7 +29,7 @@ sealed class StringRes {
   static const String commingSoon = 'Comming Soon';
   static const String newReleases = 'New Releases for you';
   static const String recentlyPlayed = 'Recently played';
-  static const String spotifyRecent = 'Recently played on Spotify';
+  static const String spotifyRecent = 'Recently Played on Spotify';
   static const String authSpotify = 'Authenticate via Spotify';
   static const String createPlaylist = 'Create Playlist';
   static const String pubPlaylist = 'Public Playlist';

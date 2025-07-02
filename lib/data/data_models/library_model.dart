@@ -1,5 +1,7 @@
+import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/common/other_models.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,6 +12,7 @@ class LibraryModel extends Equatable {
   final String? name;
   final LibItemType? type;
   final OwnerModel? owner;
+  final String? uri;
 
   const LibraryModel({
     this.id,
@@ -18,6 +21,7 @@ class LibraryModel extends Equatable {
     this.type,
     this.owner,
     this.albumId,
+    this.uri,
   });
 
   factory LibraryModel.fromJson(Map<String, dynamic> json) {
@@ -58,6 +62,21 @@ class LibraryModel extends Equatable {
       name: json['name'],
       type: LibItemType.values.firstWhere((e) => e.name == type),
       owner: owner,
+      uri: json['uri'],
+    );
+  }
+
+  Track toTrack() {
+    final artists = owner?.name?.split(',') ?? [];
+    return Track(
+      id: id,
+      name: name,
+      type: type?.name,
+      album: Album(image: image, id: albumId),
+      artists: List<Artist>.from(
+        artists.map((e) => Artist(name: e)),
+      ),
+      uri: uri,
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:ampify/data/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:ampify/data/utils/dimens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,17 +19,13 @@ class PlayerCompact extends StatelessWidget {
     final bloc = context.read<PlayerBloc>();
     final sliderBloc = context.read<PlayerSliderBloc>();
 
-    const duration = Duration(milliseconds: 300);
-    const double playerHeight = 60;
-    const double padding = 5;
-
     return BlocConsumer<PlayerBloc, PlayerState>(
       buildWhen: (pr, cr) {
         final track = pr.track != cr.track;
-        final isShow = pr.showPlayer != cr.showPlayer;
+
         final isDuration = pr.durationLoading != cr.durationLoading;
         final isStateChange = pr.playerState != cr.playerState;
-        return track || isShow || isStateChange || isDuration;
+        return track || isStateChange || isDuration;
       },
       listener: (context, state) {
         if (state.playerState == MusicState.loading || state.durationLoading) {
@@ -43,117 +40,130 @@ class PlayerCompact extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        final bgColor = state.track.bgColor?.withAlpha(30) ?? scheme.background;
+        final _bg =
+            context.isDarkMode ? state.track.darkBgColor : state.track.bgColor;
+        final bgColor = _bg?.withAlpha(100) ?? scheme.background;
         final selected = state.playerState == MusicState.playing;
         final loading = state.playerState == MusicState.loading;
 
-        return AnimatedSlide(
-          duration: duration,
-          offset: Offset(0.0, state.showPlayer ?? false ? 0.08 : 1),
-          child: Container(
-            height: playerHeight,
-            width: double.infinity,
-            margin: const EdgeInsets.only(
-                bottom: Dimens.kNavBarHeight,
-                left: Dimens.sizeSmall,
-                right: Dimens.sizeSmall),
-            padding: const EdgeInsets.fromLTRB(padding, padding, padding, 0),
-            decoration: BoxDecoration(
-              color: Color.alphaBlend(bgColor, scheme.surface),
-              borderRadius: BorderRadius.circular(Dimens.sizeSmall - 2),
-              boxShadow: [
+        return Container(
+          margin: Utils.insetsOnly(Dimens.sizeSmall, bottom: Dimens.zero),
+          padding: Utils.insetsOnly(Dimens.sizeExtraSmall, bottom: Dimens.zero),
+          decoration: BoxDecoration(
+            color: Color.alphaBlend(bgColor, scheme.surface),
+            borderRadius: BorderRadius.circular(Dimens.sizeExtraSmall),
+            boxShadow: [
+              // if (context.isDarkMode)
+              ...[
                 BoxShadow(
-                  color: Colors.black26,
+                  color: scheme.surface.withAlpha(150),
+                  offset: Offset(0, Dimens.sizeLarge),
                   blurRadius: Dimens.sizeMedium,
-                  spreadRadius: Dimens.sizeExtraSmall,
-                )
+                  spreadRadius: Dimens.sizeLarge,
+                ),
+                BoxShadow(
+                  color: scheme.surface.withAlpha(100),
+                  blurRadius: Dimens.sizeMedium,
+                  spreadRadius: Dimens.sizeLarge,
+                ),
               ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            enableDrag: true,
-                            builder: (_) => const PlayerScreen(),
-                          );
-                        },
-                        child: ColoredBox(
-                          color: Colors.transparent,
-                          child: Row(
-                            children: [
-                              MyCachedImage(
-                                state.track.image,
-                                width: playerHeight - padding * 2,
-                                borderRadius: 2,
-                              ),
-                              const SizedBox(width: Dimens.sizeSmall),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      state.track.title ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      state.track.subtitle ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: scheme.textColorLight,
-                                          fontSize: Dimens.fontMed),
-                                    )
-                                  ],
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: Dimens.sizeMedium,
+                spreadRadius: Dimens.sizeExtraSmall,
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                      child: GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        enableDrag: true,
+                        builder: (_) => const PlayerScreen(),
+                      );
+                    },
+                    child: ColoredBox(
+                      color: Colors.transparent,
+                      child: Row(
+                        children: [
+                          Builder(builder: (context) {
+                            const double _dimen = 50;
+                            final _scalar = MediaQuery.textScalerOf(context);
+                            final dimen = _scalar.scale(_dimen);
+
+                            return MyCachedImage(state.track.image,
+                                borderRadius: Dimens.sizeMini, width: dimen);
+                          }),
+                          const SizedBox(width: Dimens.sizeSmall),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  state.track.title ?? '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: Dimens.fontDefault,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  state.track.subtitle ?? '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: scheme.textColor.withAlpha(200),
+                                      fontSize: Dimens.fontMed),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      )),
-                      const SizedBox(width: Dimens.sizeSmall),
-                      LoadingIcon(
-                        loading: loading,
-                        onPressed: bloc.onPlayPause,
-                        iconSize: Dimens.sizeMidLarge,
-                        isSelected: selected,
-                        selectedIcon: const Icon(Icons.pause),
-                        style: IconButton.styleFrom(
-                            splashFactory: NoSplash.splashFactory),
-                        icon: const Icon(Icons.play_arrow),
+                        ],
                       ),
-                      const SizedBox(width: Dimens.sizeSmall),
-                    ],
+                    ),
+                  )),
+                  const SizedBox(width: Dimens.sizeSmall),
+                  LoadingIcon(
+                    loading: loading,
+                    onPressed: bloc.onPlayPause,
+                    iconSize: Dimens.iconLarge,
+                    isSelected: selected,
+                    selectedIcon: const Icon(Icons.pause),
+                    style: IconButton.styleFrom(
+                        foregroundColor: scheme.textColor,
+                        splashFactory: NoSplash.splashFactory),
+                    icon: const Icon(Icons.play_arrow),
                   ),
-                ),
-                BlocListener<PlayerSliderBloc, PlayerSliderState>(
-                  listenWhen: (pr, cr) {
-                    final ended = cr.current == state.length;
-                    final length = state.length != 0 && cr.current != 0;
-                    return ended && length;
-                  },
-                  listener: (_, slider) => bloc.onTrackEnded(slider),
-                  child: const SizedBox.shrink(),
-                ),
-                const SizedBox(height: Dimens.sizeExtraSmall),
-                LayoutBuilder(builder: (context, constraints) {
+                  const SizedBox(width: Dimens.sizeSmall),
+                ],
+              ),
+              BlocListener<PlayerSliderBloc, PlayerSliderState>(
+                listenWhen: (pr, cr) {
+                  final ended = cr.current == state.length;
+                  final length = state.length != 0 && cr.current != 0;
+                  return ended && length;
+                },
+                listener: (_, slider) => bloc.onTrackEnded(slider),
+                child: const SizedBox.shrink(),
+              ),
+              const SizedBox(height: Dimens.sizeExtraSmall),
+              SizedBox(
+                height: Dimens.sizeExtraSmall,
+                child: LayoutBuilder(builder: (context, constraints) {
                   return ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(Dimens.sizeMini),
                     child: Container(
                       width: constraints.maxWidth,
-                      height: Dimens.sizeExtraSmall - 1,
                       alignment: AlignmentDirectional.centerStart,
-                      color: Color.alphaBlend(bgColor, scheme.disabled),
+                      color: Color.alphaBlend(
+                          bgColor, scheme.textColorLight.withAlpha(150)),
                       child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                           builder: (context, slider) {
                         Duration duration = Duration.zero;
@@ -173,9 +183,9 @@ class PlayerCompact extends StatelessWidget {
                       }),
                     ),
                   );
-                })
-              ],
-            ),
+                }),
+              )
+            ],
           ),
         );
       },

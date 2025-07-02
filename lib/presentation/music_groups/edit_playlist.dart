@@ -22,7 +22,7 @@ class EditPlaylistScreen extends StatelessWidget {
     final bloc = context.read<EditPlaylistBloc>();
     return BaseWidget(
       appBar: AppBar(backgroundColor: scheme.background),
-      padding: Utils.paddingHoriz(Dimens.sizeExtraLarge),
+      padding: Utils.insetsHoriz(Dimens.sizeExtraLarge),
       child: BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
         buildWhen: (pr, cr) => pr.id != cr.id,
         builder: (context, state) {
@@ -32,25 +32,28 @@ class EditPlaylistScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  MyCachedImage(
-                    state.image,
-                    height: width,
-                    width: width,
-                    borderRadius: Dimens.sizeExtraSmall,
-                  ),
+                  MyCachedImage(state.image,
+                      height: width,
+                      width: width,
+                      borderRadius: Dimens.sizeExtraSmall),
                 ],
               ),
               const SizedBox(height: Dimens.sizeExtraLarge),
               TextFormField(
-                decoration: const InputDecoration(label: Text('Title')),
+                decoration: InputDecoration(
+                    label: Text('Title'),
+                    labelStyle: TextStyle(fontSize: Dimens.fontDefault)),
+                style: TextStyle(fontSize: Dimens.fontDefault),
                 controller: bloc.titleContr,
               ),
               const SizedBox(height: Dimens.sizeMidLarge),
               TextFormField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   label: Text('Describe your vibe!'),
+                  labelStyle: TextStyle(fontSize: Dimens.fontDefault),
                   constraints: BoxConstraints(maxHeight: 100),
                 ),
+                style: TextStyle(fontSize: Dimens.fontDefault),
                 controller: bloc.descContr,
                 expands: true,
                 maxLines: null,
@@ -61,7 +64,7 @@ class EditPlaylistScreen extends StatelessWidget {
                 style: TextStyle(
                     color: scheme.textColorLight,
                     fontWeight: FontWeight.w500,
-                    fontSize: Dimens.fontLarge),
+                    fontSize: Dimens.fontDefault),
               ),
               BlocListener<EditPlaylistBloc, EditPlaylistState>(
                   listener: (context, state) {

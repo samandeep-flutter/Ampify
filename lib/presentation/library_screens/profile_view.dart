@@ -57,14 +57,15 @@ class _ProfileViewState extends State<ProfileView>
                       Builder(builder: (context) {
                         final tier = box.profile?.product;
                         return Container(
-                          padding: Utils.paddingHoriz(Dimens.sizeSmall),
+                          padding: Utils.insetsHoriz(Dimens.sizeSmall),
                           decoration: BoxDecoration(
                               borderRadius:
                                   BorderRadius.circular(Dimens.borderLarge),
                               color: tier == 'premium'
                                   ? Colors.amber
                                   : scheme.backgroundDark),
-                          child: Text(tier?.toUpperCase() ?? ''),
+                          child: Text(tier?.toUpperCase() ?? '',
+                              style: TextStyle(fontSize: Dimens.fontDefault)),
                         );
                       })
                     ],
@@ -73,6 +74,7 @@ class _ProfileViewState extends State<ProfileView>
                     '${box.profile?.followers ?? ''} ${StringRes.followers}',
                     style: TextStyle(
                         color: scheme.textColorLight,
+                        fontSize: Dimens.fontDefault,
                         fontWeight: FontWeight.w500),
                   ),
                 ],
@@ -88,7 +90,8 @@ class _ProfileViewState extends State<ProfileView>
                 ListTile(
                   onTap: _switchTheme,
                   leading: Icon(Icons.color_lens_outlined),
-                  title: Text(StringRes.themeMode),
+                  title: Text(StringRes.themeMode,
+                      style: TextStyle(fontSize: Dimens.fontLarge)),
                 ),
                 const SizedBox(height: Dimens.sizeSmall),
               ],
@@ -96,10 +99,11 @@ class _ProfileViewState extends State<ProfileView>
           ),
           const SizedBox(height: Dimens.sizeLarge),
           ListTile(
-            onTap: _switchTheme,
+            onTap: logout,
             textColor: scheme.error,
             leading: Icon(Icons.logout, color: scheme.error),
-            title: Text(StringRes.logout.toUpperCase()),
+            title: Text(StringRes.logout.toUpperCase(),
+                style: TextStyle(fontSize: Dimens.fontLarge)),
           ),
         ],
       ),
@@ -107,12 +111,14 @@ class _ProfileViewState extends State<ProfileView>
   }
 
   void logout() {
+    final AuthServices auth = getIt();
     showDialog(
         context: context,
         builder: (context) {
           return MyAlertDialog(
             title: '${StringRes.logout} ?',
-            content: const Text(StringRes.logoutDesc),
+            content: Text(StringRes.logoutDesc,
+                style: TextStyle(fontSize: Dimens.fontDefault)),
             actionPadding: const EdgeInsets.only(
                 right: Dimens.sizeDefault, bottom: Dimens.sizeSmall),
             actions: [
@@ -121,13 +127,15 @@ class _ProfileViewState extends State<ProfileView>
                 style: TextButton.styleFrom(
                   foregroundColor: context.scheme.textColor,
                 ),
-                child: const Text(StringRes.cancel),
+                child: Text(StringRes.cancel.toUpperCase(),
+                    style: TextStyle(fontSize: Dimens.fontDefault)),
               ),
               TextButton(
-                onPressed: () => getIt<AuthServices>().logout,
+                onPressed: auth.logout,
                 style:
                     TextButton.styleFrom(foregroundColor: context.scheme.error),
-                child: Text(StringRes.logout.toUpperCase()),
+                child: Text(StringRes.logout.toUpperCase(),
+                    style: TextStyle(fontSize: Dimens.fontDefault)),
               ),
             ],
           );
@@ -152,9 +160,10 @@ class _ProfileViewState extends State<ProfileView>
                     groupValue: box.themeMode,
                     title: Row(
                       children: [
-                        Icon(e.icon),
+                        Icon(e.icon, size: Dimens.iconDefault),
                         const SizedBox(width: Dimens.sizeLarge),
-                        Text(e.name.capitalize),
+                        Text(e.name.capitalize,
+                            style: TextStyle(fontSize: Dimens.fontLarge)),
                       ],
                     ),
                     controlAffinity: ListTileControlAffinity.trailing,

@@ -35,13 +35,13 @@ class LoadingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme scheme = Theme.of(context).colorScheme;
+    final scheme = ThemeServices.of(context);
     return Container(
       margin: margin,
       width: defWidth ? null : width ?? 200,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor ?? scheme.primary,
+            backgroundColor: backgroundColor ?? scheme.primaryAdaptive,
             foregroundColor: foregroundColor ?? scheme.onPrimary,
             visualDensity: compact ? VisualDensity.compact : null,
             shape: ContinuousRectangleBorder(
@@ -51,14 +51,14 @@ class LoadingButton extends StatelessWidget {
                 const EdgeInsets.symmetric(vertical: Dimens.sizeDefault)),
         onPressed: enable && !(isLoading ?? false) ? onPressed : null,
         child: DefaultTextStyle.merge(
-          style: const TextStyle(
+          style: TextStyle(
               fontWeight: FontWeight.w600, fontSize: Dimens.fontLarge),
           child: Builder(builder: (context) {
             if (isLoading ?? false) {
               return SizedBox.square(
                   dimension: Dimens.sizeLarge,
                   child: CircularProgressIndicator(
-                      color: loaderColor ?? scheme.primary));
+                      color: loaderColor ?? scheme.primaryAdaptive));
             }
             return child;
           }),
@@ -102,19 +102,20 @@ class LoadingIcon extends StatelessWidget {
       isSelected: isSelected,
       selectedIcon: selectedIcon,
       onPressed: onPressed,
-      iconSize: iconSize,
-      icon: loading
-          ? Container(
-              height: loaderSize,
-              width: loaderSize,
-              alignment: Alignment.center,
-              child: SizedBox.square(
-                  dimension: 24,
-                  child: CircularProgressIndicator(
-                    color: scheme.primary,
-                  )),
-            )
-          : icon,
+      iconSize: iconSize ?? Dimens.iconDefault,
+      icon: Builder(builder: (context) {
+        if (!loading) return icon;
+        return Container(
+          height: loaderSize,
+          width: loaderSize,
+          alignment: Alignment.center,
+          child: SizedBox.square(
+              dimension: Dimens.sizeLarge,
+              child: CircularProgressIndicator(
+                color: scheme.primaryAdaptive,
+              )),
+        );
+      }),
     );
   }
 }

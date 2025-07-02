@@ -16,6 +16,7 @@ class AuthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final bloc = context.read<AuthBloc>();
+    final spotify = context.isDarkMode ? Colors.green[900] : Colors.green;
 
     return BaseWidget(
       appBar: AppBar(
@@ -25,14 +26,12 @@ class AuthScreen extends StatelessWidget {
       child: Column(
         children: [
           const Spacer(),
-          Text(
-            StringRes.auth,
-            style: Utils.titleTextStyle(scheme.textColor),
-          ),
+          Text(StringRes.auth, style: Utils.titleTextStyle(scheme.textColor)),
           const SizedBox(height: Dimens.sizeDefault),
           Text(StringRes.authDesc,
               textAlign: TextAlign.center,
-              style: TextStyle(color: scheme.textColorLight)),
+              style: TextStyle(
+                  color: scheme.textColorLight, fontSize: Dimens.fontDefault)),
           const Spacer(),
           const SizedBox(height: Dimens.sizeDefault),
           BlocConsumer<AuthBloc, AuthState>(
@@ -42,15 +41,15 @@ class AuthScreen extends StatelessWidget {
                 width: double.infinity,
                 enable: !state.isSuccess,
                 isLoading: state.isLoading,
-                loaderColor: Colors.white,
-                backgroundColor: Colors.green,
+                loaderColor: spotify,
+                backgroundColor: spotify,
                 padding: const EdgeInsets.symmetric(vertical: Dimens.sizeLarge),
                 onPressed: () => bloc.add(AuthInitial()),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(ImageRes.spotify,
-                        height: Dimens.sizeLarge, color: scheme.onPrimary),
+                        height: Dimens.iconDefault, color: scheme.onPrimary),
                     const SizedBox(width: Dimens.sizeDefault),
                     const Text(StringRes.authSpotify),
                   ],

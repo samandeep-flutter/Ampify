@@ -41,22 +41,25 @@ class RootBloc extends Bloc<RootEvent, RootState> {
     on<RootTabChanged>(_onTap);
   }
 
-  final List<BottomNavigationBarItem> tabs = const [
+  final List<BottomNavigationBarItem> tabs = [
     BottomNavigationBarItem(
-        icon: Icon(Icons.home_outlined, size: Dimens.sizeMedium),
-        activeIcon: Icon(Icons.home, size: Dimens.sizeLarge),
-        label: StringRes.home,
-        tooltip: StringRes.home),
+      icon: Icon(Icons.home_outlined, size: Dimens.iconMedSmall),
+      activeIcon: Icon(Icons.home, size: Dimens.iconDefault),
+      label: StringRes.home,
+      tooltip: StringRes.home,
+    ),
     BottomNavigationBarItem(
-        icon: Icon(Icons.search, size: Dimens.sizeMedium),
-        activeIcon: Icon(Icons.search, size: Dimens.sizeLarge),
-        label: StringRes.search,
-        tooltip: StringRes.search),
+      icon: Icon(Icons.search, size: Dimens.iconMedSmall),
+      activeIcon: Icon(Icons.search, size: Dimens.iconDefault),
+      label: StringRes.search,
+      tooltip: StringRes.search,
+    ),
     BottomNavigationBarItem(
-        icon: Icon(Icons.library_music_outlined, size: Dimens.sizeMedium),
-        activeIcon: Icon(Icons.library_music, size: Dimens.sizeLarge),
-        label: StringRes.library,
-        tooltip: StringRes.library),
+      icon: Icon(Icons.library_music_outlined, size: Dimens.iconMedSmall),
+      activeIcon: Icon(Icons.library_music, size: Dimens.iconDefault),
+      label: StringRes.library,
+      tooltip: StringRes.library,
+    ),
   ];
 
   void onIndexChange(BuildContext context, {required int index}) {

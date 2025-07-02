@@ -92,7 +92,7 @@ showSnackBar(BuildContext context, {required String text}) {
   messenger.showSnackBar(SnackBar(
       content: Text(text),
       behavior: SnackBarBehavior.floating,
-      margin: Utils.paddingHoriz(Dimens.sizeSmall),
+      margin: Utils.insetsHoriz(Dimens.sizeSmall),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Dimens.borderSmall),
       )));

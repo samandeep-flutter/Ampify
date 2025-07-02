@@ -1,6 +1,7 @@
 import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
 import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/data/utils/utils.dart';
 import 'package:ampify/presentation/widgets/my_alert_dialog.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -35,12 +36,15 @@ class PlaylistBottomSheet extends StatelessWidget {
         Row(
           children: [
             const SizedBox(width: Dimens.sizeDefault),
-            MyCachedImage(
-              image,
-              borderRadius: 2,
-              height: 50,
-              width: 60,
-            ),
+            Builder(builder: (context) {
+              final double _height = 50;
+              final _scalar = MediaQuery.textScalerOf(context);
+              final height = _scalar.scale(_height);
+              final width = _scalar.scale(_height + Dimens.sizeMedSmall);
+
+              return MyCachedImage(image,
+                  borderRadius: Dimens.sizeMini, height: height, width: width);
+            }),
             const SizedBox(width: Dimens.sizeDefault),
             Expanded(
               child: Column(
@@ -59,9 +63,8 @@ class PlaylistBottomSheet extends StatelessWidget {
                   const SizedBox(height: Dimens.sizeExtraSmall),
                   DefaultTextStyle.merge(
                     style: TextStyle(
-                      color: scheme.textColorLight,
-                      fontSize: Dimens.fontLarge - 1,
-                    ),
+                        color: scheme.textColorLight,
+                        fontSize: Dimens.fontDefault),
                     child: Row(
                       children: [
                         Flexible(
@@ -90,18 +93,12 @@ class PlaylistBottomSheet extends StatelessWidget {
           enable: false,
           onTap: () {},
           title: StringRes.addTracks,
-          leading: const Icon(
-            Icons.music_note_outlined,
-            size: Dimens.sizeMidLarge,
-          ),
+          leading: Icon(Icons.music_note_outlined, size: Dimens.iconLarge),
         ),
         BottomSheetListTile(
           onTap: () => onPicker(context),
           title: StringRes.editCover,
-          leading: const Icon(
-            Icons.photo_outlined,
-            size: Dimens.sizeMidLarge,
-          ),
+          leading: Icon(Icons.photo_outlined, size: Dimens.iconLarge),
         ),
         BottomSheetListTile(
           onTap: () {
@@ -115,10 +112,7 @@ class PlaylistBottomSheet extends StatelessWidget {
             context.pushNamed(AppRoutes.modifyPlaylist);
           },
           title: StringRes.editDetails,
-          leading: const Icon(
-            Icons.title,
-            size: Dimens.sizeMidLarge,
-          ),
+          leading: Icon(Icons.title, size: Dimens.iconLarge),
         ),
         if (details?.public ?? false)
           BottomSheetListTile(
@@ -127,10 +121,7 @@ class PlaylistBottomSheet extends StatelessWidget {
               bloc.add(const PlaylistVisibility(false));
             },
             title: 'Make Private',
-            leading: const Icon(
-              Icons.lock_outline,
-              size: Dimens.sizeMidLarge,
-            ),
+            leading: Icon(Icons.lock_outline, size: Dimens.iconLarge),
           )
         else
           BottomSheetListTile(
@@ -139,19 +130,13 @@ class PlaylistBottomSheet extends StatelessWidget {
               bloc.add(const PlaylistVisibility(true));
             },
             title: 'Make Public',
-            leading: const Icon(
-              Icons.public,
-              size: Dimens.sizeMidLarge,
-            ),
+            leading: Icon(Icons.public, size: Dimens.iconLarge),
           ),
         BottomSheetListTile(
           enable: false,
           onTap: () {},
           title: StringRes.share,
-          leading: const Icon(
-            Icons.ios_share,
-            size: Dimens.sizeMidLarge,
-          ),
+          leading: Icon(Icons.ios_share, size: Dimens.iconLarge),
         ),
         SizedBox(height: context.height * .07)
       ],
@@ -167,7 +152,6 @@ class PlaylistBottomSheet extends StatelessWidget {
           return MyAlertDialog(
             title: 'Choose Image',
             actionPadding: EdgeInsets.zero,
-            actions: const [],
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -176,16 +160,22 @@ class PlaylistBottomSheet extends StatelessWidget {
                     Navigator.pop(context);
                     bloc.pickImage(ImageSource.gallery);
                   },
-                  leading: const Icon(Icons.photo_library_outlined),
-                  title: const Text(StringRes.gallery),
+                  contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
+                  leading: Icon(Icons.photo_library_outlined,
+                      size: Dimens.iconDefault),
+                  title: Text(StringRes.gallery,
+                      style: TextStyle(fontSize: Dimens.fontLarge)),
                 ),
                 ListTile(
                   onTap: () {
                     Navigator.pop(context);
                     bloc.pickImage(ImageSource.camera);
                   },
-                  leading: const Icon(Icons.photo_camera_outlined),
-                  title: const Text(StringRes.camera),
+                  contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
+                  leading: Icon(Icons.photo_camera_outlined,
+                      size: Dimens.iconDefault),
+                  title: Text(StringRes.camera,
+                      style: TextStyle(fontSize: Dimens.fontLarge)),
                 ),
               ],
             ),

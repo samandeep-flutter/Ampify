@@ -22,12 +22,13 @@ class MyDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: Utils.paddingHoriz(margin ?? 0),
-        width: width,
-        child: Divider(
-          color: color ?? context.scheme.backgroundDark,
-          thickness: thickness,
-        ));
+      margin: Utils.insetsHoriz(margin ?? 0),
+      width: width,
+      child: Divider(
+        color: color ?? context.scheme.backgroundDark,
+        thickness: thickness,
+      ),
+    );
   }
 }
 
@@ -48,12 +49,12 @@ class PaginationDots extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = ThemeServices.of(context);
     return Padding(
-      padding: Utils.paddingHoriz(margin ?? 3),
+      padding: Utils.insetsHoriz(margin ?? 3),
       child: InkWell(
         borderRadius: BorderRadius.circular(Dimens.borderDefault),
         onTap: onTap,
         child: CircleAvatar(
-          radius: 3,
+          radius: Dimens.iconTiny,
           backgroundColor: color ??
               (current ? scheme.primary : scheme.disabled.withAlpha(80)),
         ),
@@ -117,18 +118,22 @@ class ToolTipWidget extends StatelessWidget {
             Text(
               title ?? StringRes.errorUnknown,
               textAlign: TextAlign.center,
-              style: TextStyle(color: scheme.textColorLight),
-            )
+              style: TextStyle(
+                color: scheme.textColorLight,
+                fontSize: Dimens.fontLarge,
+              ),
+            ),
           ],
         ),
       );
 
       if (_scrolable ?? false) {
         return Expanded(
-            child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          child: widget,
-        ));
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: widget,
+          ),
+        );
       }
 
       return widget;
@@ -137,22 +142,26 @@ class ToolTipWidget extends StatelessWidget {
     return Container(
       margin: margin ??
           EdgeInsets.only(
-              top: context.height * .1,
-              left: Dimens.sizeDefault,
-              right: Dimens.sizeDefault),
+            top: context.height * .1,
+            left: Dimens.sizeDefault,
+            right: Dimens.sizeDefault,
+          ),
       alignment: alignment ?? Alignment.topCenter,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_icon != null) ...[
-            _icon!,
+            _icon,
             const SizedBox(height: Dimens.sizeDefault),
           ],
           Text(
             title ?? StringRes.errorUnknown,
             textAlign: TextAlign.center,
-            style: TextStyle(color: scheme.textColorLight),
-          )
+            style: TextStyle(
+              color: scheme.textColorLight,
+              fontSize: Dimens.fontLarge,
+            ),
+          ),
         ],
       ),
     );
@@ -166,7 +175,9 @@ class SliverSizedBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(child: SizedBox(height: height, width: width));
+    return SliverToBoxAdapter(
+      child: SizedBox(height: height, width: width),
+    );
   }
 }
 
@@ -176,7 +187,6 @@ class MyAvatar extends StatelessWidget {
   final EdgeInsets? padding;
   final double? avatarRadius;
   final double? borderRadius;
-  final Color? bgColor;
   final double? height;
   final double? width;
   final BoxFit? fit;
@@ -188,7 +198,6 @@ class MyAvatar extends StatelessWidget {
     this.onTap,
     this.padding,
     this.avatarRadius,
-    this.bgColor,
     this.isAvatar,
     this.fit,
     this.borderRadius,
@@ -198,18 +207,13 @@ class MyAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = ThemeServices.of(context);
+    final radius = borderRadius ?? Dimens.borderLarge;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(borderRadius ?? 40),
-      splashColor: scheme.disabled.withAlpha(120),
-      splashFactory: InkRipple.splashFactory,
-      child: Container(
-        padding: padding ?? const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(borderRadius ?? 40),
-            color: bgColor),
+      borderRadius: BorderRadius.circular(radius),
+      child: Padding(
+        padding: padding ?? EdgeInsets.zero,
         child: MyCachedImage(
           image,
           isAvatar: isAvatar ?? false,
@@ -243,10 +247,10 @@ class SubtitleWidget extends StatelessWidget {
 
     final sub = Text(
       subtitle,
-      style: TextStyle(
-        color: style?.color ?? scheme.textColorLight,
-      ),
       maxLines: 1,
+      style: TextStyle(
+          color: style?.color ?? scheme.textColorLight,
+          fontSize: Dimens.fontDefault),
       overflow: TextOverflow.ellipsis,
     );
 
@@ -255,10 +259,12 @@ class SubtitleWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(type,
-              style: TextStyle(
+          Text(
+            type,
+            style: TextStyle(
                 color: style?.color ?? scheme.textColorLight,
-              )),
+                fontSize: Dimens.fontDefault),
+          ),
           PaginationDots(
             current: true,
             margin: Dimens.sizeSmall,
@@ -299,15 +305,17 @@ class ShadowWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius ?? 0),
         boxShadow: [
           BoxShadow(
-              color: color,
-              offset: offset ?? Offset.zero,
-              spreadRadius: spread ?? context.width * .35,
-              blurRadius: spread ?? context.width * .35),
+            color: color,
+            offset: offset ?? Offset.zero,
+            spreadRadius: spread ?? context.width * .35,
+            blurRadius: spread ?? context.width * .35,
+          ),
           if (darkShadow)
             BoxShadow(
-                color: context.scheme.textColor.withAlpha(50),
-                spreadRadius: Dimens.sizeSmall,
-                blurRadius: Dimens.sizeExtraDoubleLarge)
+              color: Colors.black12,
+              spreadRadius: Dimens.sizeSmall,
+              blurRadius: Dimens.sizeExtraDoubleLarge,
+            ),
         ],
       ),
       child: child,
@@ -327,18 +335,14 @@ class LikedSongsCover extends StatelessWidget {
       height: size,
       width: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(Dimens.sizeMini),
         gradient: LinearGradient(
-          colors: [scheme.primary, scheme.primaryContainer],
+          colors: [scheme.primaryAdaptive, Color(0xFFB4B5ED)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
-      child: Icon(
-        Icons.favorite,
-        color: scheme.background,
-        size: iconSize,
-      ),
+      child: Icon(Icons.favorite, size: iconSize, color: scheme.onPrimary),
     );
   }
 }
@@ -366,9 +370,10 @@ class BottomSheetListTile extends StatelessWidget {
       title: Text(title),
       horizontalTitleGap: Dimens.sizeLarge,
       titleTextStyle: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: Dimens.fontLarge,
-          color: scheme.textColor),
+        fontWeight: FontWeight.w500,
+        fontSize: Dimens.fontLarge,
+        color: scheme.textColor,
+      ),
     );
   }
 }

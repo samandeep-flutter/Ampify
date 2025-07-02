@@ -39,15 +39,15 @@ class HomeScreen extends StatelessWidget {
                       const SizedBox(width: Dimens.sizeDefault),
                       Text(StringRes.homeSubtitle,
                           style: TextStyle(
-                            color: scheme.textColorLight,
-                          )),
+                              color: scheme.textColorLight,
+                              fontSize: Dimens.fontDefault)),
                     ],
                   )),
               actions: [
                 IconButton(
                   onPressed: () => bloc.toHistory(context),
                   icon: Image.asset(ImageRes.history,
-                      height: Dimens.sizeLarge, color: scheme.textColor),
+                      height: Dimens.iconDefault, color: scheme.textColor),
                 ),
                 const SizedBox(width: Dimens.sizeDefault),
               ],
@@ -55,8 +55,8 @@ class HomeScreen extends StatelessWidget {
             const SliverSizedBox(height: Dimens.sizeLarge),
             SliverGridWidget(
                 child: Card(
-              color: scheme.primary,
-              margin: Utils.paddingHoriz(Dimens.sizeDefault),
+              color: scheme.shimmer,
+              margin: Utils.insetsHoriz(Dimens.sizeDefault),
               child: Container(
                 padding: const EdgeInsets.all(Dimens.sizeDefault),
                 width: double.infinity,
@@ -65,7 +65,9 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       StringRes.recentlyPlayed,
-                      style: TextStyle(color: scheme.onPrimary),
+                      style: TextStyle(
+                          color: scheme.textColorLight,
+                          fontSize: Dimens.fontDefault),
                     ),
                     Expanded(
                       child: Row(
@@ -73,14 +75,14 @@ class HomeScreen extends StatelessWidget {
                           Image.asset(
                             ImageRes.thumbnail,
                             height: context.width * .2,
-                            color: scheme.onPrimary,
+                            color: scheme.textColorLight,
                           ),
                           const SizedBox(width: Dimens.sizeDefault),
                           Text(
                             StringRes.commingSoon,
                             style: TextStyle(
-                              fontSize: Dimens.sizeLarge,
-                              color: scheme.onPrimary,
+                              fontSize: Dimens.fontExtraTripleLarge,
+                              color: scheme.textColorLight,
                             ),
                           ),
                         ],
@@ -100,13 +102,13 @@ class HomeScreen extends StatelessWidget {
                     if (state.recentlyPlayed.isEmpty) {
                       return ToolTipWidget(
                         alignment: Alignment.center,
-                        margin: Utils.paddingHoriz(Dimens.sizeLarge),
+                        margin: Utils.insetsHoriz(Dimens.sizeLarge),
                         title: StringRes.noSpotifyTracks,
                       );
                     }
 
                     return GridView.builder(
-                        padding: Utils.paddingHoriz(Dimens.sizeDefault),
+                        padding: Utils.insetsHoriz(Dimens.sizeDefault),
                         scrollDirection: Axis.horizontal,
                         gridDelegate: Utils.fixedCrossAxis(1,
                             aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
@@ -136,7 +138,7 @@ class HomeScreen extends StatelessWidget {
                       if (state.recentLoading) return const AlbumShimmer();
 
                       return GridView.builder(
-                          padding: Utils.paddingHoriz(Dimens.sizeDefault),
+                          padding: Utils.insetsHoriz(Dimens.sizeDefault),
                           scrollDirection: Axis.horizontal,
                           gridDelegate: Utils.fixedCrossAxis(1,
                               aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
@@ -180,7 +182,7 @@ class SliverGridWidget extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: Dimens.sizeDefault),
               child: Text(title!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: Dimens.fontLarge,
                   )),
@@ -222,7 +224,7 @@ class HomeAlbumTile extends StatelessWidget {
                 Text(
                   title ?? '',
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: Dimens.fontDefault,
                       fontWeight: FontWeight.bold),
                 ),

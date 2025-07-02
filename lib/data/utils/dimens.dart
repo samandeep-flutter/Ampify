@@ -1,33 +1,65 @@
+import 'package:ampify/services/responsive_font.dart';
+
 sealed class Dimens {
   /// size of 0
   static const double zero = 0;
 
-  /// size of 10
-  static const double fontSmall = 10;
+  /// adaptive size of 10
+  static double fontSmall = 10.scale;
 
-  /// size of 12
-  static const double fontMed = 12;
+  /// adaptive size of 12
+  static double get fontMed => 12.scale;
 
-  /// size of 14
-  static const double fontDefault = 14;
+  /// adaptive size of 14
+  static double get fontDefault => 14.scale;
 
-  /// size of 16
-  static const double fontLarge = 16;
+  /// adaptive size of 16
+  static double get fontLarge => 16.scale;
 
-  /// size of 18
-  static const double fontExtraLarge = 18;
+  /// adaptive size of 18
+  static double get fontExtraLarge => 18.scale;
 
-  /// size of 20
-  static const double fontExtraDoubleLarge = 20;
+  /// adaptive size of 20
+  static double get fontExtraDoubleLarge => 20.scale;
 
-  /// size of 24
-  static const double fontExtraTripleLarge = 24;
+  /// adaptive size of 24
+  static double get fontExtraTripleLarge => 24.scale;
 
-  /// size of 32
-  static const double fontUltraLarge = 32;
+  /// adaptive size of 32
+  static double get fontUltraLarge => 32.scale;
 
-  /// size of 48
-  static const double fontTitle = 48;
+  /// adaptive size of 48
+  static double get fontTitle => 48.scale;
+
+  /// adaptive size of 3
+  static double get iconTiny => 3.scale;
+
+  /// adaptive size of 8
+  static double get iconMini => 8.scale;
+
+  /// adaptive size of 12
+  static double get iconExtraSmall => 12.scale;
+
+  /// adaptive size of 16
+  static double get iconSmall => 16.scale;
+
+  /// adaptive size of 20
+  static double get iconMedSmall => 20.scale;
+
+  /// adaptive size of 24
+  static double get iconDefault => 24.scale;
+
+  /// adaptive size of 28
+  static double get iconMedium => 28.scale;
+
+  /// adaptive size of 32
+  static double get iconLarge => 32.scale;
+
+  /// adaptive size of 40
+  static double get iconExtraLarge => 40.scale;
+
+  /// size of 2
+  static const double sizeMini = 2;
 
   /// size of 4
   static const double sizeExtraSmall = 4;
@@ -73,7 +105,4 @@ sealed class Dimens {
 
   /// size of 100
   static const double circularBoder = 100;
-
-  /// size of 90
-  static const double kNavBarHeight = 90;
 }

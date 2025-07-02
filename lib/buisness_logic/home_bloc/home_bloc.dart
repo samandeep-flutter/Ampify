@@ -71,9 +71,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final getRecentlyPlayed = Completer<bool>();
     repo.getNewReleases(
       onSuccess: (json) {
-        final album = AlbumModel.fromJson(json['albums']);
-        emit(state.copyWith(albums: album.items, albumLoading: false));
-        getReleases.complete(true);
+        try {
+          final album = AlbumModel.fromJson(json['albums']);
+          emit(state.copyWith(albums: album.items));
+        } catch (e) {
+          logPrint(e, 'new releases');
+        } finally {
+          getReleases.complete(true);
+          emit(state.copyWith(albumLoading: false));
+        }
       },
       onError: (error) {
         logPrint(error, 'new releases');
