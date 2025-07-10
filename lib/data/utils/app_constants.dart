@@ -76,7 +76,7 @@ class MyColoredBox extends StatelessWidget {
   }
 }
 
-showToast(String text, {int? timeInSec}) async {
+Future<void> showToast(String text, {int? timeInSec}) async {
   await Fluttertoast.cancel();
   Future.delayed(const Duration(milliseconds: 300)).then((_) {
     Fluttertoast.showToast(
@@ -86,7 +86,7 @@ showToast(String text, {int? timeInSec}) async {
   });
 }
 
-showSnackBar(BuildContext context, {required String text}) {
+void showSnackBar(BuildContext context, {required String text}) {
   final messenger = ScaffoldMessenger.of(context);
   messenger.clearSnackBars();
   messenger.showSnackBar(SnackBar(

@@ -83,9 +83,9 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
   final box = BoxServices.instance;
   final MusicGroupRepo _repo = getIt();
 
-  onItemAdded(String id) => add(PlaylistSelected(id));
+  void onItemAdded(String id) => add(PlaylistSelected(id));
 
-  _onInit(PlaylistInitial event, Emitter<AddtoPlaylistState> emit) {
+  void _onInit(PlaylistInitial event, Emitter<AddtoPlaylistState> emit) {
     final json = BoxServices.instance.read(BoxKeys.profile);
     emit(state.copyWith(
       profile: ProfileModel.fromJson(json),
@@ -96,7 +96,7 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
     ));
   }
 
-  _onAddTrigger(
+  Future<void> _onAddTrigger(
       AddTracktoPlaylists event, Emitter<AddtoPlaylistState> emit) async {
     emit(state.copyWith(loading: true));
     try {
@@ -107,7 +107,7 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
     } catch (_) {}
   }
 
-  _onAdded(PlaylistSelected event, Emitter<AddtoPlaylistState> emit) async {
+  Future<void> _onAdded(PlaylistSelected event, Emitter<AddtoPlaylistState> emit) async {
     List<String> list = List<String>.from(state.playlists);
     if (list.contains(event.id)) {
       list.remove(event.id);

@@ -29,7 +29,7 @@ class MusicGroupTile extends StatelessWidget {
         if (isLikedSongs) {
           final result = await context.pushNamed<bool>(AppRoutes.likedSongs);
           if (result ?? false) {
-            context.read<LibraryBloc>().add(LibraryInitial());
+            context.read<LibraryBloc>().add(LibraryRefresh());
           }
           return;
         }
@@ -39,7 +39,7 @@ class MusicGroupTile extends StatelessWidget {
         );
 
         if (result ?? false) {
-          context.read<LibraryBloc>().add(LibraryInitial());
+          context.read<LibraryBloc>().add(LibraryRefresh());
         }
       },
       child: Padding(

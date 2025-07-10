@@ -75,7 +75,7 @@ class RootBloc extends Bloc<RootEvent, RootState> {
         break;
       case 2:
         if (path.startsWith(AppRoutePaths.libraryView)) break;
-        context.read<LibraryBloc>().add(LibraryInitial());
+        context.read<LibraryBloc>().add(LibraryRefresh());
         context.goNamed(AppRoutes.libraryView);
         break;
     }

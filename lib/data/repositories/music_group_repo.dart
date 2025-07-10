@@ -133,7 +133,7 @@ class MusicGroupRepo {
   }) async {
     final uris = trackUri.map((e) => e.replaceAll(':', '%3A')).toList();
     final url = AppConstants.addtoPlaylist(id, uris: uris.asString);
-    final body = {"uris": trackUri, "position": 0};
+    final body = {'uris': trackUri, 'position': 0};
 
     final response = await dio.post(url, data: body);
     ApiResponse.verify(response,
@@ -148,7 +148,7 @@ class MusicGroupRepo {
     Function(Map<String, dynamic> error)? onError,
   }) async {
     final url = AppConstants.removeFromPlaylist(id);
-    final body = {"uris": trackId /* "snapshot_id": "" */};
+    final body = {'uris': trackId /* 'snapshot_id': '' */};
 
     final response = await dio.delete(url, data: body);
     ApiResponse.verify(response,

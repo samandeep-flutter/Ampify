@@ -1,3 +1,4 @@
+import 'package:ampify/data/utils/utils.dart';
 import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
 import '../../services/theme_services.dart';
@@ -44,11 +45,8 @@ class LoadingButton extends StatelessWidget {
             backgroundColor: backgroundColor ?? scheme.primaryAdaptive,
             foregroundColor: foregroundColor ?? scheme.onPrimary,
             visualDensity: compact ? VisualDensity.compact : null,
-            shape: ContinuousRectangleBorder(
-                borderRadius:
-                    BorderRadius.circular(border ?? Dimens.borderLarge)),
-            padding: padding ??
-                const EdgeInsets.symmetric(vertical: Dimens.sizeDefault)),
+            shape: Utils.continuousBorder(border ?? Dimens.borderLarge),
+            padding: padding ?? EdgeInsets.all(Dimens.sizeDefault)),
         onPressed: enable && !(isLoading ?? false) ? onPressed : null,
         child: DefaultTextStyle.merge(
           style: TextStyle(
@@ -112,7 +110,7 @@ class LoadingIcon extends StatelessWidget {
           child: SizedBox.square(
               dimension: Dimens.sizeLarge,
               child: CircularProgressIndicator(
-                color: scheme.primaryAdaptive,
+                color: style?.foregroundColor?.resolve({}) ?? scheme.textColor,
               )),
         );
       }),

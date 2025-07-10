@@ -1,4 +1,6 @@
 import 'package:ampify/buisness_logic/root_bloc/auth_bloc.dart';
+import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
+import 'package:ampify/buisness_logic/root_bloc/music_group_bloc.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/home_screens/home_screen.dart';
 import 'package:ampify/presentation/home_screens/listn_history.dart';
@@ -33,9 +35,7 @@ abstract class AppPage {
         path: AppRoutePaths.auth,
         builder: (_, state) {
           return BlocProvider(
-            create: (_) => AuthBloc(),
-            child: const AuthScreen(),
-          );
+              create: (_) => AuthBloc(), child: const AuthScreen());
         },
       ),
       GoRoute(
@@ -51,7 +51,18 @@ abstract class AppPage {
       GoRoute(
         name: AppRoutes.modifyPlaylist,
         path: AppRoutePaths.modifyPlaylist,
-        builder: (_, state) => const EditPlaylistScreen(),
+        builder: (context, state) {
+          final id = state.pathParameters['id'];
+          final titile = state.uri.queryParameters['title'];
+          final image = state.uri.queryParameters['image'];
+          final desc = state.uri.queryParameters['desc'];
+
+          return BlocProvider(
+            create: (_) => EditPlaylistBloc(),
+            child: EditPlaylistScreen(
+                id: id!, title: titile, image: image, desc: desc),
+          );
+        },
       ),
       ShellRoute(
           builder: (_, state, navigator) => RootView(navigator),
@@ -72,14 +83,16 @@ abstract class AppPage {
                 ]),
             GoRoute(
                 name: AppRoutes.musicGroup,
-                path: '${AppRoutePaths.musicGroup}/:type/:id',
+                path: AppRoutePaths.musicGroup,
                 builder: (context, state) {
                   String id = state.pathParameters['id']!;
                   final type = LibItemType.values.firstWhere((e) {
                     return e.name == state.pathParameters['type'];
                   });
 
-                  return MusicGroupScreen(id: id, type: type);
+                  return BlocProvider(
+                      create: (_) => MusicGroupBloc(),
+                      child: MusicGroupScreen(id: id, type: type));
                 }),
             GoRoute(
               name: AppRoutes.searchView,

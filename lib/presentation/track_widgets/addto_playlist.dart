@@ -13,8 +13,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../buisness_logic/root_bloc/addto_playlist_bloc.dart';
 
-class AddtoPlaylistSheet extends StatelessWidget {
-  const AddtoPlaylistSheet({super.key});
+class AddtoPlaylistSheet extends StatefulWidget {
+  final String uri;
+  const AddtoPlaylistSheet(this.uri, {super.key});
+
+  @override
+  State<AddtoPlaylistSheet> createState() => _AddtoPlaylistSheetState();
+}
+
+class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
+  @override
+  void initState() {
+    final bloc = context.read<AddtoPlaylistBloc>();
+    bloc.add(PlaylistInitial(widget.uri));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +159,7 @@ class AddtoPlaylistSheet extends StatelessWidget {
                     listener: (context, state) {
                       if (state.success) {
                         Navigator.pop(context);
-                        context.read<LibraryBloc>().add(LibraryInitial());
+                        context.read<LibraryBloc>().add(LibraryRefresh());
                       }
                     },
                     child: const SizedBox(height: Dimens.sizeDefault)),

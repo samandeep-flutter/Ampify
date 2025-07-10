@@ -270,11 +270,14 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                   showDragHandle: true,
                                   useRootNavigator: true,
                                   builder: (context) {
-                                    return PlaylistBottomSheet(
-                                      id: state.id,
-                                      image: state.image,
-                                      title: state.title,
-                                      details: state.details,
+                                    return BlocProvider.value(
+                                      value: bloc,
+                                      child: PlaylistBottomSheet(
+                                        id: state.id,
+                                        image: state.image,
+                                        title: state.title,
+                                        details: state.details,
+                                      ),
                                     );
                                   },
                                 );

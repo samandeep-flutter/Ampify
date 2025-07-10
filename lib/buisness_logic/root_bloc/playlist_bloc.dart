@@ -55,7 +55,8 @@ class PlaylistBloc extends Bloc<PlaylistEvents, PlaylistState> {
     add(CreatePlaylist(title: titleController.text, userId: id));
   }
 
-  _onCreate(CreatePlaylist event, Emitter<PlaylistState> emit) async {
+  Future<void> _onCreate(
+      CreatePlaylist event, Emitter<PlaylistState> emit) async {
     emit(state.copyWith(loading: true));
     await _repo.createPlaylist(event.title, userId: event.userId,
         onSuccess: (json) {

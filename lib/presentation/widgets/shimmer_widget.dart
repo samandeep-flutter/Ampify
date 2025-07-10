@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import '../../data/utils/dimens.dart';
 
 class Shimmer {
-  static get avatar => const _Shimmer(borderRadius: 50);
-  static get box => const _Shimmer();
+  static Widget get avatar => const _Shimmer(borderRadius: 50);
+  static Widget get box => const _Shimmer();
 }
 
 class _Shimmer extends StatelessWidget {

@@ -93,7 +93,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     add(PlayerQueueReordered(previous: pr, current: cr));
   }
 
-  _createPosition(Duration? duration) {
+  void _createPosition(Duration? duration) {
     positionStream = player.createPositionStream(
       steps: duration?.inSeconds ?? 60,
       maxPeriod: duration ?? const Duration(minutes: 1),
@@ -133,7 +133,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   //   }
   // }
 
-  _onReorder(PlayerQueueReordered event, Emitter<PlayerState> emit) async {
+  Future<void> _onReorder(
+      PlayerQueueReordered event, Emitter<PlayerState> emit) async {
     List<TrackDetails> queueTracks = state.queue;
     final reorderedTrack = queueTracks[event.previous];
     queueTracks.removeAt(event.previous);
@@ -152,7 +153,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  _onStateChanged(PlayerStatusChanged event, Emitter<PlayerState> emit) async {
+  Future<void> _onStateChanged(
+      PlayerStatusChanged event, Emitter<PlayerState> emit) async {
     switch (state.playerState) {
       case MusicState.pause:
         emit(state.copyWith(playerState: MusicState.playing));
@@ -167,7 +169,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  _onTrackLiked(PlayerTrackLiked event, Emitter<PlayerState> emit) async {
+  Future<void> _onTrackLiked(
+      PlayerTrackLiked event, Emitter<PlayerState> emit) async {
     if (event.liked ?? false) {
       try {
         emit(state.copyWith(liked: false));
@@ -191,12 +194,14 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  _shuffleToggle(PlayerShuffleToggle event, Emitter<PlayerState> emit) async {
+  Future<void> _shuffleToggle(
+      PlayerShuffleToggle event, Emitter<PlayerState> emit) async {
     emit(state.copyWith(shuffle: !state.shuffle));
     // await player.setShuffleModeEnabled(!state.shuffle);
   }
 
-  _repeatToggle(PlayerRepeatToggle event, Emitter<PlayerState> emit) async {
+  Future<void> _repeatToggle(
+      PlayerRepeatToggle event, Emitter<PlayerState> emit) async {
     switch (player.loopMode) {
       case LoopMode.one:
         emit(state.copyWith(loopMode: MusicLoopMode.all));
@@ -214,7 +219,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  _onQueueAdded(PlayerQueueAdded event, Emitter<PlayerState> emit) async {
+  Future<void> _onQueueAdded(
+      PlayerQueueAdded event, Emitter<PlayerState> emit) async {
     try {
       if (!(state.showPlayer ?? false)) {
         showToast(StringRes.noQueue);
@@ -237,7 +243,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  _onTrackEnded(PlayerTrackEnded event, Emitter<PlayerState> emit) async {
+  Future<void> _onTrackEnded(
+      PlayerTrackEnded event, Emitter<PlayerState> emit) async {
     if (state.queue.isEmpty && state.upNext.isEmpty) {
       logPrint('empty queue...');
       emit(state.copyWith(playerState: MusicState.pause, showPlayer: false));
@@ -320,7 +327,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     emit(state.copyWith(queue: []));
   }
 
-  _onMusicGroup(MusicGroupPlayed event, Emitter<PlayerState> emit) async {
+  Future<void> _onMusicGroup(
+      MusicGroupPlayed event, Emitter<PlayerState> emit) async {
     player.pause();
     final track = await Utils.getTrackDetails(event.tracks.first);
     emit(state.copyWith(
@@ -340,7 +348,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     emit(state.copyWith(queue: [], upNext: upNext));
   }
 
-  _onTrackChange(PlayerTrackChanged event, Emitter<PlayerState> emit) async {
+  Future<void> _onTrackChange(
+      PlayerTrackChanged event, Emitter<PlayerState> emit) async {
     player.pause();
     final track = await Utils.getTrackDetails(event.track);
     emit(state.copyWith(

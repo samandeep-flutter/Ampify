@@ -63,7 +63,7 @@ class PaginationDots extends StatelessWidget {
   }
 }
 
-class ToolTipWidget extends StatelessWidget {
+class ToolTipWidget extends StatefulWidget {
   final EdgeInsets? margin;
   final dynamic _icon;
   final bool? _scrolable;
@@ -93,78 +93,49 @@ class ToolTipWidget extends StatelessWidget {
         alignment = null;
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = ThemeServices.of(context);
+  State<ToolTipWidget> createState() => _ToolTipWidgetState();
+}
 
-    if (_placeHolder) {
-      final widget = Container(
-        alignment: Alignment.center,
-        margin: EdgeInsets.only(
-          top: context.height * .15,
-          left: Dimens.sizeDefault,
-          right: Dimens.sizeDefault,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_icon != null) ...[
-              Image.asset(
-                _icon,
-                width: context.width * .3,
-                color: scheme.disabled,
-              ),
-              const SizedBox(height: Dimens.sizeDefault),
-            ],
-            Text(
-              title ?? StringRes.errorUnknown,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: scheme.textColorLight,
-                fontSize: Dimens.fontLarge,
-              ),
-            ),
-          ],
-        ),
-      );
-
-      if (_scrolable ?? false) {
-        return Expanded(
-          child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            child: widget,
-          ),
-        );
-      }
-
-      return widget;
-    }
-
+class _ToolTipWidgetState extends State<ToolTipWidget> {
+  Widget _builder() {
+    final scheme = context.scheme;
     return Container(
-      margin: margin ??
-          EdgeInsets.only(
-            top: context.height * .1,
-            left: Dimens.sizeDefault,
-            right: Dimens.sizeDefault,
-          ),
-      alignment: alignment ?? Alignment.topCenter,
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(
+        top: context.height * .15,
+        left: Dimens.sizeDefault,
+        right: Dimens.sizeDefault,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (_icon != null) ...[
-            _icon,
+          if (widget._icon != null) ...[
+            Builder(builder: (context) {
+              if (!widget._placeHolder) return widget._icon!;
+              return Image.asset(widget._icon,
+                  width: context.width * .3, color: scheme.disabled);
+            }),
             const SizedBox(height: Dimens.sizeDefault),
           ],
           Text(
-            title ?? StringRes.errorUnknown,
+            widget.title ?? StringRes.errorUnknown,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: scheme.textColorLight,
-              fontSize: Dimens.fontLarge,
-            ),
-          ),
+                color: scheme.textColorLight, fontSize: Dimens.fontLarge),
+          )
         ],
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!(widget._scrolable ?? false)) return _builder();
+    return Expanded(
+        child: SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: _builder(),
+    ));
   }
 }
 

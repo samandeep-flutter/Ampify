@@ -101,7 +101,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   final duration = const Duration(milliseconds: 200);
   bool libRefresh = false;
 
-  onPlay(BuildContext context) {
+  void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
     player.add(MusicGroupPlayed(
       id: UniqueIds.likedSongs,
@@ -110,7 +110,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     ));
   }
 
-  _titleFadeListener() {
+  void _titleFadeListener() {
     if (!scrollController.hasClients) return;
     final appbarHeight = scrollController.position.extentInside * .15;
     if (scrollController.offset > (appbarHeight - kToolbarHeight)) {
@@ -120,7 +120,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     add(const LikedSongsTitleFade(0));
   }
 
-  _loadMoreSongs() {
+  void _loadMoreSongs() {
     if (!scrollController.hasClients || state.moreLoading) return;
     if (state.tracks.length >= state.totalTracks) return;
     final pos = scrollController.position;
@@ -131,14 +131,15 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
 
   void songRemoved(String id) => add(SongRemoved(id));
 
-  _onRemoved(SongRemoved event, Emitter<LikedSongsState> emit) async {
+  void _onRemoved(SongRemoved event, Emitter<LikedSongsState> emit) async {
     libRefresh = true;
     List<Track> tracks = state.tracks;
     tracks.removeWhere((e) => e.id == event.id);
     emit(state.copyWith(tracks: tracks, totalTracks: state.totalTracks - 1));
   }
 
-  _onInit(LikedSongsInitial event, Emitter<LikedSongsState> emit) async {
+  Future<void> _onInit(
+      LikedSongsInitial event, Emitter<LikedSongsState> emit) async {
     emit(state.copyWith(loading: true, titileOpacity: 0));
     scrollController.addListener(_titleFadeListener);
     scrollController.addListener(_loadMoreSongs);
@@ -157,12 +158,13 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     );
   }
 
-  _onLoadMore(LoadMoreSongs event, Emitter<LikedSongsState> emit) {
+  void _onLoadMore(LoadMoreSongs event, Emitter<LikedSongsState> emit) {
     emit(state.copyWith(moreLoading: true));
     add(LoadMoreTrigger());
   }
 
-  _onLoadTrigger(LoadMoreTrigger event, Emitter<LikedSongsState> emit) async {
+  Future<void> _onLoadTrigger(
+      LoadMoreTrigger event, Emitter<LikedSongsState> emit) async {
     await _repo.getLikedSongs(
       offset: state.tracks.length,
       onSuccess: (json) {
@@ -176,7 +178,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     );
   }
 
-  _titleFade(LikedSongsTitleFade event, Emitter<LikedSongsState> emit) {
+  void _titleFade(LikedSongsTitleFade event, Emitter<LikedSongsState> emit) {
     emit(state.copyWith(titileOpacity: event.opacity));
   }
 }

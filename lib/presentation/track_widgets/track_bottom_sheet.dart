@@ -22,7 +22,6 @@ class TrackBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<PlayerBloc>();
-    final likedSongsBloc = context.read<LikedSongsBloc>();
     final scheme = context.scheme;
 
     return Column(
@@ -72,7 +71,10 @@ class TrackBottomSheet extends StatelessWidget {
           onTap: () {
             bloc.onTrackLiked(track.id!, liked);
             if (liked ?? false) {
-              likedSongsBloc.songRemoved(track.id!);
+              try {
+                final bloc = context.read<LikedSongsBloc>();
+                bloc.songRemoved(track.id!);
+              } catch (_) {}
             }
             Navigator.pop(context);
           },
@@ -83,15 +85,17 @@ class TrackBottomSheet extends StatelessWidget {
         BottomSheetListTile(
             onTap: () {
               Navigator.pop(context);
-              final bloc = context.read<AddtoPlaylistBloc>();
-              bloc.add(PlaylistInitial(track.uri!));
               showModalBottomSheet(
                 context: context,
                 showDragHandle: true,
                 isScrollControlled: true,
                 useSafeArea: true,
                 useRootNavigator: true,
-                builder: (_) => const AddtoPlaylistSheet(),
+                builder: (_) {
+                  return BlocProvider(
+                      create: (_) => AddtoPlaylistBloc(),
+                      child: AddtoPlaylistSheet(track.uri!));
+                },
               );
             },
             title: StringRes.addtoPlaylist,

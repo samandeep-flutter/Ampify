@@ -85,10 +85,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   final searchContr = TextEditingController();
   final focusNode = FocusNode();
 
-  _onSearchTextChanged() => add(SearchInputChanged(searchContr.text));
-  onSearchClear() => add(SearchCleared());
+  void _onSearchTextChanged() => add(SearchInputChanged(searchContr.text));
+  void onSearchClear() => add(SearchCleared());
 
-  _onInit(SearchInitial event, Emitter<SearchState> emit) {
+  void _onInit(SearchInitial event, Emitter<SearchState> emit) {
     searchContr.addListener(_onSearchTextChanged);
   }
 
@@ -98,7 +98,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     emit(state.copyWith(isLoading: false, results: null));
   }
 
-  _onInputChanged(SearchInputChanged event, Emitter<SearchState> emit) async {
+  Future<void> _onInputChanged(
+      SearchInputChanged event, Emitter<SearchState> emit) async {
     if (state.query == event.query) return;
     if (searchContr.text.isEmpty) {
       emit(state.copyWith(isLoading: false, results: null, query: ''));
@@ -108,7 +109,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     add(SearchTrigerred());
   }
 
-  _onSearchTrigerred(SearchTrigerred event, Emitter<SearchState> emit) async {
+  Future<void> _onSearchTrigerred(
+      SearchTrigerred event, Emitter<SearchState> emit) async {
     if (searchContr.text.isEmpty) {
       emit(state.copyWith(isLoading: false, results: null, query: ''));
       return;

@@ -21,7 +21,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    final bloc = context.read<HomeBloc>();
 
     return Scaffold(
         backgroundColor: scheme.background,
@@ -45,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                   )),
               actions: [
                 IconButton(
-                  onPressed: () => bloc.toHistory(context),
+                  onPressed: () => context.pushNamed(AppRoutes.listnHistory),
                   icon: Image.asset(ImageRes.history,
                       height: Dimens.iconDefault, color: scheme.textColor),
                 ),
@@ -54,112 +53,97 @@ class HomeScreen extends StatelessWidget {
             ),
             const SliverSizedBox(height: Dimens.sizeLarge),
             SliverGridWidget(
-                child: Card(
-              color: scheme.shimmer,
-              margin: Utils.insetsHoriz(Dimens.sizeDefault),
-              child: Container(
-                padding: const EdgeInsets.all(Dimens.sizeDefault),
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      StringRes.recentlyPlayed,
-                      style: TextStyle(
-                          color: scheme.textColorLight,
-                          fontSize: Dimens.fontDefault),
-                    ),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Image.asset(
-                            ImageRes.thumbnail,
-                            height: context.width * .2,
-                            color: scheme.textColorLight,
-                          ),
-                          const SizedBox(width: Dimens.sizeDefault),
-                          Text(
-                            StringRes.commingSoon,
-                            style: TextStyle(
-                              fontSize: Dimens.fontExtraTripleLarge,
-                              color: scheme.textColorLight,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )),
+              title: StringRes.recentlyPlayed,
+              child: GridView.builder(
+                  padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                  scrollDirection: Axis.horizontal,
+                  gridDelegate: Utils.fixedCrossAxis(1,
+                      aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: 3,
+                  itemBuilder: (context, index) {
+                    return HomeAlbumTile(
+                      image: null,
+                      title: StringRes.commingSoon,
+                      subtitle: '',
+                    );
+                  }),
+            ),
             const SliverSizedBox(height: Dimens.sizeLarge),
             SliverGridWidget(
               title: StringRes.spotifyRecent,
-              child: BlocBuilder<HomeBloc, HomeState>(
-                  buildWhen: (pr, cr) => pr.recentlyPlayed != cr.recentlyPlayed,
+              child: BlocBuilder<HomeBloc, HomeState>(buildWhen: (pr, cr) {
+                final tracks = pr.recentlyPlayed != cr.recentlyPlayed;
+                final loading = pr.recentLoading != cr.recentLoading;
+                return tracks || loading;
+              }, builder: (context, state) {
+                if (state.recentLoading) return const AlbumShimmer();
+                if (state.recentlyPlayed.isEmpty) {
+                  return ToolTipWidget(
+                    alignment: Alignment.center,
+                    margin: Utils.insetsHoriz(Dimens.sizeLarge),
+                    title: StringRes.noSpotifyTracks,
+                  );
+                }
+
+                return GridView.builder(
+                    padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                    scrollDirection: Axis.horizontal,
+                    gridDelegate: Utils.fixedCrossAxis(1,
+                        aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
+                    itemCount: state.recentlyPlayed.length,
+                    itemBuilder: (context, index) {
+                      final item = state.recentlyPlayed[index];
+                      return HomeAlbumTile(
+                        onTap: () {
+                          final player = context.read<PlayerBloc>();
+                          final slider = context.read<PlayerSliderBloc>();
+                          player.add(PlayerTrackChanged(item));
+                          slider.add(const PlayerSliderChange(0));
+                        },
+                        image: item.album?.image,
+                        title: item.name,
+                        subtitle: item.artists?.asString,
+                      );
+                    });
+              }),
+            ),
+            const SliverSizedBox(height: Dimens.sizeLarge),
+            SliverGridWidget(
+                title: StringRes.newReleases,
+                child: BlocBuilder<HomeBloc, HomeState>(
+                  buildWhen: (pr, cr) {
+                    final albums = pr.albums != cr.albums;
+                    final loading = pr.albumLoading != cr.albumLoading;
+                    return albums || loading;
+                  },
                   builder: (context, state) {
                     if (state.recentLoading) return const AlbumShimmer();
-                    if (state.recentlyPlayed.isEmpty) {
-                      return ToolTipWidget(
-                        alignment: Alignment.center,
-                        margin: Utils.insetsHoriz(Dimens.sizeLarge),
-                        title: StringRes.noSpotifyTracks,
-                      );
-                    }
 
                     return GridView.builder(
                         padding: Utils.insetsHoriz(Dimens.sizeDefault),
                         scrollDirection: Axis.horizontal,
                         gridDelegate: Utils.fixedCrossAxis(1,
                             aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                        itemCount: state.recentlyPlayed.length,
+                        itemCount: state.albums.length,
                         itemBuilder: (context, index) {
-                          final item = state.recentlyPlayed[index];
+                          final item = state.albums[index];
+
                           return HomeAlbumTile(
                             onTap: () {
-                              final player = context.read<PlayerBloc>();
-                              final slider = context.read<PlayerSliderBloc>();
-                              player.add(PlayerTrackChanged(item));
-                              slider.add(const PlayerSliderChange(0));
+                              context.pushNamed(AppRoutes.musicGroup,
+                                  pathParameters: {
+                                    'id': item.id!,
+                                    'type': item.type!.name
+                                  });
                             },
-                            image: item.album?.image,
+                            image: item.image,
                             title: item.name,
                             subtitle: item.artists?.asString,
                           );
                         });
-                  }),
-            ),
-            const SliverSizedBox(height: Dimens.sizeLarge),
-            SliverGridWidget(
-                title: StringRes.newReleases,
-                child: BlocBuilder<HomeBloc, HomeState>(
-                    buildWhen: (pr, cr) => pr.albums != cr.albums,
-                    builder: (context, state) {
-                      if (state.recentLoading) return const AlbumShimmer();
-
-                      return GridView.builder(
-                          padding: Utils.insetsHoriz(Dimens.sizeDefault),
-                          scrollDirection: Axis.horizontal,
-                          gridDelegate: Utils.fixedCrossAxis(1,
-                              aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                          itemCount: state.albums.length,
-                          itemBuilder: (context, index) {
-                            final item = state.albums[index];
-
-                            return HomeAlbumTile(
-                              onTap: () {
-                                context.pushNamed(AppRoutes.musicGroup,
-                                    pathParameters: {
-                                      'id': item.id!,
-                                      'type': item.type!.name
-                                    });
-                              },
-                              image: item.image,
-                              title: item.name,
-                              subtitle: item.artists?.asString,
-                            );
-                          });
-                    })),
+                  },
+                )),
             SliverSizedBox(height: context.height * .15),
           ],
         ));

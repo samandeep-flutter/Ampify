@@ -121,7 +121,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                 buildWhen: (pr, cr) => pr.sortby != cr.sortby,
                 builder: (context, state) {
                   return TextButton.icon(
-                    onPressed: () => sortBy(context),
+                    onPressed: sortBy,
                     style: IconButton.styleFrom(
                       foregroundColor: scheme.textColor,
                     ),
@@ -199,7 +199,7 @@ class _LibraryScreenState extends State<LibraryScreen>
     );
   }
 
-  void sortBy(BuildContext context) {
+  void sortBy() {
     final scheme = context.scheme;
     final bloc = context.read<LibraryBloc>();
     showModalBottomSheet(

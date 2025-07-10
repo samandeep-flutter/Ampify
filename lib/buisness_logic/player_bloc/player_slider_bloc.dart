@@ -35,7 +35,8 @@ class PlayerSliderBloc extends Bloc<PlayerSliderEvents, PlayerSliderState> {
     on<PlayerSliderChange>(_onSliderChange);
   }
 
-  _onSliderChange(PlayerSliderChange event, Emitter<PlayerSliderState> emit) {
+  void _onSliderChange(
+      PlayerSliderChange event, Emitter<PlayerSliderState> emit) {
     emit(state.copyWith(event.current));
   }
 }

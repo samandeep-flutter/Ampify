@@ -12,8 +12,34 @@ import '../../config/routes/app_routes.dart';
 import '../../data/utils/dimens.dart';
 import '../../data/utils/string.dart';
 
-class EditPlaylistScreen extends StatelessWidget {
-  const EditPlaylistScreen({super.key});
+class EditPlaylistScreen extends StatefulWidget {
+  final String id;
+  final String? title;
+  final String? image;
+  final String? desc;
+  const EditPlaylistScreen(
+      {super.key,
+      required this.id,
+      required this.title,
+      required this.image,
+      required this.desc});
+
+  @override
+  State<EditPlaylistScreen> createState() => _EditPlaylistScreenState();
+}
+
+class _EditPlaylistScreenState extends State<EditPlaylistScreen> {
+  @override
+  void initState() {
+    final bloc = context.read<EditPlaylistBloc>();
+    bloc.add(EditPlaylistInitial(
+      id: widget.id,
+      title: widget.title,
+      image: widget.image,
+      desc: widget.desc,
+    ));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +95,7 @@ class EditPlaylistScreen extends StatelessWidget {
               BlocListener<EditPlaylistBloc, EditPlaylistState>(
                   listener: (context, state) {
                     if (state.success) {
-                      context.read<LibraryBloc>().add(LibraryInitial());
+                      context.read<LibraryBloc>().add(LibraryRefresh());
                       context.goNamed(AppRoutes.libraryView);
                     }
                   },

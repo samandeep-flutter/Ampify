@@ -1,4 +1,5 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
+import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +25,7 @@ class _RootViewState extends State<RootView> {
     context.read<PlayerBloc>().add(PlayerInitial());
     context.read<SearchBloc>().add(SearchInitial());
     context.read<HomeBloc>().add(HomeInitial());
+    context.read<LibraryBloc>().add(LibraryInitial());
     super.initState();
   }
 
@@ -34,7 +36,6 @@ class _RootViewState extends State<RootView> {
     final searchBloc = context.read<SearchBloc>();
 
     return Scaffold(
-      // extendBody: true,
       resizeToAvoidBottomInset: false,
       backgroundColor: scheme.background,
       body: Stack(

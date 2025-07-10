@@ -1,4 +1,3 @@
-import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
 import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/data/utils/utils.dart';
@@ -103,13 +102,14 @@ class PlaylistBottomSheet extends StatelessWidget {
         BottomSheetListTile(
           onTap: () {
             Navigator.pop(context);
-            final plbloc = context.read<EditPlaylistBloc>();
-            plbloc.add(EditPlaylistInitial(
-                id: id,
-                image: image,
-                title: title,
-                desc: details?.description));
-            context.pushNamed(AppRoutes.modifyPlaylist);
+            final pathParams = {'id': id!};
+            final params = {
+              'image': image,
+              'title': title,
+              'desc': details?.description
+            };
+            context.pushNamed(AppRoutes.modifyPlaylist,
+                pathParameters: pathParams, queryParameters: params);
           },
           title: StringRes.editDetails,
           leading: Icon(Icons.title, size: Dimens.iconLarge),

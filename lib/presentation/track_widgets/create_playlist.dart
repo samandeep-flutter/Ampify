@@ -46,7 +46,7 @@ class CreatePlaylistView extends StatelessWidget {
             BlocListener<PlaylistBloc, PlaylistState>(
               listener: (context, state) {
                 if (state.success) {
-                  context.read<LibraryBloc>().add(LibraryInitial());
+                  context.read<LibraryBloc>().add(LibraryRefresh());
                   context.pop();
                 }
               },
@@ -62,11 +62,8 @@ class CreatePlaylistView extends StatelessWidget {
                             vertical: Dimens.sizeDefault),
                         foregroundColor: scheme.textColor,
                         backgroundColor: scheme.background,
-                        shape: ContinuousRectangleBorder(
-                          side: BorderSide(color: scheme.primaryAdaptive),
-                          borderRadius:
-                              BorderRadius.circular(Dimens.borderLarge),
-                        )),
+                        shape: Utils.continuousBorder(Dimens.borderLarge,
+                            border: scheme.primaryAdaptive)),
                     onPressed: context.pop,
                     child: Text(
                       StringRes.cancel,

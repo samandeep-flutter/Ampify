@@ -6,7 +6,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
-version: 1.0.0+1
+version: 1.0.1+1
 
 # if changed/modified icon, run this command ater changing the path to icon in yaml file
 # dart run flutter_native_splash:create --path=native_splash.yaml
@@ -34,7 +34,7 @@ dependencies:
   rxdart: ^0.28.0
   get_it: ^8.0.2
   get_storage: ^2.1.1
-  go_router: ^15.2.3
+  go_router: ^16.0.0
   # audio player
   just_audio: ^0.10.4
   audio_service: ^0.18.17
@@ -65,7 +65,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # The following section is specific to Flutter packages.
 flutter:

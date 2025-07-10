@@ -186,7 +186,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   //   super.add(event);
   // }
 
-  onPlay(BuildContext context) {
+  void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
     player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
   }
@@ -207,7 +207,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     }
   }
 
-  _scrollListener() {
+  void _scrollListener() {
     if (!scrollController.hasClients) return;
     final appbarHeight = scrollController.position.extentInside * .4;
     if (scrollController.offset > (appbarHeight - kToolbarHeight)) {
@@ -221,7 +221,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     add(MusicGroupFav(id, type: type, liked: liked));
   }
 
-  _onInit(MusicGroupInitial event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onInit(
+      MusicGroupInitial event, Emitter<MusicGroupState> emit) async {
     try {
       final json = BoxServices.instance.read(BoxKeys.profile);
       profile = ProfileModel.fromJson(json);
@@ -237,7 +238,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     add(AlbumInitial(id: event.id, type: event.type));
   }
 
-  _onPlaylist(PlaylistInitial event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onPlaylist(
+      PlaylistInitial event, Emitter<MusicGroupState> emit) async {
     final completer = Completer<bool>();
     _repo.playlistDetails(event.id, onSuccess: (json) async {
       final playlist = Playlist.fromJson(json);
@@ -275,7 +277,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     await completer.future;
   }
 
-  _onAlbum(AlbumInitial event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onAlbum(
+      AlbumInitial event, Emitter<MusicGroupState> emit) async {
     final completer = Completer<bool>();
 
     _repo.albumDetails(event.id, onSuccess: (json) async {
@@ -305,7 +308,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     await completer.future;
   }
 
-  _onFav(MusicGroupFav event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onFav(
+      MusicGroupFav event, Emitter<MusicGroupState> emit) async {
     libRefresh = true;
     if (event.liked) {
       try {
@@ -337,7 +341,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     }
   }
 
-  _onCoverChanged(
+  Future<void> _onCoverChanged(
       PlaylistCoverChanged event, Emitter<MusicGroupState> emit) async {
     showToast(StringRes.uploading);
     emit(state.copyWith(image: ''));
@@ -346,7 +350,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     add(PlaylistInitial(state.id!));
   }
 
-  _onVisibility(PlaylistVisibility event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onVisibility(
+      PlaylistVisibility event, Emitter<MusicGroupState> emit) async {
     await _repo.editPlaylist(
       id: state.id!,
       title: state.title!,
@@ -361,7 +366,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     showToast(StringRes.nowPrivate);
   }
 
-  _titleFade(MusicGroupTitleFade event, Emitter<MusicGroupState> emit) {
+  void _titleFade(MusicGroupTitleFade event, Emitter<MusicGroupState> emit) {
     emit(state.copyWith(titileOpacity: event.opacity));
   }
 }

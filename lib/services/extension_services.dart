@@ -24,7 +24,7 @@ extension MyList on List<String> {
 extension ArtistNames on List<Artist> {
   String get asString => _toString(this);
 
-  _toString(List<Artist> artists) {
+  String _toString(List<Artist> artists) {
     final list = List<String>.from(artists.map((e) => e.name));
     return list.asString;
   }
@@ -148,13 +148,13 @@ extension MyString on String {
     return DateTime(year, month, day, hour, min, sec, milli);
   }
 
-  _emailRegExp(String text) {
+  bool _emailRegExp(String text) {
     final emailExp =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailExp.hasMatch(text);
   }
 
-  _passRegExp(String text) {
+  bool _passRegExp(String text) {
     final passExp = RegExp(r'^(?=.*[A-Z])(?=.*\d).{6,}$');
     return passExp.hasMatch(text);
   }

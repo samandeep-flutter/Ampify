@@ -32,6 +32,12 @@ sealed class Utils {
         left ?? padding, top ?? padding, right ?? padding, bottom ?? padding);
   }
 
+  static OutlinedBorder continuousBorder(double radius, {Color? border}) {
+    return ContinuousRectangleBorder(
+        side: border != null ? BorderSide(color: border) : BorderSide.none,
+        borderRadius: BorderRadius.circular(Dimens.borderLarge));
+  }
+
   static SliverGridDelegate fixedCrossAxis(int count,
       {double? spacing, double? aspectRatio}) {
     return SliverGridDelegateWithFixedCrossAxisCount(
@@ -64,7 +70,7 @@ sealed class Utils {
       final palete = await PaletteGenerator.fromImageProvider(
           NetworkImage(image!),
           size: const Size(200, 200));
-      return palete.lightVibrantColor?.color;
+      return palete.dominantColor?.color;
     } catch (_) {
       return null;
     }

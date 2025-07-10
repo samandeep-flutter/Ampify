@@ -1,6 +1,8 @@
 import 'dart:ui';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/services/box_services.dart';
 import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/config/firebase_options.dart';
 import 'package:ampify/config/routes/app_pages.dart';
@@ -13,14 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
 import 'buisness_logic/home_bloc/home_bloc.dart';
 import 'buisness_logic/library_bloc/library_bloc.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'buisness_logic/library_bloc/liked_songs_bloc.dart';
-import 'buisness_logic/root_bloc/addto_playlist_bloc.dart';
-import 'buisness_logic/root_bloc/edit_playlist_bloc.dart';
-import 'buisness_logic/root_bloc/music_group_bloc.dart';
 import 'buisness_logic/player_bloc/player_bloc.dart';
 import 'buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'buisness_logic/root_bloc/root_bloc.dart';
@@ -30,6 +30,8 @@ import 'services/getit_instance.dart';
 import 'services/theme_services.dart';
 
 void main() async {
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
   WidgetsFlutterBinding.ensureInitialized();
   await _initServices();
   runApp(const ThemeServices(child: MyApp()));
@@ -57,8 +59,16 @@ Future<void> _initServices() async {
       statusBarIconBrightness: Brightness.dark,
       systemNavigationBarIconBrightness: Brightness.light,
     ));
+    final _box = BoxServices.instance;
+    if (_box.read(BoxKeys.token) == null) return;
+    final LibraryRepo _libRepo = getIt();
+    await _libRepo.getProfile(onSuccess: (json) {
+      _box.write(BoxKeys.profile, json);
+    });
   } catch (e) {
     logPrint(e, 'init');
+  } finally {
+    FlutterNativeSplash.remove();
   }
 }
 
@@ -87,13 +97,10 @@ class MyApp extends StatelessWidget {
               BlocProvider(create: (_) => RootBloc()),
               BlocProvider(create: (_) => PlayerBloc()),
               BlocProvider(create: (_) => PlayerSliderBloc()),
-              BlocProvider(create: (_) => MusicGroupBloc()),
-              BlocProvider(create: (_) => EditPlaylistBloc()),
               BlocProvider(create: (_) => HomeBloc()),
               BlocProvider(create: (_) => SearchBloc()),
-              BlocProvider(create: (_) => LikedSongsBloc()),
-              BlocProvider(create: (_) => AddtoPlaylistBloc()),
               BlocProvider(create: (_) => LibraryBloc()),
+              BlocProvider(create: (_) => LikedSongsBloc()),
             ],
             child: MaxWidthBox(
               maxWidth: 1200,
