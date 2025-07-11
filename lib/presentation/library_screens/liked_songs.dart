@@ -113,12 +113,11 @@ class _LikedSongsState extends State<LikedSongs> {
                             builder: (context, pl) {
                               final group =
                                   pl.musicGroupId == UniqueIds.likedSongs;
-                              final loading =
-                                  pl.playerState == MusicState.loading;
+                              final loading = pl.playerState.isLoading;
                               return LoadingIcon(
                                 onPressed: () => bloc.onPlay(context),
-                                iconSize: Dimens.iconLarge,
-                                loaderSize: Dimens.iconLarge,
+                                iconSize: Dimens.iconXLarge,
+                                loaderSize: Dimens.iconXLarge,
                                 loading: group && loading,
                                 isSelected: group,
                                 selectedIcon: const Icon(Icons.pause),

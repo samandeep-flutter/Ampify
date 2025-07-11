@@ -34,8 +34,7 @@ class CreatePlaylistView extends StatelessWidget {
               controller: bloc.titleController,
               textCapitalization: TextCapitalization.sentences,
               style: TextStyle(
-                  fontSize: Dimens.fontExtraTripleLarge,
-                  fontWeight: FontWeight.w500),
+                  fontSize: Dimens.fontExtraLarge, fontWeight: FontWeight.w500),
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return StringRes.errorEmpty('Name');
@@ -69,7 +68,7 @@ class CreatePlaylistView extends StatelessWidget {
                       StringRes.cancel,
                       style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: Dimens.fontLarge),
+                          fontSize: Dimens.fontXXXLarge),
                     ),
                   ),
                 ),

@@ -48,14 +48,15 @@ class MusicGroupTile extends StatelessWidget {
         child: Row(
           children: [
             Builder(builder: (context) {
+              final _dimen = Dimens.iconTileLarge;
               final _scalar = MediaQuery.textScalerOf(context);
-              final double dimen = imageHeight ?? _scalar.scale(55);
+              final double dimen = imageHeight ?? _scalar.scale(_dimen);
+              if (isLikedSongs) return LikedSongsCover(size: dimen);
 
-              if (isLikedSongs) {
-                return LikedSongsCover(size: dimen);
-              }
-              return MyCachedImage(item.image,
-                  borderRadius: Dimens.sizeMini, height: dimen, width: dimen);
+              return SizedBox.square(
+                dimension: dimen,
+                child: MyCachedImage(item.image, borderRadius: Dimens.sizeMini),
+              );
             }),
             const SizedBox(width: Dimens.sizeDefault),
             Expanded(
@@ -69,7 +70,7 @@ class MusicGroupTile extends StatelessWidget {
                     style: TextStyle(
                         color: scheme.textColor,
                         fontWeight: FontWeight.w500,
-                        fontSize: Dimens.fontLarge),
+                        fontSize: Dimens.fontXXXLarge),
                   ),
                   SubtitleWidget(
                     style: TextStyle(

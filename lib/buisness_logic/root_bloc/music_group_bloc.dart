@@ -11,6 +11,7 @@ import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
+import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -188,6 +189,11 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
   void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
+    final playing = player.state.playerState.isPlaying;
+    if (playing && player.state.musicGroupId == state.id) {
+      player.onPlayPause();
+      return;
+    }
     player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
   }
 

@@ -35,11 +35,15 @@ class TrackTile extends StatelessWidget {
         child: Row(
           children: [
             if (showImage ?? true) ...[
-              Builder(builder: (context) {
-                final dimen = Dimens.iconExtraLarge;
-                return MyCachedImage(track.album?.image,
-                    borderRadius: Dimens.sizeMini, height: dimen, width: dimen);
-              }),
+              Builder(
+                builder: (context) {
+                  final dimen = Dimens.iconUltraLarge;
+                  return SizedBox.square(
+                      dimension: dimen,
+                      child: MyCachedImage(track.album?.image,
+                          borderRadius: Dimens.sizeMini));
+                },
+              ),
               const SizedBox(width: Dimens.sizeDefault),
             ],
             Expanded(
@@ -51,7 +55,7 @@ class TrackTile extends StatelessWidget {
                     style: TextStyle(
                       color: scheme.textColor,
                       fontWeight: FontWeight.w500,
-                      fontSize: Dimens.fontLarge,
+                      fontSize: Dimens.fontXXXLarge,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -109,34 +113,55 @@ class TrackDetailsTile extends StatelessWidget {
   final TrackDetails track;
   final Widget? title;
   final Widget? trailing;
-  const TrackDetailsTile({
-    super.key,
-    required this.track,
-    this.title,
-    this.trailing,
-  });
+  const TrackDetailsTile(
+      {super.key, required this.track, this.title, this.trailing});
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    return ListTile(
-      leading: Builder(builder: (context) {
-        final dimen = Dimens.iconExtraLarge;
-        return MyCachedImage(track.image,
-            borderRadius: Dimens.sizeMini, height: dimen, width: dimen);
-      }),
-      title: title ??
-          Text(track.title ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
-      titleTextStyle: TextStyle(
-        color: scheme.textColor,
-        fontWeight: FontWeight.w500,
-        fontSize: Dimens.fontLarge,
+    return Padding(
+      padding: Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
+      child: Row(
+        children: [
+          Builder(
+            builder: (context) {
+              final dimen = Dimens.iconUltraLarge;
+              return SizedBox.square(
+                  dimension: dimen,
+                  child: MyCachedImage(track.image,
+                      borderRadius: Dimens.sizeMini));
+            },
+          ),
+          const SizedBox(width: Dimens.sizeDefault),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  track.title ?? '',
+                  style: TextStyle(
+                    color: scheme.textColor,
+                    fontWeight: FontWeight.w500,
+                    fontSize: Dimens.fontXXXLarge,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  track.subtitle ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: scheme.textColorLight,
+                    fontSize: Dimens.fontDefault,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (trailing != null) trailing!,
+        ],
       ),
-      subtitle: Text(track.subtitle ?? '',
-          maxLines: 1, overflow: TextOverflow.ellipsis),
-      subtitleTextStyle:
-          TextStyle(color: scheme.textColorLight, fontSize: Dimens.fontDefault),
-      trailing: trailing,
     );
   }
 }

@@ -28,11 +28,11 @@ class PlayerCompact extends StatelessWidget {
         return track || isStateChange || isDuration;
       },
       listener: (context, state) {
-        if (state.playerState == MusicState.loading || state.durationLoading) {
+        if (state.playerState.isLoading || state.durationLoading) {
           sliderBloc.add(const PlayerSliderChange(0));
           return;
         }
-        if (state.playerState == MusicState.playing) {
+        if (state.playerState.isPlaying) {
           bloc.positionStream?.listen((duration) {
             final current = duration.inSeconds;
             sliderBloc.add(PlayerSliderChange(current));
@@ -43,8 +43,8 @@ class PlayerCompact extends StatelessWidget {
         final _bg =
             context.isDarkMode ? state.track.darkBgColor : state.track.bgColor;
         final bgColor = _bg?.withAlpha(100) ?? scheme.background;
-        final selected = state.playerState == MusicState.playing;
-        final loading = state.playerState == MusicState.loading;
+        final selected = state.playerState.isPlaying;
+        final loading = state.playerState.isLoading;
 
         return Container(
           margin: Utils.insetsOnly(Dimens.sizeSmall, bottom: Dimens.zero),
@@ -53,20 +53,17 @@ class PlayerCompact extends StatelessWidget {
             color: Color.alphaBlend(bgColor, scheme.surface),
             borderRadius: BorderRadius.circular(Dimens.sizeExtraSmall),
             boxShadow: [
-              // if (context.isDarkMode)
-              ...[
-                BoxShadow(
-                  color: scheme.surface.withAlpha(150),
-                  offset: Offset(0, Dimens.sizeLarge),
-                  blurRadius: Dimens.sizeMedium,
-                  spreadRadius: Dimens.sizeLarge,
-                ),
-                BoxShadow(
-                  color: scheme.surface.withAlpha(100),
-                  blurRadius: Dimens.sizeMedium,
-                  spreadRadius: Dimens.sizeLarge,
-                ),
-              ],
+              BoxShadow(
+                color: scheme.surface.withAlpha(150),
+                offset: Offset(0, Dimens.sizeLarge),
+                blurRadius: Dimens.sizeMedium,
+                spreadRadius: Dimens.sizeLarge,
+              ),
+              BoxShadow(
+                color: scheme.surface.withAlpha(100),
+                blurRadius: Dimens.sizeMedium,
+                spreadRadius: Dimens.sizeLarge,
+              ),
               BoxShadow(
                 color: Colors.black26,
                 blurRadius: Dimens.sizeMedium,
@@ -94,9 +91,8 @@ class PlayerCompact extends StatelessWidget {
                       child: Row(
                         children: [
                           Builder(builder: (context) {
-                            const double _dimen = 50;
                             final _scalar = MediaQuery.textScalerOf(context);
-                            final dimen = _scalar.scale(_dimen);
+                            final dimen = _scalar.scale(Dimens.iconTileLarge);
 
                             return MyCachedImage(state.track.image,
                                 borderRadius: Dimens.sizeMini, width: dimen);
@@ -111,7 +107,7 @@ class PlayerCompact extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                      fontSize: Dimens.fontDefault,
+                                      fontSize: Dimens.fontXXXLarge,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
@@ -120,7 +116,7 @@ class PlayerCompact extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       color: scheme.textColor.withAlpha(200),
-                                      fontSize: Dimens.fontMed),
+                                      fontSize: Dimens.fontDefault),
                                 )
                               ],
                             ),
@@ -133,7 +129,7 @@ class PlayerCompact extends StatelessWidget {
                   LoadingIcon(
                     loading: loading,
                     onPressed: bloc.onPlayPause,
-                    iconSize: Dimens.iconLarge,
+                    iconSize: Dimens.iconXLarge,
                     isSelected: selected,
                     selectedIcon: const Icon(Icons.pause),
                     style: IconButton.styleFrom(

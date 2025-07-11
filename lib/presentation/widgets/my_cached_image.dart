@@ -62,7 +62,7 @@ class _MyCachedImageState extends State<MyCachedImage> {
       final _path = isAvatar ? ImageRes.userThumbnail : ImageRes.thumbnail;
       final _radius = widget.avatarRadius ?? Dimens.sizeLarge;
       final _thumbnail = Padding(
-          padding: EdgeInsets.all(isAvatar ? _radius * .7 : Dimens.iconLarge),
+          padding: EdgeInsets.all(isAvatar ? _radius * .7 : Dimens.iconXLarge),
           child: Image.asset(_path,
               color: scheme.disabled, fit: widget.fit ?? BoxFit.cover));
 

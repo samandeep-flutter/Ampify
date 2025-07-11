@@ -25,7 +25,8 @@ class LibraryRepo {
     Function(Map<String, dynamic> error)? onError,
   }) async {
     const url = AppConstants.myPlaylists;
-    final response = await dio.get('$url?offset=${offset ?? 0}&limit=10');
+    // add '&limit=10' to limit to 10
+    final response = await dio.get('$url?offset=${offset ?? 0}');
     ApiResponse.verify(response,
         onSuccess: onSuccess,
         onError: onError ?? (e) => logPrint(e, 'playlist'));
@@ -38,7 +39,8 @@ class LibraryRepo {
     Function(Map<String, dynamic> error)? onError,
   }) async {
     const url = AppConstants.myAlbums;
-    final response = await dio.get('$url?offset=${offset ?? 0}&limit=10');
+    // add '&limit=10' to limit to 10
+    final response = await dio.get('$url?offset=${offset ?? 0}');
     ApiResponse.verify(response,
         onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'albums'));
   }

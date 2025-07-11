@@ -170,7 +170,7 @@ class MusicGroupShimmer extends StatelessWidget {
             if (!isLikedSongs)
               Icon(
                 Icons.add_circle_outline,
-                size: Dimens.iconLarge,
+                size: Dimens.iconXLarge,
                 color: context.scheme.shimmer,
               ),
             const Spacer(),

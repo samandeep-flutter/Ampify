@@ -104,7 +104,7 @@ class PlayerScreen extends StatelessWidget {
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                          fontSize: Dimens.fontExtraLarge,
+                                          fontSize: Dimens.fontXXLarge,
                                           fontWeight: FontWeight.bold,
                                           color: scheme.textColor),
                                     ),
@@ -131,7 +131,7 @@ class PlayerScreen extends StatelessWidget {
                               },
                               isSelected: state.liked,
                               selectedIcon: const Icon(Icons.favorite),
-                              iconSize: Dimens.iconLarge,
+                              iconSize: Dimens.iconXLarge,
                               icon: const Icon(Icons.favorite_outline),
                             );
                           },
@@ -147,7 +147,7 @@ class PlayerScreen extends StatelessWidget {
                       return track || length;
                     },
                     builder: (context, state) {
-                      final loading = state.playerState == MusicState.loading;
+                      final loading = state.playerState.isLoading;
                       return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                           builder: (context, slider) {
                         double current = 0;
@@ -218,17 +218,17 @@ class PlayerScreen extends StatelessWidget {
                                     backgroundColor:
                                         state.shuffle ? scheme.primary : null),
                                 selectedIcon: Image.asset(ImageRes.shuffle,
-                                    width: Dimens.iconDefault - 2,
+                                    width: Dimens.iconMedium,
                                     color: scheme.onPrimary),
                                 icon: Image.asset(ImageRes.shuffle,
-                                    height: Dimens.iconDefault - 2,
+                                    height: Dimens.iconMedium,
                                     color: scheme.textColor),
                               );
                             }),
                         IconButton(
                           onPressed: bloc.onPrevious,
                           color: scheme.textColor,
-                          iconSize: Dimens.iconLarge + 4,
+                          iconSize: Dimens.iconLarge,
                           icon: const Icon(Icons.skip_previous_rounded),
                         ),
                         BlocBuilder<PlayerBloc, PlayerState>(
@@ -240,9 +240,8 @@ class PlayerScreen extends StatelessWidget {
                               onPressed: bloc.onPlayPause,
                               iconSize: Dimens.iconExtraLarge,
                               loaderSize: Dimens.iconExtraLarge,
-                              loading: state.playerState == MusicState.loading,
-                              isSelected:
-                                  state.playerState == MusicState.playing,
+                              loading: state.playerState.isLoading,
+                              isSelected: state.playerState.isLoading,
                               selectedIcon: const Icon(Icons.pause),
                               style: IconButton.styleFrom(
                                   backgroundColor: scheme.textColor,
@@ -254,7 +253,7 @@ class PlayerScreen extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: bloc.onNext,
-                          iconSize: Dimens.iconLarge + 4,
+                          iconSize: Dimens.iconLarge,
                           color: scheme.textColor,
                           icon: const Icon(Icons.skip_next_rounded),
                         ),

@@ -50,7 +50,7 @@ class LoadingButton extends StatelessWidget {
         onPressed: enable && !(isLoading ?? false) ? onPressed : null,
         child: DefaultTextStyle.merge(
           style: TextStyle(
-              fontWeight: FontWeight.w600, fontSize: Dimens.fontLarge),
+              fontWeight: FontWeight.w600, fontSize: Dimens.fontXXXLarge),
           child: Builder(builder: (context) {
             if (isLoading ?? false) {
               return SizedBox.square(

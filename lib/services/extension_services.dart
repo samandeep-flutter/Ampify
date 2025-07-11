@@ -1,3 +1,4 @@
+import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/services/theme_services.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
@@ -19,6 +20,11 @@ extension MyList on List<String> {
   String _removeBraces(List<String> list) {
     return list.toString().replaceAll(RegExp(r'[\[\]]'), '');
   }
+}
+
+extension MyMusicState on MusicState? {
+  bool get isPlaying => this == MusicState.playing;
+  bool get isLoading => this == MusicState.loading;
 }
 
 extension ArtistNames on List<Artist> {

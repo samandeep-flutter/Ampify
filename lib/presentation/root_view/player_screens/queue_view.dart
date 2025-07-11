@@ -31,7 +31,7 @@ class QueueView extends StatelessWidget {
           title: const Text(StringRes.queueTitle),
           centerTitle: true,
           titleTextStyle: TextStyle(
-            fontSize: Dimens.fontLarge,
+            fontSize: Dimens.fontXXXLarge,
             fontWeight: FontWeight.w600,
             color: scheme.textColor,
           ),
@@ -48,17 +48,16 @@ class QueueView extends StatelessWidget {
         ),
         bottom: const BottomPlayer(),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: Dimens.sizeDefault),
-            Row(
-              children: [
-                SizedBox(width: Dimens.sizeDefault),
-                Text(
+            Padding(
+              padding: EdgeInsets.only(left: Dimens.sizeDefault),
+              child: Text(
                   StringRes.nowPlaying,
                   style: TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: Dimens.fontLarge),
+                    fontWeight: FontWeight.bold, fontSize: Dimens.fontXXXLarge),
                 ),
-              ],
             ),
             BlocBuilder<PlayerBloc, PlayerState>(
               buildWhen: (pr, cr) => pr.track != cr.track,
@@ -73,7 +72,7 @@ class QueueView extends StatelessWidget {
                           style: TextStyle(
                               color: scheme.primary,
                               fontWeight: FontWeight.w500,
-                              fontSize: Dimens.fontLarge),
+                              fontSize: Dimens.fontXXXLarge),
                           children: [
                             WidgetSpan(
                               child: SizedBox.square(
@@ -82,8 +81,7 @@ class QueueView extends StatelessWidget {
                                       buildWhen: (pr, cr) =>
                                           pr.playerState != cr.playerState,
                                       builder: (_, state) {
-                                        if (state.playerState ==
-                                            MusicState.playing) {
+                                        if (state.playerState.isPlaying) {
                                           return Image.asset(ImageRes.musicWave,
                                               fit: BoxFit.cover,
                                               color: scheme.primary);
@@ -108,7 +106,7 @@ class QueueView extends StatelessWidget {
                 builder: (context, state) {
                   if (state.queue.isEmpty) return const SizedBox.shrink();
 
-                  return Column(
+                  return ListView(
                     children: [
                       Row(
                         children: [
@@ -117,7 +115,7 @@ class QueueView extends StatelessWidget {
                             StringRes.nextQueue,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: Dimens.fontLarge),
+                                fontSize: Dimens.fontXXXLarge),
                           ),
                           const Spacer(),
                           TextButton(
@@ -132,8 +130,9 @@ class QueueView extends StatelessWidget {
                           const SizedBox(width: Dimens.sizeDefault),
                         ],
                       ),
-                      Expanded(
-                        child: ReorderableListView.builder(
+                      ReorderableListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                           itemCount: state.queue.length,
                           itemBuilder: (context, index) {
                             final item = state.queue[index];
@@ -227,7 +226,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
                 IconButton(
                   onPressed: bloc.onPrevious,
                   color: scheme.textColor,
-                  iconSize: Dimens.iconLarge,
+                  iconSize: Dimens.iconXLarge,
                   icon: const Icon(Icons.skip_previous_rounded),
                 ),
                 const SizedBox(width: Dimens.sizeDefault),
@@ -238,10 +237,10 @@ class _BottomPlayerState extends State<BottomPlayer> {
                   builder: (context, state) {
                     return LoadingIcon(
                       onPressed: bloc.onPlayPause,
-                      iconSize: Dimens.iconLarge,
-                      loaderSize: Dimens.iconLarge,
-                      loading: state.playerState == MusicState.loading,
-                      isSelected: state.playerState == MusicState.playing,
+                      iconSize: Dimens.iconXLarge,
+                      loaderSize: Dimens.iconXLarge,
+                      loading: state.playerState.isLoading,
+                      isSelected: state.playerState.isPlaying,
                       selectedIcon: const Icon(Icons.pause),
                       style: IconButton.styleFrom(
                           backgroundColor: scheme.textColor,
@@ -254,7 +253,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
                 const SizedBox(width: Dimens.sizeDefault),
                 IconButton(
                   onPressed: bloc.onNext,
-                  iconSize: Dimens.iconLarge,
+                  iconSize: Dimens.iconXLarge,
                   color: scheme.textColor,
                   icon: const Icon(Icons.skip_next_rounded),
                 ),

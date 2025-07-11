@@ -27,8 +27,7 @@ class MyAlertDialog extends StatelessWidget {
 
     return AlertDialog(
         backgroundColor: scheme.surface,
-        title: Text(title,
-            style: TextStyle(fontSize: Dimens.fontExtraDoubleLarge)),
+        title: Text(title, style: TextStyle(fontSize: Dimens.fontLarge)),
         titleTextStyle: titleTextStyle,
         content: content,
         shape: RoundedRectangleBorder(
@@ -68,7 +67,7 @@ class MyBottomSheet extends StatelessWidget {
                 const SizedBox(width: 75),
                 Text(title,
                     style: TextStyle(
-                      fontSize: Dimens.fontExtraLarge,
+                      fontSize: Dimens.fontXXLarge,
                       fontWeight: FontWeight.w600,
                     )),
                 Padding(

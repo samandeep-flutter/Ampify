@@ -304,12 +304,11 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           BlocBuilder<PlayerBloc, PlayerState>(
                             builder: (context, pl) {
                               final group = pl.musicGroupId == state.id;
-                              final loading =
-                                  pl.playerState == MusicState.loading;
+                              final loading = pl.playerState.isLoading;
                               return LoadingIcon(
                                 onPressed: () => bloc.onPlay(context),
-                                iconSize: Dimens.iconLarge,
-                                loaderSize: Dimens.iconLarge,
+                                iconSize: Dimens.iconXLarge,
+                                loaderSize: Dimens.iconXLarge,
                                 loading: group && loading,
                                 isSelected: group,
                                 selectedIcon: const Icon(Icons.pause),
@@ -348,7 +347,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   child: DefaultTextStyle.merge(
                     style: TextStyle(
                         color: scheme.textColorLight,
-                        fontSize: Dimens.fontLarge),
+                        fontSize: Dimens.fontXXXLarge),
                     child: Row(
                       children: [
                         const SizedBox(width: Dimens.sizeDefault),

@@ -222,7 +222,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                 title: Text(e.name.capitalize),
                 titleTextStyle: TextStyle(
                   color: scheme.textColor,
-                  fontSize: Dimens.fontLarge,
+                  fontSize: Dimens.fontXXXLarge,
                   fontWeight: FontWeight.w500,
                 ),
               );

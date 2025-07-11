@@ -51,13 +51,13 @@ class TrackBottomSheet extends StatelessWidget {
                     style: TextStyle(
                         color: scheme.textColor,
                         fontWeight: FontWeight.w600,
-                        fontSize: Dimens.fontLarge),
+                        fontSize: Dimens.fontXXXLarge),
                   ),
                   const SizedBox(height: Dimens.sizeExtraSmall),
                   Text(track.artists?.asString ?? '',
                       style: TextStyle(
                         color: scheme.textColorLight,
-                        fontSize: Dimens.fontLarge - 1,
+                        fontSize: Dimens.fontXXXLarge - 1,
                       ))
                 ],
               ),
@@ -79,7 +79,7 @@ class TrackBottomSheet extends StatelessWidget {
             Navigator.pop(context);
           },
           leading: LikedSongsCover(
-              size: Dimens.iconLarge, iconSize: Dimens.iconSmall),
+              size: Dimens.iconXLarge, iconSize: Dimens.iconSmall),
           title: liked ?? false ? StringRes.removeLiked : StringRes.addtoLiked,
         ),
         BottomSheetListTile(
@@ -99,14 +99,14 @@ class TrackBottomSheet extends StatelessWidget {
               );
             },
             title: StringRes.addtoPlaylist,
-            leading: Icon(Icons.add_circle_outline, size: Dimens.iconLarge)),
+            leading: Icon(Icons.add_circle_outline, size: Dimens.iconXLarge)),
         BottomSheetListTile(
           onTap: () {
             bloc.add(PlayerQueueAdded(track));
             Navigator.pop(context);
           },
           title: StringRes.addtoQueue,
-          leading: Icon(Icons.queue_music_outlined, size: Dimens.iconLarge),
+          leading: Icon(Icons.queue_music_outlined, size: Dimens.iconXLarge),
         ),
         BottomSheetListTile(
             onTap: () {
@@ -118,7 +118,7 @@ class TrackBottomSheet extends StatelessWidget {
             },
             enable: track.album?.id != null,
             title: StringRes.gotoAlbum,
-            leading: Icon(Icons.album_outlined, size: Dimens.iconLarge)),
+            leading: Icon(Icons.album_outlined, size: Dimens.iconXLarge)),
         BottomSheetListTile(
           onTap: () {
             bloc.onTrackShare(track.id!);
@@ -126,7 +126,7 @@ class TrackBottomSheet extends StatelessWidget {
           },
           enable: false,
           title: StringRes.share,
-          leading: Icon(Icons.share_sharp, size: Dimens.iconMedium),
+          leading: Icon(Icons.share_sharp, size: Dimens.iconXXLarge),
         ),
         SizedBox(height: context.height * .05)
       ],

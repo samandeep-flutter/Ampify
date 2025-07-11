@@ -6,6 +6,7 @@ import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/data/utils/utils.dart';
+import 'package:ampify/services/extension_services.dart';
 import 'package:ampify/services/getit_instance.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart' hide PlayerState, PlayerEvent;
@@ -51,10 +52,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   final LibraryRepo _libRepo = getIt();
 
   Stream<Duration>? positionStream;
-  final queue = ConcatenatingAudioSource(children: []);
 
-  _onInit(PlayerInitial event, Emitter<PlayerState> emit) async {
-    await player.setAudioSource(queue);
+  Future<void> _onInit(PlayerInitial event, Emitter<PlayerState> emit) async {
+    await player.setAudioSources([]);
   }
 
   void onSliderChange(double value) async {
@@ -81,7 +81,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   void onNext() {}
 
   void onTrackEnded(PlayerSliderState slider) {
-    if (state.playerState == MusicState.loading) return;
+    if (state.playerState.isLoading) return;
     if (slider.current != 0 && state.length != 0) {
       if (slider.current == state.length) {
         add(PlayerTrackEnded());
@@ -101,26 +101,24 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   }
 
   Future<Duration?> _getDuration() async {
+    final _duration = Completer<Duration?>();
+    late final StreamSubscription<Duration?> stream;
     try {
-      final compeleter = Completer<Duration>();
-      final stream = player.durationStream.listen((data) {
-        if (data == null || data.inSeconds == state.length) return;
-        Future.delayed(const Duration(seconds: 5)).then((data) {
-          try {
-            compeleter.isCompleted;
-          } catch (_) {
-            return;
-          }
-          if (!compeleter.isCompleted) throw Exception();
-        });
-        compeleter.complete(data);
+      stream = player.durationStream.listen((duration) {
+        if (duration != null && duration.inSeconds > 0) {
+          _duration.complete(duration);
+        }
+      }, onError: (error) {
+        logPrint(error, 'Duration');
+        if (!_duration.isCompleted) _duration.complete(null);
       });
-      final duration = await compeleter.future;
-      stream.cancel();
-      return duration;
+      final result = await _duration.future;
+      return result;
     } catch (e) {
       logPrint(e, 'Duration');
       return null;
+    } finally {
+      stream.cancel();
     }
   }
 
@@ -142,12 +140,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     emit(state.copyWith(queue: queueTracks));
 
     try {
-      queue.removeRange(player.nextIndex ?? 0, queue.length - 1);
+      final end = player.audioSources.length - 1;
+      player.removeAudioSourceRange(player.nextIndex ?? 0, end);
       final track = state.queue.first;
       final artist = track.subtitle?.split(',').first;
-      final uri = await _musicRepo.searchSong('${track.title} $artist');
-      final source = AudioSource.uri(uri!);
-      await queue.add(source);
+      final song = await _musicRepo.searchSong('${track.title} $artist');
+      final source = AudioSource.uri(song!.uri);
+      await player.addAudioSource(source);
     } catch (e) {
       logPrint(e, 'Queue next');
     }
@@ -186,11 +185,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         emit(state.copyWith(liked: true));
       }
       final result = await _libRepo.addtoLikedSongs(event.id);
-      if (!result) throw Exception();
-    } catch (_) {
+      if (!result) throw FormatException();
+    } on FormatException {
       if (state.track.id == event.id) {
         emit(state.copyWith(liked: false));
       }
+    } catch (e) {
+      logPrint(e, 'Liked');
     }
   }
 
@@ -230,14 +231,15 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       final track = await Utils.getTrackDetails(event.track);
       emit(state.copyWith(queue: [...state.queue, track]));
       if (state.upNext.isNotEmpty) {
-        await queue.removeRange(player.nextIndex ?? 0, queue.length - 1);
+        final end = player.audioSources.length - 1;
+        await player.removeAudioSourceRange(player.nextIndex ?? 0, end);
       }
       if (player.hasNext) return;
       logPrint('song added instaneously...');
       final artist = track.subtitle?.split(',').first;
-      final uri = await _musicRepo.searchSong('${track.title} $artist');
-      final source = AudioSource.uri(uri!);
-      await queue.add(source);
+      final song = await _musicRepo.searchSong('${track.title} $artist');
+      final source = AudioSource.uri(song!.uri);
+      await player.addAudioSource(source);
     } catch (e) {
       logPrint(e, 'Queue instaneous');
     }
@@ -260,11 +262,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         emit(state.copyWith(
             track: track, queue: newQueue, length: 0, durationLoading: true));
         final duration = await _getDuration();
+        if (duration == null) throw Exception();
         _createPosition(duration);
         emit(state.copyWith(
-            playerState: MusicState.playing,
-            length: duration?.inSeconds ?? 0,
-            durationLoading: false));
+          playerState: MusicState.playing,
+          length: duration.inSeconds,
+          durationLoading: false,
+        ));
       } catch (e) {
         emit(state.copyWith(playerState: MusicState.pause));
         logPrint(e, 'Duration');
@@ -279,9 +283,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
       final artist = track.subtitle?.split(',').first;
       try {
-        final uri = await _musicRepo.searchSong('${track.title} $artist');
-        final source = AudioSource.uri(uri!);
-        await queue.add(source);
+        final song = await _musicRepo.searchSong('${track.title} $artist');
+        final source = AudioSource.uri(song!.uri);
+        await player.addAudioSource(source);
       } catch (e) {
         logPrint(e, 'Queue next');
       }
@@ -297,11 +301,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       emit(state.copyWith(
           track: track, upNext: upNext, length: 0, durationLoading: true));
       final duration = await _getDuration();
+      if (duration == null) throw FormatException();
       _createPosition(duration);
       emit(state.copyWith(
-          playerState: MusicState.playing,
-          length: duration?.inSeconds ?? 0,
-          durationLoading: false));
+        playerState: MusicState.playing,
+        length: duration.inSeconds,
+        durationLoading: false,
+      ));
     } catch (e) {
       emit(state.copyWith(playerState: MusicState.pause));
       logPrint(e, 'Duration');
@@ -310,9 +316,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     track = state.upNext.first;
     final artist = track.subtitle?.split(',').first;
     try {
-      final uri = await _musicRepo.searchSong('${track.title} $artist');
-      final source = AudioSource.uri(uri!);
-      await queue.add(source);
+      final song = await _musicRepo.searchSong('${track.title} $artist');
+      final source = AudioSource.uri(song!.uri);
+      await player.addAudioSource(source);
     } catch (e) {
       logPrint(e, 'Up next');
     }
@@ -320,7 +326,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   void _onQueueCleared(PlayerQueueCleared event, Emitter<PlayerState> emit) {
     try {
-      queue.removeRange(player.nextIndex ?? 0, queue.length - 1);
+      final end = player.audioSources.length - 1;
+      player.removeAudioSourceRange(player.nextIndex ?? 0, end);
     } catch (e) {
       logPrint(e, 'Queue clear');
     }
@@ -329,16 +336,26 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   Future<void> _onMusicGroup(
       MusicGroupPlayed event, Emitter<PlayerState> emit) async {
-    player.pause();
-    final track = await Utils.getTrackDetails(event.tracks.first);
+    await player.clearAudioSources();
     emit(state.copyWith(
-        musicGroupId: event.id,
-        track: track,
-        length: 0,
-        liked: event.liked,
-        showPlayer: true,
-        playerState: MusicState.loading));
-    await queue.clear();
+      playerState: MusicState.loading,
+      musicGroupId: event.id,
+      liked: event.liked,
+      showPlayer: true,
+    ));
+    final track = await Utils.getTrackDetails(event.tracks.first);
+    final artist = track.subtitle?.split(',').first;
+    final song = await _musicRepo.searchSong('${track.title} $artist');
+    final source = AudioSource.uri(song!.uri);
+    await player.addAudioSource(source);
+    _createPosition(song.duration);
+
+    emit(state.copyWith(
+      track: track,
+      playerState: MusicState.playing,
+      length: song.duration.inSeconds,
+    ));
+    await player.play();
     List<TrackDetails> upNext = [];
     event.tracks.skip(1).forEach((e) async {
       final details = await Utils.getTrackDetails(e);
@@ -359,17 +376,16 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         showPlayer: true,
         playerState: MusicState.loading));
     try {
-      await queue.clear();
+      await player.clearAudioSources();
       emit(state.copyWith(queue: []));
       final artist = track.subtitle?.split(',').first;
-      final uri = await _musicRepo.searchSong('${track.title} $artist');
-      final source = AudioSource.uri(uri!);
-      await queue.add(source);
-      final duration = await _getDuration();
-      _createPosition(duration);
+      final song = await _musicRepo.searchSong('${track.title} $artist');
+      final source = AudioSource.uri(song!.uri);
+      await player.addAudioSource(source);
+      _createPosition(song.duration);
       emit(state.copyWith(
         playerState: MusicState.playing,
-        length: duration?.inSeconds ?? 0,
+        length: song.duration.inSeconds,
       ));
       await player.play();
     } catch (e) {

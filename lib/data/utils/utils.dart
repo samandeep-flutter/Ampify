@@ -12,7 +12,7 @@ import '../data_models/common/tracks_model.dart';
 sealed class Utils {
   static TextStyle defTitleStyle(BuildContext context) {
     return TextStyle(
-        fontSize: Dimens.fontExtraDoubleLarge,
+        fontSize: Dimens.fontLarge,
         fontWeight: FontWeight.w600,
         color: context.scheme.textColor);
   }
@@ -56,6 +56,7 @@ sealed class Utils {
 
     return TrackDetails(
       id: track.id,
+      videoId: null,
       albumId: track.album?.id,
       title: track.name,
       bgColor: color,

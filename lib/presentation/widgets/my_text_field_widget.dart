@@ -132,12 +132,12 @@ class _MyTextFieldState extends State<MyTextField> {
                       icon: const Icon(Icons.visibility_off))
                   : null,
               label: Text(widget.title),
-              labelStyle: TextStyle(fontSize: Dimens.fontExtraLarge),
+              labelStyle: TextStyle(fontSize: Dimens.fontXXLarge),
               border: const OutlineInputBorder(),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: scheme.primaryAdaptive),
               )),
-      style: TextStyle(fontSize: Dimens.fontExtraLarge),
+      style: TextStyle(fontSize: Dimens.fontXXLarge),
       inputFormatters: widget.inputFormatters,
       validator: widget.customValidator ??
           (value) {
@@ -217,8 +217,8 @@ class SearchTextField extends StatelessWidget {
             hintText: title,
             fillColor: backgroundColor,
             filled: backgroundColor != null,
-            hintStyle: TextStyle(
-                color: scheme.disabled, fontSize: Dimens.fontExtraLarge),
+            hintStyle:
+                TextStyle(color: scheme.disabled, fontSize: Dimens.fontXXLarge),
             focusedBorder: border(),
             enabledBorder: border(),
             prefixIcon: Icon(Icons.search, color: scheme.disabled),

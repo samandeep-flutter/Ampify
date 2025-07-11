@@ -5,8 +5,6 @@
 ![repo size](https://img.shields.io/github/repo-size/samanjhutty/ampify)
 ![Release Date](https://img.shields.io/github/release-date/samanjhutty/ampify)
 
-**Ampify: Turn Up the Volume on Your Music Journey!**
-
 Ampify enhances your Spotify experience by providing smarter playlist management, music discovery, and personalized features—all designed to amplify your listening journey.
 
 ## Features
@@ -17,18 +15,13 @@ Ampify enhances your Spotify experience by providing smarter playlist management
 
 ## Getting Started
 
-### Prerequisites
-
-- A Spotify account
-- Internet connectivity
-
 ### Setting Up Spotify App
 
 1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
 2. Log in with your Spotify account and create a new app.
 3. Provide the necessary details (e.g., App Name, Description) and click **Create**.
 4. Note down the **Client ID** and **Client Secret**.
-5. Add your app's redirect URL (e.g., `<APPNAME/UNIQUE-APP-NAME>://<REDIECT-LINK>`) in the app settings under **Redirect URIs**.
+5. Add your app's redirect URL (e.g., `myapp://spotify-login`) in the app settings under **Redirect URIs**.
 
 ### Configuring Environment Variables
 

@@ -52,7 +52,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                       StringRes.addtoPlaylist,
                       style: TextStyle(
                         color: scheme.textColor,
-                        fontSize: Dimens.fontLarge,
+                        fontSize: Dimens.fontXXXLarge,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

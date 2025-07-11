@@ -36,10 +36,10 @@ class PlaylistBottomSheet extends StatelessWidget {
           children: [
             const SizedBox(width: Dimens.sizeDefault),
             Builder(builder: (context) {
-              final double _height = 50;
+              final _dimen = Dimens.iconTileLarge;
               final _scalar = MediaQuery.textScalerOf(context);
-              final height = _scalar.scale(_height);
-              final width = _scalar.scale(_height + Dimens.sizeMedSmall);
+              final double height = _scalar.scale(_dimen);
+              final width = _scalar.scale(_dimen + Dimens.sizeMedSmall);
 
               return MyCachedImage(image,
                   borderRadius: Dimens.sizeMini, height: height, width: width);
@@ -57,7 +57,7 @@ class PlaylistBottomSheet extends StatelessWidget {
                     style: TextStyle(
                         color: scheme.textColor,
                         fontWeight: FontWeight.w600,
-                        fontSize: Dimens.fontLarge),
+                        fontSize: Dimens.fontXXXLarge),
                   ),
                   const SizedBox(height: Dimens.sizeExtraSmall),
                   DefaultTextStyle.merge(
@@ -92,12 +92,12 @@ class PlaylistBottomSheet extends StatelessWidget {
           enable: false,
           onTap: () {},
           title: StringRes.addTracks,
-          leading: Icon(Icons.music_note_outlined, size: Dimens.iconLarge),
+          leading: Icon(Icons.music_note_outlined, size: Dimens.iconXLarge),
         ),
         BottomSheetListTile(
           onTap: () => onPicker(context),
           title: StringRes.editCover,
-          leading: Icon(Icons.photo_outlined, size: Dimens.iconLarge),
+          leading: Icon(Icons.photo_outlined, size: Dimens.iconXLarge),
         ),
         BottomSheetListTile(
           onTap: () {
@@ -112,7 +112,7 @@ class PlaylistBottomSheet extends StatelessWidget {
                 pathParameters: pathParams, queryParameters: params);
           },
           title: StringRes.editDetails,
-          leading: Icon(Icons.title, size: Dimens.iconLarge),
+          leading: Icon(Icons.title, size: Dimens.iconXLarge),
         ),
         if (details?.public ?? false)
           BottomSheetListTile(
@@ -121,7 +121,7 @@ class PlaylistBottomSheet extends StatelessWidget {
               bloc.add(const PlaylistVisibility(false));
             },
             title: 'Make Private',
-            leading: Icon(Icons.lock_outline, size: Dimens.iconLarge),
+            leading: Icon(Icons.lock_outline, size: Dimens.iconXLarge),
           )
         else
           BottomSheetListTile(
@@ -130,13 +130,13 @@ class PlaylistBottomSheet extends StatelessWidget {
               bloc.add(const PlaylistVisibility(true));
             },
             title: 'Make Public',
-            leading: Icon(Icons.public, size: Dimens.iconLarge),
+            leading: Icon(Icons.public, size: Dimens.iconXLarge),
           ),
         BottomSheetListTile(
           enable: false,
           onTap: () {},
           title: StringRes.share,
-          leading: Icon(Icons.ios_share, size: Dimens.iconLarge),
+          leading: Icon(Icons.ios_share, size: Dimens.iconXLarge),
         ),
         SizedBox(height: context.height * .07)
       ],
@@ -164,7 +164,7 @@ class PlaylistBottomSheet extends StatelessWidget {
                   leading: Icon(Icons.photo_library_outlined,
                       size: Dimens.iconDefault),
                   title: Text(StringRes.gallery,
-                      style: TextStyle(fontSize: Dimens.fontLarge)),
+                      style: TextStyle(fontSize: Dimens.fontXXXLarge)),
                 ),
                 ListTile(
                   onTap: () {
@@ -175,7 +175,7 @@ class PlaylistBottomSheet extends StatelessWidget {
                   leading: Icon(Icons.photo_camera_outlined,
                       size: Dimens.iconDefault),
                   title: Text(StringRes.camera,
-                      style: TextStyle(fontSize: Dimens.fontLarge)),
+                      style: TextStyle(fontSize: Dimens.fontXXXLarge)),
                 ),
               ],
             ),

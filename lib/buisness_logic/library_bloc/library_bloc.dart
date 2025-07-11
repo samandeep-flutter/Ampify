@@ -155,7 +155,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   void _loadMoreItems() {
     if (!scrollController.hasClients || state.moreLoading) return;
     final total = state.albumCount + state.playlistCount;
-    if (state.items.length >= total) return;
+    if (_libItems.length >= total) return;
     if (scrollController.position.extentAfter < 300) {
       add(LibraryLoadMore());
     }
@@ -183,8 +183,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final alCompleter = Completer<bool>();
     List<LibraryModel> items = state.items;
 
-    final plOffset = items.where((e) => e.type == LibItemType.playlist);
-    final alOffset = items.where((e) => e.type != LibItemType.playlist);
+    final plOffset = _libItems.where((e) => e.type == LibItemType.playlist);
+    final alOffset = _libItems.where((e) => e.type != LibItemType.playlist);
 
     try {
       if (plOffset.length < state.playlistCount) {
@@ -212,6 +212,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
       if (plOffset.length < state.playlistCount) await plCompleter.future;
       if (alOffset.length < state.albumCount) await alCompleter.future;
+      items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
+      _libItems = items;
       emit(state.copyWith(items: items));
     } catch (e) {
       logPrint(e, 'load more');
@@ -255,6 +257,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         items.add(Utils.likedSongs(count: state.totalLiked));
       }
       items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
+      _libItems = items;
       emit(state.copyWith(
           items: items, playlistCount: plCount, albumCount: alCount));
     } catch (e) {

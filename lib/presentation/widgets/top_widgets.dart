@@ -121,7 +121,7 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
             widget.title ?? StringRes.errorUnknown,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: scheme.textColorLight, fontSize: Dimens.fontLarge),
+                color: scheme.textColorLight, fontSize: Dimens.fontXXXLarge),
           )
         ],
       ),
@@ -342,7 +342,7 @@ class BottomSheetListTile extends StatelessWidget {
       horizontalTitleGap: Dimens.sizeLarge,
       titleTextStyle: TextStyle(
         fontWeight: FontWeight.w500,
-        fontSize: Dimens.fontLarge,
+        fontSize: Dimens.fontXXXLarge,
         color: scheme.textColor,
       ),
     );

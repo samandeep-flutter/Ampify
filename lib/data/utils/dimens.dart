@@ -14,16 +14,22 @@ sealed class Dimens {
   static double get fontDefault => 14.scale;
 
   /// adaptive size of 16
-  static double get fontLarge => 16.scale;
+  static double get fontXXXLarge => 16.scale;
 
   /// adaptive size of 18
-  static double get fontExtraLarge => 18.scale;
+  static double get fontXXLarge => 18.scale;
 
   /// adaptive size of 20
-  static double get fontExtraDoubleLarge => 20.scale;
+  static double get fontXLarge => 20.scale;
+
+  /// adaptive size of 22
+  static double get fontLarge => 22.scale;
 
   /// adaptive size of 24
-  static double get fontExtraTripleLarge => 24.scale;
+  static double get fontExtraLarge => 24.scale;
+
+  /// adaptive size of 28
+  static double get fontExtraDoubleLarge => 28.scale;
 
   /// adaptive size of 32
   static double get fontUltraLarge => 32.scale;
@@ -46,17 +52,29 @@ sealed class Dimens {
   /// adaptive size of 20
   static double get iconMedSmall => 20.scale;
 
+  /// adaptive size of 22
+  static double get iconMedium => 22.scale;
+
   /// adaptive size of 24
   static double get iconDefault => 24.scale;
 
   /// adaptive size of 28
-  static double get iconMedium => 28.scale;
+  static double get iconXXLarge => 28.scale;
 
   /// adaptive size of 32
-  static double get iconLarge => 32.scale;
+  static double get iconXLarge => 32.scale;
+
+  /// adaptive size of 36
+  static double get iconLarge => 36.scale;
 
   /// adaptive size of 40
   static double get iconExtraLarge => 40.scale;
+
+  /// adaptive size of 48
+  static double get iconUltraLarge => 48.scale;
+
+  /// adaptive size of 55
+  static double get iconTileLarge => 55.scale;
 
   /// size of 2
   static const double sizeMini = 2;

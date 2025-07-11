@@ -39,7 +39,7 @@ class HomeScreen extends StatelessWidget {
                       Text(StringRes.homeSubtitle,
                           style: TextStyle(
                               color: scheme.textColorLight,
-                              fontSize: Dimens.fontDefault)),
+                              fontSize: Dimens.fontXXXLarge)),
                     ],
                   )),
               actions: [
@@ -110,40 +110,41 @@ class HomeScreen extends StatelessWidget {
             ),
             const SliverSizedBox(height: Dimens.sizeLarge),
             SliverGridWidget(
-                title: StringRes.newReleases,
-                child: BlocBuilder<HomeBloc, HomeState>(
-                  buildWhen: (pr, cr) {
-                    final albums = pr.albums != cr.albums;
-                    final loading = pr.albumLoading != cr.albumLoading;
-                    return albums || loading;
-                  },
-                  builder: (context, state) {
-                    if (state.recentLoading) return const AlbumShimmer();
+              title: StringRes.newReleases,
+              child: BlocBuilder<HomeBloc, HomeState>(
+                buildWhen: (pr, cr) {
+                  final albums = pr.albums != cr.albums;
+                  final loading = pr.albumLoading != cr.albumLoading;
+                  return albums || loading;
+                },
+                builder: (context, state) {
+                  if (state.recentLoading) return const AlbumShimmer();
 
-                    return GridView.builder(
-                        padding: Utils.insetsHoriz(Dimens.sizeDefault),
-                        scrollDirection: Axis.horizontal,
-                        gridDelegate: Utils.fixedCrossAxis(1,
-                            aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                        itemCount: state.albums.length,
-                        itemBuilder: (context, index) {
-                          final item = state.albums[index];
+                  return GridView.builder(
+                      padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                      scrollDirection: Axis.horizontal,
+                      gridDelegate: Utils.fixedCrossAxis(1,
+                          aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
+                      itemCount: state.albums.length,
+                      itemBuilder: (context, index) {
+                        final item = state.albums[index];
 
-                          return HomeAlbumTile(
-                            onTap: () {
-                              context.pushNamed(AppRoutes.musicGroup,
-                                  pathParameters: {
-                                    'id': item.id!,
-                                    'type': item.type!.name
-                                  });
-                            },
-                            image: item.image,
-                            title: item.name,
-                            subtitle: item.artists?.asString,
-                          );
-                        });
-                  },
-                )),
+                        return HomeAlbumTile(
+                          onTap: () {
+                            context.pushNamed(AppRoutes.musicGroup,
+                                pathParameters: {
+                                  'id': item.id!,
+                                  'type': item.type!.name
+                                });
+                          },
+                          image: item.image,
+                          title: item.name,
+                          subtitle: item.artists?.asString,
+                        );
+                      });
+                },
+              ),
+            ),
             SliverSizedBox(height: context.height * .15),
           ],
         ));
@@ -168,7 +169,7 @@ class SliverGridWidget extends StatelessWidget {
               child: Text(title!,
                   style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: Dimens.fontLarge,
+                    fontSize: Dimens.fontXXLarge,
                   )),
             ),
           const SizedBox(height: Dimens.sizeSmall),
@@ -209,14 +210,14 @@ class HomeAlbumTile extends StatelessWidget {
                   title ?? '',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: Dimens.fontDefault,
+                      fontSize: Dimens.fontXXXLarge - 1,
                       fontWeight: FontWeight.bold),
                 ),
                 Text(
                   subtitle ?? '',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: Dimens.fontDefault - 1,
+                      fontSize: Dimens.fontDefault,
                       color: scheme.textColorLight),
                 )
               ],
