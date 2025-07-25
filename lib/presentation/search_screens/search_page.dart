@@ -1,17 +1,9 @@
 import 'package:ampify/buisness_logic/search_bloc/search_bloc.dart';
-import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/string.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
 import 'package:ampify/presentation/track_widgets/track_tile.dart';
-import 'package:ampify/presentation/widgets/base_widget.dart';
-import 'package:ampify/presentation/widgets/my_text_field_widget.dart';
-import 'package:ampify/presentation/widgets/shimmer_widget.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/utils/image_resources.dart';
-import '../widgets/top_widgets.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
@@ -86,10 +78,7 @@ class SearchPage extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = state.results![index];
 
-                    if (item.type == LibItemType.track) {
-                      return TrackTile(item.toTrack());
-                    }
-
+                    if (item.type.isTrack) return TrackTile(item.asTrack);
                     return MusicGroupTile(item,
                         imageHeight: Dimens.iconExtraLarge);
                   },

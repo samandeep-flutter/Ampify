@@ -3,13 +3,12 @@ import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/player_bloc/player_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import '../../buisness_logic/root_bloc/root_bloc.dart';
 import '../../buisness_logic/search_bloc/search_bloc.dart';
 import 'player_screens/player_compact.dart';
-import '../../data/utils/dimens.dart';
 
 class RootView extends StatefulWidget {
   final Widget tabBar;

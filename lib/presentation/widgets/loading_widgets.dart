@@ -1,7 +1,5 @@
-import 'package:ampify/data/utils/utils.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
-import '../../data/utils/dimens.dart';
-import '../../services/theme_services.dart';
 
 class LoadingButton extends StatelessWidget {
   final Widget child;
@@ -68,7 +66,7 @@ class LoadingButton extends StatelessWidget {
 
 class LoadingIcon extends StatelessWidget {
   final Widget icon;
-  final bool loading;
+  final bool? loading;
   final double? iconSize;
   final double? loaderSize;
   final Widget? selectedIcon;
@@ -78,7 +76,7 @@ class LoadingIcon extends StatelessWidget {
   const LoadingIcon({
     super.key,
     required this.icon,
-    required this.loading,
+    this.loading,
     required this.onPressed,
     this.iconSize,
     this.loaderSize,
@@ -102,7 +100,7 @@ class LoadingIcon extends StatelessWidget {
       onPressed: onPressed,
       iconSize: iconSize ?? Dimens.iconDefault,
       icon: Builder(builder: (context) {
-        if (!loading) return icon;
+        if (!(loading ?? false)) return icon;
         return Container(
           height: loaderSize,
           width: loaderSize,

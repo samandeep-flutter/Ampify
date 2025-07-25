@@ -1,16 +1,7 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/config/routes/app_routes.dart';
-import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/loading_widgets.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../buisness_logic/root_bloc/addto_playlist_bloc.dart';
 
 class AddtoPlaylistSheet extends StatefulWidget {
@@ -39,9 +30,8 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
             final playlists = state.items.where((e) {
-              final isPlaylist = e.type == LibItemType.playlist;
               final myPlaylists = e.owner?.id == bloc.box.profile!.id;
-              return isPlaylist && myPlaylists;
+              return e.type.isPlaylist && myPlaylists;
             }).toList();
             return Column(
               children: [

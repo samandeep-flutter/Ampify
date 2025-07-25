@@ -1,12 +1,7 @@
 import 'dart:ui';
 import 'package:ampify/data/repositories/library_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/services/box_services.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/config/firebase_options.dart';
-import 'package:ampify/config/routes/app_pages.dart';
-import 'package:ampify/services/responsive_font.dart';
 import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -25,9 +20,6 @@ import 'buisness_logic/player_bloc/player_bloc.dart';
 import 'buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'buisness_logic/root_bloc/root_bloc.dart';
 import 'buisness_logic/search_bloc/search_bloc.dart';
-import 'services/notification_services.dart';
-import 'services/getit_instance.dart';
-import 'services/theme_services.dart';
 
 void main() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();

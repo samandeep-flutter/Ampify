@@ -1,10 +1,6 @@
-import 'package:ampify/data/utils/dimens.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
-import '../../data/utils/app_constants.dart';
-import '../../data/utils/image_resources.dart';
-import 'shimmer_widget.dart';
 
 class MyCachedImage extends StatefulWidget {
   final String? image;

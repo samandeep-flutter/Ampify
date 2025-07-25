@@ -1,18 +1,11 @@
 import 'dart:math';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
-import 'package:ampify/data/utils/image_resources.dart';
-import 'package:ampify/services/extension_services.dart';
-import 'package:ampify/data/utils/dimens.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
 import '../../track_widgets/track_bottom_sheet.dart';
-import '../../widgets/loading_widgets.dart';
 import 'queue_view.dart';
 
 class PlayerScreen extends StatelessWidget {
@@ -44,8 +37,10 @@ class PlayerScreen extends StatelessWidget {
                         context: context,
                         showDragHandle: true,
                         useRootNavigator: true,
-                        builder: (_) => TrackBottomSheet(state.track.toTrack(),
-                            liked: state.liked));
+                        builder: (_) {
+                          return TrackBottomSheet(state.track.asTrack,
+                              liked: state.liked);
+                        });
                   },
                   iconSize: Dimens.iconDefault,
                   icon: const Icon(Icons.more_vert),
@@ -241,7 +236,7 @@ class PlayerScreen extends StatelessWidget {
                               iconSize: Dimens.iconExtraLarge,
                               loaderSize: Dimens.iconExtraLarge,
                               loading: state.playerState.isLoading,
-                              isSelected: state.playerState.isLoading,
+                              isSelected: state.playerState.isPlaying,
                               selectedIcon: const Icon(Icons.pause),
                               style: IconButton.styleFrom(
                                   backgroundColor: scheme.textColor,

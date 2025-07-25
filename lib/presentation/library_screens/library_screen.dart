@@ -1,19 +1,9 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/image_resources.dart';
-import 'package:ampify/data/utils/utils.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
-import 'package:ampify/presentation/widgets/my_alert_dialog.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
-import '../widgets/base_widget.dart';
-import '../widgets/shimmer_widget.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -32,32 +22,38 @@ class _LibraryScreenState extends State<LibraryScreen>
     return BaseWidget(
       appBar: AppBar(
         backgroundColor: scheme.background,
-        leading: Container(
-          margin: EdgeInsets.only(left: Dimens.sizeSmall),
-          decoration: bloc.box.profile?.product == 'premium'
-              ? const BoxDecoration(
-                  gradient: SweepGradient(
-                    colors: [
-                      Color(0xFF6A2E8B),
-                      Color(0xFF5271FF),
-                      Color(0xFF00C2FF),
-                      Color(0xFF2D3A68),
-                      Color(0xFF7EC8FF),
-                      Color(0xFFFFB84D),
-                      Color(0xFF833AB4),
-                    ],
-                  ),
-                  borderRadius:
-                      BorderRadius.all(Radius.circular(Dimens.borderLarge)),
-                )
-              : null,
-          child: MyAvatar(
-            bloc.box.profile?.image,
-            isAvatar: true,
-            padding: EdgeInsets.all(Dimens.sizeExtraSmall),
-            onTap: () => context.pushNamed(AppRoutes.profile),
-            avatarRadius: Dimens.iconMedSmall,
-          ),
+        leadingWidth: (Dimens.iconMedSmall * 2) + Dimens.sizeDefault,
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(width: Dimens.sizeSmall),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: bloc.box.profile?.product == 'premium'
+                    ? SweepGradient(
+                        colors: [
+                          Color(0xFF6A2E8B),
+                          Color(0xFF5271FF),
+                          Color(0xFF00C2FF),
+                          Color(0xFF2D3A68),
+                          Color(0xFF7EC8FF),
+                          Color(0xFFFFB84D),
+                          Color(0xFF833AB4),
+                        ],
+                      )
+                    : null,
+                borderRadius:
+                    BorderRadius.all(Radius.circular(Dimens.borderLarge)),
+              ),
+              child: MyAvatar(
+                bloc.box.profile?.image,
+                isAvatar: true,
+                padding: EdgeInsets.all(Dimens.sizeExtraSmall),
+                onTap: () => context.pushNamed(AppRoutes.profile),
+                avatarRadius: Dimens.iconMedSmall,
+              ),
+            ),
+          ],
         ),
         title: const Text(StringRes.myLibrary),
         titleTextStyle: Utils.defTitleStyle(context),
@@ -67,11 +63,10 @@ class _LibraryScreenState extends State<LibraryScreen>
           child: BlocBuilder<LibraryBloc, LibraryState>(
             buildWhen: (pr, cr) => pr.filterSel != cr.filterSel,
             builder: (context, state) {
-              final items = [LibItemType.playlist, LibItemType.album];
               return Row(
                 children: [
                   const SizedBox(width: Dimens.sizeDefault),
-                  ...items.map((e) {
+                  ...[LibItemType.playlist, LibItemType.album].map((e) {
                     return Padding(
                       padding: const EdgeInsets.only(right: Dimens.sizeSmall),
                       child: TextButton(

@@ -26,6 +26,7 @@ sealed class StringRes {
   static const String themeMode = 'Theme Mode';
   static const String followers = 'Followers';
   static const String sortBy = 'Sort by';
+  static const String clear = 'Clear';
   static const String commingSoon = 'Comming Soon';
   static const String newReleases = 'New Releases for you';
   static const String recentlyPlayed = 'Recently played';
@@ -39,6 +40,7 @@ sealed class StringRes {
   static const String nowPlaying = 'Now Playing';
   static const String nextQueue = 'Next in Queue';
   static const String clearQueue = 'Clear Queue';
+  static const String upNext = 'Up Next';
   static const String queueTitle = 'Playing from play queue';
   static const String myLibrary = 'My Library';
   static const String editCover = 'Edit Cover';

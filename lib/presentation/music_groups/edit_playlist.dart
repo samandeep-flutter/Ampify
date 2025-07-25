@@ -1,16 +1,8 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/base_widget.dart';
-import 'package:ampify/presentation/widgets/loading_widgets.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../config/routes/app_routes.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
 
 class EditPlaylistScreen extends StatefulWidget {
   final String id;

@@ -1,10 +1,5 @@
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
-import '../../services/theme_services.dart';
-import 'my_cached_image.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class MyDivider extends StatelessWidget {
   final double? width;

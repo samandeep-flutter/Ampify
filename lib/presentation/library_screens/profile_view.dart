@@ -1,15 +1,5 @@
-import 'package:ampify/services/auth_services.dart';
-import 'package:ampify/services/box_services.dart';
-import 'package:ampify/services/extension_services.dart';
-import 'package:ampify/services/getit_instance.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/base_widget.dart';
-import 'package:ampify/presentation/widgets/my_alert_dialog.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});

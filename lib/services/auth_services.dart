@@ -1,12 +1,8 @@
 import 'dart:io';
 import 'package:ampify/data/repositories/auth_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/config/routes/app_routes.dart';
-import 'package:ampify/services/box_services.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class AuthServices {
   AuthServices._init();

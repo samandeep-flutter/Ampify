@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/box_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/data/repositories/library_repo.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/services/getit_instance.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -183,8 +180,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final alCompleter = Completer<bool>();
     List<LibraryModel> items = state.items;
 
-    final plOffset = _libItems.where((e) => e.type == LibItemType.playlist);
-    final alOffset = _libItems.where((e) => e.type != LibItemType.playlist);
+    final plOffset = _libItems.where((e) => e.type.isPlaylist);
+    final alOffset = _libItems.where((e) => !e.type.isPlaylist);
 
     try {
       if (plOffset.length < state.playlistCount) {

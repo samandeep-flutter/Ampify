@@ -1,7 +1,6 @@
 import 'package:ampify/data/data_provider/api_response.dart';
 import 'package:ampify/data/data_provider/dio_client.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class HomeRepo {
   final DioClient dio;

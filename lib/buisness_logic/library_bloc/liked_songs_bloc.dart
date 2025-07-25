@@ -1,7 +1,6 @@
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/repositories/library_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -104,10 +103,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
     player.add(MusicGroupPlayed(
-      id: UniqueIds.likedSongs,
-      tracks: state.tracks,
-      liked: true,
-    ));
+        id: UniqueIds.likedSongs, tracks: state.tracks, liked: true));
   }
 
   void _titleFadeListener() {

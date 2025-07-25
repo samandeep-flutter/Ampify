@@ -1,17 +1,8 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/config/routes/app_routes.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/image_resources.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/presentation/widgets/shimmer_widget.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import '../../buisness_logic/player_bloc/player_slider_bloc.dart';
 

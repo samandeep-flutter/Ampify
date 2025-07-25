@@ -1,6 +1,8 @@
 import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 class Track extends Equatable {
   final Album? album;
@@ -66,6 +68,16 @@ class Track extends Equatable {
         'uri': uri,
       };
 
+  TrackDetails get asTrackDetails {
+    return TrackDetails.track(
+      id: id,
+      title: name,
+      albumId: album?.id,
+      image: album?.image,
+      subtitle: artists?.asString,
+    );
+  }
+
   @override
   List<Object?> get props => [
         album,
@@ -80,5 +92,99 @@ class Track extends Equatable {
         trackNumber,
         type,
         uri,
+      ];
+}
+
+class TrackDetails extends Equatable {
+  final String? id;
+  final String? videoId;
+  final String? albumId;
+  final Duration? duration;
+  final String? image;
+  final String? title;
+  final String? subtitle;
+  final Color? bgColor;
+  final Color? darkBgColor;
+
+  const TrackDetails({
+    required this.id,
+    required this.videoId,
+    required this.albumId,
+    required this.duration,
+    required this.image,
+    required this.title,
+    required this.subtitle,
+    required this.bgColor,
+    required this.darkBgColor,
+  });
+
+  const TrackDetails.init()
+      : id = null,
+        videoId = null,
+        duration = null,
+        albumId = null,
+        image = null,
+        title = null,
+        subtitle = null,
+        darkBgColor = null,
+        bgColor = null;
+  const TrackDetails.track({
+    required this.id,
+    required this.albumId,
+    required this.image,
+    required this.title,
+    required this.subtitle,
+  })  : videoId = null,
+        duration = null,
+        darkBgColor = null,
+        bgColor = null;
+
+  TrackDetails copyWith({
+    String? id,
+    String? videoId,
+    String? uri,
+    String? albumId,
+    String? image,
+    String? title,
+    Duration? duration,
+    String? subtitle,
+    Color? bgColor,
+    Color? darkBgColor,
+  }) {
+    return TrackDetails(
+      id: id ?? this.id,
+      videoId: videoId ?? this.videoId,
+      albumId: albumId ?? this.albumId,
+      duration: duration ?? this.duration,
+      image: image ?? this.image,
+      title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      bgColor: bgColor ?? this.bgColor,
+      darkBgColor: darkBgColor ?? this.darkBgColor,
+    );
+  }
+
+  Track get asTrack {
+    return Track(
+        id: id,
+        name: title,
+        durationMs: duration?.inMilliseconds,
+        album: Album(id: albumId, image: image),
+        artists: subtitle?.split(',').map((e) {
+          return Artist(name: e);
+        }).toList());
+  }
+
+  @override
+  List<Object?> get props => [
+        id,
+        videoId,
+        albumId,
+        duration,
+        image,
+        title,
+        subtitle,
+        bgColor,
+        darkBgColor
       ];
 }

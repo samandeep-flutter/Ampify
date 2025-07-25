@@ -1,20 +1,11 @@
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/image_resources.dart';
 import 'package:ampify/presentation/track_widgets/track_tile.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/presentation/widgets/shimmer_widget.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
+import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/root_bloc/music_group_bloc.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/utils.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../widgets/loading_widgets.dart';
 import 'playlist_bottom_sheet.dart';
 
 class MusicGroupScreen extends StatefulWidget {
@@ -47,7 +38,6 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
         builder: (context, state) {
           final fgColor = state.bgColor?.withAlpha(30) ?? scheme.backgroundDark;
           final date = state.details?.releaseDate;
-          final isPlaylist = state.type == LibItemType.playlist;
 
           if (state.loading) return const MusicGroupShimmer();
 
@@ -128,13 +118,13 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Container(
-                            padding: state.type == LibItemType.playlist
+                            padding: state.type.isPlaylist
                                 ? const EdgeInsets.symmetric(
                                     vertical: Dimens.sizeExtraSmall,
                                     horizontal: Dimens.sizeDefault,
                                   )
                                 : EdgeInsets.zero,
-                            decoration: state.type == LibItemType.playlist
+                            decoration: state.type.isPlaylist
                                 ? BoxDecoration(
                                     border: Border.all(
                                       color: state.bgColor ?? scheme.disabled,
@@ -173,7 +163,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                         color: scheme.textColor,
                                       ),
                                       children: [
-                                        if (isPlaylist)
+                                        if (state.type.isPlaylist)
                                           const TextSpan(text: 'by '),
                                         TextSpan(
                                             text: state.details?.owner?.name),
@@ -181,7 +171,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                     ),
                                   ),
                                 ),
-                                if (!isPlaylist) ...[
+                                if (!state.type.isPlaylist) ...[
                                   PaginationDots(
                                     current: true,
                                     margin: Dimens.sizeSmall,
@@ -199,7 +189,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                               ],
                             ),
                           ),
-                          if (isPlaylist)
+                          if (state.type.isPlaylist)
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -304,13 +294,11 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           BlocBuilder<PlayerBloc, PlayerState>(
                             builder: (context, pl) {
                               final group = pl.musicGroupId == state.id;
-                              final loading = pl.playerState.isLoading;
                               return LoadingIcon(
                                 onPressed: () => bloc.onPlay(context),
                                 iconSize: Dimens.iconXLarge,
                                 loaderSize: Dimens.iconXLarge,
-                                loading: group && loading,
-                                isSelected: group,
+                                isSelected: group && pl.playerState.isPlaying,
                                 selectedIcon: const Icon(Icons.pause),
                                 style: IconButton.styleFrom(
                                   backgroundColor: scheme.textColor,
@@ -338,7 +326,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                 itemCount: state.tracks.length,
                 itemBuilder: (context, index) {
                   final track = state.tracks[index];
-                  return TrackTile(track, showImage: isPlaylist);
+                  return TrackTile(track, showImage: state.type.isPlaylist);
                 },
               ),
               const SliverSizedBox(height: Dimens.sizeLarge),
@@ -369,7 +357,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   ),
                 ),
               const SliverSizedBox(height: Dimens.sizeSmall),
-              if (!isPlaylist)
+              if (!state.type.isPlaylist)
                 SliverToBoxAdapter(
                   child: Builder(
                     builder: (context) {

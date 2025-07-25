@@ -27,6 +27,15 @@ extension MyMusicState on MusicState? {
   bool get isLoading => this == MusicState.loading;
 }
 
+extension MyLibItem on LibItemType? {
+  bool get isPlaylist => this == LibItemType.playlist;
+  bool get isTrack => this == LibItemType.track;
+  // bool get isAlbum =>
+  //     this == LibItemType.album ||
+  //     this == LibItemType.compilation ||
+  //     this == LibItemType.single;
+}
+
 extension ArtistNames on List<Artist> {
   String get asString => _toString(this);
 

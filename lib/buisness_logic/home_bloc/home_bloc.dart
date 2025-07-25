@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'package:ampify/services/notification_services.dart';
 import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/playlist_model.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/data_models/search_model.dart';
 import 'package:ampify/data/repositories/home_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

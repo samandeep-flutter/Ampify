@@ -66,7 +66,7 @@ class LibraryModel extends Equatable {
     );
   }
 
-  Track toTrack() {
+  Track get asTrack {
     final artists = owner?.name?.split(',') ?? [];
     return Track(
       id: id,

@@ -1,7 +1,5 @@
 import 'package:ampify/data/repositories/music_group_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/box_services.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/data_models/profile_model.dart';
@@ -107,7 +105,8 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
     } catch (_) {}
   }
 
-  Future<void> _onAdded(PlaylistSelected event, Emitter<AddtoPlaylistState> emit) async {
+  Future<void> _onAdded(
+      PlaylistSelected event, Emitter<AddtoPlaylistState> emit) async {
     List<String> list = List<String>.from(state.playlists);
     if (list.contains(event.id)) {
       list.remove(event.id);

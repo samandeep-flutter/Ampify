@@ -1,5 +1,4 @@
-import 'package:ampify/data/data_models/common/album_model.dart';
-import 'package:ampify/data/data_models/common/artist_model.dart';
+import 'dart:convert';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
@@ -85,69 +84,21 @@ class PlayerState extends Equatable {
         durationLoading,
         playerState
       ];
-}
 
-class TrackDetails extends Equatable {
-  final String? id;
-  final String? albumId;
-  final String? image;
-  final String? title;
-  final String? subtitle;
-  final Color? bgColor;
-  final Color? darkBgColor;
-
-  const TrackDetails({
-    required this.id,
-    required this.albumId,
-    required this.image,
-    required this.title,
-    required this.subtitle,
-    required this.bgColor,
-    required this.darkBgColor,
-  });
-
-  const TrackDetails.init()
-      : id = null,
-        albumId = null,
-        image = null,
-        title = null,
-        subtitle = null,
-        darkBgColor = null,
-        bgColor = null;
-
-  TrackDetails copyWith({
-    String? id,
-    String? uri,
-    String? albumId,
-    String? image,
-    String? title,
-    String? subtitle,
-    Color? bgColor,
-    Color? darkBgColor,
-  }) {
-    return TrackDetails(
-      id: id ?? this.id,
-      albumId: albumId ?? this.albumId,
-      image: image ?? this.image,
-      title: title ?? this.title,
-      subtitle: subtitle ?? this.subtitle,
-      bgColor: bgColor ?? this.bgColor,
-      darkBgColor: darkBgColor ?? this.darkBgColor,
-    );
-  }
-
-  Track toTrack() {
-    return Track(
-        id: id,
-        name: title,
-        album: Album(id: albumId, image: image),
-        artists: subtitle?.split(',').map((e) {
-          return Artist(name: e);
-        }).toList());
-  }
-
-  @override
-  List<Object?> get props => [id, image, title, subtitle, bgColor, darkBgColor];
+  // @override
+  // String toString() {
+  //   return '''{
+  //     'musicGroupId': $musicGroupId,
+  //     'track': ${track.title} ${track.id},
+  //     'length': $length,
+  //     'shuffle': $shuffle,
+  //     'loopMode': ${loopMode.name},
+  //     'liked': $liked,
+  //     'queue': ${queue.length},
+  //     'upNext': ${upNext.length},
+  //     'playerState': ${playerState?.name},
+  //   }''';
+  // }
 }
 
 enum MusicState { playing, pause, loading }
