@@ -175,6 +175,33 @@ class TrackDetails extends Equatable {
         }).toList());
   }
 
+  factory TrackDetails.fromJson(Map<String, dynamic> json) {
+    final duration = Duration(seconds: json['duration'] ?? 0);
+    return TrackDetails(
+      id: json['id'],
+      videoId: json['videoId'],
+      albumId: json['albumId'],
+      duration: duration.inSeconds > 0 ? duration : null,
+      image: json['image'],
+      title: json['title'],
+      subtitle: json['subtitle'],
+      bgColor: Color(json['bgColor']),
+      darkBgColor: Color(json['darkBgColor']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'videoId': videoId,
+        'albumId': albumId,
+        'image': image,
+        'title': title,
+        'subtitle': subtitle,
+        'duration': duration?.inSeconds,
+        'bgColor': bgColor?.toARGB32(),
+        'darkBgColor': darkBgColor?.toARGB32(),
+      };
+
   @override
   List<Object?> get props => [
         id,

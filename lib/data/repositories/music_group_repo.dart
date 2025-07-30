@@ -1,14 +1,14 @@
-import 'package:ampify/services/box_services.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import '../data_provider/api_response.dart';
 import '../data_provider/dio_client.dart';
-import '../utils/app_constants.dart';
 
 class MusicGroupRepo {
   final DioClient dio;
   const MusicGroupRepo({required this.dio});
 
+  @protected
   static final _box = BoxServices.instance;
 
   Future<bool> isFavPlaylist(String id) async {

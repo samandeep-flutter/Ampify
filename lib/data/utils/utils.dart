@@ -1,15 +1,18 @@
+import 'dart:async';
+
 import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/repositories/music_repo.dart';
+import 'package:ampify/data/utils/exports.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
-import '../../buisness_logic/player_bloc/player_state.dart';
 import '../data_models/common/tracks_model.dart';
 
 sealed class Utils {
+  @protected
+  static final MusicRepo _repo = getIt();
+
   static TextStyle defTitleStyle(BuildContext context) {
     return TextStyle(
         fontSize: Dimens.fontLarge,
@@ -48,21 +51,29 @@ sealed class Utils {
   }
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
+    final _details = Completer<SongYtDetails?>();
+    final artist = track.artists?.asString.split(',').first;
+    _repo.getDetailsFromQuery('${track.name} $artist').then((details) {
+      _details.complete(details);
+    });
     final palete = await PaletteGenerator.fromImageProvider(
         NetworkImage(track.album?.image ?? ''),
-        size: const Size(200, 200));
+        size: const Size.square(200));
+
+    final details = await _details.future;
     final color = palete.lightVibrantColor?.color;
     final darkColor = palete.darkVibrantColor?.color;
 
     return TrackDetails(
       id: track.id,
-      videoId: null,
       albumId: track.album?.id,
       title: track.name,
       bgColor: color,
       darkBgColor: darkColor,
       image: track.album?.image,
       subtitle: track.artists?.asString,
+      duration: details?.duration,
+      videoId: details?.videoId,
     );
   }
 
@@ -84,6 +95,18 @@ sealed class Utils {
       type: LibItemType.playlist,
       name: StringRes.likedSongs,
       owner: OwnerModel(name: '$count songs'),
+    );
+  }
+
+  static MediaItem toMediaItem(TrackDetails track, {Uri? uri}) {
+    return MediaItem(
+      id: track.id ?? '',
+      album: track.albumId ?? '',
+      duration: track.duration,
+      artist: track.subtitle ?? '',
+      artUri: Uri.tryParse(track.image ?? ''),
+      title: track.title ?? '',
+      extras: {'uri': uri, ...track.toJson()},
     );
   }
 

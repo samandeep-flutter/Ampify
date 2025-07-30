@@ -21,6 +21,7 @@ class RootView extends StatefulWidget {
 class _RootViewState extends State<RootView> {
   @override
   void initState() {
+    context.read<RootBloc>().add(RootInitial());
     context.read<PlayerBloc>().add(PlayerInitial());
     context.read<SearchBloc>().add(SearchInitial());
     context.read<HomeBloc>().add(HomeInitial());
@@ -46,14 +47,14 @@ class _RootViewState extends State<RootView> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              BlocBuilder<PlayerBloc, PlayerState>(
-                  buildWhen: (pr, cr) => pr.showPlayer != cr.showPlayer,
-                  builder: (context, state) {
-                    return AnimatedSlide(
-                        duration: Durations.medium2,
-                        offset: Offset(0, state.showPlayer ?? false ? 0.05 : 2),
-                        child: PlayerCompact());
-                  }),
+              BlocBuilder<PlayerBloc, PlayerState>(buildWhen: (pr, cr) {
+                return pr.playerState.isHidden != cr.playerState.isHidden;
+              }, builder: (context, state) {
+                return AnimatedSlide(
+                    duration: Durations.medium2,
+                    offset: Offset(0, state.playerState.isHidden ? 2 : .05),
+                    child: PlayerCompact());
+              }),
               DecoratedBox(
                 decoration: BoxDecoration(
                     gradient: LinearGradient(

@@ -1,5 +1,7 @@
+import 'package:ampify/buisness_logic/root_bloc/root_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -27,46 +29,61 @@ class _ProfileViewState extends State<ProfileView>
           const SizedBox(height: Dimens.sizeDefault),
           Row(
             children: [
-              MyCachedImage(box.profile?.image,
-                  isAvatar: true, avatarRadius: context.width * .1),
+              BlocBuilder<RootBloc, RootState>(
+                  buildWhen: (pr, cr) => pr.profile != cr.profile,
+                  builder: (context, state) {
+                    return MyCachedImage(state.profile?.image,
+                        isAvatar: true, avatarRadius: context.width * .1);
+                  }),
               const SizedBox(width: Dimens.sizeLarge),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Text(
-                        box.profile?.displayName ?? '',
-                        style: TextStyle(
-                          color: scheme.textColor,
-                          fontSize: Dimens.fontXXLarge,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      BlocBuilder<RootBloc, RootState>(
+                          buildWhen: (pr, cr) => pr.profile != cr.profile,
+                          builder: (context, state) {
+                            return Text(
+                              state.profile?.displayName ?? '',
+                              style: TextStyle(
+                                color: scheme.textColor,
+                                fontSize: Dimens.fontXXLarge,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }),
                       const SizedBox(width: Dimens.sizeSmall),
-                      Builder(builder: (context) {
-                        final tier = box.profile?.product;
-                        return Container(
-                          padding: Utils.insetsHoriz(Dimens.sizeSmall),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.borderLarge),
-                              color: tier == 'premium'
-                                  ? Colors.amber
-                                  : scheme.backgroundDark),
-                          child: Text(tier?.toUpperCase() ?? '',
-                              style: TextStyle(fontSize: Dimens.fontDefault)),
-                        );
-                      })
+                      BlocBuilder<RootBloc, RootState>(
+                          buildWhen: (pr, cr) => pr.profile != cr.profile,
+                          builder: (context, state) {
+                            final tier = state.profile?.product;
+                            return Container(
+                              padding: Utils.insetsHoriz(Dimens.sizeSmall),
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.circular(Dimens.borderLarge),
+                                  color: tier == 'premium'
+                                      ? Colors.amber
+                                      : scheme.backgroundDark),
+                              child: Text(tier?.toUpperCase() ?? '',
+                                  style:
+                                      TextStyle(fontSize: Dimens.fontDefault)),
+                            );
+                          })
                     ],
                   ),
-                  Text(
-                    '${box.profile?.followers ?? ''} ${StringRes.followers}',
-                    style: TextStyle(
-                        color: scheme.textColorLight,
-                        fontSize: Dimens.fontDefault,
-                        fontWeight: FontWeight.w500),
-                  ),
+                  BlocBuilder<RootBloc, RootState>(
+                      buildWhen: (pr, cr) => pr.profile != cr.profile,
+                      builder: (context, state) {
+                        return Text(
+                          '${state.profile?.followers ?? ''} ${StringRes.followers}',
+                          style: TextStyle(
+                              color: scheme.textColorLight,
+                              fontSize: Dimens.fontDefault,
+                              fontWeight: FontWeight.w500),
+                        );
+                      }),
                 ],
               )
             ],

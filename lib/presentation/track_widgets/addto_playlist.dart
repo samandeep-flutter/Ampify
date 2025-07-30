@@ -30,7 +30,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
             final playlists = state.items.where((e) {
-              final myPlaylists = e.owner?.id == bloc.box.profile!.id;
+              final myPlaylists = e.owner?.id == bloc.box.uid!;
               return e.type.isPlaylist && myPlaylists;
             }).toList();
             return Column(
@@ -50,7 +50,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                     ElevatedButton.icon(
                       onPressed: () {
                         Navigator.pop(context);
-                        final id = bloc.box.profile!.id!;
+                        final id = bloc.box.uid!;
                         context.pushNamed(AppRoutes.createPlaylist,
                             pathParameters: {'userId': id});
                       },

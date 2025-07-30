@@ -1,33 +1,39 @@
-import 'package:ampify/services/box_services.dart';
-import 'package:ampify/services/extension_services.dart';
+// ignore_for_file: library_private_types_in_public_api
+
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 
 class _Themes extends InheritedWidget {
-  final ThemeServiceState data;
+  final _ThemeServiceState data;
   const _Themes({required super.child, required this.data});
 
   @override
-  bool updateShouldNotify(covariant _Themes oldWidget) => true;
+  bool updateShouldNotify(_Themes oldWidget) => true;
 }
 
 class ThemeServices extends StatefulWidget {
   final Widget child;
   const ThemeServices({super.key, required this.child});
 
-  static ThemeServiceState? maybeOf(BuildContext context) {
+  static _ThemeServiceState? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<_Themes>()?.data;
   }
 
-  static ThemeServiceState of(BuildContext context) {
+  static _ThemeServiceState of(BuildContext context) {
     assert(maybeOf(context) != null);
     return maybeOf(context)!;
   }
 
   @override
-  State<ThemeServices> createState() => ThemeServiceState();
+  State<ThemeServices> createState() => _ThemeServiceState();
 }
 
-class ThemeServiceState extends State<ThemeServices> {
+extension MyThemeState on BuildContext {
+  _ThemeServiceState get scheme => ThemeServices.of(this);
+}
+
+class _ThemeServiceState extends State<ThemeServices> {
+  @protected
   final _box = BoxServices.instance;
 
   late String _text;

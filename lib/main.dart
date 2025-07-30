@@ -54,9 +54,7 @@ Future<void> _initServices() async {
     final _box = BoxServices.instance;
     if (_box.read(BoxKeys.token) == null) return;
     final LibraryRepo _libRepo = getIt();
-    await _libRepo.getProfile(onSuccess: (json) {
-      _box.write(BoxKeys.profile, json);
-    });
+    await _libRepo.getProfile(onSuccess: (_) {});
   } catch (e) {
     logPrint(e, 'init');
   } finally {

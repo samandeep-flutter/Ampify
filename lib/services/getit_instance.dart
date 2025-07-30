@@ -20,7 +20,7 @@ Future<void> getInit() async {
   getIt.registerLazySingleton<AppLinks>(() => AppLinks());
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<YoutubeExplode>(() => YoutubeExplode());
-  getIt.registerLazySingletonAsync<AudioHandler>(audioServicesInit);
+  getIt.registerSingletonAsync<AudioHandler>(audioServicesInit);
   getIt.registerSingletonAsync<AuthServices>(AuthServices.to.init);
   getIt.registerLazySingleton<LoggingInterceptor>(() => LoggingInterceptor());
   getIt.registerLazySingleton<Dio>(() => Dio());

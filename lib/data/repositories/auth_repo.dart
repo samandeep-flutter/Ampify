@@ -1,17 +1,20 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import '../../services/box_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import '../data_provider/api_response.dart';
 import '../data_provider/dio_client.dart';
-import '../utils/app_constants.dart';
 
 class AuthRepo {
   final DioClient dio;
   const AuthRepo({required this.dio});
 
+  @protected
   static final _box = BoxServices.instance;
+
+  @protected
   final _scopes =
       'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read user-top-read ugc-image-upload';
 
@@ -56,7 +59,10 @@ class AuthRepo {
         onError: (e) => logPrint(e, 'token'));
   }
 
-  Future<void> refreshToken() async {
+  Future<void> refreshToken({
+    required Function(Map<String, dynamic> json) onSuccess,
+    required Function(Map<String, dynamic> error) onError,
+  }) async {
     final data = {
       'grant_type': 'refresh_token',
       'refresh_token': _box.read(BoxKeys.refreshToken),
@@ -68,11 +74,6 @@ class AuthRepo {
     };
     final response = await dio.post(AppConstants.token,
         data: data, options: Options(headers: header));
-    ApiResponse.verify(response, onSuccess: (json) {
-      dprint('refresh: ${json['access_token']}');
-      _box.write(BoxKeys.token, json['access_token']);
-    }, onError: (e) {
-      logPrint(e, 'token');
-    });
+    ApiResponse.verify(response, onSuccess: onSuccess, onError: onError);
   }
 }

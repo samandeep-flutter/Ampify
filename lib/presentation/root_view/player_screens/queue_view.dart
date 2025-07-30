@@ -1,15 +1,10 @@
 import 'dart:math';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/image_resources.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/presentation/widgets/base_widget.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
-import '../../widgets/loading_widgets.dart';
 import '../../track_widgets/track_tile.dart';
 
 class QueueView extends StatelessWidget {
@@ -26,6 +21,7 @@ class QueueView extends StatelessWidget {
         color: scheme.background,
         resizeBottom: false,
         appBar: AppBar(
+          scrolledUnderElevation: 0,
           backgroundColor: scheme.background,
           automaticallyImplyLeading: false,
           title: const Text(StringRes.queueTitle),
@@ -50,102 +46,107 @@ class QueueView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: Dimens.sizeDefault),
+            BlocListener<PlayerBloc, PlayerState>(
+              listener: (context, state) {
+                if (state.playerState.isHidden) Navigator.pop(context);
+              },
+              child: const SizedBox(height: Dimens.sizeDefault),
+            ),
             Padding(
               padding: EdgeInsets.only(left: Dimens.sizeDefault),
               child: Text(
-                  StringRes.nowPlaying,
-                  style: TextStyle(
+                StringRes.nowPlaying,
+                style: TextStyle(
                     fontWeight: FontWeight.bold, fontSize: Dimens.fontXXXLarge),
-                ),
+              ),
             ),
             BlocBuilder<PlayerBloc, PlayerState>(
               buildWhen: (pr, cr) => pr.track != cr.track,
-              builder: (_, state) {
-                return TrackDetailsTile(
-                  track: state.track,
-                  title: RichText(
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textScaler: MediaQuery.textScalerOf(context),
-                      text: TextSpan(
-                          style: TextStyle(
-                              color: scheme.primary,
-                              fontWeight: FontWeight.w500,
-                              fontSize: Dimens.fontXXXLarge),
-                          children: [
-                            WidgetSpan(
-                              child: SizedBox.square(
-                                  dimension: Dimens.iconMedSmall,
-                                  child: BlocBuilder<PlayerBloc, PlayerState>(
-                                      buildWhen: (pr, cr) =>
-                                          pr.playerState != cr.playerState,
-                                      builder: (_, state) {
-                                        if (state.playerState.isPlaying) {
-                                          return Image.asset(ImageRes.musicWave,
-                                              fit: BoxFit.cover,
-                                              color: scheme.primary);
-                                        }
-
-                                        return Image.asset(
-                                            ImageRes.musicWavePaused,
-                                            fit: BoxFit.cover,
-                                            color: scheme.primary);
-                                      })),
-                            ),
-                            const WidgetSpan(
-                                child: SizedBox(width: Dimens.sizeExtraSmall)),
-                            TextSpan(text: state.track.title ?? ''),
-                          ])),
-                );
-              },
+              builder: (_, state) => TrackDetailsTile.playing(state.track),
             ),
             Expanded(
               child: BlocBuilder<PlayerBloc, PlayerState>(
-                buildWhen: (pr, cr) => pr.queue != cr.queue,
+                buildWhen: (pr, cr) {
+                  final queue = pr.queue != cr.queue;
+                  final next = pr.upNext != cr.upNext;
+                  return queue || next;
+                },
                 builder: (context, state) {
-                  if (state.queue.isEmpty) return const SizedBox.shrink();
-
-                  return ListView(
-                    children: [
-                      Row(
-                        children: [
-                          const SizedBox(width: Dimens.sizeDefault),
-                          Text(
-                            StringRes.nextQueue,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: Dimens.fontXXXLarge),
+                  return CustomScrollView(
+                    slivers: [
+                      if (state.queue.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: Row(
+                            children: [
+                              const SizedBox(width: Dimens.sizeDefault),
+                              Text(
+                                StringRes.nextQueue,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: Dimens.fontXXXLarge),
+                              ),
+                              const Spacer(),
+                              TextButton(
+                                onPressed: bloc.clearQueue,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: scheme.disabled,
+                                  textStyle: TextStyle(
+                                      color: scheme.textColorLight,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                child: const Text(StringRes.clearQueue),
+                              ),
+                              const SizedBox(width: Dimens.sizeDefault),
+                            ],
                           ),
-                          const Spacer(),
-                          TextButton(
-                            onPressed: bloc.clearQueue,
-                            style: TextButton.styleFrom(
-                                foregroundColor: scheme.disabled,
-                                textStyle: TextStyle(
-                                    color: scheme.textColorLight,
-                                    fontWeight: FontWeight.bold)),
-                            child: const Text(StringRes.clearQueue),
-                          ),
-                          const SizedBox(width: Dimens.sizeDefault),
-                        ],
-                      ),
-                      ReorderableListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                          itemCount: state.queue.length,
-                          itemBuilder: (context, index) {
-                            final item = state.queue[index];
-                            return TrackDetailsTile(
-                              track: item,
-                              key: ValueKey(item.id),
-                              trailing: Icon(Icons.menu_outlined,
-                                  size: Dimens.iconMedSmall),
-                            );
-                          },
-                          onReorder: bloc.onQueueReorder,
                         ),
+                      SliverReorderableList(
+                        itemCount: state.queue.length,
+                        itemBuilder: (context, index) {
+                          final item = state.queue[index];
+                          return TrackDetailsTile(
+                            item,
+                            key: ValueKey(item.id),
+                            trailing: Icon(Icons.menu_outlined,
+                                size: Dimens.iconMedSmall),
+                          );
+                        },
+                        onReorder: bloc.onQueueReorder,
                       ),
+                      if (state.upNext.isNotEmpty)
+                        SliverToBoxAdapter(
+                          child: Row(
+                            children: [
+                              const SizedBox(width: Dimens.sizeDefault),
+                              Text(
+                                StringRes.upNext,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: Dimens.fontXXXLarge),
+                              ),
+                              const Spacer(),
+                              TextButton(
+                                onPressed: bloc.clearUpnext,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: scheme.disabled,
+                                  textStyle: TextStyle(
+                                      color: scheme.textColorLight,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                child: const Text(StringRes.clear),
+                              ),
+                              const SizedBox(width: Dimens.sizeDefault),
+                            ],
+                          ),
+                        ),
+                      SliverList.builder(
+                        itemCount: state.upNext.length,
+                        itemBuilder: (context, index) {
+                          final item = state.upNext[index];
+                          return TrackTile(item);
+                        },
+                      ),
+                      SliverSizedBox(height: context.height * .05)
                     ],
                   );
                 },
@@ -202,17 +203,12 @@ class _BottomPlayerState extends State<BottomPlayer> {
                         color: scheme.backgroundDark,
                         child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                             builder: (context, slider) {
-                          Duration duration = Duration.zero;
-                          double width = 0;
-                          if (state.length != 0) {
-                            duration = const Duration(seconds: 1);
-                            width = (slider.current / (state.length ?? 0)) *
-                                constraints.maxWidth;
-                          }
+                          final factor =
+                              slider.current.widthFactor(state.length);
                           return AnimatedContainer(
-                              duration: duration,
-                              color: scheme.primary,
-                              width: width);
+                              duration: slider.animate,
+                              width: factor * constraints.maxWidth,
+                              color: scheme.primary);
                         }),
                       ),
                     );

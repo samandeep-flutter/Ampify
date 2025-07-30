@@ -36,9 +36,9 @@ sealed class BoxKeys {
   static const String boxName = 'Ampify';
   static const String theme = 'theme';
   static const String themeMode = 'theme-mode';
+  static const String uid = 'uid';
   static const String token = 'token';
   static const String refreshToken = 'refresh-token';
-  static const String profile = 'profile';
 }
 
 sealed class EnvKeys {
@@ -49,6 +49,12 @@ sealed class EnvKeys {
 
 sealed class UniqueIds {
   static const String likedSongs = '00-liked-songs';
+}
+
+sealed class PlayerActions {
+  static const String clearQueue = 'clear-queue';
+  static const String removeRange = 'remove-range';
+  static const String removeUpcomming = 'remove-upcomming';
 }
 
 void logPrint(Object? value, [String? name]) {

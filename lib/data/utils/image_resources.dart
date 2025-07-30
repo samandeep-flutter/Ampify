@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 sealed class ImageRes {
   static final String spotify = _toIcons('spotify.png');
   static final String thumbnail = _toImages('thumbnail.png');
@@ -14,6 +16,8 @@ sealed class ImageRes {
   static final String musicWave = _toIcons('music-wave.gif');
   static final String musicWavePaused = _toIcons('music-wave-paused.png');
 
+  @protected
   static String _toIcons(String icon) => 'assets/icons/$icon';
+  @protected
   static String _toImages(String icon) => 'assets/images/$icon';
 }

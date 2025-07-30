@@ -1,5 +1,4 @@
 import 'package:ampify/services/theme_services.dart';
-import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import '../data/utils/app_constants.dart';
@@ -22,14 +21,7 @@ class BoxServices {
     );
   }
 
-  ProfileModel? get profile {
-    try {
-      final json = box.read(BoxKeys.profile);
-      return ProfileModel.fromJson(json);
-    } catch (_) {
-      return null;
-    }
-  }
+  String? get uid => box.read<String>(BoxKeys.uid);
 
   Future<void> saveTheme(MyTheme theme) async {
     await box.write(BoxKeys.theme, theme.title);

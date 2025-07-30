@@ -1,4 +1,5 @@
 import 'package:ampify/data/data_models/common/tracks_model.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:equatable/equatable.dart';
 
 class PlayerEvent extends Equatable {
@@ -10,8 +11,6 @@ class PlayerEvent extends Equatable {
 
 class PlayerInitial extends PlayerEvent {}
 
-class PlayerStatusChanged extends PlayerEvent {}
-
 class PlayerTrackLiked extends PlayerEvent {
   final String id;
   final bool? liked;
@@ -21,9 +20,23 @@ class PlayerTrackLiked extends PlayerEvent {
   List<Object?> get props => [id, liked, super.props];
 }
 
+class PlayerMediaStream extends PlayerEvent {
+  final MediaItem mediaItem;
+  const PlayerMediaStream(this.mediaItem);
+
+  @override
+  List<Object?> get props => [mediaItem, super.props];
+}
+
 class PlayerShuffleToggle extends PlayerEvent {}
 
-class PlayerRepeatToggle extends PlayerEvent {}
+class PlayerPlaybackStream extends PlayerEvent {
+  final PlaybackState state;
+  const PlayerPlaybackStream(this.state);
+
+  @override
+  List<Object?> get props => [state, super.props];
+}
 
 class PlayerQueueReordered extends PlayerEvent {
   final int previous;

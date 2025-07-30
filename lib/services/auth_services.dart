@@ -43,7 +43,7 @@ class AuthServices {
 
   Future<void> logout() async {
     await box.remove(BoxKeys.token);
-    await box.remove(BoxKeys.profile);
+    await box.remove(BoxKeys.uid);
     await box.remove(BoxKeys.refreshToken);
     context?.goNamed(AppRoutes.auth);
   }

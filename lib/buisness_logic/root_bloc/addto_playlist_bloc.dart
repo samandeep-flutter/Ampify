@@ -2,7 +2,6 @@ import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/data_models/profile_model.dart';
 
 class AddtoPlaylistEvents extends Equatable {
   const AddtoPlaylistEvents();
@@ -30,7 +29,6 @@ class PlaylistSelected extends AddtoPlaylistEvents {
 class AddTracktoPlaylists extends AddtoPlaylistEvents {}
 
 class AddtoPlaylistState extends Equatable {
-  final ProfileModel? profile;
   final String? trackUri;
   final List<String> playlists;
   final bool loading;
@@ -38,7 +36,6 @@ class AddtoPlaylistState extends Equatable {
 
   const AddtoPlaylistState({
     required this.trackUri,
-    required this.profile,
     required this.playlists,
     required this.loading,
     required this.success,
@@ -46,21 +43,18 @@ class AddtoPlaylistState extends Equatable {
 
   const AddtoPlaylistState.init()
       : trackUri = null,
-        profile = null,
         playlists = const [],
         loading = false,
         success = false;
 
   AddtoPlaylistState copyWith({
     String? trackUri,
-    ProfileModel? profile,
     List<String>? playlists,
     bool? loading,
     bool? success,
   }) {
     return AddtoPlaylistState(
       trackUri: trackUri ?? this.trackUri,
-      profile: profile ?? this.profile,
       playlists: playlists ?? this.playlists,
       loading: loading ?? this.loading,
       success: success ?? this.success,
@@ -84,14 +78,7 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
   void onItemAdded(String id) => add(PlaylistSelected(id));
 
   void _onInit(PlaylistInitial event, Emitter<AddtoPlaylistState> emit) {
-    final json = BoxServices.instance.read(BoxKeys.profile);
-    emit(state.copyWith(
-      profile: ProfileModel.fromJson(json),
-      trackUri: event.uri,
-      playlists: [],
-      loading: false,
-      success: false,
-    ));
+    emit(AddtoPlaylistState.init().copyWith(trackUri: event.uri));
   }
 
   Future<void> _onAddTrigger(

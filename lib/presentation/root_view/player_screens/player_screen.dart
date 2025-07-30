@@ -39,7 +39,7 @@ class PlayerScreen extends StatelessWidget {
                         useRootNavigator: true,
                         builder: (_) {
                           return TrackBottomSheet(state.track.asTrack,
-                              liked: state.liked);
+                              liked: state.isLiked);
                         });
                   },
                   iconSize: Dimens.iconDefault,
@@ -77,9 +77,7 @@ class PlayerScreen extends StatelessWidget {
                       }),
                   BlocListener<PlayerBloc, PlayerState>(
                     listener: (context, state) {
-                      if (!(state.showPlayer ?? true)) {
-                        Navigator.pop(context);
-                      }
+                      if (state.playerState.isHidden) Navigator.pop(context);
                     },
                     child: SizedBox(height: context.height * .05),
                   ),
@@ -117,14 +115,14 @@ class PlayerScreen extends StatelessWidget {
                         ),
                         const SizedBox(width: Dimens.sizeDefault),
                         BlocBuilder<PlayerBloc, PlayerState>(
-                          buildWhen: (pr, cr) => pr.liked != cr.liked,
+                          buildWhen: (pr, cr) => pr.isLiked != cr.isLiked,
                           builder: (context, state) {
                             return IconButton(
                               onPressed: () {
                                 final id = state.track.id;
-                                bloc.onTrackLiked(id!, state.liked);
+                                bloc.onTrackLiked(id!, state.isLiked);
                               },
-                              isSelected: state.liked,
+                              isSelected: state.isLiked,
                               selectedIcon: const Icon(Icons.favorite),
                               iconSize: Dimens.iconXLarge,
                               icon: const Icon(Icons.favorite_outline),
@@ -146,13 +144,11 @@ class PlayerScreen extends StatelessWidget {
                       return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                           builder: (context, slider) {
                         double current = 0;
-                        int length = 1;
-                        if (!loading && state.length != 0) {
-                          current = slider.current.toDouble();
-                          length = state.length ?? 1;
+                        Duration length = Duration(seconds: 1);
+                        if (!loading && !state.length.isZero) {
+                          current = slider.current.inSeconds.toDouble();
+                          length = state.length ?? Duration(seconds: 1);
                         }
-                        final currLength = Duration(seconds: slider.current);
-                        final maxLength = Duration(seconds: state.length ?? 0);
 
                         return SliderTheme(
                           data: const SliderThemeData(
@@ -166,10 +162,10 @@ class PlayerScreen extends StatelessWidget {
                                 height: Dimens.sizeMedium,
                                 child: Slider(
                                   value: current,
-                                  divisions: length,
+                                  divisions: length.inSeconds,
                                   activeColor: scheme.textColor,
                                   inactiveColor: scheme.textColorLight,
-                                  max: length.toDouble(),
+                                  max: length.inSeconds.toDouble(),
                                   onChanged: bloc.onSliderChange,
                                 ),
                               ),
@@ -183,9 +179,9 @@ class PlayerScreen extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     const SizedBox(width: Dimens.sizeMedium),
-                                    Text(currLength.format()),
+                                    Text(slider.current.format()),
                                     const Spacer(),
-                                    Text(maxLength.format()),
+                                    Text(state.length.format()),
                                     const SizedBox(width: Dimens.sizeLarge),
                                   ],
                                 ),

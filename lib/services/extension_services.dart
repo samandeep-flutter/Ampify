@@ -2,11 +2,12 @@ import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/services/theme_services.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:just_audio/just_audio.dart';
 
 extension MyContext on BuildContext {
-  ThemeServiceState get scheme => ThemeServices.of(this);
   Color get background => ThemeServices.of(this).background;
   double get height => MediaQuery.sizeOf(this).height;
   double get width => MediaQuery.sizeOf(this).width;
@@ -23,7 +24,9 @@ extension MyList on List<String> {
 }
 
 extension MyMusicState on MusicState? {
+  bool get isHidden => this == MusicState.hidden;
   bool get isPlaying => this == MusicState.playing;
+  bool get isPause => this == MusicState.pause;
   bool get isLoading => this == MusicState.loading;
 }
 
@@ -45,10 +48,112 @@ extension ArtistNames on List<Artist> {
   }
 }
 
-extension MusicDuration on Duration {
-  String format() => _format(this);
+extension MyMediaItems on MediaItem {
+  AudioSource get toAudioSource {
+    return AudioSource.uri(extras!['uri'] as Uri, tag: extras);
+  }
+}
 
-  String _format(Duration time) {
+extension MyPlaybackState on PlaybackState {
+  /// Helper method to get the adjacent [MusicState] from [AudioProcessingState].
+  ///
+  /// [MusicState] is a music player's status.
+  MusicState get playerState {
+    switch (processingState) {
+      case AudioProcessingState.loading:
+        return MusicState.loading;
+
+      case AudioProcessingState.buffering:
+        return MusicState.playing;
+
+      case AudioProcessingState.ready:
+        return playing ? MusicState.playing : MusicState.pause;
+
+      default:
+        return MusicState.hidden;
+    }
+  }
+}
+
+extension MyRepeatMode on LoopMode {
+  /// Helper method to get the adjacent [AudioServiceRepeatMode] from [LoopMode].
+  ///
+  /// [AudioServiceRepeatMode] is from [audio_service].
+  AudioServiceRepeatMode get toRepeatMode {
+    switch (this) {
+      case LoopMode.off:
+        return AudioServiceRepeatMode.none;
+      case LoopMode.all:
+        return AudioServiceRepeatMode.all;
+      case LoopMode.one:
+        return AudioServiceRepeatMode.one;
+    }
+  }
+}
+
+extension MyLoopMode on AudioServiceRepeatMode {
+  /// Helper method to get the adjacent [LoopMode] from [AudioServiceRepeatMode].
+  ///
+  /// [LoopMode] is from [just_audio].
+  /// [AudioServiceRepeatMode] is from [audio_service].
+  MusicLoopMode? get toLoopMode {
+    switch (this) {
+      case AudioServiceRepeatMode.none:
+        return MusicLoopMode.off;
+      case AudioServiceRepeatMode.all:
+        return MusicLoopMode.all;
+      case AudioServiceRepeatMode.one:
+        return MusicLoopMode.once;
+
+      default:
+        return null;
+    }
+  }
+}
+
+extension ExtendedMusicLoopMode on MusicLoopMode {
+  /// Helper method to get the adjacent [AudioServiceRepeatMode] from [MusicLoopMode].
+  ///
+  /// [MusicLoopMode] is music player's loop mode.
+  AudioServiceRepeatMode get toAudioState {
+    switch (this) {
+      case MusicLoopMode.off:
+        return AudioServiceRepeatMode.none;
+      case MusicLoopMode.all:
+        return AudioServiceRepeatMode.all;
+      case MusicLoopMode.once:
+        return AudioServiceRepeatMode.one;
+    }
+  }
+}
+
+extension MyAudioProcessingState on ProcessingState {
+  AudioProcessingState get toAudioState {
+    switch (this) {
+      case ProcessingState.idle:
+        return AudioProcessingState.idle;
+      case ProcessingState.loading:
+        return AudioProcessingState.loading;
+      case ProcessingState.buffering:
+        return AudioProcessingState.buffering;
+      case ProcessingState.ready:
+        return AudioProcessingState.ready;
+      case ProcessingState.completed:
+        return AudioProcessingState.completed;
+    }
+  }
+}
+
+extension MusicDuration on Duration? {
+  bool get isZero => (this?.inSeconds ?? 0) == 0;
+  String format() => _format(this);
+  double widthFactor(Duration? total) {
+    if ((total?.inSeconds ?? 0) == 0) return 0;
+    return (this?.inSeconds ?? 0) / total!.inSeconds;
+  }
+
+  String _format(Duration? time) {
+    if (time == null) return '0:00';
     if (time.inMinutes >= 60) {
       final min = time.inMinutes - (time.inHours * 60);
       return '${time.inHours}:${_formatInt(min)}';

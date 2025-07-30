@@ -1,4 +1,5 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
+import 'package:ampify/buisness_logic/root_bloc/root_bloc.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
@@ -27,32 +28,36 @@ class _LibraryScreenState extends State<LibraryScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(width: Dimens.sizeSmall),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: bloc.box.profile?.product == 'premium'
-                    ? SweepGradient(
-                        colors: [
-                          Color(0xFF6A2E8B),
-                          Color(0xFF5271FF),
-                          Color(0xFF00C2FF),
-                          Color(0xFF2D3A68),
-                          Color(0xFF7EC8FF),
-                          Color(0xFFFFB84D),
-                          Color(0xFF833AB4),
-                        ],
-                      )
-                    : null,
-                borderRadius:
-                    BorderRadius.all(Radius.circular(Dimens.borderLarge)),
-              ),
-              child: MyAvatar(
-                bloc.box.profile?.image,
-                isAvatar: true,
-                padding: EdgeInsets.all(Dimens.sizeExtraSmall),
-                onTap: () => context.pushNamed(AppRoutes.profile),
-                avatarRadius: Dimens.iconMedSmall,
-              ),
-            ),
+            BlocBuilder<RootBloc, RootState>(
+                buildWhen: (pr, cr) => pr.profile != cr.profile,
+                builder: (context, state) {
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: state.profile?.product == 'premium'
+                          ? SweepGradient(
+                              colors: [
+                                Color(0xFF6A2E8B),
+                                Color(0xFF5271FF),
+                                Color(0xFF00C2FF),
+                                Color(0xFF2D3A68),
+                                Color(0xFF7EC8FF),
+                                Color(0xFFFFB84D),
+                                Color(0xFF833AB4),
+                              ],
+                            )
+                          : null,
+                      borderRadius:
+                          BorderRadius.all(Radius.circular(Dimens.borderLarge)),
+                    ),
+                    child: MyAvatar(
+                      state.profile?.image,
+                      isAvatar: true,
+                      padding: EdgeInsets.all(Dimens.sizeExtraSmall),
+                      onTap: () => context.pushNamed(AppRoutes.profile),
+                      avatarRadius: Dimens.iconMedSmall,
+                    ),
+                  );
+                }),
           ],
         ),
         title: const Text(StringRes.myLibrary),
@@ -88,11 +93,8 @@ class _LibraryScreenState extends State<LibraryScreen>
           TextButton.icon(
             style: TextButton.styleFrom(foregroundColor: scheme.textColor),
             onPressed: () {
-              final id = bloc.box.profile!.id!;
-              context.pushNamed(
-                AppRoutes.createPlaylist,
-                pathParameters: {'userId': id},
-              );
+              context.pushNamed(AppRoutes.createPlaylist,
+                  pathParameters: {'userId': bloc.box.uid!});
             },
             label: Text(
               StringRes.create,

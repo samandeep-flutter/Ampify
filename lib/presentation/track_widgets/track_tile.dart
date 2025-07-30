@@ -1,12 +1,8 @@
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/utils.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/track_widgets/track_bottom_sheet.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +24,7 @@ class TrackTile extends StatelessWidget {
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         bloc.add(PlayerTrackChanged(track, liked: liked));
-        sliderBloc.add(const PlayerSliderChange(0));
+        sliderBloc.add(PlayerSliderReset());
       },
       child: Padding(
         padding: Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
@@ -113,14 +109,19 @@ class TrackDetailsTile extends StatelessWidget {
   final TrackDetails track;
   final Widget? title;
   final Widget? trailing;
-  const TrackDetailsTile(
-      {super.key, required this.track, this.title, this.trailing});
+  final bool isPlaying;
+  const TrackDetailsTile(this.track, {super.key, this.title, this.trailing})
+      : isPlaying = false;
+  const TrackDetailsTile.playing(this.track, {super.key, this.trailing})
+      : title = null,
+        isPlaying = true;
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     return Padding(
-      padding: Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
+      padding: EdgeInsets.symmetric(
+          vertical: Dimens.sizeSmall, horizontal: Dimens.sizeDefault),
       child: Row(
         children: [
           Builder(
@@ -137,16 +138,54 @@ class TrackDetailsTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  track.title ?? '',
-                  style: TextStyle(
-                    color: scheme.textColor,
-                    fontWeight: FontWeight.w500,
-                    fontSize: Dimens.fontXXXLarge,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Builder(builder: (context) {
+                  if (!isPlaying) {
+                    if (title != null) return title!;
+                    return Text(
+                      track.title ?? '',
+                      style: TextStyle(
+                        color: scheme.textColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: Dimens.fontXXXLarge,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  }
+                  return RichText(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textScaler: MediaQuery.textScalerOf(context),
+                      text: TextSpan(
+                          style: TextStyle(
+                              color: scheme.primary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.fontXXXLarge),
+                          children: [
+                            WidgetSpan(
+                              child: SizedBox.square(
+                                  dimension: Dimens.iconMedSmall,
+                                  child: BlocBuilder<PlayerBloc, PlayerState>(
+                                      buildWhen: (pr, cr) =>
+                                          pr.playerState != cr.playerState,
+                                      builder: (_, state) {
+                                        if (state.playerState.isPlaying) {
+                                          return Image.asset(ImageRes.musicWave,
+                                              fit: BoxFit.cover,
+                                              color: scheme.primary);
+                                        }
+
+                                        return Image.asset(
+                                            ImageRes.musicWavePaused,
+                                            fit: BoxFit.cover,
+                                            color: scheme.primary);
+                                      })),
+                            ),
+                            const WidgetSpan(
+                                child: SizedBox(width: Dimens.sizeExtraSmall)),
+                            TextSpan(text: track.title ?? ''),
+                          ]));
+                }),
                 Text(
                   track.subtitle ?? '',
                   maxLines: 1,

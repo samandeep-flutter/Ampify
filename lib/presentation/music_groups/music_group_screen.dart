@@ -250,8 +250,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                               );
                             },
                           ),
-                          if (bloc.profile?.id! ==
-                              state.details?.owner?.id) ...[
+                          if (bloc.uid! == state.details?.owner?.id) ...[
                             const SizedBox(width: Dimens.sizeSmall),
                             IconButton(
                               onPressed: () {

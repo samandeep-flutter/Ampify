@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 sealed class ResponsiveFont {
   // static late double _screenWidth;
+  @protected
   static late TextScaler _scaleFactor;
 
   // static const double _minScale = 0.85;

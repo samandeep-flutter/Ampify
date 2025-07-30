@@ -7,7 +7,6 @@ import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
@@ -173,8 +172,9 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   final MusicGroupRepo _repo = getIt();
   final scrollController = ScrollController();
   final picker = ImagePicker();
-  ProfileModel? profile;
   bool libRefresh = false;
+
+  String? get uid => BoxServices.instance.uid;
 
   // @override
   // void add(MusicGroupEvent event) {
@@ -224,10 +224,6 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
   Future<void> _onInit(
       MusicGroupInitial event, Emitter<MusicGroupState> emit) async {
-    try {
-      final json = BoxServices.instance.read(BoxKeys.profile);
-      profile = ProfileModel.fromJson(json);
-    } catch (_) {}
     emit(state.copyWith(id: event.id, loading: true, titileOpacity: 0));
     scrollController.addListener(_scrollListener);
     libRefresh = false;

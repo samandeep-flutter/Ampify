@@ -1,3 +1,5 @@
+import 'package:ampify/data/data_models/profile_model.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -23,13 +25,19 @@ class RootTabChanged extends RootEvent {
 
 class RootState extends Equatable {
   final int index;
-  const RootState(this.index);
-  const RootState.init() : index = 0;
+  final ProfileModel? profile;
+  const RootState({required this.index, required this.profile});
+  const RootState.init()
+      : index = 0,
+        profile = null;
 
-  RootState copyWith(int? index) => RootState(index ?? this.index);
+  RootState copyWith({int? index, ProfileModel? profile}) {
+    return RootState(
+        index: index ?? this.index, profile: profile ?? this.profile);
+  }
 
   @override
-  List<Object?> get props => [index];
+  List<Object?> get props => [index, profile];
 }
 
 class RootBloc extends Bloc<RootEvent, RootState> {
@@ -37,6 +45,7 @@ class RootBloc extends Bloc<RootEvent, RootState> {
     on<RootInitial>(_onInit);
     on<RootTabChanged>(_onTap);
   }
+  final LibraryRepo _libRepo = getIt();
 
   final List<BottomNavigationBarItem> tabs = [
     BottomNavigationBarItem(
@@ -79,9 +88,13 @@ class RootBloc extends Bloc<RootEvent, RootState> {
     add(RootTabChanged(index));
   }
 
-  void _onInit(RootInitial event, Emitter<RootState> emit) async {}
+  void _onInit(RootInitial event, Emitter<RootState> emit) async {
+    await _libRepo.getProfile(onSuccess: (json) {
+      emit(state.copyWith(profile: ProfileModel.fromJson(json)));
+    });
+  }
 
   void _onTap(RootTabChanged event, Emitter<RootState> emit) {
-    emit(state.copyWith(event.index));
+    emit(state.copyWith(index: event.index));
   }
 }

@@ -90,7 +90,7 @@ class HomeScreen extends StatelessWidget {
                           final player = context.read<PlayerBloc>();
                           final slider = context.read<PlayerSliderBloc>();
                           player.add(PlayerTrackChanged(item));
-                          slider.add(const PlayerSliderChange(0));
+                          slider.add(PlayerSliderReset());
                         },
                         image: item.album?.image,
                         title: item.name,

@@ -64,7 +64,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onFinish(AuthFinished event, Emitter<AuthState> emit) async {
     final completer = Completer<bool>();
     await _libRepo.getProfile(onSuccess: (json) async {
-      await _box.write(BoxKeys.profile, json);
+      await _box.write(BoxKeys.uid, json['id']);
       completer.complete(true);
       emit(state.copyWith(isLoading: false, isSuccess: true));
     }, onError: (e) {

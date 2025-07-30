@@ -19,20 +19,16 @@ class PlayerCompact extends StatelessWidget {
     return BlocConsumer<PlayerBloc, PlayerState>(
       buildWhen: (pr, cr) {
         final track = pr.track != cr.track;
-
-        final isDuration = pr.durationLoading != cr.durationLoading;
-        final isStateChange = pr.playerState != cr.playerState;
-        return track || isStateChange || isDuration;
+        return track || pr.playerState != cr.playerState;
       },
       listener: (context, state) {
-        if (state.playerState.isLoading || state.durationLoading) {
-          sliderBloc.add(const PlayerSliderChange(0));
+        if (state.playerState.isLoading) {
+          sliderBloc.add(PlayerSliderReset());
           return;
         }
         if (state.playerState.isPlaying) {
           bloc.positionStream?.listen((duration) {
-            final current = duration.inSeconds;
-            sliderBloc.add(PlayerSliderChange(current));
+            sliderBloc.add(PlayerSliderChange(duration));
           });
         }
       },
@@ -140,10 +136,18 @@ class PlayerCompact extends StatelessWidget {
               BlocListener<PlayerSliderBloc, PlayerSliderState>(
                 listenWhen: (pr, cr) {
                   final ended = cr.current == state.length;
-                  final length = state.length != 0 && cr.current != 0;
-                  return ended && length;
+                  return ended && !state.length.isZero && !cr.current.isZero;
                 },
-                listener: (_, slider) => bloc.onTrackEnded(slider),
+                listener: (context, slider) {
+                  if (state.playerState.isLoading) return;
+                  final _slider = context.read<PlayerSliderBloc>();
+                  if (!state.length.isZero && !slider.current.isZero) {
+                    if (slider.current == state.length) {
+                      bloc.add(PlayerTrackEnded());
+                      _slider.add(PlayerSliderReset());
+                    }
+                  }
+                },
                 child: const SizedBox.shrink(),
               ),
               const SizedBox(height: Dimens.sizeExtraSmall),
@@ -159,19 +163,10 @@ class PlayerCompact extends StatelessWidget {
                           bgColor, scheme.textColorLight.withAlpha(150)),
                       child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                           builder: (context, slider) {
-                        Duration duration = Duration.zero;
-                        double width = 0;
-                        if (state.length != 0) {
-                          width = (slider.current / (state.length ?? 0)) *
-                              constraints.maxWidth;
-                        }
-
-                        if (state.length != 0 && slider.current != 0) {
-                          duration = const Duration(seconds: 1);
-                        }
+                        final factor = slider.current.widthFactor(state.length);
                         return AnimatedContainer(
-                            duration: duration,
-                            width: width,
+                            duration: slider.animate,
+                            width: factor * constraints.maxWidth,
                             color: scheme.textColor);
                       }),
                     ),
