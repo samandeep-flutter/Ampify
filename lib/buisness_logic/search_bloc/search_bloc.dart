@@ -5,7 +5,6 @@ import 'package:ampify/data/repositories/search_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rxdart/transformers.dart';
 
 class SearchEvent extends Equatable {
   const SearchEvent();
@@ -67,19 +66,15 @@ class SearchState extends Equatable {
   List<Object?> get props => [query, isLoading, isError, results];
 }
 
-EventTransformer<T> _debounce<T>(Duration duration) {
-  return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
-}
-
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc() : super(const SearchState.init()) {
-    on<SearchTrigerred>(_onSearchTrigerred, transformer: _debounce(_duration));
+    on<SearchTrigerred>(_onSearchTrigerred,
+        transformer: Utils.debounce(Durations.extralong2));
     on<SearchInputChanged>(_onInputChanged);
     on<SearchInitial>(_onInit);
     on<SearchCleared>(_onSearchClear);
   }
   final SearchRepo _searchRepo = getIt();
-  final _duration = const Duration(milliseconds: 800);
   final searchContr = TextEditingController();
   final focusNode = FocusNode();
 

@@ -19,18 +19,14 @@ class MusicGroupTile extends StatelessWidget {
     return InkWell(
       onTap: () async {
         FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(const Duration(milliseconds: 200));
+        await Future.delayed(Durations.short4);
+        bool? result;
         if (isLikedSongs) {
-          final result = await context.pushNamed<bool>(AppRoutes.likedSongs);
-          if (result ?? false) {
-            context.read<LibraryBloc>().add(LibraryRefresh());
-          }
-          return;
+          result = await context.pushNamed<bool>(AppRoutes.likedSongs);
+        } else {
+          result = await context.pushNamed<bool>(AppRoutes.musicGroup,
+              pathParameters: {'id': item.id!, 'type': item.type!.name});
         }
-        final result = await context.pushNamed<bool>(
-          AppRoutes.musicGroup,
-          pathParameters: {'id': item.id!, 'type': item.type!.name},
-        );
 
         if (result ?? false) {
           context.read<LibraryBloc>().add(LibraryRefresh());

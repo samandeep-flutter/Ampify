@@ -55,7 +55,7 @@ class _LikedSongsState extends State<LikedSongs> {
                     builder: (context, state) {
                       return AnimatedOpacity(
                         opacity: state.titileOpacity,
-                        duration: const Duration(milliseconds: 500),
+                        duration: Durations.long2,
                         child: const Text(StringRes.likedSongs),
                       );
                     }),

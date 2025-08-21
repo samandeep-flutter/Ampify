@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/config/firebase_options.dart';
 import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
@@ -24,7 +23,6 @@ import 'buisness_logic/search_bloc/search_bloc.dart';
 void main() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: binding);
-  WidgetsFlutterBinding.ensureInitialized();
   await _initServices();
   runApp(const ThemeServices(child: MyApp()));
 }
@@ -39,7 +37,7 @@ Future<void> _initServices() async {
       fbCrash.recordError(error, stack, fatal: true);
       return true;
     };
-    await getInit();
+    await initGetIt();
     await dotenv.load();
     await getIt<YTMusic>().initialize();
     await GetStorage.init(BoxKeys.boxName);
@@ -53,8 +51,7 @@ Future<void> _initServices() async {
     ));
     final _box = BoxServices.instance;
     if (_box.read(BoxKeys.token) == null) return;
-    final LibraryRepo _libRepo = getIt();
-    await _libRepo.getProfile(onSuccess: (_) {});
+    await getIt<AuthServices>().getProfile();
   } catch (e) {
     logPrint(e, 'init');
   } finally {

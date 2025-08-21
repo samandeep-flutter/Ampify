@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:ampify/data/repositories/auth_repo.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,8 @@ class AuthServices {
 
   final AppLinks _appLinks = getIt();
   final box = BoxServices.instance;
+
+  ProfileModel? profile;
 
   Future<AuthServices> init() async {
     _appLinks.uriLinkStream.listen(_dynamicLinks);
@@ -39,6 +43,13 @@ class AuthServices {
     } catch (_) {
       return AppRoutes.auth;
     }
+  }
+
+  Future<void> getProfile() async {
+    final LibraryRepo _libRepo = getIt();
+    await _libRepo.getProfile(onSuccess: (json) {
+      profile = ProfileModel.fromJson(json);
+    });
   }
 
   Future<void> logout() async {

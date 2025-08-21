@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
@@ -134,20 +135,16 @@ class PlayerScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: Dimens.sizeDefault),
                   BlocBuilder<PlayerBloc, PlayerState>(
-                    buildWhen: (pre, cur) {
-                      final track = pre.track != cur.track;
-                      final length = pre.length != cur.length;
-                      return track || length;
-                    },
+                    buildWhen: (pr, cr) => pr.track != cr.track,
                     builder: (context, state) {
                       final loading = state.playerState.isLoading;
                       return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                           builder: (context, slider) {
                         double current = 0;
-                        Duration length = Duration(seconds: 1);
-                        if (!loading && !state.length.isZero) {
+                        Duration length = Durations.extralong4;
+                        if (!loading && !state.track.duration.isZero) {
                           current = slider.current.inSeconds.toDouble();
-                          length = state.length ?? Duration(seconds: 1);
+                          length = state.track.duration ?? Durations.extralong4;
                         }
 
                         return SliderTheme(
@@ -165,6 +162,7 @@ class PlayerScreen extends StatelessWidget {
                                   divisions: length.inSeconds,
                                   activeColor: scheme.textColor,
                                   inactiveColor: scheme.textColorLight,
+                                  min: Dimens.zero,
                                   max: length.inSeconds.toDouble(),
                                   onChanged: bloc.onSliderChange,
                                 ),
@@ -181,7 +179,7 @@ class PlayerScreen extends StatelessWidget {
                                     const SizedBox(width: Dimens.sizeMedium),
                                     Text(slider.current.format()),
                                     const Spacer(),
-                                    Text(state.length.format()),
+                                    Text(state.track.duration.format()),
                                     const SizedBox(width: Dimens.sizeLarge),
                                   ],
                                 ),
@@ -217,7 +215,7 @@ class PlayerScreen extends StatelessWidget {
                               );
                             }),
                         IconButton(
-                          onPressed: bloc.onPrevious,
+                          onPressed: () => bloc.add(PlayerPreviousTrack()),
                           color: scheme.textColor,
                           iconSize: Dimens.iconLarge,
                           icon: const Icon(Icons.skip_previous_rounded),
@@ -243,7 +241,7 @@ class PlayerScreen extends StatelessWidget {
                           },
                         ),
                         IconButton(
-                          onPressed: bloc.onNext,
+                          onPressed: () => bloc.add(PlayerNextTrack()),
                           iconSize: Dimens.iconLarge,
                           color: scheme.textColor,
                           icon: const Icon(Icons.skip_next_rounded),

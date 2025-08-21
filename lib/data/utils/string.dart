@@ -75,6 +75,8 @@ sealed class StringRes {
       ' please login again';
 
   // long texts
+  static const String notiDesc =
+      'Notification related to media playback in the application';
   static const String authDesc = 'Log in with Spotify to connect and amplify'
       ' your music journey. You\'ll be redirected to a browser for authentication';
   static const String logoutDesc = 'Are you sure you want to log out? You’ll'

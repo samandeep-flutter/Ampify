@@ -4,7 +4,6 @@ import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rxdart/transformers.dart';
 import '../../data/data_models/common/playlist_model.dart';
 import '../player_bloc/player_bloc.dart';
 import '../player_bloc/player_events.dart';
@@ -81,23 +80,18 @@ class LikedSongsState extends Equatable {
       [tracks, totalTracks, loading, moreLoading, titileOpacity];
 }
 
-EventTransformer<T> _debounce<T>(Duration duration) {
-  return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
-}
-
 class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   LikedSongsBloc() : super(const LikedSongsState.init()) {
     on<LikedSongsInitial>(_onInit);
     on<SongRemoved>(_onRemoved);
     on<LoadMoreSongs>(_onLoadMore);
     on<LikedSongsTitleFade>(_titleFade);
-    on<LoadMoreTrigger>(_onLoadTrigger, transformer: _debounce(duration));
+    on<LoadMoreTrigger>(_onLoadTrigger, transformer: Utils.debounce(Durations.short4));
   }
 
   final LibraryRepo _repo = getIt();
   final scrollController = ScrollController();
 
-  final duration = const Duration(milliseconds: 200);
   bool libRefresh = false;
 
   void onPlay(BuildContext context) {

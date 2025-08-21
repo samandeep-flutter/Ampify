@@ -185,8 +185,9 @@ class TrackDetails extends Equatable {
       image: json['image'],
       title: json['title'],
       subtitle: json['subtitle'],
-      bgColor: Color(json['bgColor']),
-      darkBgColor: Color(json['darkBgColor']),
+      bgColor: json['bgColor'] != null ? Color(json['bgColor']) : null,
+      darkBgColor:
+          json['darkBgColor'] != null ? Color(json['darkBgColor']) : null,
     );
   }
 

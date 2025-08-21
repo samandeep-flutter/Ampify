@@ -75,9 +75,7 @@ class SongTileShimmer extends StatelessWidget {
       child: Row(
         children: [
           SizedBox.square(
-            dimension: iconSize ?? Dimens.iconExtraLarge,
-            child: Shimmer.box,
-          ),
+              dimension: iconSize ?? Dimens.iconUltraLarge, child: Shimmer.box),
           const SizedBox(width: Dimens.sizeDefault),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,9 +117,7 @@ class MusicGroupShimmer extends StatelessWidget {
         ),
         if (!isLikedSongs)
           SizedBox.square(
-            dimension: imageSize ?? context.height * .3,
-            child: Shimmer.box,
-          ),
+              dimension: imageSize ?? context.height * .3, child: Shimmer.box),
         Container(
           margin: const EdgeInsets.all(Dimens.sizeDefault),
           child: Column(
@@ -135,14 +131,16 @@ class MusicGroupShimmer extends StatelessWidget {
               const SizedBox(height: Dimens.sizeSmall),
               if (!isLikedSongs) ...[
                 SizedBox(
-                    height: Dimens.sizeDefault - 1,
-                    width: double.infinity,
-                    child: Shimmer.box),
+                  height: Dimens.sizeDefault - 1,
+                  width: double.infinity,
+                  child: Shimmer.box,
+                ),
                 const SizedBox(height: Dimens.sizeSmall),
                 SizedBox(
-                    height: Dimens.sizeDefault - 1,
-                    width: double.infinity,
-                    child: Shimmer.box),
+                  height: Dimens.sizeDefault - 1,
+                  width: double.infinity,
+                  child: Shimmer.box,
+                ),
                 const SizedBox(height: Dimens.sizeSmall),
               ],
               Row(
@@ -182,9 +180,7 @@ class MusicGroupShimmer extends StatelessWidget {
               itemCount: itemCount ?? 5,
               padding: const EdgeInsets.only(top: Dimens.sizeDefault),
               physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (_, index) {
-                return const SongTileShimmer();
-              }),
+              itemBuilder: (_, index) => const SongTileShimmer()),
         )
       ],
     );

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import '../../../buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/presentation/root_view/player_screens/player_screen.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
-import 'player_screen.dart';
 
 class PlayerCompact extends StatelessWidget {
   const PlayerCompact({super.key});
@@ -24,12 +24,6 @@ class PlayerCompact extends StatelessWidget {
       listener: (context, state) {
         if (state.playerState.isLoading) {
           sliderBloc.add(PlayerSliderReset());
-          return;
-        }
-        if (state.playerState.isPlaying) {
-          bloc.positionStream?.listen((duration) {
-            sliderBloc.add(PlayerSliderChange(duration));
-          });
         }
       },
       builder: (context, state) {
@@ -39,8 +33,9 @@ class PlayerCompact extends StatelessWidget {
         final selected = state.playerState.isPlaying;
         final loading = state.playerState.isLoading;
 
-        return Container(
-          margin: Utils.insetsOnly(Dimens.sizeSmall, bottom: Dimens.zero),
+        return AnimatedContainer(
+          duration: Durations.long2,
+          margin: Utils.insetsOnly(Dimens.sizeSmall, bottom: Dimens.sizeMini),
           padding: Utils.insetsOnly(Dimens.sizeExtraSmall, bottom: Dimens.zero),
           decoration: BoxDecoration(
             color: Color.alphaBlend(bgColor, scheme.surface),
@@ -135,17 +130,14 @@ class PlayerCompact extends StatelessWidget {
               ),
               BlocListener<PlayerSliderBloc, PlayerSliderState>(
                 listenWhen: (pr, cr) {
-                  final ended = cr.current == state.length;
-                  return ended && !state.length.isZero && !cr.current.isZero;
+                  final ended = cr.current == state.track.duration;
+                  final notSame = pr.current != cr.current;
+                  return ended && notSame && !cr.current.isZero;
                 },
                 listener: (context, slider) {
                   if (state.playerState.isLoading) return;
-                  final _slider = context.read<PlayerSliderBloc>();
-                  if (!state.length.isZero && !slider.current.isZero) {
-                    if (slider.current == state.length) {
-                      bloc.add(PlayerTrackEnded());
-                      _slider.add(PlayerSliderReset());
-                    }
+                  if (slider.current == state.track.duration) {
+                    bloc.add(PlayerTrackEnded());
                   }
                 },
                 child: const SizedBox.shrink(),
@@ -163,7 +155,8 @@ class PlayerCompact extends StatelessWidget {
                           bgColor, scheme.textColorLight.withAlpha(150)),
                       child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                           builder: (context, slider) {
-                        final factor = slider.current.widthFactor(state.length);
+                        final factor =
+                            slider.current.widthFactor(state.track.duration);
                         return AnimatedContainer(
                             duration: slider.animate,
                             width: factor * constraints.maxWidth,

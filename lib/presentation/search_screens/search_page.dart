@@ -49,7 +49,7 @@ class SearchPage extends StatelessWidget {
               if (state.isLoading) {
                 return Expanded(
                   child: ListView.builder(
-                    itemCount: 10,
+                    itemCount: 12,
                     padding: const EdgeInsets.only(top: Dimens.sizeDefault),
                     itemBuilder: (_, __) => const SongTileShimmer(),
                   ),
@@ -80,7 +80,7 @@ class SearchPage extends StatelessWidget {
 
                     if (item.type.isTrack) return TrackTile(item.asTrack);
                     return MusicGroupTile(item,
-                        imageHeight: Dimens.iconExtraLarge);
+                        imageHeight: Dimens.iconUltraLarge);
                   },
                 ),
               );

@@ -1,5 +1,4 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/buisness_logic/root_bloc/root_bloc.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
@@ -15,6 +14,8 @@ class LibraryScreen extends StatefulWidget {
 
 class _LibraryScreenState extends State<LibraryScreen>
     with TickerProviderStateMixin {
+  final AuthServices auth = getIt();
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<LibraryBloc>();
@@ -28,36 +29,32 @@ class _LibraryScreenState extends State<LibraryScreen>
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(width: Dimens.sizeSmall),
-            BlocBuilder<RootBloc, RootState>(
-                buildWhen: (pr, cr) => pr.profile != cr.profile,
-                builder: (context, state) {
-                  return DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: state.profile?.product == 'premium'
-                          ? SweepGradient(
-                              colors: [
-                                Color(0xFF6A2E8B),
-                                Color(0xFF5271FF),
-                                Color(0xFF00C2FF),
-                                Color(0xFF2D3A68),
-                                Color(0xFF7EC8FF),
-                                Color(0xFFFFB84D),
-                                Color(0xFF833AB4),
-                              ],
-                            )
-                          : null,
-                      borderRadius:
-                          BorderRadius.all(Radius.circular(Dimens.borderLarge)),
-                    ),
-                    child: MyAvatar(
-                      state.profile?.image,
-                      isAvatar: true,
-                      padding: EdgeInsets.all(Dimens.sizeExtraSmall),
-                      onTap: () => context.pushNamed(AppRoutes.profile),
-                      avatarRadius: Dimens.iconMedSmall,
-                    ),
-                  );
-                }),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: auth.profile?.product == 'premium'
+                    ? SweepGradient(
+                        colors: [
+                          Color(0xFF6A2E8B),
+                          Color(0xFF5271FF),
+                          Color(0xFF00C2FF),
+                          Color(0xFF2D3A68),
+                          Color(0xFF7EC8FF),
+                          Color(0xFFFFB84D),
+                          Color(0xFF833AB4),
+                        ],
+                      )
+                    : null,
+                borderRadius:
+                    BorderRadius.all(Radius.circular(Dimens.borderLarge)),
+              ),
+              child: MyAvatar(
+                auth.profile?.image,
+                isAvatar: true,
+                padding: EdgeInsets.all(Dimens.sizeExtraSmall),
+                onTap: () => context.pushNamed(AppRoutes.profile),
+                avatarRadius: Dimens.iconMedSmall,
+              ),
+            )
           ],
         ),
         title: const Text(StringRes.myLibrary),
@@ -212,7 +209,7 @@ class _LibraryScreenState extends State<LibraryScreen>
               return ListTile(
                 onTap: () async {
                   bloc.add(LibrarySorted(e));
-                  await Future.delayed(const Duration(milliseconds: 200));
+                  await Future.delayed(Durations.short4);
                   // ignore: use_build_context_synchronously
                   if (mounted) Navigator.pop(context);
                 },

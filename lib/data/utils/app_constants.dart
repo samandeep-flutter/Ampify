@@ -81,7 +81,7 @@ class MyColoredBox extends StatelessWidget {
 
 Future<void> showToast(String text, {int? timeInSec}) async {
   await Fluttertoast.cancel();
-  Future.delayed(const Duration(milliseconds: 300)).then((_) {
+  Future.delayed(Durations.medium2).then((_) {
     Fluttertoast.showToast(
         msg: text,
         timeInSecForIosWeb: timeInSec ?? 1,

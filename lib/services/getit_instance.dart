@@ -16,7 +16,7 @@ import '../data/repositories/music_repo.dart';
 
 GetIt getIt = GetIt.instance;
 
-Future<void> getInit() async {
+Future<void> initGetIt() async {
   getIt.registerLazySingleton<AppLinks>(() => AppLinks());
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<YoutubeExplode>(() => YoutubeExplode());

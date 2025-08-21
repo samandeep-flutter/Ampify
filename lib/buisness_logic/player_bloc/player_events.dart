@@ -28,6 +28,10 @@ class PlayerMediaStream extends PlayerEvent {
   List<Object?> get props => [mediaItem, super.props];
 }
 
+class PlayerNextTrack extends PlayerEvent {}
+
+class PlayerPreviousTrack extends PlayerEvent {}
+
 class PlayerShuffleToggle extends PlayerEvent {}
 
 class PlayerPlaybackStream extends PlayerEvent {

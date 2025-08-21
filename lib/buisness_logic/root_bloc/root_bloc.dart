@@ -1,5 +1,3 @@
-import 'package:ampify/data/data_models/profile_model.dart';
-import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +11,6 @@ sealed class RootEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class RootInitial extends RootEvent {}
-
 class RootTabChanged extends RootEvent {
   final int index;
   const RootTabChanged(this.index);
@@ -25,28 +21,21 @@ class RootTabChanged extends RootEvent {
 
 class RootState extends Equatable {
   final int index;
-  final ProfileModel? profile;
-  const RootState({required this.index, required this.profile});
-  const RootState.init()
-      : index = 0,
-        profile = null;
+  const RootState({required this.index});
+  const RootState.init() : index = 0;
 
-  RootState copyWith({int? index, ProfileModel? profile}) {
-    return RootState(
-        index: index ?? this.index, profile: profile ?? this.profile);
+  RootState copyWith(int? index) {
+    return RootState(index: index ?? this.index);
   }
 
   @override
-  List<Object?> get props => [index, profile];
+  List<Object?> get props => [index];
 }
 
 class RootBloc extends Bloc<RootEvent, RootState> {
   RootBloc() : super(const RootState.init()) {
-    on<RootInitial>(_onInit);
     on<RootTabChanged>(_onTap);
   }
-  final LibraryRepo _libRepo = getIt();
-
   final List<BottomNavigationBarItem> tabs = [
     BottomNavigationBarItem(
       icon: Icon(Icons.home_outlined, size: Dimens.iconMedSmall),
@@ -88,13 +77,7 @@ class RootBloc extends Bloc<RootEvent, RootState> {
     add(RootTabChanged(index));
   }
 
-  void _onInit(RootInitial event, Emitter<RootState> emit) async {
-    await _libRepo.getProfile(onSuccess: (json) {
-      emit(state.copyWith(profile: ProfileModel.fromJson(json)));
-    });
-  }
-
   void _onTap(RootTabChanged event, Emitter<RootState> emit) {
-    emit(state.copyWith(index: event.index));
+    emit(state.copyWith(event.index));
   }
 }

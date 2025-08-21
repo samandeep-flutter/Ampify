@@ -53,7 +53,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   builder: (context, state) {
                     return AnimatedOpacity(
                       opacity: state.titileOpacity,
-                      duration: const Duration(milliseconds: 500),
+                      duration: Durations.long2,
                       child: Text(state.title ?? ''),
                     );
                   },

@@ -1,4 +1,5 @@
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/services/theme_services.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
@@ -6,6 +7,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
 extension MyContext on BuildContext {
   Color get background => ThemeServices.of(this).background;
@@ -13,6 +15,14 @@ extension MyContext on BuildContext {
   double get width => MediaQuery.sizeOf(this).width;
   Orientation get orientation => MediaQuery.orientationOf(this);
   bool get isDarkMode => ThemeServices.of(this).themeMode == ThemeMode.dark;
+}
+
+extension MyIterable on Iterable<String> {
+  String get asString => _removeBraces(this);
+
+  String _removeBraces(Iterable<String> list) {
+    return list.toString().replaceAll(RegExp(r'[\[\]]'), '');
+  }
 }
 
 extension MyList on List<String> {
@@ -54,11 +64,18 @@ extension MyMediaItems on MediaItem {
   }
 }
 
+extension MyQueue on ValueStream<List<MediaItem>> {
+  bool isLast(List<TrackDetails> queue) {
+    if (value.isEmpty || queue.isEmpty) return false;
+    return queue.first.id == value.last.id;
+  }
+}
+
 extension MyPlaybackState on PlaybackState {
   /// Helper method to get the adjacent [MusicState] from [AudioProcessingState].
   ///
   /// [MusicState] is a music player's status.
-  MusicState get playerState {
+  MusicState? get playerState {
     switch (processingState) {
       case AudioProcessingState.loading:
         return MusicState.loading;
@@ -69,8 +86,12 @@ extension MyPlaybackState on PlaybackState {
       case AudioProcessingState.ready:
         return playing ? MusicState.playing : MusicState.pause;
 
-      default:
+      case AudioProcessingState.error:
+      case AudioProcessingState.idle:
         return MusicState.hidden;
+
+      default:
+        return null;
     }
   }
 }
@@ -165,9 +186,13 @@ extension MusicDuration on Duration? {
     return '0:${_formatInt(time.inSeconds)}';
   }
 
-  String _formatInt(int num) {
-    if (num < 10) return '0$num';
-    return num.toString();
+  String _formatInt(int num) => num < 10 ? '0$num' : '$num';
+}
+
+extension MyDuration on Duration {
+  Duration ceil() {
+    final _seconds = (inMilliseconds / 1000).ceil();
+    return Duration(seconds: _seconds);
   }
 }
 

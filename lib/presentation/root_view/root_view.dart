@@ -21,7 +21,6 @@ class RootView extends StatefulWidget {
 class _RootViewState extends State<RootView> {
   @override
   void initState() {
-    context.read<RootBloc>().add(RootInitial());
     context.read<PlayerBloc>().add(PlayerInitial());
     context.read<SearchBloc>().add(SearchInitial());
     context.read<HomeBloc>().add(HomeInitial());

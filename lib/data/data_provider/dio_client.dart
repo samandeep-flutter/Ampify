@@ -122,8 +122,6 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
           try {
             dprint('refresh: ${json['access_token']}');
             box.write(BoxKeys.token, json['access_token']);
-            // box.write(BoxKeys.refreshToken, json['refresh_token']);
-
             err.requestOptions.headers.update(
                 'Authorization', (_) => 'Bearer ${json['access_token']}');
             final response = await dio.fetch(err.requestOptions);

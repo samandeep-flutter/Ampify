@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:flutter/material.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -64,6 +65,7 @@ class QueueView extends StatelessWidget {
               buildWhen: (pr, cr) => pr.track != cr.track,
               builder: (_, state) => TrackDetailsTile.playing(state.track),
             ),
+            const SizedBox(height: Dimens.sizeDefault),
             Expanded(
               child: BlocBuilder<PlayerBloc, PlayerState>(
                 buildWhen: (pr, cr) {
@@ -141,9 +143,8 @@ class QueueView extends StatelessWidget {
                         ),
                       SliverList.builder(
                         itemCount: state.upNext.length,
-                        itemBuilder: (context, index) {
-                          final item = state.upNext[index];
-                          return TrackTile(item);
+                        itemBuilder: (_, index) {
+                          return TrackTile(state.upNext[index]);
                         },
                       ),
                       SliverSizedBox(height: context.height * .05)
@@ -204,7 +205,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
                         child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                             builder: (context, slider) {
                           final factor =
-                              slider.current.widthFactor(state.length);
+                              slider.current.widthFactor(state.track.duration);
                           return AnimatedContainer(
                               duration: slider.animate,
                               width: factor * constraints.maxWidth,
@@ -220,7 +221,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
               children: [
                 const SizedBox(width: Dimens.sizeDefault),
                 IconButton(
-                  onPressed: bloc.onPrevious,
+                  onPressed: () => bloc.add(PlayerPreviousTrack()),
                   color: scheme.textColor,
                   iconSize: Dimens.iconXLarge,
                   icon: const Icon(Icons.skip_previous_rounded),
@@ -248,7 +249,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
                 ),
                 const SizedBox(width: Dimens.sizeDefault),
                 IconButton(
-                  onPressed: bloc.onNext,
+                  onPressed: () => bloc.add(PlayerNextTrack()),
                   iconSize: Dimens.iconXLarge,
                   color: scheme.textColor,
                   icon: const Icon(Icons.skip_next_rounded),

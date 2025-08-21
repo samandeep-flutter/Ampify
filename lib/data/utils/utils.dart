@@ -6,7 +6,9 @@ import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:rxdart/rxdart.dart';
 import '../data_models/common/tracks_model.dart';
 
 sealed class Utils {
@@ -51,7 +53,7 @@ sealed class Utils {
   }
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
-    final _details = Completer<SongYtDetails?>();
+    final _details = Completer<SongYtDetails>();
     final artist = track.artists?.asString.split(',').first;
     _repo.getDetailsFromQuery('${track.name} $artist').then((details) {
       _details.complete(details);
@@ -61,19 +63,17 @@ sealed class Utils {
         size: const Size.square(200));
 
     final details = await _details.future;
-    final color = palete.lightVibrantColor?.color;
-    final darkColor = palete.darkVibrantColor?.color;
 
     return TrackDetails(
       id: track.id,
       albumId: track.album?.id,
       title: track.name,
-      bgColor: color,
-      darkBgColor: darkColor,
+      bgColor: palete.lightVibrantColor?.color,
+      darkBgColor: palete.darkVibrantColor?.color,
       image: track.album?.image,
       subtitle: track.artists?.asString,
-      duration: details?.duration,
-      videoId: details?.videoId,
+      duration: details.duration,
+      videoId: details.videoId,
     );
   }
 
@@ -108,6 +108,10 @@ sealed class Utils {
       title: track.title ?? '',
       extras: {'uri': uri, ...track.toJson()},
     );
+  }
+
+  static EventTransformer<T> debounce<T>(Duration duration) {
+    return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
   }
 
 //   static String timeFromNow(DateTime? date) {

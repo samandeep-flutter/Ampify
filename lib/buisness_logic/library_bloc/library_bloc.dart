@@ -4,7 +4,6 @@ import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rxdart/rxdart.dart';
 import '../../data/data_models/library_model.dart';
 
 class LibraryEvent extends Equatable {
@@ -105,22 +104,18 @@ class LibraryState extends Equatable {
 
 enum SortOrder { alphabetical, owner, custom }
 
-EventTransformer<T> _debounce<T>(Duration duration) {
-  return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
-}
-
 class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   LibraryBloc() : super(const LibraryState.init()) {
     on<LibraryInitial>(_onInit);
     on<LibraryRefresh>(_onRefresh);
     on<LibraryLoadMore>(_onLoadMore);
     on<LibraryFiltered>(_onFiltered);
-    on<LibraryLoadTrigger>(_onLoadTrigger, transformer: _debounce(duration));
+    on<LibraryLoadTrigger>(_onLoadTrigger,
+        transformer: Utils.debounce(Durations.short4));
     on<LibrarySorted>(_onSorted);
   }
   final LibraryRepo _repo = getIt();
   final box = BoxServices.instance;
-  final duration = const Duration(milliseconds: 200);
   final scrollController = ScrollController();
   List<LibraryModel> _libItems = [];
 
