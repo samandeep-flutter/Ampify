@@ -57,7 +57,9 @@ class Album extends Equatable {
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
       tracks: List<Track>.from(json['tracks']?['items']?.map((e) {
-            return Track.fromJson(e, image: albumImage);
+            final album =
+                Album(image: albumImage, name: json['name'], id: json['id']);
+            return Track.fromJson(e, image: albumImage, album: album);
           }) ??
           []),
       copyrights: List<Copyrights>.from(json['copyrights']?.map((e) {

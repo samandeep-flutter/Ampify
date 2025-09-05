@@ -25,7 +25,7 @@ class MusicGroupTile extends StatelessWidget {
           result = await context.pushNamed<bool>(AppRoutes.likedSongs);
         } else {
           result = await context.pushNamed<bool>(AppRoutes.musicGroup,
-              pathParameters: {'id': item.id!, 'type': item.type!.name});
+              pathParameters: {'id': item.id!, 'type': item.type?.name ?? ''});
         }
 
         if (result ?? false) {

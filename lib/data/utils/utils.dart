@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/repositories/music_repo.dart';
@@ -63,13 +62,14 @@ sealed class Utils {
         size: const Size.square(200));
 
     final details = await _details.future;
+    final defColor = palete.dominantColor?.color;
 
     return TrackDetails(
       id: track.id,
       albumId: track.album?.id,
       title: track.name,
-      bgColor: palete.lightVibrantColor?.color,
-      darkBgColor: palete.darkVibrantColor?.color,
+      bgColor: palete.vibrantColor?.color ?? defColor,
+      darkBgColor: palete.darkVibrantColor?.color ?? defColor,
       image: track.album?.image,
       subtitle: track.artists?.asString,
       duration: details.duration,
@@ -82,7 +82,7 @@ sealed class Utils {
       final palete = await PaletteGenerator.fromImageProvider(
           NetworkImage(image!),
           size: const Size(200, 200));
-      return palete.dominantColor?.color;
+      return palete.vibrantColor?.color ?? palete.dominantColor?.color;
     } catch (_) {
       return null;
     }
@@ -113,29 +113,4 @@ sealed class Utils {
   static EventTransformer<T> debounce<T>(Duration duration) {
     return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
   }
-
-//   static String timeFromNow(DateTime? date) {
-//     if (date == null) return '';
-//     final diff = now.difference(date);
-//     if (diff.inDays > 0) {
-//       switch (diff.inDays) {
-//         case > 364:
-//           return '${(diff.inDays / 365).toStringAsFixed(1)} years ago';
-//         case > 30:
-//           return '${(diff.inDays / 30.416).round()} days ago';
-//         case > 6:
-//           return '${(diff.inDays / 7).round()} weeks ago';
-//         case 1:
-//           return '1 day ago';
-//         default:
-//           return '${diff.inDays} days ago';
-//       }
-//     } else if (diff.inHours > 0) {
-//       return '${diff.inHours} hours ago';
-//     } else if (diff.inMinutes > 0) {
-//       return '${diff.inMinutes} min ago';
-//     }
-
-//     return 'Just now';
-//   }
 }

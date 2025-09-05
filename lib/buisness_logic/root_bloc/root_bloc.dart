@@ -11,6 +11,8 @@ sealed class RootEvent extends Equatable {
   List<Object?> get props => [];
 }
 
+class RootTabReset extends RootEvent {}
+
 class RootTabChanged extends RootEvent {
   final int index;
   const RootTabChanged(this.index);
@@ -35,6 +37,7 @@ class RootState extends Equatable {
 class RootBloc extends Bloc<RootEvent, RootState> {
   RootBloc() : super(const RootState.init()) {
     on<RootTabChanged>(_onTap);
+    on<RootTabReset>(_onReset);
   }
   final List<BottomNavigationBarItem> tabs = [
     BottomNavigationBarItem(
@@ -79,5 +82,9 @@ class RootBloc extends Bloc<RootEvent, RootState> {
 
   void _onTap(RootTabChanged event, Emitter<RootState> emit) {
     emit(state.copyWith(event.index));
+  }
+
+  void _onReset(RootTabReset event, Emitter<RootState> emit) {
+    emit(const RootState.init());
   }
 }

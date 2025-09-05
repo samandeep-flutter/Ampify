@@ -20,8 +20,6 @@ Future<void> initGetIt() async {
   getIt.registerLazySingleton<AppLinks>(() => AppLinks());
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<YoutubeExplode>(() => YoutubeExplode());
-  getIt.registerSingletonAsync<AudioHandler>(audioServicesInit);
-  getIt.registerSingletonAsync<AuthServices>(AuthServices.to.init);
   getIt.registerLazySingleton<LoggingInterceptor>(() => LoggingInterceptor());
   getIt.registerLazySingleton<Dio>(() => Dio());
   getIt.registerLazySingleton<DioClient>(
@@ -34,4 +32,10 @@ Future<void> initGetIt() async {
       () => MusicGroupRepo(dio: getIt()));
   getIt.registerLazySingleton(
       () => MusicRepo(ytMusic: getIt(), ytExplode: getIt(), dio: getIt()));
+
+  // async singletons
+  getIt.registerSingletonAsync<AuthServices>(AuthServices.to.init);
+  await getIt.isReady<AuthServices>();
+  getIt.registerSingletonAsync<AudioHandler>(audioServicesInit);
+  await getIt.isReady<AudioHandler>();
 }

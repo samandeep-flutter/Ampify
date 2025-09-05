@@ -273,14 +273,14 @@ class ShadowWidget extends StatelessWidget {
           BoxShadow(
             color: color,
             offset: offset ?? Offset.zero,
-            spreadRadius: spread ?? context.width * .35,
-            blurRadius: spread ?? context.width * .35,
+            spreadRadius: spread ?? context.width * .5,
+            blurRadius: spread ?? context.width * .4,
           ),
           if (darkShadow)
             BoxShadow(
               color: Colors.black12,
-              spreadRadius: Dimens.sizeSmall,
-              blurRadius: Dimens.sizeExtraDoubleLarge,
+              spreadRadius: Dimens.sizeDefault,
+              blurRadius: Dimens.sizeMidLarge,
             ),
         ],
       ),
@@ -341,5 +341,19 @@ class BottomSheetListTile extends StatelessWidget {
         color: scheme.textColor,
       ),
     );
+  }
+}
+
+class DisabledWidget extends StatelessWidget {
+  /// defaults to true.
+  final bool? disabled;
+  final Widget child;
+  const DisabledWidget({super.key, this.disabled, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+        opacity: disabled ?? true ? .5 : 1,
+        child: AbsorbPointer(absorbing: disabled ?? true, child: child));
   }
 }

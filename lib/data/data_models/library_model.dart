@@ -7,12 +7,18 @@ import 'package:equatable/equatable.dart';
 
 class LibraryModel extends Equatable {
   final String? id;
-  final String? albumId;
-  final String? image;
   final String? name;
+  final String? image;
+  final String? albumId;
   final LibItemType? type;
   final OwnerModel? owner;
   final String? uri;
+
+  /// only available for library albums.
+  final DateTime? addedAt;
+
+  /// only available in playlists.
+  final String? snapId;
 
   const LibraryModel({
     this.id,
@@ -20,7 +26,9 @@ class LibraryModel extends Equatable {
     this.name,
     this.type,
     this.owner,
+    this.addedAt,
     this.albumId,
+    this.snapId,
     this.uri,
   });
 
@@ -28,6 +36,8 @@ class LibraryModel extends Equatable {
     OwnerModel? owner;
     String? images;
     String? type;
+
+    // get owner and type respectively
     if (json['type'] == 'playlist') {
       owner = OwnerModel.fromJson(json['owner']);
       type = json['type'];
@@ -45,6 +55,7 @@ class LibraryModel extends Equatable {
       }
     }
 
+    // get image url respectively.
     if (json['type'] == 'track') {
       images = json['album']?['images'];
     } else {
@@ -57,11 +68,13 @@ class LibraryModel extends Equatable {
 
     return LibraryModel(
       id: json['id'],
-      albumId: json['album']?['id'],
+      owner: owner,
       image: images,
       name: json['name'],
+      albumId: json['album']?['id'],
       type: LibItemType.values.firstWhere((e) => e.name == type),
-      owner: owner,
+      addedAt: DateTime.tryParse(json['added_at'] ?? ''),
+      snapId: json['snapshot_id'],
       uri: json['uri'],
     );
   }
@@ -81,7 +94,17 @@ class LibraryModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, image, name, type, owner, albumId];
+  List<Object?> get props => [
+        id,
+        image,
+        name,
+        type,
+        owner,
+        albumId,
+        uri,
+        snapId,
+        addedAt,
+      ];
 }
 
 enum LibItemType { playlist, album, track, single, compilation }

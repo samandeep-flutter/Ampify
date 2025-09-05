@@ -63,6 +63,8 @@ class PlayerQueueAdded extends PlayerEvent {
 
 class PlayerQueueCleared extends PlayerEvent {}
 
+class PlayerUpNextCleared extends PlayerEvent {}
+
 class PlayerTrackEnded extends PlayerEvent {}
 
 class MusicGroupPlayed extends PlayerEvent {

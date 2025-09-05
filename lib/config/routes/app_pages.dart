@@ -7,6 +7,7 @@ import 'package:ampify/presentation/home_screens/listn_history.dart';
 import 'package:ampify/presentation/library_screens/library_screen.dart';
 import 'package:ampify/presentation/library_screens/profile_view.dart';
 import 'package:ampify/presentation/music_groups/edit_playlist.dart';
+import 'package:ampify/presentation/root_view/not_found_screen.dart';
 import 'package:ampify/presentation/search_screens/search_page.dart';
 import 'package:ampify/presentation/root_view/auth_screen.dart';
 import 'package:flutter/foundation.dart';
@@ -27,6 +28,7 @@ abstract class AppPage {
     initialLocation: '/${_auth.initialRoute}',
     debugLogDiagnostics: kDebugMode,
     navigatorKey: _auth.navigator,
+    errorBuilder: (_, state) => NotFoundScreen(state),
     routes: [
       GoRoute(
         name: AppRoutes.auth,
@@ -83,14 +85,18 @@ abstract class AppPage {
                 name: AppRoutes.musicGroup,
                 path: AppRoutePaths.musicGroup,
                 builder: (context, state) {
-                  String id = state.pathParameters['id']!;
-                  final type = LibItemType.values.firstWhere((e) {
-                    return e.name == state.pathParameters['type'];
-                  });
-
-                  return BlocProvider(
-                      create: (_) => MusicGroupBloc(),
-                      child: MusicGroupScreen(id: id, type: type));
+                  try {
+                    String id = state.pathParameters['id']!;
+                    final type = LibItemType.values.firstWhere((e) {
+                      return e.name == state.pathParameters['type'];
+                    }, orElse: () => LibItemType.album);
+                    return BlocProvider(
+                        create: (_) => MusicGroupBloc(),
+                        child: MusicGroupScreen(id: id, type: type));
+                  } catch (e) {
+                    logPrint(e, 'route');
+                    return NotFoundScreen(state);
+                  }
                 }),
             GoRoute(
               name: AppRoutes.searchView,

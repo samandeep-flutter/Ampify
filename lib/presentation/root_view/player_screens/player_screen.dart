@@ -1,13 +1,13 @@
 import 'dart:math';
+import 'package:ampify/presentation/root_view/player_screens/queue_view.dart';
+import 'package:flutter/material.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
-import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
+import 'package:ampify/data/utils/exports.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../track_widgets/track_bottom_sheet.dart';
-import 'queue_view.dart';
 
 class PlayerScreen extends StatelessWidget {
   const PlayerScreen({super.key});
@@ -65,10 +65,10 @@ class PlayerScreen extends StatelessWidget {
                         final _bg = context.isDarkMode
                             ? state.track.darkBgColor
                             : state.track.bgColor;
-                        final fgColor = _bg?.withAlpha(100);
+                        final fgColor = _bg?.withAlpha(150);
                         final bgColor = scheme.background;
                         return ShadowWidget(
-                          offset: const Offset(0, 50),
+                          offset: const Offset(0, -Dimens.sizeDefault),
                           darkShadow: context.isDarkMode,
                           margin: const EdgeInsets.all(Dimens.sizeMedium),
                           color: Color.alphaBlend(fgColor ?? bgColor, bgColor),
@@ -196,24 +196,27 @@ class PlayerScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        BlocBuilder<PlayerBloc, PlayerState>(
-                            buildWhen: (pr, cr) => pr.shuffle != cr.shuffle,
-                            builder: (context, state) {
-                              return IconButton(
-                                onPressed: bloc.onShuffle,
-                                iconSize: Dimens.iconDefault,
-                                isSelected: state.shuffle,
-                                style: IconButton.styleFrom(
-                                    backgroundColor:
-                                        state.shuffle ? scheme.primary : null),
-                                selectedIcon: Image.asset(ImageRes.shuffle,
-                                    width: Dimens.iconMedium,
-                                    color: scheme.onPrimary),
-                                icon: Image.asset(ImageRes.shuffle,
-                                    height: Dimens.iconMedium,
-                                    color: scheme.textColor),
-                              );
-                            }),
+                        DisabledWidget(
+                          child: BlocBuilder<PlayerBloc, PlayerState>(
+                              buildWhen: (pr, cr) => pr.shuffle != cr.shuffle,
+                              builder: (context, state) {
+                                return IconButton(
+                                  onPressed: bloc.onShuffle,
+                                  iconSize: Dimens.iconDefault,
+                                  isSelected: state.shuffle,
+                                  style: IconButton.styleFrom(
+                                      backgroundColor: state.shuffle
+                                          ? scheme.primary
+                                          : null),
+                                  selectedIcon: Image.asset(ImageRes.shuffle,
+                                      width: Dimens.iconMedium,
+                                      color: scheme.onPrimary),
+                                  icon: Image.asset(ImageRes.shuffle,
+                                      height: Dimens.iconMedium,
+                                      color: scheme.textColor),
+                                );
+                              }),
+                        ),
                         IconButton(
                           onPressed: () => bloc.add(PlayerPreviousTrack()),
                           color: scheme.textColor,
@@ -246,24 +249,24 @@ class PlayerScreen extends StatelessWidget {
                           color: scheme.textColor,
                           icon: const Icon(Icons.skip_next_rounded),
                         ),
-                        BlocBuilder<PlayerBloc, PlayerState>(
-                            buildWhen: (pr, cr) => pr.loopMode != cr.loopMode,
-                            builder: (context, state) {
-                              return IconButton(
-                                  onPressed: bloc.onRepeat,
-                                  isSelected:
-                                      state.loopMode != MusicLoopMode.off,
-                                  style: IconButton.styleFrom(
-                                      backgroundColor:
-                                          state.loopMode != MusicLoopMode.off
-                                              ? scheme.primary
-                                              : null),
-                                  iconSize: Dimens.iconDefault,
-                                  selectedIcon: Icon(state.loopMode.icon,
-                                      color: scheme.onPrimary),
-                                  icon: Icon(state.loopMode.icon,
-                                      color: scheme.textColor));
-                            }),
+                        DisabledWidget(
+                          child: BlocBuilder<PlayerBloc, PlayerState>(
+                              buildWhen: (pr, cr) => pr.loopMode != cr.loopMode,
+                              builder: (context, state) {
+                                return IconButton(
+                                    onPressed: bloc.onRepeat,
+                                    isSelected: !state.loopMode.isOff,
+                                    style: IconButton.styleFrom(
+                                        backgroundColor:!state.loopMode.isOff
+                                            ? scheme.primary
+                                            : null),
+                                    iconSize: Dimens.iconDefault,
+                                    selectedIcon: Icon(state.loopMode.icon,
+                                        color: scheme.onPrimary),
+                                    icon: Icon(state.loopMode.icon,
+                                        color: scheme.textColor));
+                              }),
+                        ),
                       ],
                     ),
                   ),
@@ -276,13 +279,13 @@ class PlayerScreen extends StatelessWidget {
                             foregroundColor: scheme.textColor),
                         onPressed: () {
                           showModalBottomSheet(
-                              context: context,
-                              useSafeArea: false,
-                              isScrollControlled: true,
-                              enableDrag: true,
-                              backgroundColor: scheme.background,
-                              builder: (_) =>
-                                  const SafeArea(child: QueueView()));
+                            context: context,
+                            useSafeArea: false,
+                            isScrollControlled: true,
+                            enableDrag: true,
+                            backgroundColor: scheme.background,
+                            builder: (_) => const QueueView(),
+                          );
                         },
                         label: Text(StringRes.queue,
                             style: TextStyle(fontSize: Dimens.fontDefault)),

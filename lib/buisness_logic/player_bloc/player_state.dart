@@ -46,15 +46,18 @@ class PlayerState extends Equatable {
     MusicState? playerState,
   }) {
     return PlayerState(
-        musicGroupId: musicGroupId ?? this.musicGroupId,
-        track: track ?? this.track,
-        isLiked: isLiked ?? this.isLiked,
-        queue: queue ?? this.queue,
-        upNext: upNext ?? this.upNext,
-        shuffle: shuffle ?? this.shuffle,
-        loopMode: loopMode ?? this.loopMode,
-        playerState: playerState ?? this.playerState);
+      musicGroupId: musicGroupId ?? this.musicGroupId,
+      track: track ?? this.track,
+      isLiked: isLiked ?? this.isLiked,
+      queue: queue ?? this.queue,
+      upNext: upNext ?? this.upNext,
+      shuffle: shuffle ?? this.shuffle,
+      loopMode: loopMode ?? this.loopMode,
+      playerState: playerState ?? this.playerState,
+    );
   }
+
+  bool get isQueueEmpty => queue.isEmpty && upNext.isEmpty;
 
   @override
   List<Object?> get props => [
@@ -65,7 +68,7 @@ class PlayerState extends Equatable {
         isLiked,
         queue,
         upNext,
-        playerState
+        playerState,
       ];
 
   // @override

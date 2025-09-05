@@ -32,7 +32,6 @@ class _RootViewState extends State<RootView> {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final bloc = context.read<RootBloc>();
-    final searchBloc = context.read<SearchBloc>();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -42,51 +41,52 @@ class _RootViewState extends State<RootView> {
         alignment: Alignment.bottomCenter,
         children: [
           widget.tabBar,
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              BlocBuilder<PlayerBloc, PlayerState>(buildWhen: (pr, cr) {
-                return pr.playerState.isHidden != cr.playerState.isHidden;
-              }, builder: (context, state) {
-                return AnimatedSlide(
-                    duration: Durations.medium2,
-                    offset: Offset(0, state.playerState.isHidden ? 2 : .05),
-                    child: PlayerCompact());
-              }),
-              DecoratedBox(
-                decoration: BoxDecoration(
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                BlocBuilder<PlayerBloc, PlayerState>(buildWhen: (pr, cr) {
+                  return pr.playerState.isHidden != cr.playerState.isHidden;
+                }, builder: (context, state) {
+                  return AnimatedSlide(
+                      duration: Durations.medium2,
+                      offset: Offset(0, state.playerState.isHidden ? 2 : 0),
+                      child: PlayerCompact());
+                }),
+                DecoratedBox(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
-                  stops: [.65, .85, 1],
-                  colors: [
-                    scheme.surface,
-                    scheme.surface.withAlpha(200),
-                    scheme.surface.withAlpha(0),
-                  ],
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                )),
-                child: BlocBuilder<RootBloc, RootState>(
-                  buildWhen: (pr, cr) => pr.index != cr.index,
-                  builder: (context, state) {
-                    return BottomNavigationBar(
-                      backgroundColor: Colors.transparent,
-                      elevation: Dimens.sizeExtraLarge,
-                      selectedFontSize: Dimens.fontDefault,
-                      unselectedFontSize: Dimens.fontMed,
-                      unselectedItemColor: scheme.disabled,
-                      selectedItemColor: scheme.textColor,
-                      onTap: (index) {
-                        if (index != 1) searchBloc.onSearchClear();
-                        bloc.onIndexChange(context, index: index);
-                      },
-                      currentIndex: state.index,
-                      items: bloc.tabs,
-                    );
-                  },
-                ),
-              )
-            ],
+                      stops: [.2, .8, 1],
+                      colors: [
+                        scheme.surface,
+                        scheme.surface.withAlpha(150),
+                        scheme.surface.withAlpha(0),
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                  child: BlocBuilder<RootBloc, RootState>(
+                    buildWhen: (pr, cr) => pr.index != cr.index,
+                    builder: (context, state) {
+                      return BottomNavigationBar(
+                        backgroundColor: Colors.transparent,
+                        elevation: Dimens.sizeExtraLarge,
+                        selectedFontSize: Dimens.fontDefault,
+                        unselectedFontSize: Dimens.fontMed,
+                        unselectedItemColor: scheme.disabled,
+                        selectedItemColor: scheme.textColor,
+                        onTap: (index) =>
+                            bloc.onIndexChange(context, index: index),
+                        currentIndex: state.index,
+                        items: bloc.tabs,
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
           ),
         ],
       ),

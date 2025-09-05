@@ -1,4 +1,5 @@
 import 'package:ampify/buisness_logic/library_bloc/liked_songs_bloc.dart';
+import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/track_widgets/addto_playlist.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
@@ -104,11 +105,10 @@ class TrackBottomSheet extends StatelessWidget {
         ),
         BottomSheetListTile(
             onTap: () {
-              Navigator.pop(context);
-              context.pushNamed(
-                AppRoutes.musicGroup,
-                pathParameters: {'id': track.album!.id!, 'type': track.type!},
-              );
+              context.close(2);
+              final type = LibItemType.album.name;
+              context.pushNamed(AppRoutes.musicGroup,
+                  pathParameters: {'id': track.album!.id!, 'type': type});
             },
             enable: track.album?.id != null,
             title: StringRes.gotoAlbum,

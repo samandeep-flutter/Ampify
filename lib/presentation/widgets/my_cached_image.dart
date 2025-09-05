@@ -60,18 +60,18 @@ class _MyCachedImageState extends State<MyCachedImage> {
       final _thumbnail = Padding(
           padding: EdgeInsets.all(isAvatar ? _radius * .7 : Dimens.iconXLarge),
           child: Image.asset(_path,
-              color: scheme.disabled, fit: widget.fit ?? BoxFit.cover));
+              color: scheme.backgroundDark, fit: widget.fit ?? BoxFit.cover));
 
       if (isAvatar) {
         return CircleAvatar(
-            backgroundColor: scheme.backgroundDark,
+            backgroundColor: scheme.shimmer,
             radius: widget.avatarRadius,
             child: loading ? Shimmer.avatar : _thumbnail);
       }
       return ClipRRect(
           borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
           child: Container(
-              color: scheme.backgroundDark,
+              color: scheme.shimmer,
               height: widget.height,
               width: widget.width,
               child: loading ? Shimmer.box : _thumbnail));

@@ -15,8 +15,9 @@ class AuthRepo {
   static final _box = BoxServices.instance;
 
   @protected
-  final _scopes =
-      'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public user-read-recently-played user-read-private user-library-modify user-library-read user-top-read ugc-image-upload';
+  final _scopes = 'playlist-read-private playlist-read-collaborative'
+      ' playlist-modify-private playlist-modify-public user-read-recently-played'
+      ' user-read-private user-library-modify user-library-read user-top-read ugc-image-upload';
 
   Future<String?> auth() async {
     try {

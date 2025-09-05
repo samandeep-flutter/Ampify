@@ -120,7 +120,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   List<LibraryModel> _libItems = [];
 
   void _onInit(LibraryInitial event, Emitter<LibraryState> emit) {
-    scrollController.addListener(_loadMoreItems);
+    // scrollController.addListener(_loadMoreItems);
     add(LibraryRefresh());
   }
 
@@ -144,14 +144,14 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     }
   }
 
-  void _loadMoreItems() {
-    if (!scrollController.hasClients || state.moreLoading) return;
-    final total = state.albumCount + state.playlistCount;
-    if (_libItems.length >= total) return;
-    if (scrollController.position.extentAfter < 300) {
-      add(LibraryLoadMore());
-    }
-  }
+  // void _loadMoreItems() {
+  //   if (!scrollController.hasClients || state.moreLoading) return;
+  //   final total = state.albumCount + state.playlistCount;
+  //   if (_libItems.length >= total) return;
+  //   if (scrollController.position.extentAfter < 300) {
+  //     add(LibraryLoadMore());
+  //   }
+  // }
 
   void _onFiltered(LibraryFiltered event, Emitter<LibraryState> emit) {
     if (state.filterSel == null) _libItems = state.items;

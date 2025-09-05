@@ -200,12 +200,13 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         add(PlaylistCoverChanged(File(file.path)));
         return true;
       }
-      throw Exception(StringRes.noImage);
+      throw FormatException(StringRes.noImage);
+    } on FormatException catch (e) {
+      showToast(e.message);
     } catch (e) {
-      showToast(StringRes.noImage);
       logPrint(e, 'Image Picker');
-      return false;
     }
+    return false;
   }
 
   void _scrollListener() {
@@ -230,9 +231,9 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
     if (event.type.isPlaylist) {
       add(PlaylistInitial(event.id));
-      return;
+    } else {
+      add(AlbumInitial(id: event.id, type: event.type));
     }
-    add(AlbumInitial(id: event.id, type: event.type));
   }
 
   Future<void> _onPlaylist(
@@ -308,33 +309,23 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   Future<void> _onFav(
       MusicGroupFav event, Emitter<MusicGroupState> emit) async {
     libRefresh = true;
-    if (event.liked) {
-      try {
-        emit(state.copyWith(isFav: false));
-        if (event.type == LibItemType.playlist) {
-          final result = await _repo.removeSavedPlaylist(event.id);
-          if (!result) throw Exception();
-          return;
-        }
-        final result = await _repo.removeSavedAlbum(event.id);
-        if (!result) throw Exception();
-      } catch (_) {
-        emit(state.copyWith(isFav: true));
-      }
-      return;
-    }
-
     try {
-      emit(state.copyWith(isFav: true));
-      if (event.type == LibItemType.playlist) {
-        final result = await _repo.savePlaylist(event.id);
-        if (!result) throw Exception();
-        return;
+      emit(state.copyWith(isFav: !event.liked));
+      if (event.liked) {
+        final success = event.type.isPlaylist
+            ? await _repo.removeSavedPlaylist(event.id)
+            : await _repo.removeSavedAlbum(event.id);
+        if (!success) throw const FormatException();
+      } else {
+        final success = event.type.isPlaylist
+            ? await _repo.savePlaylist(event.id)
+            : await _repo.saveAlbum(event.id);
+        if (!success) throw const FormatException();
       }
-      final result = await _repo.saveAlbum(event.id);
-      if (!result) throw Exception();
-    } catch (_) {
-      emit(state.copyWith(isFav: false));
+    } on FormatException {
+      emit(state.copyWith(isFav: event.liked));
+    } catch (e) {
+      logPrint(e, 'Fav');
     }
   }
 

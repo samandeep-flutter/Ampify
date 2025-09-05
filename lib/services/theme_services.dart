@@ -1,11 +1,9 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 
 class _Themes extends InheritedWidget {
-  final _ThemeServiceState data;
-  const _Themes({required super.child, required this.data});
+  final ThemeServiceState scheme;
+  const _Themes({required super.child, required this.scheme});
 
   @override
   bool updateShouldNotify(_Themes oldWidget) => true;
@@ -15,24 +13,24 @@ class ThemeServices extends StatefulWidget {
   final Widget child;
   const ThemeServices({super.key, required this.child});
 
-  static _ThemeServiceState? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_Themes>()?.data;
+  static ThemeServiceState? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_Themes>()?.scheme;
   }
 
-  static _ThemeServiceState of(BuildContext context) {
+  static ThemeServiceState of(BuildContext context) {
     assert(maybeOf(context) != null);
     return maybeOf(context)!;
   }
 
   @override
-  State<ThemeServices> createState() => _ThemeServiceState();
+  State<ThemeServices> createState() => ThemeServiceState();
 }
 
 extension MyThemeState on BuildContext {
-  _ThemeServiceState get scheme => ThemeServices.of(this);
+  ThemeServiceState get scheme => ThemeServices.of(this);
 }
 
-class _ThemeServiceState extends State<ThemeServices> {
+class ThemeServiceState extends State<ThemeServices> {
   @protected
   final _box = BoxServices.instance;
 
@@ -97,14 +95,14 @@ class _ThemeServiceState extends State<ThemeServices> {
     switch (mode?.brightness ?? _box.themeMode.brightness) {
       case Brightness.dark:
         _primaryAdaptive = theme.primaryDark;
-        _background = const Color(0xFF212121);
-        _backgroundDark = const Color(0xFF4F4F4F);
-        _surface = const Color(0xFF303030);
+        _background = const Color(0xFF171717);
+        _backgroundDark = const Color(0xFF353535);
+        _surface = const Color(0xFF252525);
         _textColor = const Color(0xFFEEEEEE);
         _textColorLight = const Color(0xFF9B9B9B);
         _onError = const Color(0xFF523C40);
         _onSuccess = const Color(0xFF4C5E4A);
-        _shimmer = Color(0xFF404040);
+        _shimmer = const Color(0xFF212121);
         break;
       case Brightness.light:
         _primaryAdaptive = theme.primary;
@@ -126,7 +124,7 @@ class _ThemeServiceState extends State<ThemeServices> {
 
   @override
   Widget build(BuildContext context) {
-    return _Themes(data: this, child: widget.child);
+    return _Themes(scheme: this, child: widget.child);
   }
 }
 

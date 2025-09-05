@@ -1,5 +1,6 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -121,15 +122,9 @@ class HomeScreen extends StatelessWidget {
                         final item = state.albums[index];
 
                         return HomeAlbumTile(
-                          onTap: () {
-                            context.pushNamed(AppRoutes.musicGroup,
-                                pathParameters: {
-                                  'id': item.id!,
-                                  'type': item.type!.name
-                                });
-                          },
                           image: item.image,
                           title: item.name,
+                          onTap: () => toMusicGroup(context, album: item),
                           subtitle: item.artists?.asString,
                         );
                       });
@@ -139,6 +134,11 @@ class HomeScreen extends StatelessWidget {
             SliverSizedBox(height: context.height * .15),
           ],
         ));
+  }
+
+  void toMusicGroup(BuildContext context, {required Album album}) {
+    context.pushNamed(AppRoutes.musicGroup,
+        pathParameters: {'id': album.id!, 'type': album.type?.name ?? ''});
   }
 }
 

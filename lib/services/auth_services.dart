@@ -4,6 +4,7 @@ import 'package:ampify/data/repositories/auth_repo.dart';
 import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:app_links/app_links.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 
 class AuthServices {
@@ -15,12 +16,20 @@ class AuthServices {
   BuildContext? get context => navigator.currentContext;
 
   final AppLinks _appLinks = getIt();
+  AudioSession? session;
+
+  @protected
   final box = BoxServices.instance;
 
   ProfileModel? profile;
 
   Future<AuthServices> init() async {
     _appLinks.uriLinkStream.listen(_dynamicLinks);
+    try {
+      session = await AudioSession.instance;
+    } catch (e) {
+      logPrint(e, 'auth init');
+    }
     return this;
   }
 

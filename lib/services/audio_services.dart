@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
 import '../data/utils/exports.dart';
 
@@ -26,11 +27,20 @@ class MyAudioHandler extends BaseAudioHandler {
     _playerStream();
     _positionStream();
     _indexChanges();
+    _interruptionListener();
     playbackState.add(playbackState.value.copyWith(
-      systemActions: const {MediaAction.seek},
+      systemActions: const {
+        MediaAction.seek,
+        MediaAction.play,
+        MediaAction.pause,
+        MediaAction.skipToNext,
+        MediaAction.skipToPrevious
+      },
       androidCompactActionIndices: const [0, 1, 3],
       repeatMode: _player.loopMode.toRepeatMode,
       shuffleMode: AudioServiceShuffleMode.none,
+      updatePosition: _player.position,
+      bufferedPosition: _player.bufferedPosition,
       speed: _player.speed,
     ));
     return this;
@@ -44,11 +54,15 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> play() async {
+    final session = getIt<AuthServices>().session;
+    session?.setActive(true);
     await _player.play();
   }
 
   @override
   Future<void> pause() async {
+    final session = getIt<AuthServices>().session;
+    session?.setActive(false);
     await _player.pause();
   }
 
@@ -61,6 +75,7 @@ class MyAudioHandler extends BaseAudioHandler {
   Future<void> playMediaItem(MediaItem mediaItem) async {
     queue.drain();
     await _player.setAudioSource(mediaItem.toAudioSource);
+    this.mediaItem.add(mediaItem);
     queue.add([mediaItem]);
     _player.play();
   }
@@ -70,8 +85,6 @@ class MyAudioHandler extends BaseAudioHandler {
     try {
       if (!_player.hasNext) return;
       await _player.seekToNext();
-      // if (_index >= queue.value.length - 1) return;
-      // mediaItem.add(queue.value[++_index]);
     } catch (e) {
       logPrint(e, 'audio next');
     }
@@ -82,8 +95,6 @@ class MyAudioHandler extends BaseAudioHandler {
     try {
       if (!_player.hasPrevious) return;
       await _player.seekToPrevious();
-      // if (_index <= 0) return;
-      // mediaItem.add(queue.value[--_index]);
     } catch (e) {
       logPrint(e, 'audio previous');
     }
@@ -148,6 +159,8 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> stop() async {
+    final session = getIt<AuthServices>().session;
+    session?.setActive(false);
     await _player.stop();
     return super.stop();
   }
@@ -184,28 +197,26 @@ class MyAudioHandler extends BaseAudioHandler {
   void _indexChanges() {
     _player.currentIndexStream.listen((index) {
       if (index == null || index == _index) return;
-      logPrint('index: $index, ${queue.value.length}');
-      final item = _player.audioSource?.sequence.firstOrNull;
-      logPrint('$index, ${queue.value.map((e) => e.title).asString}'
-          '\n player: ${item?.tag['title']}');
       mediaItem.add(queue.value[index]);
       _index = index;
     });
   }
 
-  // void _durationListener() {
-  //   _player.durationStream.listen((duration) {
-  //     var index = _player.currentIndex;
-  //     final newQueue = queue.value;
-  //     if (index == null || newQueue.isEmpty) return;
-  //     if (_player.shuffleModeEnabled) {
-  //       index = _player.shuffleIndices.indexOf(index);
-  //     }
-  //     final oldMediaItem = newQueue[index];
-  //     final newMediaItem = oldMediaItem.copyWith(duration: duration);
-  //     newQueue[index] = newMediaItem;
-  //     queue.add(newQueue);
-  //     mediaItem.add(newMediaItem);
-  //   });
-  // }
+  Future<void> _interruptionListener() async {
+    final session = getIt<AuthServices>().session;
+    session?.becomingNoisyEventStream.listen((_) => pause());
+    session?.interruptionEventStream.listen((event) {
+      switch (event.type) {
+        case AudioInterruptionType.duck:
+          _player.setVolume(event.begin ? .3 : 1);
+          break;
+        case AudioInterruptionType.pause:
+          event.begin ? pause() : play();
+          break;
+        case AudioInterruptionType.unknown:
+          event.begin ? pause() : stop();
+          break;
+      }
+    });
+  }
 }

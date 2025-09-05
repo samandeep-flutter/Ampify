@@ -1,15 +1,12 @@
-import 'package:ampify/data/utils/exports.dart';
+import 'package:ampify/data/utils/app_constants.dart';
+import 'package:ampify/services/extension_services.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import '../data_provider/api_response.dart';
 import '../data_provider/dio_client.dart';
 
 class MusicGroupRepo {
   final DioClient dio;
   const MusicGroupRepo({required this.dio});
-
-  @protected
-  static final _box = BoxServices.instance;
 
   Future<bool> isFavPlaylist(String id) async {
     final response = await dio.get(AppConstants.isFollowPlaylist(id));
@@ -67,7 +64,7 @@ class MusicGroupRepo {
 
   Future<void> getUserPlaylists(
     String? id, {
-    int? limit,
+    // int? limit,
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
@@ -84,14 +81,9 @@ class MusicGroupRepo {
     required Function(Map<String, dynamic> json) onSuccess,
     Function(Map<String, dynamic> error)? onError,
   }) async {
-    final token = _box.read(BoxKeys.token);
     final body = {'name': title, 'public': true};
-    final hearders = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
     final response = await dio.post(AppConstants.userPlaylists(userId),
-        options: Options(headers: hearders), data: body);
+        options: Options(contentType: 'application/json'), data: body);
     ApiResponse.verify(response,
         onSuccess: onSuccess,
         onError: onError ?? (e) => logPrint(e, 'create playlist'));
@@ -102,26 +94,16 @@ class MusicGroupRepo {
       required String title,
       required String desc,
       required bool public}) async {
-    final token = _box.read(BoxKeys.token);
     final body = {'name': title, 'description': desc, 'public': public};
-    final hearders = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
     final response = await dio.put(AppConstants.playlistDetails(id),
-        options: Options(headers: hearders), data: body);
+        options: Options(contentType: 'application/json'), data: body);
     return response.response?.statusCode == 200;
   }
 
   Future<bool> changeCoverImage(
       {required String id, required String image}) async {
-    final token = _box.read(BoxKeys.token);
-    final hearders = {
-      'Content-Type': 'image/jpeg',
-      'Authorization': 'Bearer $token'
-    };
     final response = await dio.put(AppConstants.changePlaylistCover(id),
-        options: Options(headers: hearders), data: image);
+        options: Options(contentType: 'image/jpeg'), data: image);
     return response.response?.statusCode == 202;
   }
 

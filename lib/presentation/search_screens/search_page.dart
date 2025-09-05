@@ -19,27 +19,30 @@ class SearchPage extends StatelessWidget {
         scrolledUnderElevation: 0,
         backgroundColor: scheme.background,
         toolbarHeight: Dimens.circularBoder,
-        title: BlocBuilder<SearchBloc, SearchState>(
-          buildWhen: (previous, current) {
-            final query = bloc.searchContr.text.trim();
-            return query.isEmpty || query.length == 1;
-          },
-          builder: (context, state) {
-            final query = bloc.searchContr.text;
-            return SearchTextField(
-              title: 'Search',
-              controller: bloc.searchContr,
-              focusNode: bloc.focusNode,
-              trailing: query.isNotEmpty
-                  ? IconButton(
-                      onPressed: bloc.onSearchClear,
-                      color: scheme.disabled,
-                      icon: const Icon(Icons.clear),
-                    )
-                  : null,
-              borderRadius: Dimens.borderSmall,
-            );
-          },
+        title: PopScope(
+          onPopInvokedWithResult: (didPop, _) => bloc.onSearchClear(),
+          child: BlocBuilder<SearchBloc, SearchState>(
+            buildWhen: (previous, current) {
+              final query = bloc.searchContr.text.trim();
+              return query.isEmpty || query.length == 1;
+            },
+            builder: (context, state) {
+              final query = bloc.searchContr.text;
+              return SearchTextField(
+                title: 'Search',
+                controller: bloc.searchContr,
+                focusNode: bloc.focusNode,
+                trailing: query.isNotEmpty
+                    ? IconButton(
+                        onPressed: bloc.onSearchClear,
+                        color: scheme.disabled,
+                        icon: const Icon(Icons.clear),
+                      )
+                    : null,
+                borderRadius: Dimens.borderSmall,
+              );
+            },
+          ),
         ),
       ),
       child: Column(

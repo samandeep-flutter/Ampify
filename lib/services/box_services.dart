@@ -13,9 +13,8 @@ class BoxServices {
   final box = GetStorage(BoxKeys.boxName);
 
   MyTheme get theme {
-    String? title = box.read(BoxKeys.theme);
     return MyTheme.values.firstWhere(
-      (element) => element.title == title,
+      (e) => e.title == box.read(BoxKeys.theme),
       orElse: () => MyTheme.values.first,
     );
   }
@@ -27,9 +26,8 @@ class BoxServices {
   }
 
   ThemeMode get themeMode {
-    String? brightness = box.read(BoxKeys.themeMode);
     return ThemeMode.values.firstWhere(
-      (element) => element.name == brightness,
+      (e) => e.name == box.read(BoxKeys.themeMode),
       orElse: () => ThemeMode.dark,
     );
   }

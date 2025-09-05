@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:equatable/equatable.dart';
@@ -42,26 +43,18 @@ class PlayerSliderState extends Equatable {
 class PlayerSliderBloc extends Bloc<PlayerSliderEvents, PlayerSliderState> {
   PlayerSliderBloc() : super(const PlayerSliderState.init()) {
     on<PlayerSliderChange>(_onSliderChange);
-    on<PlayerSliderReset>(_onSliderReset,
-        transformer: Utils.debounce(Durations.long2));
-
-    _audioHandler.customEvent.listen((duration) {
-      if (duration is! Duration) return;
-      if (!state.current.isZero && state.current == duration) {
-        add(PlayerSliderReset());
-      } else {
-        add(PlayerSliderChange(duration.ceil()));
-      }
-    });
+    on<PlayerSliderReset>(_onSliderReset);
   }
 
-  @override
-  void onEvent(PlayerSliderEvents event) {
-    dprint(event.runtimeType.toString());
-    super.onEvent(event);
-  }
+  // @override
+  // void onEvent(PlayerSliderEvents event) {
+  //   dprint(event.runtimeType.toString());
+  //   super.onEvent(event);
+  // }
 
   final AudioHandler _audioHandler = getIt();
+  StreamSubscription? streamSub;
+  Stream get durationStream => _audioHandler.customEvent;
 
   void _onSliderChange(
       PlayerSliderChange event, Emitter<PlayerSliderState> emit) {
@@ -72,5 +65,11 @@ class PlayerSliderBloc extends Bloc<PlayerSliderEvents, PlayerSliderState> {
   void _onSliderReset(
       PlayerSliderReset event, Emitter<PlayerSliderState> emit) {
     emit(const PlayerSliderState.init());
+  }
+
+  @override
+  Future<void> close() {
+    streamSub?.cancel();
+    return super.close();
   }
 }

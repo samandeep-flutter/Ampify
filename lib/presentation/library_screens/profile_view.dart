@@ -1,5 +1,7 @@
+import 'package:ampify/buisness_logic/root_bloc/root_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -122,7 +124,11 @@ class _ProfileViewState extends State<ProfileView>
                     style: TextStyle(fontSize: Dimens.fontDefault)),
               ),
               TextButton(
-                onPressed: auth.logout,
+                onPressed: () {
+                  final bloc = context.read<RootBloc>();
+                  bloc.add(RootTabReset());
+                  auth.logout();
+                },
                 style:
                     TextButton.styleFrom(foregroundColor: context.scheme.error),
                 child: Text(StringRes.logout.toUpperCase(),
@@ -162,7 +168,7 @@ class _ProfileViewState extends State<ProfileView>
                       context.scheme.switchThemeMode(theme);
                       await Future.delayed(Durations.medium4);
                       // ignore: use_build_context_synchronously
-                      context.pop();
+                      if (mounted) Navigator.pop(context);
                     },
                   );
                 }),

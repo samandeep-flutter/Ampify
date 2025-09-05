@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 sealed class AppConstants {
   static const String baseUrl = 'https://api.spotify.com/v1/';
   static const String token = 'https://accounts.spotify.com/api/token';
+
   static const String search = 'search';
   static const String profile = 'me';
   static const String myPlaylists = 'me/playlists';
@@ -63,8 +64,8 @@ void logPrint(Object? value, [String? name]) {
   dev.log(log ?? 'null', name: name ?? StringRes.appName);
 }
 
-void dprint(String? value) {
-  if (!kReleaseMode) debugPrint(value ?? 'null');
+void dprint(Object? value) {
+  if (kDebugMode) print(value ?? 'null');
 }
 
 class MyColoredBox extends StatelessWidget {
