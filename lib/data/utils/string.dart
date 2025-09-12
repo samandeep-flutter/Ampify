@@ -99,6 +99,10 @@ sealed class StringRes {
       ' personalize your playlist.';
   static const String noSpotifyTracks = 'There are currenlty no tracks to show'
       ', tracks will begin to appear as you listen to them!';
+  static const String noNewTracks =
+      'No new tracks available. Stay tuned for updates.';
+  static const String cannotbePlayed =
+      'This track cannot be played at the moment.';
   static const String errorPage = 'The specified page cannot be found, '
       'please try again or contact the developer';
 }

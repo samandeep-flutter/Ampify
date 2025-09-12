@@ -61,8 +61,8 @@ class AuthRepo {
   }
 
   Future<void> refreshToken({
-    required Function(Map<String, dynamic> json) onSuccess,
-    required Function(Map<String, dynamic> error) onError,
+    required SuccessCallback onSuccess,
+    required ErrorCallback onError,
   }) async {
     final data = {
       'grant_type': 'refresh_token',

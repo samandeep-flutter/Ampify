@@ -5,11 +5,11 @@ import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_storage/get_storage.dart';
 import 'buisness_logic/home_bloc/home_bloc.dart';
 import 'buisness_logic/library_bloc/library_bloc.dart';
@@ -21,8 +21,7 @@ import 'buisness_logic/root_bloc/root_bloc.dart';
 import 'buisness_logic/search_bloc/search_bloc.dart';
 
 void main() async {
-  final binding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: binding);
+  WidgetsFlutterBinding.ensureInitialized();
   await _initServices();
   runApp(const ThemeServices(child: MyApp()));
 }
@@ -54,8 +53,6 @@ Future<void> _initServices() async {
     await getIt<AuthServices>().getProfile();
   } catch (e) {
     logPrint(e, 'init');
-  } finally {
-    FlutterNativeSplash.remove();
   }
 }
 
@@ -70,6 +67,7 @@ class MyApp extends StatelessWidget {
       routerConfig: AppPage.routes,
       title: StringRes.appName,
       debugShowCheckedModeBanner: false,
+      scrollBehavior: CupertinoScrollBehavior(),
       builder: (context, child) {
         ResponsiveFont.init(context);
         return ResponsiveBreakpoints.builder(

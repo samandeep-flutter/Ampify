@@ -120,12 +120,7 @@ class _MyTextFieldState extends State<MyTextField> {
                       splashRadius: 10,
                       selectedIcon: const Icon(Icons.visibility),
                       isSelected: isSelected,
-                      onPressed: () {
-                        setState(() {
-                          isSelected = !isSelected;
-                          obscureText = !obscureText;
-                        });
-                      },
+                      onPressed: _toggleVisibility,
                       icon: const Icon(Icons.visibility_off))
                   : null,
               label: Text(widget.title),
@@ -151,6 +146,13 @@ class _MyTextFieldState extends State<MyTextField> {
             return null;
           },
     );
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      isSelected = !isSelected;
+      obscureText = !obscureText;
+    });
   }
 }
 

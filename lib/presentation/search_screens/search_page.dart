@@ -14,7 +14,6 @@ class SearchPage extends StatelessWidget {
     final bloc = context.read<SearchBloc>();
 
     return BaseWidget(
-      padding: EdgeInsets.zero,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         backgroundColor: scheme.background,
@@ -53,20 +52,18 @@ class SearchPage extends StatelessWidget {
                 return Expanded(
                   child: ListView.builder(
                     itemCount: 12,
+                    physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.only(top: Dimens.sizeDefault),
                     itemBuilder: (_, __) => const SongTileShimmer(),
                   ),
                 );
-              }
-              if (state.results == null) {
+              } else if (state.results == null) {
                 return ToolTipWidget.placeHolder(
                   scrolable: true,
                   icon: ImageRes.music,
                   title: StringRes.searchBarSubtitle,
                 );
-              }
-
-              if (state.results!.isEmpty) {
+              } else if (state.results!.isEmpty) {
                 return ToolTipWidget.placeHolder(
                   scrolable: true,
                   icon: ImageRes.search,
@@ -76,6 +73,7 @@ class SearchPage extends StatelessWidget {
 
               return Expanded(
                 child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.only(bottom: context.height * .18),
                   itemCount: state.results?.length ?? 0,
                   itemBuilder: (context, index) {

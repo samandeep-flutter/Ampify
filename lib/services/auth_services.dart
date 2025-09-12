@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:ampify/data/repositories/auth_repo.dart';
@@ -15,18 +16,21 @@ class AuthServices {
   final navigator = GlobalKey<NavigatorState>();
   BuildContext? get context => navigator.currentContext;
 
+  final _connectionStream = StreamController<bool>();
+  Stream<bool> get connectionStream => _connectionStream.stream;
+  bool _isConnected = true;
+
   final AppLinks _appLinks = getIt();
+  final _box = BoxServices.instance;
+
   AudioSession? session;
-
-  @protected
-  final box = BoxServices.instance;
-
   ProfileModel? profile;
 
   Future<AuthServices> init() async {
     _appLinks.uriLinkStream.listen(_dynamicLinks);
     try {
       session = await AudioSession.instance;
+      _connectionStream.add(true);
     } catch (e) {
       logPrint(e, 'auth init');
     }
@@ -47,11 +51,17 @@ class AuthServices {
 
   String get initialRoute {
     try {
-      box.read(BoxKeys.token) as String;
+      _box.read(BoxKeys.token) as String;
       return AppRoutes.homeView;
     } catch (_) {
       return AppRoutes.auth;
     }
+  }
+
+  Future<void> setConnection(bool result) async {
+    if (result == _isConnected) return;
+    _connectionStream.add(result);
+    _isConnected = result;
   }
 
   Future<void> getProfile() async {
@@ -62,9 +72,13 @@ class AuthServices {
   }
 
   Future<void> logout() async {
-    await box.remove(BoxKeys.token);
-    await box.remove(BoxKeys.uid);
-    await box.remove(BoxKeys.refreshToken);
+    await _box.remove(BoxKeys.token);
+    await _box.remove(BoxKeys.uid);
+    await _box.remove(BoxKeys.refreshToken);
     context?.goNamed(AppRoutes.auth);
+  }
+
+  void dispose() {
+    _connectionStream.close();
   }
 }

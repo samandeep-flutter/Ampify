@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:ampify/data/utils/app_constants.dart';
 import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
-import 'package:flutter/material.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import '../data_provider/dio_client.dart';
 
@@ -14,7 +13,6 @@ class MusicRepo {
   MusicRepo(
       {required this.ytMusic, required this.ytExplode, required this.dio});
 
-  @protected
   final _ytClients = [YoutubeApiClient.androidVr];
 
   Future<Uri?> searchSong(String query) async {

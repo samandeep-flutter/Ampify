@@ -53,7 +53,7 @@ class MyBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomSheet(
-        onClosing: onClose ?? () {},
+        onClosing: () {},
         animationController: BottomSheet.createAnimationController(vsync),
         builder: (_) {
           return SafeArea(
@@ -67,17 +67,20 @@ class MyBottomSheet extends StatelessWidget {
                       fontSize: Dimens.fontXXLarge,
                       fontWeight: FontWeight.w600,
                     )),
-                Padding(
-                  padding: const EdgeInsets.only(right: Dimens.sizeDefault),
-                  child: TextButton(
-                    onPressed: onClose ?? () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                        visualDensity: VisualDensity.compact),
-                    child: Text(
-                      StringRes.close.toUpperCase(),
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: Dimens.fontDefault),
+                PopScope(
+                  onPopInvokedWithResult: (didPop, _) => onClose?.call(),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: Dimens.sizeDefault),
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact),
+                      child: Text(
+                        StringRes.close.toUpperCase(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimens.fontDefault),
+                      ),
                     ),
                   ),
                 ),

@@ -1,6 +1,7 @@
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
+import 'package:ampify/services/extension_services.dart';
 import 'package:equatable/equatable.dart';
 import 'other_models.dart';
 
@@ -40,10 +41,7 @@ class Album extends Equatable {
   });
 
   factory Album.fromJson(Map<String, dynamic> json) {
-    final albumImage = (json['images'] as List?)?.isNotEmpty ?? false
-        ? (json['images'] as List?)?.first['url']
-        : null;
-
+    final albumImage = (json['images'] as List?)?.firstElement?['url'];
     return Album(
       albumType: json['album_type'],
       totalTracks: json['total_tracks'],

@@ -1,8 +1,10 @@
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/data/utils/exports.dart';
+import 'package:ampify/presentation/widgets/custom_scroll_physics.dart';
 import '../../buisness_logic/root_bloc/music_group_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,6 +45,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
 
           return CustomScrollView(
             controller: bloc.scrollController,
+            physics: const BottomBounceScrollPhysics(),
             slivers: [
               SliverAppBar(
                 expandedHeight: context.height * .35,
@@ -253,24 +256,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           if (bloc.uid! == state.details?.owner?.id) ...[
                             const SizedBox(width: Dimens.sizeSmall),
                             IconButton(
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  showDragHandle: true,
-                                  useRootNavigator: true,
-                                  builder: (context) {
-                                    return BlocProvider.value(
-                                      value: bloc,
-                                      child: PlaylistBottomSheet(
-                                        id: state.id,
-                                        image: state.image,
-                                        title: state.title,
-                                        details: state.details,
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
+                              onPressed: () => _toMoreDetails(bloc, state),
                               style: IconButton.styleFrom(
                                 visualDensity: VisualDensity.compact,
                               ),
@@ -290,24 +276,47 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             ),
                           ],
                           const Spacer(),
-                          BlocBuilder<PlayerBloc, PlayerState>(
-                            builder: (context, pl) {
-                              final group = pl.musicGroupId == state.id;
-                              return LoadingIcon(
-                                onPressed: () => bloc.onPlay(context),
-                                iconSize: Dimens.iconXLarge,
-                                loaderSize: Dimens.iconXLarge,
-                                isSelected: group && pl.playerState.isPlaying,
-                                selectedIcon: const Icon(Icons.pause),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: scheme.textColor,
-                                  foregroundColor: scheme.surface,
-                                  splashFactory: NoSplash.splashFactory,
-                                ),
-                                icon: const Icon(Icons.play_arrow),
-                              );
-                            },
+                          DisabledWidget(
+                            child: BlocBuilder<PlayerBloc, PlayerState>(
+                                buildWhen: (pr, cr) => pr.shuffle != cr.shuffle,
+                                builder: (context, state) {
+                                  return IconButton(
+                                    onPressed: _shuffleToggle,
+                                    iconSize: Dimens.iconDefault,
+                                    isSelected: state.shuffle,
+                                    style: IconButton.styleFrom(
+                                        backgroundColor: state.shuffle
+                                            ? scheme.primary
+                                            : null),
+                                    selectedIcon: Image.asset(ImageRes.shuffle,
+                                        width: Dimens.iconMedium,
+                                        color: scheme.onPrimary),
+                                    icon: Image.asset(ImageRes.shuffle,
+                                        height: Dimens.iconMedium,
+                                        color: scheme.textColor),
+                                  );
+                                }),
                           ),
+                          const SizedBox(width: Dimens.sizeDefault),
+                          BlocBuilder<PlayerBloc, PlayerState>(
+                              buildWhen: (pr, cr) {
+                            return pr.playerState != cr.playerState;
+                          }, builder: (context, pl) {
+                            final group = pl.musicGroupId == state.id;
+                            return LoadingIcon(
+                              onPressed: () => bloc.onPlay(context),
+                              iconSize: Dimens.iconXLarge,
+                              loaderSize: Dimens.iconXLarge,
+                              isSelected: group && pl.playerState.isPlaying,
+                              selectedIcon: const Icon(Icons.pause),
+                              style: IconButton.styleFrom(
+                                backgroundColor: scheme.textColor,
+                                foregroundColor: scheme.surface,
+                                splashFactory: NoSplash.splashFactory,
+                              ),
+                              icon: const Icon(Icons.play_arrow),
+                            );
+                          }),
                         ],
                       ),
                     ],
@@ -391,7 +400,8 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                 ),
                               const WidgetSpan(child: SizedBox(width: 8)),
                               TextSpan(
-                                text: rights?.first.text?.removeCoprights,
+                                text:
+                                    rights?.firstElement?.text?.removeCoprights,
                               ),
                             ],
                           ),
@@ -400,11 +410,35 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                     },
                   ),
                 ),
-              SliverSizedBox(height: context.height * .18),
+              SliverSizedBox(height: context.height * .2),
             ],
           );
         },
       ),
+    );
+  }
+
+  void _shuffleToggle() {
+    final player = context.read<PlayerBloc>();
+    player.add(PlayerShuffleToggle());
+  }
+
+  void _toMoreDetails(MusicGroupBloc bloc, MusicGroupState state) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      useRootNavigator: true,
+      builder: (context) {
+        return BlocProvider.value(
+          value: bloc,
+          child: PlaylistBottomSheet(
+            id: state.id,
+            image: state.image,
+            title: state.title,
+            details: state.details,
+          ),
+        );
+      },
     );
   }
 }

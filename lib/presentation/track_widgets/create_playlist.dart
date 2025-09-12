@@ -15,6 +15,7 @@ class CreatePlaylistView extends StatelessWidget {
 
     return BaseWidget(
         appBar: AppBar(backgroundColor: scheme.background),
+        bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
         child: ListView(
           children: [
             SizedBox(height: context.height * .1),
@@ -69,6 +70,7 @@ class CreatePlaylistView extends StatelessWidget {
                 const SizedBox(width: Dimens.sizeDefault),
                 Expanded(
                   child: BlocBuilder<PlaylistBloc, PlaylistState>(
+                    buildWhen: (pr, cr) => pr.loading != cr.loading,
                     builder: (context, state) {
                       return LoadingButton(
                         isLoading: state.loading,

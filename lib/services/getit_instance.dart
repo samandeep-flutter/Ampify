@@ -17,13 +17,11 @@ import '../data/repositories/music_repo.dart';
 GetIt getIt = GetIt.instance;
 
 Future<void> initGetIt() async {
+  getIt.registerLazySingleton<Dio>(() => Dio());
   getIt.registerLazySingleton<AppLinks>(() => AppLinks());
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<YoutubeExplode>(() => YoutubeExplode());
-  getIt.registerLazySingleton<LoggingInterceptor>(() => LoggingInterceptor());
-  getIt.registerLazySingleton<Dio>(() => Dio());
-  getIt.registerLazySingleton<DioClient>(
-      () => DioClient(dio: getIt(), interceptor: getIt()));
+  getIt.registerLazySingleton<DioClient>(() => DioClient(dio: getIt()));
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepo(dio: getIt()));
   getIt.registerLazySingleton<HomeRepo>(() => HomeRepo(dio: getIt()));
   getIt.registerLazySingleton<SearchRepo>(() => SearchRepo(dio: getIt()));

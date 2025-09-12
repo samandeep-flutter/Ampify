@@ -14,6 +14,7 @@ extension MyContext on BuildContext {
   double get height => MediaQuery.sizeOf(this).height;
   double get width => MediaQuery.sizeOf(this).width;
   Orientation get orientation => MediaQuery.orientationOf(this);
+  double get bottomInsets => MediaQuery.viewInsetsOf(this).bottom;
   bool get isDarkMode =>
       MediaQuery.platformBrightnessOf(this) == Brightness.dark;
 
@@ -61,7 +62,7 @@ extension ArtistNames on List<Artist> {
 
 extension MyMediaItems on MediaItem {
   AudioSource get toAudioSource {
-    return AudioSource.uri(extras!['uri'] as Uri, tag: extras);
+    return AudioSource.uri(Uri.parse(extras!['uri'] as String), tag: extras);
   }
 }
 
@@ -79,6 +80,8 @@ extension MyList<T> on List<T> {
     }
     return null;
   }
+
+  T? get firstElement => isEmpty ? null : first;
 }
 
 extension MyPlaybackState on PlaybackState {
@@ -331,9 +334,9 @@ extension SortMusicGroup on List<LibraryModel> {
 extension MyInt on int {
   String get format => _format(this);
   String get digit2 => this < 10 ? '0${toString()}' : toString();
-  String get digit3=> _digit3(this);
+  String get digit3 => _digit3(this);
 
-  String  _digit3(int count) {
+  String _digit3(int count) {
     switch (count) {
       case < 10:
         return '00${toString()}';

@@ -9,8 +9,8 @@ class SearchRepo {
   Future<void> search(
     String query, {
     int? limit,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    required SuccessCallback onSuccess,
+    ErrorCallback? onError,
   }) async {
     if (query.isEmpty) return;
     // add ',artist' to get artists in search.

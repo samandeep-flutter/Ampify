@@ -19,7 +19,8 @@ sealed class ResponsiveFont {
   // }
 
   static void init(BuildContext context) {
-    _scaleFactor = MediaQuery.textScalerOf(context);
+    _scaleFactor = MediaQuery.textScalerOf(context)
+        .clamp(minScaleFactor: 0.85, maxScaleFactor: 1.2);
   }
 
   // static double scale(double value) => value * _scaleFactor;

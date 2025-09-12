@@ -89,10 +89,7 @@ class _LibraryScreenState extends State<LibraryScreen>
         actions: [
           TextButton.icon(
             style: TextButton.styleFrom(foregroundColor: scheme.textColor),
-            onPressed: () {
-              context.pushNamed(AppRoutes.createPlaylist,
-                  pathParameters: {'userId': bloc.box.uid!});
-            },
+            onPressed: () => _toCreatePlaylist(bloc.box.uid!),
             label: Text(
               StringRes.create,
               style: TextStyle(fontSize: Dimens.fontDefault),
@@ -103,34 +100,36 @@ class _LibraryScreenState extends State<LibraryScreen>
           const SizedBox(width: Dimens.sizeSmall),
         ],
       ),
-      padding: EdgeInsets.zero,
-      child: ListView(
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         controller: bloc.scrollController,
-        children: [
-          const SizedBox(height: Dimens.sizeSmall),
-          Row(
-            children: [
-              const SizedBox(width: Dimens.sizeSmall),
-              BlocBuilder<LibraryBloc, LibraryState>(
-                buildWhen: (pr, cr) => pr.sortby != cr.sortby,
-                builder: (context, state) {
-                  return TextButton.icon(
-                    onPressed: sortBy,
-                    style: IconButton.styleFrom(
-                      foregroundColor: scheme.textColor,
-                    ),
-                    label: Text(
-                      state.sortby?.name.capitalize ?? StringRes.sortBy,
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: Dimens.fontDefault),
-                    ),
-                    icon: Image.asset(ImageRes.sort,
-                        height: Dimens.iconSmall, color: scheme.textColor),
-                  );
-                },
-              ),
-            ],
+        slivers: [
+          const SliverSizedBox(height: Dimens.sizeSmall),
+          SliverToBoxAdapter(
+            child: Row(
+              children: [
+                const SizedBox(width: Dimens.sizeSmall),
+                BlocBuilder<LibraryBloc, LibraryState>(
+                  buildWhen: (pr, cr) => pr.sortby != cr.sortby,
+                  builder: (context, state) {
+                    return TextButton.icon(
+                      onPressed: sortBy,
+                      style: IconButton.styleFrom(
+                        foregroundColor: scheme.textColor,
+                      ),
+                      label: Text(
+                        state.sortby?.name.capitalize ?? StringRes.sortBy,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimens.fontDefault),
+                      ),
+                      icon: Image.asset(ImageRes.sort,
+                          height: Dimens.iconSmall, color: scheme.textColor),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
           BlocBuilder<LibraryBloc, LibraryState>(
             buildWhen: (pr, cr) {
@@ -144,21 +143,16 @@ class _LibraryScreenState extends State<LibraryScreen>
             },
             builder: (context, state) {
               if (state.loading) {
-                return ListView.builder(
+                return SliverList.builder(
                   itemCount: 10,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
                   itemBuilder: (_, __) => const SongTileShimmer(iconSize: 55),
                 );
               }
 
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+              return SliverList.builder(
                 itemCount: state.items.length,
-                itemBuilder: (context, index) {
-                  final item = state.items[index];
-                  return MusicGroupTile(item);
+                itemBuilder: (_, index) {
+                  return MusicGroupTile(state.items[index]);
                 },
               );
             },
@@ -167,18 +161,24 @@ class _LibraryScreenState extends State<LibraryScreen>
             buildWhen: (pr, cr) => pr.moreLoading != cr.moreLoading,
             builder: (context, state) {
               if (state.moreLoading) {
-                return Column(
-                  children: List.generate(3, (_) {
-                    return const SongTileShimmer(iconSize: 55);
-                  }),
+                return SliverToBoxAdapter(
+                  child: Column(
+                    children: List.generate(3, (_) {
+                      return const SongTileShimmer(iconSize: 55);
+                    }),
+                  ),
                 );
               }
-              return SizedBox(height: context.height * .1);
+              return SliverSizedBox(height: context.height * .15);
             },
           ),
         ],
       ),
     );
+  }
+
+  void _toCreatePlaylist(String id) {
+    context.pushNamed(AppRoutes.createPlaylist, pathParameters: {'userId': id});
   }
 
   ButtonStyle defTextButtonStyle(bool sel) {
@@ -194,8 +194,6 @@ class _LibraryScreenState extends State<LibraryScreen>
   }
 
   void sortBy() {
-    final scheme = context.scheme;
-    final bloc = context.read<LibraryBloc>();
     showModalBottomSheet(
       context: context,
       showDragHandle: true,
@@ -208,14 +206,14 @@ class _LibraryScreenState extends State<LibraryScreen>
             children: SortOrder.values.map((e) {
               return ListTile(
                 onTap: () async {
-                  bloc.add(LibrarySorted(e));
+                  context.read<LibraryBloc>().add(LibrarySorted(e));
                   await Future.delayed(Durations.short4);
                   // ignore: use_build_context_synchronously
                   if (mounted) Navigator.pop(context);
                 },
                 title: Text(e.name.capitalize),
                 titleTextStyle: TextStyle(
-                  color: scheme.textColor,
+                  color: context.scheme.textColor,
                   fontSize: Dimens.fontXXXLarge,
                   fontWeight: FontWeight.w500,
                 ),

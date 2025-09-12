@@ -9,8 +9,8 @@ class HomeRepo {
   Future<void> getNewReleases({
     int? limit,
     int? offset,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    required SuccessCallback onSuccess,
+    ErrorCallback? onError,
   }) async {
     final url = AppConstants.newReleases(offset ?? 0);
     final response = await dio.get('$url&limit=${limit ?? 10}');
@@ -21,8 +21,8 @@ class HomeRepo {
 
   Future<void> getSeveralTracks({
     required List<String> ids,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    required SuccessCallback onSuccess,
+    ErrorCallback? onError,
   }) async {
     final _ids = ids.asString.noSpace;
     final response = await dio.get(AppConstants.severalTracks(_ids));
@@ -32,8 +32,8 @@ class HomeRepo {
 
   Future<void> getSeveralAlbums({
     required List<String> ids,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    required SuccessCallback onSuccess,
+    ErrorCallback? onError,
   }) async {
     final _ids = ids.asString.noSpace;
     final response = await dio.get(AppConstants.severalTracks(_ids));
@@ -43,8 +43,8 @@ class HomeRepo {
 
   Future<void> browseCategory({
     int? limit,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    required SuccessCallback onSuccess,
+    ErrorCallback? onError,
   }) async {
     final url = AppConstants.browse('en_IN');
     final response = await dio.get('$url&limit=${limit ?? 10}');
@@ -52,10 +52,8 @@ class HomeRepo {
         onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'browse'));
   }
 
-  Future<void> recentlyPlayed({
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
-  }) async {
+  Future<void> recentlyPlayed(
+      {required SuccessCallback onSuccess, ErrorCallback? onError}) async {
     final response = await dio.get(AppConstants.recentlyPlayed);
     ApiResponse.verify(response,
         onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'recent'));

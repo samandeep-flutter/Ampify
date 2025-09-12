@@ -106,7 +106,7 @@ sealed class Utils {
       artist: track.subtitle ?? '',
       artUri: Uri.tryParse(track.image ?? ''),
       title: track.title ?? '',
-      extras: {'uri': uri, ...track.toJson()},
+      extras: {'uri': uri.toString(), ...track.toJson()},
     );
   }
 

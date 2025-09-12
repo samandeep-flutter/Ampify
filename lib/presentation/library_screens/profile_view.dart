@@ -25,7 +25,9 @@ class _ProfileViewState extends State<ProfileView>
         titleTextStyle: Utils.defTitleStyle(context),
         centerTitle: false,
       ),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
       child: ListView(
+        physics: const BouncingScrollPhysics(),
         children: [
           const SizedBox(height: Dimens.sizeDefault),
           Row(
@@ -104,7 +106,6 @@ class _ProfileViewState extends State<ProfileView>
   }
 
   void logout() {
-    final AuthServices auth = getIt();
     showDialog(
         context: context,
         builder: (context) {
@@ -125,8 +126,7 @@ class _ProfileViewState extends State<ProfileView>
               ),
               TextButton(
                 onPressed: () {
-                  final bloc = context.read<RootBloc>();
-                  bloc.add(RootTabReset());
+                  context.read<RootBloc>().add(RootTabReset());
                   auth.logout();
                 },
                 style:

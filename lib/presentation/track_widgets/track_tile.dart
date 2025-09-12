@@ -46,15 +46,50 @@ class TrackTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    track.name ?? '',
-                    style: TextStyle(
-                      color: scheme.textColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: Dimens.fontXXXLarge,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  BlocBuilder<PlayerBloc, PlayerState>(
+                    buildWhen: (pr, cr) {
+                      final playing = pr.playerState != cr.playerState;
+                      final _track = pr.track.id != cr.track.id;
+                      final isRelevant =
+                          cr.track.id == track.id || pr.track.id == track.id;
+
+                      return (playing || _track) && isRelevant;
+                    },
+                    builder: (context, state) {
+                      return RichText(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          children: [
+                            if (state.track.id == track.id) ...[
+                              WidgetSpan(
+                                  child: SizedBox.square(
+                                dimension: Dimens.iconMedSmall,
+                                child: Image.asset(
+                                    state.playerState.isPlaying
+                                        ? ImageRes.musicWave
+                                        : ImageRes.musicWavePaused,
+                                    fit: BoxFit.cover,
+                                    color: scheme.primary),
+                              )),
+                              const WidgetSpan(
+                                  child:
+                                      SizedBox(width: Dimens.sizeExtraSmall)),
+                            ],
+                            TextSpan(
+                              text: track.name ?? '',
+                              style: TextStyle(
+                                color: state.track.id == track.id
+                                    ? scheme.primary
+                                    : scheme.textColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: Dimens.fontXXXLarge,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                   SubtitleWidget(
                     style: TextStyle(
@@ -163,24 +198,20 @@ class TrackDetailsTile extends StatelessWidget {
                               fontSize: Dimens.fontXXXLarge),
                           children: [
                             WidgetSpan(
-                              child: SizedBox.square(
-                                  dimension: Dimens.iconMedSmall,
-                                  child: BlocBuilder<PlayerBloc, PlayerState>(
-                                      buildWhen: (pr, cr) =>
-                                          pr.playerState != cr.playerState,
-                                      builder: (_, state) {
-                                        if (state.playerState.isPlaying) {
-                                          return Image.asset(ImageRes.musicWave,
-                                              fit: BoxFit.cover,
-                                              color: scheme.primary);
-                                        }
-
-                                        return Image.asset(
-                                            ImageRes.musicWavePaused,
-                                            fit: BoxFit.cover,
-                                            color: scheme.primary);
-                                      })),
-                            ),
+                                child: SizedBox.square(
+                              dimension: Dimens.iconMedSmall,
+                              child: BlocBuilder<PlayerBloc, PlayerState>(
+                                  buildWhen: (pr, cr) {
+                                return pr.playerState != cr.playerState;
+                              }, builder: (_, state) {
+                                return Image.asset(
+                                    state.playerState.isPlaying
+                                        ? ImageRes.musicWave
+                                        : ImageRes.musicWavePaused,
+                                    fit: BoxFit.cover,
+                                    color: scheme.primary);
+                              }),
+                            )),
                             const WidgetSpan(
                                 child: SizedBox(width: Dimens.sizeExtraSmall)),
                             TextSpan(text: track.title ?? ''),

@@ -187,9 +187,9 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     final playing = player.state.playerState.isPlaying;
     if (playing && player.state.musicGroupId == state.id) {
       player.onPlayPause();
-      return;
+    } else {
+      player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
     }
-    player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
   }
 
   Future<bool> pickImage(ImageSource source) async {
@@ -250,10 +250,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
       }
       final color = await Utils.getImageColor(playlist.image);
       final isFav = await _repo.isFavPlaylist(event.id);
-      String? release;
-      try {
-        release = playlist.tracks?.first.addedAt;
-      } catch (_) {}
+      final release = playlist.tracks?.firstElement?.addedAt;
       final details = MusicGroupDetails(
           owner: playlist.owner,
           public: playlist.public,
@@ -284,12 +281,12 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
       final color = await Utils.getImageColor(album.image);
       final isFav = await _repo.isFavAlbum(event.id);
       final details = MusicGroupDetails(
-          copyrights: album.copyrights,
-          releaseDate: DateTime.tryParse(album.releaseDate ?? ''),
-          owner: OwnerModel(
-            name: album.artists?.first.name,
-            id: album.artists?.first.id,
-          ));
+        copyrights: album.copyrights,
+        releaseDate: DateTime.tryParse(album.releaseDate ?? ''),
+        owner: OwnerModel(
+            name: album.artists?.firstElement?.name,
+            id: album.artists?.firstElement?.id),
+      );
       completer.complete(true);
 
       emit(state.copyWith(

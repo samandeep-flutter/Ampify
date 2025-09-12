@@ -13,6 +13,8 @@ class AddtoPlaylistSheet extends StatefulWidget {
 }
 
 class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
+  final _box = BoxServices.instance;
+
   @override
   void initState() {
     final bloc = context.read<AddtoPlaylistBloc>();
@@ -30,7 +32,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
             final playlists = state.items.where((e) {
-              final myPlaylists = e.owner?.id == bloc.box.uid!;
+              final myPlaylists = e.owner?.id == _box.uid!;
               return e.type.isPlaylist && myPlaylists;
             }).toList();
             return Column(
@@ -48,12 +50,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                     ),
                     const Spacer(),
                     ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        final id = bloc.box.uid!;
-                        context.pushNamed(AppRoutes.createPlaylist,
-                            pathParameters: {'userId': id});
-                      },
+                      onPressed: () => _toCreatePlaylist(context),
                       style: ElevatedButton.styleFrom(
                           backgroundColor: scheme.primaryAdaptive,
                           foregroundColor: scheme.onPrimary,
@@ -80,6 +77,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                   return Flexible(
                     child: GridView.builder(
                       padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                      physics: const BouncingScrollPhysics(),
                       scrollDirection: playlists.length > 2
                           ? Axis.horizontal
                           : Axis.vertical,
@@ -175,5 +173,11 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
             );
           }),
     );
+  }
+
+  void _toCreatePlaylist(BuildContext context) {
+    Navigator.pop(context);
+    context.pushNamed(AppRoutes.createPlaylist,
+        pathParameters: {'userId': _box.uid!});
   }
 }

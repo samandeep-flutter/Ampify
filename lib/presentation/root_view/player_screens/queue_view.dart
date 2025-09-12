@@ -15,146 +15,147 @@ class QueueView extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<PlayerBloc>();
     final scheme = context.scheme;
-    return SafeArea(
-      minimum: const EdgeInsets.only(top: kToolbarHeight),
-      child: BaseWidget(
-        padding: EdgeInsets.zero,
-        color: scheme.background,
-        resizeBottom: false,
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          backgroundColor: scheme.background,
-          automaticallyImplyLeading: false,
-          title: const Text(StringRes.queueTitle),
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-            fontSize: Dimens.fontXXXLarge,
-            fontWeight: FontWeight.w600,
-            color: scheme.textColor,
-          ),
-          leading: Align(
-            alignment: Alignment.topCenter,
-            child: IconButton(
-                onPressed: () => Navigator.pop(context),
-                iconSize: Dimens.iconDefault,
-                icon: Transform.rotate(
-                  angle: 3 * pi / 2,
-                  child: const Icon(Icons.arrow_back_ios),
-                )),
-          ),
+
+    return BaseWidget(
+      color: scheme.background,
+      resizeBottom: false,
+      padding: EdgeInsets.only(top: Dimens.sizeSmall),
+      shapeRadius: BorderRadius.vertical(
+        top: Radius.circular(Dimens.borderLarge),
+      ),
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        backgroundColor: scheme.background,
+        automaticallyImplyLeading: false,
+        title: const Text(StringRes.queueTitle),
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          fontSize: Dimens.fontXXXLarge,
+          fontWeight: FontWeight.w600,
+          color: scheme.textColor,
         ),
-        bottom: const BottomPlayer(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BlocListener<PlayerBloc, PlayerState>(
-              listener: (context, state) {
-                if (state.playerState.isHidden) Navigator.pop(context);
+        leading: Align(
+          alignment: Alignment.topCenter,
+          child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              iconSize: Dimens.iconDefault,
+              icon: Transform.rotate(
+                angle: 3 * pi / 2,
+                child: const Icon(Icons.arrow_back_ios),
+              )),
+        ),
+      ),
+      bottom: const BottomPlayer(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          BlocListener<PlayerBloc, PlayerState>(
+            listener: (context, state) {
+              if (state.playerState.isHidden) Navigator.pop(context);
+            },
+            child: const SizedBox(height: Dimens.sizeDefault),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: Dimens.sizeDefault),
+            child: Text(
+              StringRes.nowPlaying,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: Dimens.fontXXXLarge),
+            ),
+          ),
+          BlocBuilder<PlayerBloc, PlayerState>(
+            buildWhen: (pr, cr) => pr.track != cr.track,
+            builder: (_, state) => TrackDetailsTile.playing(state.track),
+          ),
+          const SizedBox(height: Dimens.sizeDefault),
+          Expanded(
+            child: BlocBuilder<PlayerBloc, PlayerState>(
+              buildWhen: (pr, cr) {
+                final next = pr.upNext != cr.upNext;
+                return pr.queue != cr.queue || next;
               },
-              child: const SizedBox(height: Dimens.sizeDefault),
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: Dimens.sizeDefault),
-              child: Text(
-                StringRes.nowPlaying,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: Dimens.fontXXXLarge),
-              ),
-            ),
-            BlocBuilder<PlayerBloc, PlayerState>(
-              buildWhen: (pr, cr) => pr.track != cr.track,
-              builder: (_, state) => TrackDetailsTile.playing(state.track),
-            ),
-            const SizedBox(height: Dimens.sizeDefault),
-            Expanded(
-              child: BlocBuilder<PlayerBloc, PlayerState>(
-                buildWhen: (pr, cr) {
-                  final queue = pr.queue != cr.queue;
-                  final next = pr.upNext != cr.upNext;
-                  return queue || next;
-                },
-                builder: (context, state) {
-                  return CustomScrollView(
-                    slivers: [
-                      if (state.queue.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: Row(
-                            children: [
-                              const SizedBox(width: Dimens.sizeDefault),
-                              Text(
-                                StringRes.nextQueue,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: Dimens.fontXXXLarge),
+              builder: (context, state) {
+                return CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    if (state.queue.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: Row(
+                          children: [
+                            const SizedBox(width: Dimens.sizeDefault),
+                            Text(
+                              StringRes.nextQueue,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: Dimens.fontXXXLarge),
+                            ),
+                            const Spacer(),
+                            TextButton(
+                              onPressed: bloc.clearQueue,
+                              style: TextButton.styleFrom(
+                                foregroundColor: scheme.disabled,
+                                textStyle: TextStyle(
+                                    color: scheme.textColorLight,
+                                    fontWeight: FontWeight.bold),
                               ),
-                              const Spacer(),
-                              TextButton(
-                                onPressed: bloc.clearQueue,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: scheme.disabled,
-                                  textStyle: TextStyle(
-                                      color: scheme.textColorLight,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                child: const Text(StringRes.clearQueue),
-                              ),
-                              const SizedBox(width: Dimens.sizeDefault),
-                            ],
-                          ),
+                              child: const Text(StringRes.clearQueue),
+                            ),
+                            const SizedBox(width: Dimens.sizeDefault),
+                          ],
                         ),
-                      SliverReorderableList(
-                        itemCount: state.queue.length,
-                        itemBuilder: (context, index) {
-                          final item = state.queue[index];
-                          return TrackDetailsTile(
-                            item,
-                            key: ValueKey(item.id),
-                            trailing: Icon(Icons.menu_outlined,
-                                size: Dimens.iconMedSmall),
-                          );
-                        },
-                        onReorder: bloc.onQueueReorder,
                       ),
-                      if (state.upNext.isNotEmpty)
-                        SliverToBoxAdapter(
-                          child: Row(
-                            children: [
-                              const SizedBox(width: Dimens.sizeDefault),
-                              Text(
-                                StringRes.upNext,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: Dimens.fontXXXLarge),
+                    SliverReorderableList(
+                      itemCount: state.queue.length,
+                      itemBuilder: (context, index) {
+                        final item = state.queue[index];
+                        return TrackDetailsTile(
+                          item,
+                          key: ValueKey(item.id),
+                          trailing: Icon(Icons.menu_outlined,
+                              size: Dimens.iconMedSmall),
+                        );
+                      },
+                      onReorder: bloc.onQueueReorder,
+                    ),
+                    if (state.upNext.isNotEmpty)
+                      SliverToBoxAdapter(
+                        child: Row(
+                          children: [
+                            const SizedBox(width: Dimens.sizeDefault),
+                            Text(
+                              StringRes.upNext,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: Dimens.fontXXXLarge),
+                            ),
+                            const Spacer(),
+                            TextButton(
+                              onPressed: bloc.clearUpnext,
+                              style: TextButton.styleFrom(
+                                foregroundColor: scheme.disabled,
+                                textStyle: TextStyle(
+                                    color: scheme.textColorLight,
+                                    fontWeight: FontWeight.bold),
                               ),
-                              const Spacer(),
-                              TextButton(
-                                onPressed: bloc.clearUpnext,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: scheme.disabled,
-                                  textStyle: TextStyle(
-                                      color: scheme.textColorLight,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                child: const Text(StringRes.clear),
-                              ),
-                              const SizedBox(width: Dimens.sizeDefault),
-                            ],
-                          ),
+                              child: const Text(StringRes.clear),
+                            ),
+                            const SizedBox(width: Dimens.sizeDefault),
+                          ],
                         ),
-                      SliverList.builder(
-                        itemCount: state.upNext.length,
-                        itemBuilder: (_, index) {
-                          return TrackTile(state.upNext[index]);
-                        },
                       ),
-                      SliverSizedBox(height: context.height * .05)
-                    ],
-                  );
-                },
-              ),
+                    SliverList.builder(
+                      itemCount: state.upNext.length,
+                      itemBuilder: (_, index) {
+                        return TrackTile(state.upNext[index]);
+                      },
+                    ),
+                    SliverSizedBox(height: context.height * .05)
+                  ],
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -227,26 +228,23 @@ class _BottomPlayerState extends State<BottomPlayer> {
                   icon: const Icon(Icons.skip_previous_rounded),
                 ),
                 const SizedBox(width: Dimens.sizeDefault),
-                BlocBuilder<PlayerBloc, PlayerState>(
-                  buildWhen: (pr, cr) {
-                    return pr.playerState != cr.playerState;
-                  },
-                  builder: (context, state) {
-                    return LoadingIcon(
-                      onPressed: bloc.onPlayPause,
-                      iconSize: Dimens.iconXLarge,
-                      loaderSize: Dimens.iconXLarge,
-                      loading: state.playerState.isLoading,
-                      isSelected: state.playerState.isPlaying,
-                      selectedIcon: const Icon(Icons.pause),
-                      style: IconButton.styleFrom(
-                          backgroundColor: scheme.textColor,
-                          foregroundColor: scheme.surface,
-                          splashFactory: NoSplash.splashFactory),
-                      icon: const Icon(Icons.play_arrow),
-                    );
-                  },
-                ),
+                BlocBuilder<PlayerBloc, PlayerState>(buildWhen: (pr, cr) {
+                  return pr.playerState != cr.playerState;
+                }, builder: (context, state) {
+                  return LoadingIcon(
+                    onPressed: bloc.onPlayPause,
+                    iconSize: Dimens.iconXLarge,
+                    loaderSize: Dimens.iconXLarge,
+                    loading: state.playerState.isLoading,
+                    isSelected: state.playerState.isPlaying,
+                    selectedIcon: const Icon(Icons.pause),
+                    style: IconButton.styleFrom(
+                        backgroundColor: scheme.textColor,
+                        foregroundColor: scheme.surface,
+                        splashFactory: NoSplash.splashFactory),
+                    icon: const Icon(Icons.play_arrow),
+                  );
+                }),
                 const SizedBox(width: Dimens.sizeDefault),
                 IconButton(
                   onPressed: () => bloc.add(PlayerNextTrack()),

@@ -1,4 +1,5 @@
 import 'package:ampify/data/data_models/common/tracks_model.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'other_models.dart';
 
@@ -37,9 +38,7 @@ class Playlist extends Equatable {
       description: json['description'],
       href: json['href'],
       id: json['id'],
-      image: (json['images'] as List?)?.isNotEmpty ?? false
-          ? (json['images'] as List).first['url']
-          : null,
+      image: (json['images'] as List?)?.firstElement?['url'],
       name: json['name'],
       owner: json['owner'] != null ? OwnerModel.fromJson(json['owner']) : null,
       public: json['public'],

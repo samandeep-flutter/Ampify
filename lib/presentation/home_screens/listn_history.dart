@@ -14,6 +14,7 @@ class ListeningHistory extends StatelessWidget {
         titleTextStyle: Utils.defTitleStyle(context),
         centerTitle: false,
       ),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
       child: Column(
         children: [
           Text(

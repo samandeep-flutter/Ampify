@@ -11,6 +11,8 @@ Future<AudioHandler> audioServicesInit() async {
       androidNotificationChannelDescription: StringRes.notiDesc,
       androidNotificationChannelName: 'Media',
       androidNotificationOngoing: true,
+      artDownscaleWidth: 512,
+      artDownscaleHeight: 512,
     ),
   );
 }
@@ -39,10 +41,8 @@ class MyAudioHandler extends BaseAudioHandler {
       androidCompactActionIndices: const [0, 1, 3],
       repeatMode: _player.loopMode.toRepeatMode,
       shuffleMode: AudioServiceShuffleMode.none,
-      updatePosition: _player.position,
-      bufferedPosition: _player.bufferedPosition,
-      speed: _player.speed,
     ));
+    AudioService.asyncError.listen((e) => logPrint(e, 'audio-services'));
     return this;
   }
 
@@ -73,11 +73,16 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> playMediaItem(MediaItem mediaItem) async {
-    queue.drain();
-    await _player.setAudioSource(mediaItem.toAudioSource);
-    this.mediaItem.add(mediaItem);
-    queue.add([mediaItem]);
-    _player.play();
+    try {
+      queue.drain();
+      this.mediaItem.drain();
+      await _player.setAudioSource(mediaItem.toAudioSource);
+      this.mediaItem.add(mediaItem);
+      queue.add([mediaItem]);
+      _player.play();
+    } catch (e) {
+      logPrint(e, 'audio play');
+    }
   }
 
   @override
@@ -85,6 +90,7 @@ class MyAudioHandler extends BaseAudioHandler {
     try {
       if (!_player.hasNext) return;
       await _player.seekToNext();
+      play();
     } catch (e) {
       logPrint(e, 'audio next');
     }
@@ -95,6 +101,7 @@ class MyAudioHandler extends BaseAudioHandler {
     try {
       if (!_player.hasPrevious) return;
       await _player.seekToPrevious();
+      play();
     } catch (e) {
       logPrint(e, 'audio previous');
     }
@@ -157,20 +164,16 @@ class MyAudioHandler extends BaseAudioHandler {
     }
   }
 
-  @override
-  Future<void> stop() async {
-    final session = getIt<AuthServices>().session;
-    session?.setActive(false);
-    await _player.stop();
-    return super.stop();
-  }
-
   void _playerStream() {
     _player.playerStateStream.listen((state) {
+      PlaybackState _state = playbackState.value.copyWith(
+        updatePosition: _player.position,
+        bufferedPosition: _player.bufferedPosition,
+        speed: _player.speed,
+        queueIndex: _index,
+      );
       final processing = state.processingState.toAudioState;
-      final _processing = playbackState.value.processingState;
-      PlaybackState _state = playbackState.value;
-      if (processing != _processing) {
+      if (processing != playbackState.value.processingState) {
         _state = _state.copyWith(processingState: processing);
       }
       if (state.playing != playbackState.value.playing) {
@@ -197,12 +200,13 @@ class MyAudioHandler extends BaseAudioHandler {
   void _indexChanges() {
     _player.currentIndexStream.listen((index) {
       if (index == null || index == _index) return;
+      if (index > queue.value.length - 1) return;
       mediaItem.add(queue.value[index]);
       _index = index;
     });
   }
 
-  Future<void> _interruptionListener() async {
+  void _interruptionListener() {
     final session = getIt<AuthServices>().session;
     session?.becomingNoisyEventStream.listen((_) => pause());
     session?.interruptionEventStream.listen((event) {
@@ -218,5 +222,23 @@ class MyAudioHandler extends BaseAudioHandler {
           break;
       }
     });
+  }
+
+  @override
+  Future<void> stop() async {
+    final session = getIt<AuthServices>().session;
+    session?.setActive(false);
+    queue.drain();
+    mediaItem.drain();
+    await _player.stop();
+    playbackState.add(playbackState.value.copyWith(
+      processingState: AudioProcessingState.idle,
+    ));
+  }
+
+  @override
+  Future<void> onTaskRemoved() async {
+    await stop();
+    return super.onTaskRemoved();
   }
 }

@@ -1,3 +1,5 @@
+import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
+import 'package:ampify/presentation/widgets/custom_scroll_physics.dart';
 import 'package:flutter/material.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -45,6 +47,7 @@ class _LikedSongsState extends State<LikedSongs> {
 
           return CustomScrollView(
             controller: bloc.scrollController,
+            physics: const BottomBounceScrollPhysics(),
             slivers: [
               SliverAppBar(
                 expandedHeight: context.height * .05,
@@ -102,26 +105,49 @@ class _LikedSongsState extends State<LikedSongs> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          BlocBuilder<PlayerBloc, PlayerState>(
-                            builder: (context, pl) {
-                              final group =
-                                  pl.musicGroupId == UniqueIds.likedSongs;
-                              final loading = pl.playerState.isLoading;
-                              return LoadingIcon(
-                                onPressed: () => bloc.onPlay(context),
-                                iconSize: Dimens.iconXLarge,
-                                loaderSize: Dimens.iconXLarge,
-                                loading: group && loading,
-                                isSelected: group,
-                                selectedIcon: const Icon(Icons.pause),
-                                style: IconButton.styleFrom(
-                                    backgroundColor: scheme.textColor,
-                                    foregroundColor: scheme.surface,
-                                    splashFactory: NoSplash.splashFactory),
-                                icon: const Icon(Icons.play_arrow),
-                              );
-                            },
+                          DisabledWidget(
+                            child: BlocBuilder<PlayerBloc, PlayerState>(
+                                buildWhen: (pr, cr) => pr.shuffle != cr.shuffle,
+                                builder: (context, state) {
+                                  return IconButton(
+                                    onPressed: _shuffleToggle,
+                                    iconSize: Dimens.iconDefault,
+                                    isSelected: state.shuffle,
+                                    style: IconButton.styleFrom(
+                                        backgroundColor: state.shuffle
+                                            ? scheme.primary
+                                            : null),
+                                    selectedIcon: Image.asset(ImageRes.shuffle,
+                                        width: Dimens.iconMedium,
+                                        color: scheme.onPrimary),
+                                    icon: Image.asset(ImageRes.shuffle,
+                                        height: Dimens.iconMedium,
+                                        color: scheme.textColor),
+                                  );
+                                }),
                           ),
+                          const SizedBox(width: Dimens.sizeDefault),
+                          BlocBuilder<PlayerBloc, PlayerState>(
+                              buildWhen: (pr, cr) {
+                            return pr.playerState != cr.playerState;
+                          }, builder: (context, pl) {
+                            final group =
+                                pl.musicGroupId == UniqueIds.likedSongs;
+                            final loading = pl.playerState.isLoading;
+                            return LoadingIcon(
+                              onPressed: () => bloc.onPlay(context),
+                              iconSize: Dimens.iconXLarge,
+                              loaderSize: Dimens.iconXLarge,
+                              loading: group && loading,
+                              isSelected: group,
+                              selectedIcon: const Icon(Icons.pause),
+                              style: IconButton.styleFrom(
+                                  backgroundColor: scheme.textColor,
+                                  foregroundColor: scheme.surface,
+                                  splashFactory: NoSplash.splashFactory),
+                              icon: const Icon(Icons.play_arrow),
+                            );
+                          }),
                         ],
                       )
                     ],
@@ -141,11 +167,16 @@ class _LikedSongsState extends State<LikedSongs> {
                     return const SongTileShimmer();
                   })),
                 ),
-              SliverToBoxAdapter(child: SizedBox(height: context.height * .18))
+              SliverSizedBox(height: context.height * .2)
             ],
           );
         },
       ),
     );
+  }
+
+  void _shuffleToggle() {
+    final player = context.read<PlayerBloc>();
+    player.add(PlayerShuffleToggle());
   }
 }

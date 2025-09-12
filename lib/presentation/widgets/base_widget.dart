@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 
 class BaseWidget extends StatelessWidget {
   final PreferredSizeWidget? appBar;
-  final BoxDecoration? decoration;
+  final BorderRadius? shapeRadius;
   final EdgeInsets? padding;
-  final EdgeInsets? margin;
+  final EdgeInsets? bodyPadding;
   final Color? color;
   final bool? extendBody;
   final bool? safeAreaBottom;
@@ -16,13 +16,13 @@ class BaseWidget extends StatelessWidget {
   const BaseWidget({
     super.key,
     this.appBar,
-    this.padding,
-    this.margin,
+    this.bodyPadding,
     this.color,
-    this.decoration,
     this.extendBody,
     this.safeAreaBottom,
     this.resizeBottom,
+    this.padding,
+    this.shapeRadius,
     this.bottom,
     required this.child,
   });
@@ -31,21 +31,22 @@ class BaseWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = ThemeServices.of(context);
 
-    return Scaffold(
-      appBar: appBar,
-      backgroundColor: color ?? scheme.background,
-      extendBody: extendBody ?? false,
-      resizeToAvoidBottomInset: resizeBottom,
-      bottomNavigationBar: bottom,
-      body: Container(
-        decoration: decoration,
-        child: SafeArea(
+    return Padding(
+      padding: padding ?? EdgeInsets.zero,
+      child: ClipRRect(
+        borderRadius: shapeRadius ?? BorderRadius.zero,
+        child: Scaffold(
+          appBar: appBar,
+          backgroundColor: color ?? scheme.background,
+          extendBody: extendBody ?? false,
+          resizeToAvoidBottomInset: resizeBottom,
+          bottomNavigationBar: bottom,
+          body: SafeArea(
             bottom: safeAreaBottom ?? false,
-            child: Container(
-              margin: margin,
-              padding: padding ?? Utils.insetsHoriz(Dimens.sizeLarge),
-              child: child,
-            )),
+            child:
+                Padding(padding: bodyPadding ?? EdgeInsets.zero, child: child),
+          ),
+        ),
       ),
     );
   }

@@ -141,9 +141,7 @@ class SliverSizedBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: SizedBox(height: height, width: width),
-    );
+    return SliverToBoxAdapter(child: SizedBox(height: height, width: width));
   }
 }
 

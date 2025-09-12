@@ -63,36 +63,13 @@ class TrackBottomSheet extends StatelessWidget {
         const SizedBox(height: Dimens.sizeSmall),
         const MyDivider(),
         BottomSheetListTile(
-          onTap: () {
-            bloc.onTrackLiked(track.id!, liked);
-            if (liked ?? false) {
-              try {
-                final bloc = context.read<LikedSongsBloc>();
-                bloc.songRemoved(track.id!);
-              } catch (_) {}
-            }
-            Navigator.pop(context);
-          },
+          onTap: () => _onTrackLiked(context),
           leading: LikedSongsCover(
               size: Dimens.iconXLarge, iconSize: Dimens.iconSmall),
           title: liked ?? false ? StringRes.removeLiked : StringRes.addtoLiked,
         ),
         BottomSheetListTile(
-            onTap: () {
-              Navigator.pop(context);
-              showModalBottomSheet(
-                context: context,
-                showDragHandle: true,
-                isScrollControlled: true,
-                useSafeArea: true,
-                useRootNavigator: true,
-                builder: (_) {
-                  return BlocProvider(
-                      create: (_) => AddtoPlaylistBloc(),
-                      child: AddtoPlaylistSheet(track.uri!));
-                },
-              );
-            },
+            onTap: () => _addToPlaylist(context),
             title: StringRes.addtoPlaylist,
             leading: Icon(Icons.add_circle_outline, size: Dimens.iconXLarge)),
         BottomSheetListTile(
@@ -104,12 +81,7 @@ class TrackBottomSheet extends StatelessWidget {
           leading: Icon(Icons.queue_music_outlined, size: Dimens.iconXLarge),
         ),
         BottomSheetListTile(
-            onTap: () {
-              context.close(2);
-              final type = LibItemType.album.name;
-              context.pushNamed(AppRoutes.musicGroup,
-                  pathParameters: {'id': track.album!.id!, 'type': type});
-            },
+            onTap: () => _toAlbum(context),
             enable: track.album?.id != null,
             title: StringRes.gotoAlbum,
             leading: Icon(Icons.album_outlined, size: Dimens.iconXLarge)),
@@ -124,6 +96,41 @@ class TrackBottomSheet extends StatelessWidget {
         ),
         SizedBox(height: context.height * .05)
       ],
+    );
+  }
+
+  void _toAlbum(BuildContext context) {
+    context.close(2);
+    final type = LibItemType.album.name;
+    context.pushNamed(AppRoutes.musicGroup,
+        pathParameters: {'id': track.album!.id!, 'type': type});
+  }
+
+  void _onTrackLiked(BuildContext context) {
+    final _player = context.read<PlayerBloc>();
+    _player.onTrackLiked(track.id!, liked);
+    if (liked ?? false) {
+      try {
+        final bloc = context.read<LikedSongsBloc>();
+        bloc.songRemoved(track.id!);
+      } catch (_) {}
+    }
+    Navigator.pop(context);
+  }
+
+  void _addToPlaylist(BuildContext context) {
+    Navigator.pop(context);
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      useSafeArea: true,
+      useRootNavigator: true,
+      builder: (_) {
+        return BlocProvider(
+            create: (_) => AddtoPlaylistBloc(),
+            child: AddtoPlaylistSheet(track.uri!));
+      },
     );
   }
 }

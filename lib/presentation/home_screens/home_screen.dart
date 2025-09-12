@@ -1,7 +1,9 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/data/data_models/common/album_model.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/exports.dart';
+import 'package:ampify/presentation/widgets/custom_scroll_physics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
@@ -17,6 +19,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
         backgroundColor: scheme.background,
         body: CustomScrollView(
+          physics: const BottomBounceScrollPhysics(),
           slivers: [
             SliverAppBar(
               backgroundColor: context.background,
@@ -48,10 +51,10 @@ class HomeScreen extends StatelessWidget {
               title: StringRes.recentlyPlayed,
               child: GridView.builder(
                   padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                  physics: const NeverScrollableScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   gridDelegate: Utils.fixedCrossAxis(1,
                       aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: 3,
                   itemBuilder: (context, index) {
                     return HomeAlbumTile(
@@ -64,41 +67,40 @@ class HomeScreen extends StatelessWidget {
             const SliverSizedBox(height: Dimens.sizeLarge),
             SliverGridWidget(
               title: StringRes.spotifyRecent,
-              child: BlocBuilder<HomeBloc, HomeState>(buildWhen: (pr, cr) {
-                final tracks = pr.recentlyPlayed != cr.recentlyPlayed;
-                final loading = pr.recentLoading != cr.recentLoading;
-                return tracks || loading;
-              }, builder: (context, state) {
-                if (state.recentLoading) return const AlbumShimmer();
-                if (state.recentlyPlayed.isEmpty) {
-                  return ToolTipWidget(
-                    alignment: Alignment.center,
-                    margin: Utils.insetsHoriz(Dimens.sizeLarge),
-                    title: StringRes.noSpotifyTracks,
-                  );
-                }
+              child: BlocBuilder<HomeBloc, HomeState>(
+                buildWhen: (pr, cr) {
+                  final tracks = pr.recentlyPlayed != cr.recentlyPlayed;
+                  final loading = pr.recentLoading != cr.recentLoading;
+                  return tracks || loading;
+                },
+                builder: (context, state) {
+                  if (state.recentLoading) return const AlbumShimmer();
+                  if (state.recentlyPlayed.isEmpty) {
+                    return ToolTipWidget(
+                      alignment: Alignment.center,
+                      margin: Utils.insetsHoriz(Dimens.sizeLarge),
+                      title: StringRes.noSpotifyTracks,
+                    );
+                  }
 
-                return GridView.builder(
-                    padding: Utils.insetsHoriz(Dimens.sizeDefault),
-                    scrollDirection: Axis.horizontal,
-                    gridDelegate: Utils.fixedCrossAxis(1,
-                        aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                    itemCount: state.recentlyPlayed.length,
-                    itemBuilder: (context, index) {
-                      final item = state.recentlyPlayed[index];
-                      return HomeAlbumTile(
-                        onTap: () {
-                          final player = context.read<PlayerBloc>();
-                          final slider = context.read<PlayerSliderBloc>();
-                          player.add(PlayerTrackChanged(item));
-                          slider.add(PlayerSliderReset());
-                        },
-                        image: item.album?.image,
-                        title: item.name,
-                        subtitle: item.artists?.asString,
-                      );
-                    });
-              }),
+                  return GridView.builder(
+                      padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                      physics: const BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      gridDelegate: Utils.fixedCrossAxis(1,
+                          aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
+                      itemCount: state.recentlyPlayed.length,
+                      itemBuilder: (context, index) {
+                        final item = state.recentlyPlayed[index];
+                        return HomeAlbumTile(
+                          title: item.name,
+                          subtitle: item.artists?.asString,
+                          image: item.album?.image,
+                          onTap: () => playRecentlyPlayed(context, track: item),
+                        );
+                      });
+                },
+              ),
             ),
             const SliverSizedBox(height: Dimens.sizeLarge),
             SliverGridWidget(
@@ -110,10 +112,18 @@ class HomeScreen extends StatelessWidget {
                   return albums || loading;
                 },
                 builder: (context, state) {
-                  if (state.recentLoading) return const AlbumShimmer();
+                  if (state.albumLoading) return const AlbumShimmer();
+                  if (state.albums.isEmpty) {
+                    return ToolTipWidget(
+                      alignment: Alignment.center,
+                      margin: Utils.insetsHoriz(Dimens.sizeLarge),
+                      title: StringRes.noNewTracks,
+                    );
+                  }
 
                   return GridView.builder(
                       padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                      physics: const BouncingScrollPhysics(),
                       scrollDirection: Axis.horizontal,
                       gridDelegate: Utils.fixedCrossAxis(1,
                           aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
@@ -139,6 +149,13 @@ class HomeScreen extends StatelessWidget {
   void toMusicGroup(BuildContext context, {required Album album}) {
     context.pushNamed(AppRoutes.musicGroup,
         pathParameters: {'id': album.id!, 'type': album.type?.name ?? ''});
+  }
+
+  void playRecentlyPlayed(BuildContext context, {required Track track}) {
+    final player = context.read<PlayerBloc>();
+    final slider = context.read<PlayerSliderBloc>();
+    player.add(PlayerTrackChanged(track));
+    slider.add(PlayerSliderReset());
   }
 }
 

@@ -21,6 +21,7 @@ class RootView extends StatefulWidget {
 class _RootViewState extends State<RootView> {
   @override
   void initState() {
+    context.read<RootBloc>().add(RootInitial());
     context.read<PlayerBloc>().add(PlayerInitial());
     context.read<SearchBloc>().add(SearchInitial());
     context.read<HomeBloc>().add(HomeInitial());
@@ -57,10 +58,11 @@ class _RootViewState extends State<RootView> {
                 DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      stops: [.2, .8, 1],
+                      stops: [.2, .6, .8, 1],
                       colors: [
                         scheme.surface,
-                        scheme.surface.withAlpha(150),
+                        scheme.surface.withAlpha(200),
+                        scheme.surface.withAlpha(80),
                         scheme.surface.withAlpha(0),
                       ],
                       begin: Alignment.bottomCenter,
@@ -68,23 +70,58 @@ class _RootViewState extends State<RootView> {
                     ),
                   ),
                   child: BlocBuilder<RootBloc, RootState>(
-                    buildWhen: (pr, cr) => pr.index != cr.index,
-                    builder: (context, state) {
-                      return BottomNavigationBar(
-                        backgroundColor: Colors.transparent,
-                        elevation: Dimens.sizeExtraLarge,
-                        selectedFontSize: Dimens.fontDefault,
-                        unselectedFontSize: Dimens.fontMed,
-                        unselectedItemColor: scheme.disabled,
-                        selectedItemColor: scheme.textColor,
-                        onTap: (index) =>
-                            bloc.onIndexChange(context, index: index),
-                        currentIndex: state.index,
-                        items: bloc.tabs,
-                      );
-                    },
-                  ),
-                )
+                      buildWhen: (pr, cr) => pr.isConnected != cr.isConnected,
+                      builder: (context, state) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(height: Dimens.sizeSmall),
+                            MediaQuery.removePadding(
+                              context: context,
+                              removeBottom: !state.isConnected,
+                              child: BlocBuilder<RootBloc, RootState>(
+                                buildWhen: (pr, cr) => pr.index != cr.index,
+                                builder: (context, state) {
+                                  return BottomNavigationBar(
+                                    backgroundColor: Colors.transparent,
+                                    elevation: Dimens.sizeExtraLarge,
+                                    selectedFontSize: Dimens.fontDefault,
+                                    unselectedFontSize: Dimens.fontMed,
+                                    unselectedItemColor: scheme.disabled,
+                                    selectedItemColor: scheme.textColor,
+                                    onTap: (index) => bloc
+                                        .onIndexChange(context, index: index),
+                                    currentIndex: state.index,
+                                    items: bloc.tabs,
+                                  );
+                                },
+                              ),
+                            ),
+                            AnimatedContainer(
+                              duration: Duration(seconds: 2),
+                              height: state.isConnected ? 0 : null,
+                              padding: EdgeInsets.only(
+                                  top: Dimens.sizeSmall,
+                                  bottom: Dimens.sizeDefault),
+                              color: Colors.blue.shade700,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.language, color: scheme.onPrimary),
+                                  const SizedBox(width: Dimens.sizeDefault),
+                                  Text(
+                                    'No internet connection',
+                                    style: TextStyle(
+                                        color: scheme.onPrimary,
+                                        fontSize: Dimens.fontXXXLarge),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                ),
               ],
             ),
           ),

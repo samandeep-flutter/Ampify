@@ -62,7 +62,7 @@ class LibraryModel extends Equatable {
       if (json['images'] is String) {
         images = json['images'];
       } else {
-        images = (json['images'] as List?)?.first['url'];
+        images = (json['images'] as List?)?.firstElement?['url'];
       }
     }
 

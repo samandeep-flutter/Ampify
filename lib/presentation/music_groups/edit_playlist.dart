@@ -40,11 +40,12 @@ class _EditPlaylistScreenState extends State<EditPlaylistScreen> {
     final bloc = context.read<EditPlaylistBloc>();
     return BaseWidget(
       appBar: AppBar(backgroundColor: scheme.background),
-      padding: Utils.insetsHoriz(Dimens.sizeExtraLarge),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeExtraLarge),
       child: BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
         buildWhen: (pr, cr) => pr.id != cr.id,
         builder: (context, state) {
           return ListView(
+            physics: const BouncingScrollPhysics(),
             children: [
               const SizedBox(height: Dimens.sizeSmall),
               Row(
@@ -93,14 +94,15 @@ class _EditPlaylistScreenState extends State<EditPlaylistScreen> {
                   },
                   child: SizedBox(height: context.height * .1)),
               BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
+                  buildWhen: (pr, cr) => pr.loading != cr.loading,
                   builder: (context, state) {
-                return LoadingButton(
-                  isLoading: state.loading,
-                  width: double.infinity,
-                  onPressed: bloc.onEdited,
-                  child: const Text(StringRes.submit),
-                );
-              })
+                    return LoadingButton(
+                      isLoading: state.loading,
+                      width: double.infinity,
+                      onPressed: bloc.onEdited,
+                      child: const Text(StringRes.submit),
+                    );
+                  })
             ],
           );
         },

@@ -20,7 +20,6 @@ class PlaylistBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    final bloc = context.read<MusicGroupBloc>();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -82,51 +81,39 @@ class PlaylistBottomSheet extends StatelessWidget {
         const MyDivider(),
         BottomSheetListTile(
           enable: false,
-          onTap: () {},
+          onTap: () {
+            // TODO: implement add tracks to playlist.
+          },
           title: StringRes.addTracks,
           leading: Icon(Icons.music_note_outlined, size: Dimens.iconXLarge),
         ),
         BottomSheetListTile(
-          onTap: () => onPicker(context),
+          onTap: () => _pickCoverImage(context),
           title: StringRes.editCover,
           leading: Icon(Icons.photo_outlined, size: Dimens.iconXLarge),
         ),
         BottomSheetListTile(
-          onTap: () {
-            Navigator.pop(context);
-            final pathParams = {'id': id!};
-            final params = {
-              'image': image,
-              'title': title,
-              'desc': details?.description
-            };
-            context.pushNamed(AppRoutes.modifyPlaylist,
-                pathParameters: pathParams, queryParameters: params);
-          },
+          onTap: () => _toEditDetails(context),
           title: StringRes.editDetails,
           leading: Icon(Icons.title, size: Dimens.iconXLarge),
         ),
         if (details?.public ?? false)
           BottomSheetListTile(
-            onTap: () {
-              Navigator.pop(context);
-              bloc.add(const PlaylistVisibility(false));
-            },
+            onTap: () => _toggleVisibility(context, false),
             title: 'Make Private',
             leading: Icon(Icons.lock_outline, size: Dimens.iconXLarge),
           )
         else
           BottomSheetListTile(
-            onTap: () {
-              Navigator.pop(context);
-              bloc.add(const PlaylistVisibility(true));
-            },
+            onTap: () => _toggleVisibility(context, true),
             title: 'Make Public',
             leading: Icon(Icons.public, size: Dimens.iconXLarge),
           ),
         BottomSheetListTile(
           enable: false,
-          onTap: () {},
+          onTap: () {
+            // TODO: implement share playlist.
+          },
           title: StringRes.share,
           leading: Icon(Icons.ios_share, size: Dimens.iconXLarge),
         ),
@@ -135,7 +122,25 @@ class PlaylistBottomSheet extends StatelessWidget {
     );
   }
 
-  void onPicker(BuildContext context) {
+  void _toggleVisibility(BuildContext context, bool visibility) {
+    final bloc = context.read<MusicGroupBloc>();
+    Navigator.pop(context);
+    bloc.add(PlaylistVisibility(visibility));
+  }
+
+  void _toEditDetails(BuildContext context) {
+    Navigator.pop(context);
+    final pathParams = {'id': id!};
+    final params = {
+      'image': image,
+      'title': title,
+      'desc': details?.description
+    };
+    context.pushNamed(AppRoutes.modifyPlaylist,
+        pathParameters: pathParams, queryParameters: params);
+  }
+
+  void _pickCoverImage(BuildContext context) {
     Navigator.pop(context);
     final bloc = context.read<MusicGroupBloc>();
     showDialog(

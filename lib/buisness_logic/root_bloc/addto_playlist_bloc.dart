@@ -72,7 +72,6 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
     on<AddTracktoPlaylists>(_onAddTrigger);
   }
 
-  final box = BoxServices.instance;
   final MusicGroupRepo _repo = getIt();
 
   void onItemAdded(String id) => add(PlaylistSelected(id));

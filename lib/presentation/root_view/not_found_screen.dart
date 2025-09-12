@@ -16,6 +16,7 @@ class _NotFoundScreenState extends State<NotFoundScreen> {
 
     return BaseWidget(
       appBar: AppBar(backgroundColor: scheme.background),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
       child: DefaultTextStyle.merge(
         style:
             TextStyle(color: scheme.textColorLight, fontSize: Dimens.fontLarge),

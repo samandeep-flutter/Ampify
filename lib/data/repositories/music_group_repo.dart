@@ -40,34 +40,24 @@ class MusicGroupRepo {
     return response.response?.statusCode == 200;
   }
 
-  Future<void> playlistDetails(
-    String id, {
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
-  }) async {
+  Future<void> playlistDetails(String id,
+      {required SuccessCallback onSuccess, ErrorCallback? onError}) async {
     final response = await dio.get(AppConstants.playlistDetails(id));
     ApiResponse.verify(response,
         onSuccess: onSuccess,
         onError: onError ?? (e) => logPrint(e, 'playlist details'));
   }
 
-  Future<void> albumDetails(
-    String id, {
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
-  }) async {
+  Future<void> albumDetails(String id,
+      {required SuccessCallback onSuccess, ErrorCallback? onError}) async {
     final response = await dio.get(AppConstants.albumDetails(id));
     ApiResponse.verify(response,
         onSuccess: onSuccess,
         onError: onError ?? (e) => logPrint(e, 'album details'));
   }
 
-  Future<void> getUserPlaylists(
-    String? id, {
-    // int? limit,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
-  }) async {
+  Future<void> getUserPlaylists(String? id,
+      {required SuccessCallback onSuccess, ErrorCallback? onError}) async {
     if (id == null) return;
     final response = await dio.get(AppConstants.userPlaylists(id));
     ApiResponse.verify(response,
@@ -78,8 +68,8 @@ class MusicGroupRepo {
   Future<void> createPlaylist(
     String title, {
     required String userId,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    required SuccessCallback onSuccess,
+    ErrorCallback? onError,
   }) async {
     final body = {'name': title, 'public': true};
     final response = await dio.post(AppConstants.userPlaylists(userId),
@@ -89,11 +79,12 @@ class MusicGroupRepo {
         onError: onError ?? (e) => logPrint(e, 'create playlist'));
   }
 
-  Future<bool> editPlaylist(
-      {required String id,
-      required String title,
-      required String desc,
-      required bool public}) async {
+  Future<bool> editPlaylist({
+    required String id,
+    required String title,
+    required String desc,
+    required bool public,
+  }) async {
     final body = {'name': title, 'description': desc, 'public': public};
     final response = await dio.put(AppConstants.playlistDetails(id),
         options: Options(contentType: 'application/json'), data: body);
@@ -110,8 +101,8 @@ class MusicGroupRepo {
   Future<void> addTracktoPlaylist(
     String id, {
     required List<String> trackUri,
-    Function(Map<String, dynamic> json)? onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    SuccessCallback? onSuccess,
+    ErrorCallback? onError,
   }) async {
     final uris = trackUri.map((e) => e.replaceAll(':', '%3A')).toList();
     final url = AppConstants.addtoPlaylist(id, uris: uris.asString);
@@ -126,8 +117,8 @@ class MusicGroupRepo {
   Future<void> removeTrackfromPlaylist(
     String id, {
     required List<String> trackId,
-    required Function(Map<String, dynamic> json) onSuccess,
-    Function(Map<String, dynamic> error)? onError,
+    required SuccessCallback onSuccess,
+    ErrorCallback? onError,
   }) async {
     final url = AppConstants.removeFromPlaylist(id);
     final body = {'uris': trackId /* 'snapshot_id': '' */};

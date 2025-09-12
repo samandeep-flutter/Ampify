@@ -134,6 +134,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     try {
       final queue = _audioHandler.queue.value;
       final _index = queue.indexWhere((e) => e.id == state.track.id);
+      if (queue.length == _index + 1) throw FormatException();
       if (state.queue.isNotEmpty) {
         if (queue[_index + 1].id == state.queue.first.id) return;
         throw FormatException();
@@ -148,11 +149,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   void _onPreviousTrack(
       PlayerPreviousTrack event, Emitter<PlayerState> emit) async {
-    if (state.queue.isNotEmpty) {
-      emit(state.copyWith(queue: [state.track, ...state.queue]));
-    } else if (state.upNext.isNotEmpty) {
-      emit(state.copyWith(upNext: [state.track.asTrack, ...state.upNext]));
-    }
+    emit(state.copyWith(queue: [state.track, ...state.queue]));
     await _audioHandler.skipToPrevious();
   }
 
@@ -205,10 +202,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onQueueAdded(
       PlayerQueueAdded event, Emitter<PlayerState> emit) async {
     try {
-      if (state.playerState.isHidden) {
-        showToast(StringRes.noQueue);
-        return;
-      }
+      if (state.playerState.isHidden) throw FormatException();
       showToast(StringRes.queueAdded);
       final track = await Utils.getTrackDetails(event.track);
       emit(state.copyWith(queue: [...state.queue, track]));
@@ -219,6 +213,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       final uri = await _musicRepo.fromVideoId(track.videoId);
       final _media = Utils.toMediaItem(track, uri: uri);
       _audioHandler.addQueueItem(_media);
+    } on FormatException {
+      showToast(StringRes.noQueue);
     } catch (e) {
       logPrint(e, 'Queue instaneous');
     }
@@ -235,6 +231,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       }
       await _prepareNextTrackSource();
     } on FormatException {
+      await _audioHandler.stop();
       emit(PlayerState.init());
     } catch (e) {
       logPrint(e, 'Track ended');
@@ -242,35 +239,33 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   }
 
   Future<void> _prepareNextTrackSource() async {
-    if (state.queue.isNotEmpty) {
-      final track = state.queue.first;
-      try {
+    try {
+      if (state.queue.isNotEmpty) {
+        final track = state.queue.first;
         final uri = await _musicRepo.fromVideoId(track.videoId);
         final _media = Utils.toMediaItem(track, uri: uri);
         await _audioHandler.addQueueItem(_media);
-      } catch (e) {
-        logPrint(e, 'preloading queue');
-      }
-    } else if (state.upNext.isNotEmpty) {
-      try {
+      } else if (state.upNext.isNotEmpty) {
         final track = await Utils.getTrackDetails(state.upNext.first);
         final uri = await _musicRepo.fromVideoId(track.videoId);
         final _media = Utils.toMediaItem(track, uri: uri);
         await _audioHandler.addQueueItem(_media);
-      } catch (e) {
-        logPrint(e, 'preloading upNext');
       }
+    } catch (e) {
+      logPrint(e, 'preloading track');
     }
   }
 
   void _onQueueCleared(PlayerQueueCleared event, Emitter<PlayerState> emit) {
     _audioHandler.customAction(PlayerActions.removeUpcomming);
     emit(state.copyWith(queue: []));
+    _prepareNextTrackSource();
   }
 
   void _onUpNextCleared(PlayerUpNextCleared event, Emitter<PlayerState> emit) {
-    _audioHandler.customAction(PlayerActions.removeUpcomming);
     emit(state.copyWith(upNext: []));
+    if (state.queue.isNotEmpty) return;
+    _audioHandler.customAction(PlayerActions.removeUpcomming);
   }
 
   Future<void> _onMusicGroup(

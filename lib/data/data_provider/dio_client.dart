@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -7,12 +8,11 @@ import 'api_response.dart';
 
 class DioClient {
   final Dio dio;
-  final LoggingInterceptor interceptor;
 
-  DioClient({required this.dio, required this.interceptor}) {
+  DioClient({required this.dio}) {
     dio.options.baseUrl = AppConstants.baseUrl;
     dio.interceptors
-        .addAll([TokenInterceptor(dio), if (kDebugMode) interceptor]);
+        .addAll([TokenInterceptor(dio), if (kDebugMode) LoggingInterceptor()]);
   }
   @protected
   final box = BoxServices.instance;
@@ -109,13 +109,19 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
   TokenInterceptor(this.dio);
 
   @override
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
+    getIt<AuthServices>().setConnection(true);
+    handler.next(response);
+  }
+
+  @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     try {
       final box = BoxServices.instance;
       final completer = Completer<bool>();
 
       final status = err.response?.data['error']['status'];
-      if (status != 401) throw Exception();
+      if (status != 401) throw err;
 
       getIt<AuthRepo>().refreshToken(
         onSuccess: (json) async {
@@ -139,8 +145,11 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
         },
       );
       await completer.future;
-    } catch (e) {
-      logPrint(e, 'token');
+    } on DioException catch (e) {
+      if (e.error is SocketException) {
+        getIt<AuthServices>().setConnection(false);
+      }
+      logPrint(e, 'DIO');
       handler.reject(err);
     }
   }
