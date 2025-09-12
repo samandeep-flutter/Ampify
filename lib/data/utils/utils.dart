@@ -52,9 +52,9 @@ sealed class Utils {
   }
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
-    final _details = Completer<SongYtDetails>();
-    final artist = track.artists?.asString.split(',').first;
-    _repo.getDetailsFromQuery('${track.name} $artist').then((details) {
+    final _details = Completer<SongYtDetails?>();
+    final artist = track.artists?.asString.split(',').firstElement;
+    _repo.getDetailsFromQuery('${track.name} - $artist').then((details) {
       _details.complete(details);
     });
     final palete = await PaletteGenerator.fromImageProvider(
@@ -72,8 +72,8 @@ sealed class Utils {
       darkBgColor: palete.darkVibrantColor?.color ?? defColor,
       image: track.album?.image,
       subtitle: track.artists?.asString,
-      duration: details.duration,
-      videoId: details.videoId,
+      duration: details?.duration,
+      videoId: details?.videoId,
     );
   }
 
@@ -98,7 +98,7 @@ sealed class Utils {
     );
   }
 
-  static MediaItem toMediaItem(TrackDetails track, {Uri? uri}) {
+  static MediaItem toMediaItem(TrackDetails track, {required Uri uri}) {
     return MediaItem(
       id: track.id ?? '',
       album: track.albumId ?? '',

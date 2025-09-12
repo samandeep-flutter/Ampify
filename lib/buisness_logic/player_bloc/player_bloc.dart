@@ -164,7 +164,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     try {
       _audioHandler.customAction(PlayerActions.removeUpcomming);
       final uri = await _musicRepo.fromVideoId(state.queue.first.videoId);
-      final _media = Utils.toMediaItem(state.queue.first, uri: uri);
+      // TODO: add null check functionality
+      final _media = Utils.toMediaItem(state.queue.first, uri: uri!);
       _audioHandler.addQueueItem(_media);
     } catch (e) {
       logPrint(e, 'Queue next');
@@ -211,7 +212,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       }
       if (_audioHandler.queue.isLast(state.queue)) return;
       final uri = await _musicRepo.fromVideoId(track.videoId);
-      final _media = Utils.toMediaItem(track, uri: uri);
+      // TODO: add null check functionality
+      final _media = Utils.toMediaItem(track, uri: uri!);
       _audioHandler.addQueueItem(_media);
     } on FormatException {
       showToast(StringRes.noQueue);
@@ -243,12 +245,14 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       if (state.queue.isNotEmpty) {
         final track = state.queue.first;
         final uri = await _musicRepo.fromVideoId(track.videoId);
-        final _media = Utils.toMediaItem(track, uri: uri);
+        // TODO: add null check functionality
+        final _media = Utils.toMediaItem(track, uri: uri!);
         await _audioHandler.addQueueItem(_media);
       } else if (state.upNext.isNotEmpty) {
         final track = await Utils.getTrackDetails(state.upNext.first);
         final uri = await _musicRepo.fromVideoId(track.videoId);
-        final _media = Utils.toMediaItem(track, uri: uri);
+        // TODO: add null check functionality
+        final _media = Utils.toMediaItem(track, uri: uri!);
         await _audioHandler.addQueueItem(_media);
       }
     } catch (e) {
@@ -279,7 +283,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     ));
     final track = await Utils.getTrackDetails(event.tracks.first);
     final uri = await _musicRepo.fromVideoId(track.videoId);
-    final _media = Utils.toMediaItem(track, uri: uri);
+    // TODO: add null check functionality
+    final _media = Utils.toMediaItem(track, uri: uri!);
     _audioHandler.playMediaItem(_media);
     _audioHandler.play();
     final upnext = event.tracks.skip(1).toList();
@@ -301,9 +306,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       _audioHandler.customAction(PlayerActions.clearQueue);
       emit(state.copyWith(queue: []));
       final uri = await _musicRepo.fromVideoId(track.videoId);
+      if (uri == null) throw FormatException();
       final _media = Utils.toMediaItem(track, uri: uri);
       await _audioHandler.playMediaItem(_media);
       _audioHandler.play();
+    } on FormatException {
+      showToast(StringRes.cannotbePlayed);
+      emit(state.copyWith(playerState: MusicState.hidden));
     } catch (e) {
       logPrint(e, 'Track Change');
       showToast(StringRes.somethingWrong);
