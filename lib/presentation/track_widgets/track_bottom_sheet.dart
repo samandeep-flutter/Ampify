@@ -71,20 +71,20 @@ class TrackBottomSheet extends StatelessWidget {
         BottomSheetListTile(
             onTap: () => _addToPlaylist(context),
             title: StringRes.addtoPlaylist,
-            leading: Icon(Icons.add_circle_outline, size: Dimens.iconXLarge)),
+            icon: Icons.add_circle_outline),
         BottomSheetListTile(
           onTap: () {
             bloc.add(PlayerQueueAdded(track));
             Navigator.pop(context);
           },
           title: StringRes.addtoQueue,
-          leading: Icon(Icons.queue_music_outlined, size: Dimens.iconXLarge),
+          icon: Icons.queue_music_outlined,
         ),
         BottomSheetListTile(
             onTap: () => _toAlbum(context),
             enable: track.album?.id != null,
             title: StringRes.gotoAlbum,
-            leading: Icon(Icons.album_outlined, size: Dimens.iconXLarge)),
+            icon: Icons.album_outlined),
         BottomSheetListTile(
           onTap: () {
             bloc.onTrackShare(track.id!);
@@ -92,7 +92,7 @@ class TrackBottomSheet extends StatelessWidget {
           },
           enable: false,
           title: StringRes.share,
-          leading: Icon(Icons.share_sharp, size: Dimens.iconXXLarge),
+          icon: Icons.share_sharp,
         ),
         SizedBox(height: context.height * .05)
       ],

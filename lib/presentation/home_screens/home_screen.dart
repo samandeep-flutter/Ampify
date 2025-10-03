@@ -27,21 +27,21 @@ class HomeScreen extends StatelessWidget {
               centerTitle: false,
               titleTextStyle: Utils.defTitleStyle(context),
               bottom: PreferredSize(
-                  preferredSize: const Size.fromHeight(Dimens.sizeLarge),
+                  preferredSize: const Size.fromHeight(Dimens.sizeDefault),
                   child: Row(
                     children: [
                       const SizedBox(width: Dimens.sizeDefault),
                       Text(StringRes.homeSubtitle,
                           style: TextStyle(
                               color: scheme.textColorLight,
-                              fontSize: Dimens.fontXXXLarge)),
+                              fontSize: Dimens.fontDefault + 1)),
                     ],
                   )),
               actions: [
                 IconButton(
                   onPressed: () => context.pushNamed(AppRoutes.listnHistory),
                   icon: Image.asset(ImageRes.history,
-                      height: Dimens.iconDefault, color: scheme.textColor),
+                      height: Dimens.iconMedSmall, color: scheme.textColor),
                 ),
                 const SizedBox(width: Dimens.sizeDefault),
               ],
@@ -218,7 +218,7 @@ class HomeAlbumTile extends StatelessWidget {
                   title ?? '',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: Dimens.fontXXXLarge - 1,
+                      fontSize: Dimens.fontDefault + 1,
                       fontWeight: FontWeight.bold),
                 ),
                 Text(

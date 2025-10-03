@@ -81,18 +81,18 @@ class _ProfileViewState extends State<ProfileView>
             color: scheme.surface,
             child: Column(
               children: [
-                const SizedBox(height: Dimens.sizeSmall),
+                const SizedBox(height: Dimens.sizeExtraSmall),
                 ListTile(
                   onTap: _switchTheme,
                   leading: Icon(Icons.color_lens_outlined),
                   title: Text(StringRes.themeMode,
                       style: TextStyle(fontSize: Dimens.fontXXXLarge)),
                 ),
-                const SizedBox(height: Dimens.sizeSmall),
+                const SizedBox(height: Dimens.sizeExtraSmall),
               ],
             ),
           ),
-          const SizedBox(height: Dimens.sizeLarge),
+          const SizedBox(height: Dimens.sizeSmall),
           ListTile(
             onTap: logout,
             textColor: scheme.error,

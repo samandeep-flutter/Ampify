@@ -102,11 +102,13 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: Dimens.sizeSmall),
                       Text(
                         state.title ?? '',
                         style: Utils.defTitleStyle(context),
                       ),
-                      if (state.details?.description?.isNotEmpty ?? false)
+                      if (state.details?.description?.isNotEmpty ?? false) ...[
+                        const SizedBox(height: Dimens.sizeExtraSmall),
                         Text(
                           state.details!.description!.unescape,
                           style: TextStyle(
@@ -114,7 +116,8 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             fontSize: Dimens.fontDefault,
                           ),
                         ),
-                      const SizedBox(height: Dimens.sizeSmall),
+                      ],
+                      const SizedBox(height: Dimens.sizeDefault),
                       Wrap(
                         runSpacing: Dimens.sizeSmall,
                         spacing: Dimens.sizeSmall,
@@ -343,7 +346,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   child: DefaultTextStyle.merge(
                     style: TextStyle(
                         color: scheme.textColorLight,
-                        fontSize: Dimens.fontXXXLarge),
+                        fontSize: Dimens.fontDefault + 1),
                     child: Row(
                       children: [
                         const SizedBox(width: Dimens.sizeDefault),

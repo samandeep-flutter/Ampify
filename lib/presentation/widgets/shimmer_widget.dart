@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class Shimmer {
   static Widget get avatar => const _Shimmer(borderRadius: 50);
-  static Widget get box => const _Shimmer();
+  static Widget get box => const _Shimmer(borderRadius: Dimens.sizeMini);
 }
 
 class _Shimmer extends StatelessWidget {

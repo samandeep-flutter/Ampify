@@ -21,7 +21,7 @@ class PlayerScreen extends StatelessWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverSafeArea(sliver: SliverSizedBox(height: Dimens.sizeDefault)),
+          SliverSafeArea(sliver: SliverSizedBox()),
           SliverAppBar(
             forceMaterialTransparency: true,
             leading: IconButton(

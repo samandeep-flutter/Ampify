@@ -79,7 +79,7 @@ class MyBottomSheet extends StatelessWidget {
                         StringRes.close.toUpperCase(),
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: Dimens.fontDefault),
+                            fontSize: Dimens.fontMed),
                       ),
                     ),
                   ),

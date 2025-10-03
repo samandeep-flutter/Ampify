@@ -85,29 +85,29 @@ class PlaylistBottomSheet extends StatelessWidget {
             // TODO: implement add tracks to playlist.
           },
           title: StringRes.addTracks,
-          leading: Icon(Icons.music_note_outlined, size: Dimens.iconXLarge),
+          icon: Icons.music_note_outlined,
         ),
         BottomSheetListTile(
           onTap: () => _pickCoverImage(context),
           title: StringRes.editCover,
-          leading: Icon(Icons.photo_outlined, size: Dimens.iconXLarge),
+          icon: Icons.photo_outlined,
         ),
         BottomSheetListTile(
           onTap: () => _toEditDetails(context),
           title: StringRes.editDetails,
-          leading: Icon(Icons.title, size: Dimens.iconXLarge),
+          icon: Icons.title,
         ),
         if (details?.public ?? false)
           BottomSheetListTile(
             onTap: () => _toggleVisibility(context, false),
             title: 'Make Private',
-            leading: Icon(Icons.lock_outline, size: Dimens.iconXLarge),
+            icon: Icons.lock_outline,
           )
         else
           BottomSheetListTile(
             onTap: () => _toggleVisibility(context, true),
             title: 'Make Public',
-            leading: Icon(Icons.public, size: Dimens.iconXLarge),
+            icon: Icons.public,
           ),
         BottomSheetListTile(
           enable: false,
@@ -115,7 +115,7 @@ class PlaylistBottomSheet extends StatelessWidget {
             // TODO: implement share playlist.
           },
           title: StringRes.share,
-          leading: Icon(Icons.ios_share, size: Dimens.iconXLarge),
+          icon: Icons.ios_share,
         ),
         SizedBox(height: context.height * .07)
       ],

@@ -31,9 +31,11 @@ extension MyIterable on Iterable<String> {
 }
 
 extension ListToString on List<String> {
-  String get asString {
-    return toString().replaceAll(RegExp(r'[\[\]]'), '');
-  }
+  String get asString => toString().replaceAll(RegExp(r'[\[\]]'), '');
+}
+
+extension ArtistNames on List<Artist> {
+  String get asString => List<String>.from(map((e) => e.name)).asString;
 }
 
 extension MyMusicState on MusicState? {
@@ -49,15 +51,6 @@ extension MyLibItem on LibItemType? {
   //     this == LibItemType.album ||
   //     this == LibItemType.compilation ||
   //     this == LibItemType.single;
-}
-
-extension ArtistNames on List<Artist> {
-  String get asString => _toString(this);
-
-  String _toString(List<Artist> artists) {
-    final list = List<String>.from(artists.map((e) => e.name));
-    return list.asString;
-  }
 }
 
 extension MyMediaItems on MediaItem {

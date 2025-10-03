@@ -75,7 +75,6 @@ class _RootViewState extends State<RootView> {
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const SizedBox(height: Dimens.sizeSmall),
                             MediaQuery.removePadding(
                               context: context,
                               removeBottom: !state.isConnected,
@@ -97,8 +96,7 @@ class _RootViewState extends State<RootView> {
                                 },
                               ),
                             ),
-                            AnimatedContainer(
-                              duration: Duration(seconds: 2),
+                            Container(
                               height: state.isConnected ? 0 : null,
                               padding: EdgeInsets.only(
                                   top: Dimens.sizeSmall,

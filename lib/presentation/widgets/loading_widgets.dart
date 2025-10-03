@@ -40,11 +40,15 @@ class LoadingButton extends StatelessWidget {
       width: defWidth ? null : width ?? 200,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor ?? scheme.primaryAdaptive,
-            foregroundColor: foregroundColor ?? scheme.onPrimary,
-            visualDensity: compact ? VisualDensity.compact : null,
-            shape: Utils.continuousBorder(border ?? Dimens.borderLarge),
-            padding: padding ?? EdgeInsets.all(Dimens.sizeDefault)),
+          backgroundColor: backgroundColor ?? scheme.primaryAdaptive,
+          foregroundColor: foregroundColor ?? scheme.onPrimary,
+          visualDensity: compact ? VisualDensity.compact : null,
+          shape: Utils.continuousBorder(border ?? Dimens.borderLarge),
+          padding: padding ??
+              (compact
+                  ? Utils.insetsHoriz(Dimens.sizeMedSmall)
+                  : EdgeInsets.all(Dimens.sizeMedSmall)),
+        ),
         onPressed: enable && !(isLoading ?? false) ? onPressed : null,
         child: DefaultTextStyle.merge(
           style: TextStyle(

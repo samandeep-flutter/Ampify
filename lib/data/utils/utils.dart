@@ -16,7 +16,7 @@ sealed class Utils {
 
   static TextStyle defTitleStyle(BuildContext context) {
     return TextStyle(
-        fontSize: Dimens.fontLarge,
+        fontSize: Dimens.fontXXLarge,
         fontWeight: FontWeight.w600,
         color: context.scheme.textColor);
   }

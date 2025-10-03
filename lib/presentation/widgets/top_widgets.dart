@@ -209,15 +209,6 @@ class SubtitleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
 
-    final sub = Text(
-      subtitle,
-      maxLines: 1,
-      style: TextStyle(
-          color: style?.color ?? scheme.textColorLight,
-          fontSize: Dimens.fontDefault),
-      overflow: TextOverflow.ellipsis,
-    );
-
     return DefaultTextStyle.merge(
       style: style,
       child: Row(
@@ -234,9 +225,20 @@ class SubtitleWidget extends StatelessWidget {
             margin: Dimens.sizeSmall,
             color: style?.color ?? scheme.textColorLight,
           ),
-          if (expanded) Expanded(child: sub) else sub,
+          if (expanded) Expanded(child: sub(context)) else sub(context),
         ],
       ),
+    );
+  }
+
+  Widget sub(BuildContext context) {
+    return Text(
+      subtitle,
+      maxLines: 1,
+      style: TextStyle(
+          color: style?.color ?? context.scheme.textColorLight,
+          fontSize: Dimens.fontDefault),
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
@@ -314,12 +316,14 @@ class LikedSongsCover extends StatelessWidget {
 class BottomSheetListTile extends StatelessWidget {
   final String title;
   final Widget? leading;
+  final IconData? icon;
   final bool? enable;
   final VoidCallback? onTap;
   const BottomSheetListTile({
     super.key,
     required this.title,
     this.leading,
+    this.icon,
     this.onTap,
     this.enable,
   });
@@ -330,12 +334,12 @@ class BottomSheetListTile extends StatelessWidget {
     return ListTile(
       enabled: enable ?? true,
       onTap: onTap,
-      leading: leading,
+      leading: leading ?? Icon(icon, size: Dimens.iconXXLarge),
       title: Text(title),
       horizontalTitleGap: Dimens.sizeLarge,
       titleTextStyle: TextStyle(
         fontWeight: FontWeight.w500,
-        fontSize: Dimens.fontXXXLarge,
+        fontSize: Dimens.fontXXXLarge - 1,
         color: scheme.textColor,
       ),
     );

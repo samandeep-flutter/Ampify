@@ -50,7 +50,7 @@ class _LibraryScreenState extends State<LibraryScreen>
               child: MyAvatar(
                 auth.profile?.image,
                 isAvatar: true,
-                padding: EdgeInsets.all(Dimens.sizeExtraSmall),
+                padding: EdgeInsets.all(Dimens.sizeMini),
                 onTap: () => context.pushNamed(AppRoutes.profile),
                 avatarRadius: Dimens.iconMedSmall,
               ),
@@ -95,7 +95,7 @@ class _LibraryScreenState extends State<LibraryScreen>
               style: TextStyle(fontSize: Dimens.fontDefault),
             ),
             iconAlignment: IconAlignment.end,
-            icon: Icon(Icons.library_add_outlined, size: Dimens.iconDefault),
+            icon: Icon(Icons.library_add_outlined, size: Dimens.iconMedSmall),
           ),
           const SizedBox(width: Dimens.sizeSmall),
         ],
@@ -145,7 +145,8 @@ class _LibraryScreenState extends State<LibraryScreen>
               if (state.loading) {
                 return SliverList.builder(
                   itemCount: 10,
-                  itemBuilder: (_, __) => const SongTileShimmer(iconSize: 55),
+                  itemBuilder: (_, __) =>
+                      SongTileShimmer(iconSize: Dimens.iconTileLarge),
                 );
               }
 
@@ -164,7 +165,7 @@ class _LibraryScreenState extends State<LibraryScreen>
                 return SliverToBoxAdapter(
                   child: Column(
                     children: List.generate(3, (_) {
-                      return const SongTileShimmer(iconSize: 55);
+                      return SongTileShimmer(iconSize: Dimens.iconTileLarge);
                     }),
                   ),
                 );

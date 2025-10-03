@@ -60,19 +60,20 @@ class _EditPlaylistScreenState extends State<EditPlaylistScreen> {
               const SizedBox(height: Dimens.sizeExtraLarge),
               TextFormField(
                 decoration: InputDecoration(
-                    label: Text('Title'),
-                    labelStyle: TextStyle(fontSize: Dimens.fontDefault)),
-                style: TextStyle(fontSize: Dimens.fontDefault),
+                  label: Text('Title'),
+                  labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
+                ),
+                style: TextStyle(fontSize: Dimens.fontXXXLarge),
                 controller: bloc.titleContr,
               ),
               const SizedBox(height: Dimens.sizeMidLarge),
               TextFormField(
                 decoration: InputDecoration(
                   label: Text('Describe your vibe!'),
-                  labelStyle: TextStyle(fontSize: Dimens.fontDefault),
+                  labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
                   constraints: BoxConstraints(maxHeight: 100),
                 ),
-                style: TextStyle(fontSize: Dimens.fontDefault),
+                style: TextStyle(fontSize: Dimens.fontXXXLarge),
                 controller: bloc.descContr,
                 expands: true,
                 maxLines: null,

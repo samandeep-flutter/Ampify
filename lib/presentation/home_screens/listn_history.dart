@@ -20,7 +20,8 @@ class ListeningHistory extends StatelessWidget {
           Text(
             StringRes.listnHisSubtitle,
             style: TextStyle(
-                color: scheme.textColorLight, fontSize: Dimens.fontXXXLarge),
+                color: scheme.textColorLight,
+                fontSize: Dimens.fontXXXLarge - 1),
           ),
           ToolTipWidget.placeHolder(
             icon: ImageRes.musicAlt,

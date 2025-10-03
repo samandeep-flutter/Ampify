@@ -73,8 +73,6 @@ class PlayerCompact extends StatelessWidget {
                           child: Row(
                         children: [
                           Builder(builder: (context) {
-                            final _scalar = MediaQuery.textScalerOf(context);
-                            final dimen = _scalar.scale(Dimens.iconTileLarge);
                             return DecoratedBox(
                               decoration: BoxDecoration(boxShadow: [
                                 BoxShadow(
@@ -83,8 +81,11 @@ class PlayerCompact extends StatelessWidget {
                                   spreadRadius: Dimens.sizeExtraSmall,
                                 ),
                               ]),
-                              child: MyCachedImage(state.track.image,
-                                  borderRadius: Dimens.sizeMini, width: dimen),
+                              child: MyCachedImage(
+                                state.track.image,
+                                borderRadius: Dimens.sizeMini,
+                                width: Dimens.iconUltraLarge,
+                              ),
                             );
                           }),
                           const SizedBox(width: Dimens.sizeSmall),
@@ -97,7 +98,7 @@ class PlayerCompact extends StatelessWidget {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
-                                      fontSize: Dimens.fontXXXLarge,
+                                      fontSize: Dimens.fontDefault + 1,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
@@ -106,7 +107,7 @@ class PlayerCompact extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       color: scheme.textColor.withAlpha(200),
-                                      fontSize: Dimens.fontDefault),
+                                      fontSize: Dimens.fontDefault - 1),
                                 )
                               ],
                             ),
@@ -162,7 +163,7 @@ class PlayerCompact extends StatelessWidget {
                   ),
                   const SizedBox(height: Dimens.sizeExtraSmall),
                   SizedBox(
-                    height: Dimens.sizeExtraSmall,
+                    height: Dimens.sizeExtraSmall - 1,
                     child: LayoutBuilder(builder: (context, constraints) {
                       return ClipRRect(
                         borderRadius: BorderRadius.circular(Dimens.sizeMini),

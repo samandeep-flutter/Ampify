@@ -45,7 +45,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                       style: TextStyle(
                         color: scheme.textColor,
                         fontSize: Dimens.fontXXXLarge,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const Spacer(),
@@ -81,8 +81,8 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                       scrollDirection: playlists.length > 2
                           ? Axis.horizontal
                           : Axis.vertical,
-                      gridDelegate:
-                          Utils.fixedCrossAxis(2, spacing: Dimens.sizeSmall),
+                      gridDelegate: Utils.fixedCrossAxis(2,
+                          spacing: Dimens.sizeSmall, aspectRatio: 1.1),
                       itemCount: playlists.length,
                       itemBuilder: (context, index) {
                         final item = playlists[index];
@@ -126,7 +126,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                             if (state.playlists.contains(item.id))
                               Container(
                                 margin: const EdgeInsets.only(
-                                    right: Dimens.sizeMedSmall,
+                                    right: Dimens.sizeLarge,
                                     top: Dimens.sizeSmall),
                                 alignment: Alignment.topRight,
                                 child: CircleAvatar(

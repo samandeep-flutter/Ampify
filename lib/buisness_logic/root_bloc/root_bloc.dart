@@ -60,19 +60,19 @@ class RootBloc extends Bloc<RootEvent, RootState> {
   final List<BottomNavigationBarItem> tabs = [
     BottomNavigationBarItem(
       icon: Icon(Icons.home_outlined, size: Dimens.iconMedSmall),
-      activeIcon: Icon(Icons.home, size: Dimens.iconDefault),
+      activeIcon: Icon(Icons.home, size: Dimens.iconMedium),
       label: StringRes.home,
       tooltip: StringRes.home,
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.search, size: Dimens.iconMedSmall),
-      activeIcon: Icon(Icons.search, size: Dimens.iconDefault),
+      activeIcon: Icon(Icons.search, size: Dimens.iconMedium),
       label: StringRes.search,
       tooltip: StringRes.search,
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.library_music_outlined, size: Dimens.iconMedSmall),
-      activeIcon: Icon(Icons.library_music, size: Dimens.iconDefault),
+      activeIcon: Icon(Icons.library_music, size: Dimens.iconMedium),
       label: StringRes.library,
       tooltip: StringRes.library,
     ),

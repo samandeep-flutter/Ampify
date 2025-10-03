@@ -70,40 +70,51 @@ class MyApp extends StatelessWidget {
       scrollBehavior: CupertinoScrollBehavior(),
       builder: (context, child) {
         ResponsiveFont.init(context);
-        return ResponsiveBreakpoints.builder(
+        return ResponsiveWrapper.builder(
+          MultiBlocProvider(providers: [
+            BlocProvider(create: (_) => RootBloc()),
+            BlocProvider(create: (_) => PlayerBloc()),
+            BlocProvider(create: (_) => PlayerSliderBloc()),
+            BlocProvider(create: (_) => HomeBloc()),
+            BlocProvider(create: (_) => SearchBloc()),
+            BlocProvider(create: (_) => LibraryBloc()),
+            BlocProvider(create: (_) => LikedSongsBloc()),
+          ], child: child ?? const SizedBox.shrink()),
           breakpoints: [
-            const Breakpoint(start: 0, end: 450, name: MOBILE),
-            const Breakpoint(start: 451, end: 800, name: TABLET),
-            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+            const ResponsiveBreakpoint.resize(450, name: MOBILE),
+            const ResponsiveBreakpoint.autoScale(600, name: TABLET),
+            const ResponsiveBreakpoint.resize(800, name: DESKTOP),
+            const ResponsiveBreakpoint.autoScale(1700, name: '4K'),
           ],
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (_) => RootBloc()),
-              BlocProvider(create: (_) => PlayerBloc()),
-              BlocProvider(create: (_) => PlayerSliderBloc()),
-              BlocProvider(create: (_) => HomeBloc()),
-              BlocProvider(create: (_) => SearchBloc()),
-              BlocProvider(create: (_) => LibraryBloc()),
-              BlocProvider(create: (_) => LikedSongsBloc()),
-            ],
-            child: MaxWidthBox(
-              maxWidth: 1200,
-              backgroundColor: theme.disabled,
-              child: Builder(builder: (context) {
-                return ResponsiveScaledBox(
-                  width: ResponsiveValue<double?>(context, conditionalValues: [
-                    Condition.equals(name: MOBILE, value: 450),
-                    Condition.between(start: 800, end: 1100, value: 800),
-                    Condition.between(start: 1000, end: 1200, value: 1000),
-                  ]).value,
-                  child: ClampingScrollWrapper.builder(
-                      context, child ?? const SizedBox.shrink()),
-                );
-              }),
-            ),
-          ),
         );
+        // return ResponsiveBreakpoints.builder(
+        //   breakpoints: [
+        //     const Breakpoint(start: 0, end: 450, name: MOBILE),
+        //     const Breakpoint(start: 451, end: 800, name: TABLET),
+        //     const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+        //     const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+        //   ],
+        //   child: MultiBlocProvider(
+        //     providers: [
+        //       // init bloc here
+        //     ],
+        //     child: MaxWidthBox(
+        //       maxWidth: 1200,
+        //       backgroundColor: theme.disabled,
+        //       child: Builder(builder: (context) {
+        //         return ResponsiveScaledBox(
+        //           width: ResponsiveValue<double?>(context, conditionalValues: [
+        //             Condition.equals(name: MOBILE, value: 450),
+        //             Condition.between(start: 800, end: 1100, value: 800),
+        //             Condition.between(start: 1000, end: 1200, value: 1000),
+        //           ]).value,
+        //           child: ClampingScrollWrapper.builder(
+        //               context, child ?? const SizedBox.shrink()),
+        //         );
+        //       }),
+        //     ),
+        //   ),
+        // );
       },
       themeMode: theme.themeMode,
       theme: ThemeData(

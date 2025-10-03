@@ -14,9 +14,7 @@ class AuthScreen extends StatelessWidget {
 
     return BaseWidget(
       appBar: AppBar(
-        backgroundColor: scheme.background,
-        toolbarHeight: Dimens.sizeLarge,
-      ),
+          backgroundColor: scheme.background, toolbarHeight: Dimens.sizeLarge),
       bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
       child: Column(
         children: [
@@ -40,7 +38,6 @@ class AuthScreen extends StatelessWidget {
                 isLoading: state.isLoading,
                 loaderColor: spotify,
                 backgroundColor: spotify,
-                padding: const EdgeInsets.symmetric(vertical: Dimens.sizeLarge),
                 onPressed: () => bloc.add(AuthInitial()),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
