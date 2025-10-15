@@ -56,6 +56,7 @@ sealed class PlayerActions {
   static const String clearQueue = 'clear-queue';
   static const String removeRange = 'remove-range';
   static const String removeUpcomming = 'remove-upcomming';
+  static const String addToQueue = 'add-to-queue';
 }
 
 void logPrint(Object? value, [String? name]) {
@@ -83,10 +84,7 @@ class MyColoredBox extends StatelessWidget {
 Future<void> showToast(String text, {int? timeInSec}) async {
   await Fluttertoast.cancel();
   Future.delayed(Durations.medium2).then((_) {
-    Fluttertoast.showToast(
-        msg: text,
-        timeInSecForIosWeb: timeInSec ?? 1,
-        gravity: ToastGravity.SNACKBAR);
+    Fluttertoast.showToast(msg: text, timeInSecForIosWeb: timeInSec ?? 1);
   });
 }
 

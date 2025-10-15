@@ -4,7 +4,6 @@ import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/data_models/common/tracks_model.dart';
@@ -22,6 +21,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         transformer: Utils.debounce(longDuration));
     on<PlayerQueueCleared>(_onQueueCleared);
     on<PlayerUpNextCleared>(_onUpNextCleared);
+    on<PlayerPrepareNextTrack>(_onPrepareTrack);
+    on<PlayerUpNextHandler>(_onUpNextHandler);
     on<PlayerTrackChanged>(_onTrackChange);
     on<MusicGroupPlayed>(_onMusicGroup);
     on<PlayerMediaStream>(_onMediaStream,
@@ -60,8 +61,6 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         if (isClosed) return;
         add(PlayerPlaybackStream(state));
       });
-      final session = getIt<AuthServices>().session;
-      await session?.configure(const AudioSessionConfiguration.music());
     } catch (e) {
       logPrint(e, 'player init');
     }
@@ -86,7 +85,17 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   void onShuffle() => add(PlayerShuffleToggle());
 
   void onRepeat() {
-    _audioHandler.setRepeatMode(state.loopMode.toAudioState);
+    switch (state.loopMode) {
+      case MusicLoopMode.off:
+        _audioHandler.setRepeatMode(AudioServiceRepeatMode.one);
+        break;
+      case MusicLoopMode.once:
+        _audioHandler.setRepeatMode(AudioServiceRepeatMode.all);
+        break;
+      case MusicLoopMode.all:
+        _audioHandler.setRepeatMode(AudioServiceRepeatMode.none);
+        break;
+    }
   }
 
   void clearQueue() => add(PlayerQueueCleared());
@@ -111,7 +120,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   void _onPlaybackStream(
       PlayerPlaybackStream event, Emitter<PlayerState> emit) {
     try {
-      logPrint(event.state.processingState, 'state');
+      logPrint(
+          '${event.state.processingState} [${DateTime.now().formatLongTime}]',
+          'state');
       final _state = event.state.playerState;
       final _loop = event.state.repeatMode.toLoopMode;
       final loop = state.loopMode == _loop ? null : _loop;
@@ -143,7 +154,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         throw FormatException();
       }
     } on FormatException {
-      _prepareNextTrackSource();
+      add(PlayerPrepareNextTrack());
     } catch (_) {}
   }
 
@@ -160,11 +171,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     queueTracks.removeAt(event.previous);
     queueTracks.insert(event.current, reorderedTrack);
     emit(state.copyWith(queue: queueTracks));
-
     try {
-      _audioHandler.customAction(PlayerActions.removeUpcomming);
+      await _audioHandler.customAction(PlayerActions.removeUpcomming);
       final uri = await _musicRepo.fromVideoId(state.queue.first.videoId);
-      // TODO: add null check functionality
       final _media = Utils.toMediaItem(state.queue.first, uri: uri!);
       _audioHandler.addQueueItem(_media);
     } catch (e) {
@@ -208,15 +217,26 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       final track = await Utils.getTrackDetails(event.track);
       emit(state.copyWith(queue: [...state.queue, track]));
       if (state.upNext.isNotEmpty) {
-        _audioHandler.customAction(PlayerActions.removeUpcomming);
+        await _audioHandler.customAction(PlayerActions.removeUpcomming);
       }
-      if (_audioHandler.queue.isLast(state.queue)) return;
-      final uri = await _musicRepo.fromVideoId(track.videoId);
-      // TODO: add null check functionality
-      final _media = Utils.toMediaItem(track, uri: uri!);
-      _audioHandler.addQueueItem(_media);
+      try {
+        if (_audioHandler.queue.isLast(state.queue)) return;
+        final uri = await _musicRepo.fromVideoId(track.videoId);
+        if (uri == null) throw Exception();
+        final _media = Utils.toMediaItem(track, uri: uri);
+        // try {
+        //   if (state.upNext.isEmpty) throw FormatException();
+        //   if (state.queue.isNotEmpty) throw FormatException();
+        //   await _audioHandler.customAction(
+        //       PlayerActions.addToQueue, _media.extras);
+        // } catch (_) {
+        _audioHandler.addQueueItem(_media);
+        // }
+      } catch (_) {
+        showToast(StringRes.cannotbeAdded);
+      }
     } on FormatException {
-      showToast(StringRes.noQueue);
+      add(PlayerTrackChanged(event.track));
     } catch (e) {
       logPrint(e, 'Queue instaneous');
     }
@@ -225,13 +245,14 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onTrackEnded(
       PlayerTrackEnded event, Emitter<PlayerState> emit) async {
     try {
-      if (state.isQueueEmpty) throw FormatException();
+      // TODO: might need to refactor in case of recomendations/loop mode
+      if (state.isEmptyOrFinished) throw FormatException();
       if (state.queue.isNotEmpty) {
         emit(state.copyWith(queue: state.queue.skip(1).toList()));
       } else if (state.upNext.isNotEmpty) {
         emit(state.copyWith(upNext: state.upNext.skip(1).toList()));
       }
-      await _prepareNextTrackSource();
+      add(PlayerPrepareNextTrack());
     } on FormatException {
       await _audioHandler.stop();
       emit(PlayerState.init());
@@ -240,30 +261,42 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     }
   }
 
-  Future<void> _prepareNextTrackSource() async {
+  Future<void> _onPrepareTrack(
+      PlayerPrepareNextTrack event, Emitter<PlayerState> emit) async {
     try {
       if (state.queue.isNotEmpty) {
-        final track = state.queue.first;
-        final uri = await _musicRepo.fromVideoId(track.videoId);
-        // TODO: add null check functionality
-        final _media = Utils.toMediaItem(track, uri: uri!);
-        await _audioHandler.addQueueItem(_media);
+        try {
+          final track = state.queue.first;
+          final uri = await _musicRepo.fromVideoId(track.videoId);
+          if (uri == null) throw FormatException();
+          final _media = Utils.toMediaItem(track, uri: uri);
+          await _audioHandler.addQueueItem(_media);
+        } catch (_) {
+          emit(state.copyWith(queue: state.queue.skip(1).toList()));
+          add(PlayerPrepareNextTrack());
+        }
       } else if (state.upNext.isNotEmpty) {
-        final track = await Utils.getTrackDetails(state.upNext.first);
-        final uri = await _musicRepo.fromVideoId(track.videoId);
-        // TODO: add null check functionality
-        final _media = Utils.toMediaItem(track, uri: uri!);
-        await _audioHandler.addQueueItem(_media);
+        try {
+          final track = await Utils.getTrackDetails(state.upNext.first);
+          final uri = await _musicRepo.fromVideoId(track.videoId);
+          if (uri == null) throw FormatException();
+          final _media = Utils.toMediaItem(track, uri: uri);
+          await _audioHandler.addQueueItem(_media);
+        } catch (_) {
+          emit(state.copyWith(upNext: state.upNext.skip(1).toList()));
+          add(PlayerPrepareNextTrack());
+        }
       }
     } catch (e) {
       logPrint(e, 'preloading track');
     }
   }
 
-  void _onQueueCleared(PlayerQueueCleared event, Emitter<PlayerState> emit) {
-    _audioHandler.customAction(PlayerActions.removeUpcomming);
+  Future<void> _onQueueCleared(
+      PlayerQueueCleared event, Emitter<PlayerState> emit) async {
+    await _audioHandler.customAction(PlayerActions.removeUpcomming);
     emit(state.copyWith(queue: []));
-    _prepareNextTrackSource();
+    add(PlayerPrepareNextTrack());
   }
 
   void _onUpNextCleared(PlayerUpNextCleared event, Emitter<PlayerState> emit) {
@@ -275,21 +308,48 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onMusicGroup(
       MusicGroupPlayed event, Emitter<PlayerState> emit) async {
     await _audioHandler.customAction(PlayerActions.clearQueue);
+    final _track = event.tracks.first;
     emit(state.copyWith(
       musicGroupId: event.id,
       isLiked: event.liked,
-      track: event.tracks.first.asTrackDetails,
       playerState: MusicState.loading,
+      track: _track.asTrackDetails,
+      upNext: event.tracks.skip(1).toList(),
+      queue: [],
     ));
-    final track = await Utils.getTrackDetails(event.tracks.first);
-    final uri = await _musicRepo.fromVideoId(track.videoId);
-    // TODO: add null check functionality
-    final _media = Utils.toMediaItem(track, uri: uri!);
-    _audioHandler.playMediaItem(_media);
-    _audioHandler.play();
-    final upnext = event.tracks.skip(1).toList();
-    emit(state.copyWith(queue: [], upNext: upnext));
-    _prepareNextTrackSource();
+
+    try {
+      final track = await Utils.getTrackDetails(_track);
+      final uri = await _musicRepo.fromVideoId(track.videoId);
+      if (uri == null) throw FormatException();
+      final _media = Utils.toMediaItem(track, uri: uri);
+      _audioHandler.playMediaItem(_media);
+      add(PlayerPrepareNextTrack());
+    } on FormatException {
+      emit(state.copyWith(upNext: event.tracks.skip(1).toList()));
+      showToast(StringRes.cannotbePlayed);
+      add(PlayerUpNextHandler());
+    }
+  }
+
+  Future<void> _onUpNextHandler(
+      PlayerUpNextHandler event, Emitter<PlayerState> emit) async {
+    if (state.upNext.isEmpty) return;
+    final track = state.upNext.first;
+    final upnext = state.upNext.skip(1).toList();
+    emit(state.copyWith(track: track.asTrackDetails, upNext: upnext));
+    try {
+      final _track = await Utils.getTrackDetails(track);
+      final uri = await _musicRepo.fromVideoId(_track.videoId);
+      if (uri == null) throw FormatException();
+      final _media = Utils.toMediaItem(_track, uri: uri);
+      _audioHandler.playMediaItem(_media);
+      emit(state.copyWith(upNext: state.upNext.skip(1).toList()));
+      add(PlayerPrepareNextTrack());
+    } on FormatException {
+      emit(state.copyWith(upNext: state.upNext.skip(1).toList()));
+      add(PlayerUpNextHandler());
+    }
   }
 
   Future<void> _onTrackChange(
@@ -309,7 +369,6 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       if (uri == null) throw FormatException();
       final _media = Utils.toMediaItem(track, uri: uri);
       await _audioHandler.playMediaItem(_media);
-      _audioHandler.play();
     } on FormatException {
       showToast(StringRes.cannotbePlayed);
       emit(state.copyWith(playerState: MusicState.hidden));

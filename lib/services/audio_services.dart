@@ -42,6 +42,7 @@ class MyAudioHandler extends BaseAudioHandler {
       repeatMode: _player.loopMode.toRepeatMode,
       shuffleMode: AudioServiceShuffleMode.none,
     ));
+
     AudioService.asyncError.listen((e) => logPrint(e, 'audio-services'));
     return this;
   }
@@ -74,12 +75,12 @@ class MyAudioHandler extends BaseAudioHandler {
   @override
   Future<void> playMediaItem(MediaItem mediaItem) async {
     try {
+      await _player.setAudioSource(mediaItem.toAudioSource);
       queue.drain();
       this.mediaItem.drain();
-      await _player.setAudioSource(mediaItem.toAudioSource);
       this.mediaItem.add(mediaItem);
       queue.add([mediaItem]);
-      _player.play();
+      play();
     } catch (e) {
       logPrint(e, 'audio play');
     }
@@ -127,6 +128,7 @@ class MyAudioHandler extends BaseAudioHandler {
   Future<void> _clearQueue() async {
     await _player.clearAudioSources();
     queue.drain();
+    mediaItem.drain();
   }
 
   Future<void> _removeRange(int? start, int? end) async {
@@ -140,9 +142,9 @@ class MyAudioHandler extends BaseAudioHandler {
 
   Future<void> _removeUpcomming() async {
     try {
-      final _end = _player.audioSources.length - 1;
-      await _player.removeAudioSourceRange(_player.nextIndex ?? 0, _end);
-      queue.value.removeRange(_player.nextIndex ?? 0, queue.value.length - 1);
+      final _end = _player.audioSources.length;
+      await _player.removeAudioSourceRange(_index + 1, _end);
+      queue.value.removeRange(_index + 1, queue.value.length);
     } catch (e) {
       logPrint(e, 'audio queue');
     }
@@ -153,6 +155,7 @@ class MyAudioHandler extends BaseAudioHandler {
     switch (repeatMode) {
       case AudioServiceRepeatMode.one:
         await _player.setLoopMode(LoopMode.one);
+
         break;
       case AudioServiceRepeatMode.all:
         await _player.setLoopMode(LoopMode.all);
@@ -162,6 +165,7 @@ class MyAudioHandler extends BaseAudioHandler {
         await _player.setLoopMode(LoopMode.off);
         break;
     }
+    playbackState.add(playbackState.value.copyWith(repeatMode: repeatMode));
   }
 
   void _playerStream() {

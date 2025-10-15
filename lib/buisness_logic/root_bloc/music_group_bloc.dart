@@ -184,23 +184,17 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
   void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
-    final playing = player.state.playerState.isPlaying;
-    if (playing && player.state.musicGroupId == state.id) {
-      player.onPlayPause();
-    } else {
-      player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
-    }
+    if (player.state.musicGroupId == state.id) return player.onPlayPause();
+    player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
   }
 
   Future<bool> pickImage(ImageSource source) async {
     try {
       final file =
           await picker.pickImage(source: source, maxHeight: 500, maxWidth: 500);
-      if (file != null) {
-        add(PlaylistCoverChanged(File(file.path)));
-        return true;
-      }
-      throw FormatException(StringRes.noImage);
+      if (file == null) throw FormatException(StringRes.noImage);
+      add(PlaylistCoverChanged(File(file.path)));
+      return true;
     } on FormatException catch (e) {
       showToast(e.message);
     } catch (e) {
@@ -268,7 +262,6 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         loading: false,
       ));
     });
-
     await completer.future;
   }
 

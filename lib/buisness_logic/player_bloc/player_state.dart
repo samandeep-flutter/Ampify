@@ -57,7 +57,8 @@ class PlayerState extends Equatable {
     );
   }
 
-  bool get isQueueEmpty => queue.isEmpty && upNext.isEmpty;
+  bool get isEmptyOrFinished =>
+      queue.isEmpty && upNext.isEmpty && loopMode == MusicLoopMode.off;
 
   @override
   List<Object?> get props => [
@@ -105,7 +106,8 @@ extension HelperState on Change<PlayerState> {
   String _changes(PlayerState pr, PlayerState cr) {
     final items = {
       if (pr.musicGroupId != cr.musicGroupId) 'musicGroupId': cr.musicGroupId,
-      if (pr.track != cr.track) 'track': cr.track.title,
+      if (pr.track != cr.track)
+        'track': '${cr.track.title} [${cr.track.videoId}]',
       if (pr.shuffle != cr.shuffle) 'shuffle': cr.shuffle,
       if (pr.loopMode != cr.loopMode) 'loopMode': cr.loopMode.name,
       if (pr.isLiked != cr.isLiked) 'liked': cr.isLiked,

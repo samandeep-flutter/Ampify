@@ -124,6 +124,7 @@ class _MyTextFieldState extends State<MyTextField> {
                       icon: const Icon(Icons.visibility_off))
                   : null,
               label: Text(widget.title),
+              contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
               labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
               border: const OutlineInputBorder(),
               focusedBorder: OutlineInputBorder(
@@ -216,6 +217,7 @@ class SearchTextField extends StatelessWidget {
             hintText: title,
             fillColor: backgroundColor,
             filled: backgroundColor != null,
+            contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
             hintStyle: TextStyle(
                 color: scheme.disabled, fontSize: Dimens.fontXXXLarge),
             focusedBorder: border(),
@@ -291,6 +293,7 @@ class CustomTextField extends StatelessWidget {
           fillColor: backgroundColor,
           filled: backgroundColor != null,
           hintStyle: TextStyle(color: scheme.disabled),
+          contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
           focusedBorder: defaultBorder ?? false
               ? OutlineInputBorder(
                   borderSide: BorderSide(color: scheme.primaryAdaptive))

@@ -103,6 +103,8 @@ sealed class StringRes {
       'No new tracks available. Stay tuned for updates.';
   static const String cannotbePlayed =
       'This track cannot be played at the moment.';
+  static const String cannotbeAdded =
+      'This track cannot be added to queue at the moment.';
   static const String errorPage = 'The specified page cannot be found, '
       'please try again or contact the developer';
 }

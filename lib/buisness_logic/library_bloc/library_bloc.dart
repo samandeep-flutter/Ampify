@@ -102,7 +102,16 @@ class LibraryState extends Equatable {
       ];
 }
 
-enum SortOrder { alphabetical, owner, custom }
+enum SortOrder {
+  alphabetical('Alphabetical', icon: Icons.abc),
+  owner('Owner', icon: Icons.person_outline),
+  custom('Custom', icon: Icons.sort_outlined),
+  ;
+
+  final String title;
+  final IconData? icon;
+  const SortOrder(this.title, {this.icon});
+}
 
 class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   LibraryBloc() : super(const LibraryState.init()) {

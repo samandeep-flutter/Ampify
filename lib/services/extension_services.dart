@@ -203,23 +203,16 @@ extension MyDuration on Duration {
 
 extension MyDateTime on DateTime {
   String toJson() => _dateTime(this);
-  String get formatTime => _formatedTime(this);
-  String get formatDate => _formatedDate(this);
+  String get formatDate => '${_months[month - 1]} ${day.digit2}, $year';
+  String get formatTime => '${hour.digit2}:${minute.digit2}';
+  String get formatLongTime =>
+      '${hour.digit2}:${minute.digit2}:${second.digit2}';
 
   String _dateTime(DateTime now) {
     String date = '${now.year}${now.month.digit2}${now.day.digit2}';
     String time = '${now.hour.digit2}${now.minute.digit2}'
         '${now.second.digit2}${now.millisecond.digit3}';
     return date + time;
-  }
-
-  String _formatedTime(DateTime time) {
-    return '${time.hour.digit2}:${time.minute.digit2}';
-  }
-
-  String _formatedDate(DateTime time) {
-    String day = time.day.digit2;
-    return '${_months[time.month - 1]} $day, ${time.year}';
   }
 
   List<String> get _months => [

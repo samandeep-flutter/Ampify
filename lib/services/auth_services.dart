@@ -30,6 +30,7 @@ class AuthServices {
     _appLinks.uriLinkStream.listen(_dynamicLinks);
     try {
       session = await AudioSession.instance;
+      session!.configure(const AudioSessionConfiguration.music());
       _connectionStream.add(true);
     } catch (e) {
       logPrint(e, 'auth init');

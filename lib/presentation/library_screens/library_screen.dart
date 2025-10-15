@@ -212,7 +212,8 @@ class _LibraryScreenState extends State<LibraryScreen>
                   // ignore: use_build_context_synchronously
                   if (mounted) Navigator.pop(context);
                 },
-                title: Text(e.name.capitalize),
+                leading: Icon(e.icon),
+                title: Text(e.title),
                 titleTextStyle: TextStyle(
                   color: context.scheme.textColor,
                   fontSize: Dimens.fontXXXLarge,

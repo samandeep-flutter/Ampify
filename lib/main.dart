@@ -124,6 +124,7 @@ class MyApp extends StatelessWidget {
           onPrimary: theme.onPrimary,
           brightness: Brightness.light,
         ),
+        scaffoldBackgroundColor: theme.background,
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
@@ -133,6 +134,7 @@ class MyApp extends StatelessWidget {
           onPrimary: theme.onPrimary,
           brightness: Brightness.dark,
         ),
+        scaffoldBackgroundColor: theme.background,
         useMaterial3: true,
       ),
     );

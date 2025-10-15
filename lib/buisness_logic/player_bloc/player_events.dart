@@ -67,6 +67,10 @@ class PlayerUpNextCleared extends PlayerEvent {}
 
 class PlayerTrackEnded extends PlayerEvent {}
 
+class PlayerPrepareNextTrack extends PlayerEvent {}
+
+class PlayerUpNextHandler extends PlayerEvent {}
+
 class MusicGroupPlayed extends PlayerEvent {
   final String? id;
   final List<Track> tracks;

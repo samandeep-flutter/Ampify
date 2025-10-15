@@ -53,8 +53,7 @@ sealed class Utils {
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
     final _details = Completer<SongYtDetails?>();
-    final artist = track.artists?.asString.split(',').firstElement;
-    _repo.getDetailsFromQuery('${track.name} - $artist').then((details) {
+    _repo.getDetailsFromQuery(track).then((details) {
       _details.complete(details);
     });
     final palete = await PaletteGenerator.fromImageProvider(

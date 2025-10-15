@@ -163,17 +163,17 @@ class LoggingInterceptor extends InterceptorsWrapper {
   //   super.onRequest(options, handler);
   // }
 
-  @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    final options = response.requestOptions;
-    final status = response.statusCode;
+  // @override
+  // void onResponse(Response response, ResponseInterceptorHandler handler) {
+  //   final options = response.requestOptions;
+  //   final status = response.statusCode;
 
-    final time = DateTime.now().formatTime;
-    dprint('$status | ${options.method} [$time] | ${options.path}\n'
-        // '${response.data.toString()}\n'
-        '<--------------------------END HTTP-------------------------->');
-    super.onResponse(response, handler);
-  }
+  //   final time = DateTime.now().formatLongTime;
+  //   dprint('$status | ${options.method} [$time] | ${options.path}\n'
+  //       // '${response.data.toString()}\n'
+  //       '<--------------------------END HTTP-------------------------->');
+  //   super.onResponse(response, handler);
+  // }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {

@@ -12,15 +12,46 @@ class TrackTile extends StatelessWidget {
   final Track track;
   final bool? liked;
   final bool? showImage;
-  const TrackTile(this.track, {this.liked, this.showImage, super.key});
+  final bool isQueue;
+  const TrackTile(this.track, {this.liked, this.showImage, super.key})
+      : isQueue = false;
+  const TrackTile.queue(this.track, {this.liked, this.showImage, super.key})
+      : isQueue = true;
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<PlayerBloc>();
-    final sliderBloc = context.read<PlayerSliderBloc>();
     final scheme = context.scheme;
 
-    final widget = InkWell(
+    if (isQueue) return _builder(context);
+
+    return Dismissible(
+      key: ValueKey(track.id ?? ''),
+      direction: DismissDirection.startToEnd,
+      confirmDismiss: (_) async => false,
+      onUpdate: (details) {
+        if (details.previousReached || details.previousReached) return;
+        if (details.progress < .3) return;
+        bloc.add(PlayerQueueAdded(track));
+      },
+      dismissThresholds: const {DismissDirection.startToEnd: .3},
+      background: Container(
+        alignment: Alignment.centerLeft,
+        color: scheme.primaryAdaptive,
+        padding: const EdgeInsets.only(left: Dimens.sizeLarge),
+        child: Icon(Icons.add_to_queue,
+            color: scheme.onPrimary, size: Dimens.iconDefault),
+      ),
+      child: _builder(context),
+    );
+  }
+
+  Widget _builder(BuildContext context) {
+    final sliderBloc = context.read<PlayerSliderBloc>();
+    final bloc = context.read<PlayerBloc>();
+    final scheme = context.scheme;
+
+    return InkWell(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
         bloc.add(PlayerTrackChanged(track, liked: liked));
@@ -61,21 +92,21 @@ class TrackTile extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         text: TextSpan(
                           children: [
-                            if (state.track.id == track.id) ...[
-                              WidgetSpan(
-                                  child: SizedBox.square(
-                                dimension: Dimens.iconMedSmall,
-                                child: Image.asset(
-                                    state.playerState.isPlaying
-                                        ? ImageRes.musicWave
-                                        : ImageRes.musicWavePaused,
-                                    fit: BoxFit.cover,
-                                    color: scheme.primary),
-                              )),
-                              const WidgetSpan(
-                                  child:
-                                      SizedBox(width: Dimens.sizeExtraSmall)),
-                            ],
+                            // if (state.track.id == track.id) ...[
+                            //   WidgetSpan(
+                            //       child: SizedBox.square(
+                            //     dimension: Dimens.iconMedSmall,
+                            //     child: Image.asset(
+                            //         state.playerState.isPlaying
+                            //             ? ImageRes.musicWave
+                            //             : ImageRes.musicWavePaused,
+                            //         fit: BoxFit.cover,
+                            //         color: scheme.primary),
+                            //   )),
+                            //   const WidgetSpan(
+                            //       child:
+                            //           SizedBox(width: Dimens.sizeExtraSmall)),
+                            // ],
                             TextSpan(
                               text: track.name ?? '',
                               style: TextStyle(
@@ -116,26 +147,6 @@ class TrackTile extends StatelessWidget {
           ],
         ),
       ),
-    );
-
-    return Dismissible(
-      key: ValueKey(track.id ?? ''),
-      direction: DismissDirection.startToEnd,
-      confirmDismiss: (_) async => false,
-      onUpdate: (details) {
-        if (details.previousReached || details.previousReached) return;
-        if (details.progress < .3) return;
-        bloc.add(PlayerQueueAdded(track));
-      },
-      dismissThresholds: const {DismissDirection.startToEnd: .3},
-      background: Container(
-        alignment: Alignment.centerLeft,
-        color: scheme.primaryAdaptive,
-        padding: const EdgeInsets.only(left: Dimens.sizeLarge),
-        child: Icon(Icons.add_to_queue,
-            color: scheme.onPrimary, size: Dimens.iconDefault),
-      ),
-      child: widget,
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ampify/data/utils/app_constants.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -29,14 +29,15 @@ class MusicRepo {
   //   }
   // }
 
-  Future<SongYtDetails?> getDetailsFromQuery(String query) async {
+  Future<SongYtDetails?> getDetailsFromQuery(Track track) async {
     try {
-      final _query = query.split('-').map((e) => e.trim()).toList();
-      final song = await _search(QuerySong(_query[0], _query[1]));
+      final artist =
+          track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
+      final song = await _search(QuerySong(track.name!, artist));
       final duration = await _getSongDuration(song!.videoId);
       return SongYtDetails(song.videoId, duration: duration!);
     } catch (e) {
-      logPrint(e, 'ytMusic');
+      logPrint(e, 'yt-query');
       return null;
     }
   }
@@ -53,17 +54,20 @@ class MusicRepo {
     }
   }
 
-  Future<SongDetailed?> _search(QuerySong querySong) async {
+  Future<SongDetailed?> _search(QuerySong query) async {
+    final songs = await ytMusic.searchSongs(query.text);
     try {
-      final songs = await ytMusic.searchSongs(querySong.query);
-      return songs.firstWhereOrNull((e) {
-        final name = e.name.toLowerCase();
-        final artist = e.artist.name.toLowerCase();
-        return name.contains(querySong.title.toLowerCase()) &&
-            artist.contains(querySong.artist.toLowerCase());
-      });
+      return songs.firstWhere((e) {
+        final _name = e.name.toLowerCase();
+        final _artist = e.artist.name.toLowerCase();
+        final isSame = _artist.contains(_name);
+        return (_name.contains(query.title.toLowerCase())) &&
+            (query.artists.any((f) => _artist.contains(f)) || isSame);
+      }, orElse: () => throw FormatException());
+    } on FormatException {
+      return songs.firstElement;
     } catch (e) {
-      logPrint(e, 'ytMusic');
+      logPrint(e, 'yt-search');
       return null;
     }
   }
@@ -73,7 +77,7 @@ class MusicRepo {
       final song = await ytMusic.getSong(vidId);
       return Duration(seconds: song.duration);
     } catch (e) {
-      logPrint(e, 'ytMusic');
+      logPrint(e, 'yt-duration');
       return null;
     }
   }
@@ -102,9 +106,9 @@ class SongYtDetails {
 
 class QuerySong {
   final String title;
-  final String artist;
+  final Iterable<String> artists;
 
-  QuerySong(this.title, this.artist);
+  QuerySong(this.title, this.artists);
 
-  String get query => '$title $artist';
+  String get text => '$title ${artists.first}';
 }

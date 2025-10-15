@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:flutter/material.dart';
 import 'package:ampify/data/utils/exports.dart';
@@ -19,55 +18,51 @@ class QueueView extends StatelessWidget {
     return BaseWidget(
       color: scheme.background,
       resizeBottom: false,
-      padding: EdgeInsets.only(top: Dimens.sizeSmall),
-      shapeRadius: BorderRadius.vertical(
-        top: Radius.circular(Dimens.borderLarge),
-      ),
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        backgroundColor: scheme.background,
-        automaticallyImplyLeading: false,
-        title: const Text(StringRes.queueTitle),
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          fontSize: Dimens.fontXXXLarge,
-          fontWeight: FontWeight.w600,
-          color: scheme.textColor,
-        ),
-        leading: Align(
-          alignment: Alignment.topCenter,
-          child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              iconSize: Dimens.iconDefault,
-              icon: Transform.rotate(
-                angle: 3 * pi / 2,
-                child: const Icon(Icons.arrow_back_ios),
-              )),
-        ),
-      ),
+      shapeRadius:
+          BorderRadius.vertical(top: Radius.circular(Dimens.borderMedium)),
       bottom: const BottomPlayer(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BlocListener<PlayerBloc, PlayerState>(
-            listener: (context, state) {
-              if (state.playerState.isHidden) Navigator.pop(context);
-            },
-            child: const SizedBox(height: Dimens.sizeDefault),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              BlocListener<PlayerBloc, PlayerState>(
+                listener: (context, state) {
+                  if (state.playerState.isHidden) Navigator.pop(context);
+                },
+                child: Container(
+                  margin: EdgeInsets.only(top: Dimens.sizeMedSmall),
+                  height: Dimens.sizeExtraSmall,
+                  width: Dimens.sizeUltraLarge,
+                  decoration: BoxDecoration(
+                    color: scheme.textColorLight,
+                    borderRadius: BorderRadius.circular(Dimens.sizeMini),
+                  ),
+                ),
+              )
+            ],
           ),
-          Padding(
-            padding: EdgeInsets.only(left: Dimens.sizeDefault),
-            child: Text(
-              StringRes.nowPlaying,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, fontSize: Dimens.fontXXXLarge),
+          ListTile(
+            visualDensity: VisualDensity.compact,
+            title: Text(StringRes.queue),
+            titleTextStyle: TextStyle(
+              fontSize: Dimens.fontXLarge,
+              fontWeight: FontWeight.bold,
+              color: scheme.textColor,
+            ),
+            subtitle: Text(StringRes.queueTitle),
+            subtitleTextStyle: TextStyle(
+              color: scheme.textColorLight,
+              fontWeight: FontWeight.w500,
+              fontSize: Dimens.fontDefault,
             ),
           ),
           BlocBuilder<PlayerBloc, PlayerState>(
             buildWhen: (pr, cr) => pr.track != cr.track,
             builder: (_, state) => TrackDetailsTile.playing(state.track),
           ),
-          const SizedBox(height: Dimens.sizeDefault),
+          const SizedBox(height: Dimens.sizeMedSmall),
           Expanded(
             child: BlocBuilder<PlayerBloc, PlayerState>(
               buildWhen: (pr, cr) {
@@ -93,10 +88,8 @@ class QueueView extends StatelessWidget {
                             TextButton(
                               onPressed: bloc.clearQueue,
                               style: TextButton.styleFrom(
-                                foregroundColor: scheme.disabled,
-                                textStyle: TextStyle(
-                                    color: scheme.textColorLight,
-                                    fontWeight: FontWeight.bold),
+                                visualDensity: VisualDensity.compact,
+                                foregroundColor: scheme.textColorLight,
                               ),
                               child: const Text(StringRes.clearQueue),
                             ),
@@ -117,6 +110,7 @@ class QueueView extends StatelessWidget {
                       },
                       onReorder: bloc.onQueueReorder,
                     ),
+                    const SliverSizedBox(height: Dimens.sizeSmall),
                     if (state.upNext.isNotEmpty)
                       SliverToBoxAdapter(
                         child: Row(
@@ -132,10 +126,8 @@ class QueueView extends StatelessWidget {
                             TextButton(
                               onPressed: bloc.clearUpnext,
                               style: TextButton.styleFrom(
-                                foregroundColor: scheme.disabled,
-                                textStyle: TextStyle(
-                                    color: scheme.textColorLight,
-                                    fontWeight: FontWeight.bold),
+                                visualDensity: VisualDensity.compact,
+                                foregroundColor: scheme.textColorLight,
                               ),
                               child: const Text(StringRes.clear),
                             ),
@@ -145,9 +137,7 @@ class QueueView extends StatelessWidget {
                       ),
                     SliverList.builder(
                       itemCount: state.upNext.length,
-                      itemBuilder: (_, index) {
-                        return TrackTile(state.upNext[index]);
-                      },
+                      itemBuilder: (_, i) => TrackTile.queue(state.upNext[i]),
                     ),
                     SliverSizedBox(height: context.height * .05)
                   ],

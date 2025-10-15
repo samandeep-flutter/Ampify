@@ -118,6 +118,9 @@ sealed class Dimens {
   /// size of 12
   static const double borderDefault = 12;
 
+  /// size of 20
+  static const double borderMedium = 20;
+
   /// size of 32
   static const double borderLarge = 32;
 

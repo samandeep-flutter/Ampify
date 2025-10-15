@@ -17,7 +17,6 @@ class PlayerScreen extends StatelessWidget {
     final scheme = context.scheme;
     final bloc = context.read<PlayerBloc>();
     return Scaffold(
-      extendBodyBehindAppBar: true,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
