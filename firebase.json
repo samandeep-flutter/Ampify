@@ -4,7 +4,7 @@
             "android": {
                 "default": {
                     "projectId": "ampify-samtech",
-                    "appId": "1:962828708485:android:bd7dfa5a4e9eb311e097ec",
+                    "appId": "1:962828708485:android:156869661d21e804e097ec",
                     "uploadDebugSymbols": true,
                     "fileOutput": "android/app/google-services.json"
                 }
@@ -12,7 +12,7 @@
             "ios": {
                 "default": {
                     "projectId": "ampify-samtech",
-                    "appId": "1:962828708485:ios:26b7dd048d0c96efe097ec",
+                    "appId": "1:962828708485:ios:d7b056145c33df15e097ec",
                     "uploadDebugSymbols": true,
                     "fileOutput": "ios/Runner/GoogleService-Info.plist"
                 }
@@ -21,8 +21,8 @@
                 "lib/firebase_options.dart": {
                     "projectId": "ampify-samtech",
                     "configurations": {
-                        "android": "1:962828708485:android:bd7dfa5a4e9eb311e097ec",
-                        "ios": "1:962828708485:ios:26b7dd048d0c96efe097ec"
+                        "android": "1:962828708485:android:156869661d21e804e097ec",
+                        "ios": "1:962828708485:ios:d7b056145c33df15e097ec"
                     }
                 }
             }
