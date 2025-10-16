@@ -74,7 +74,10 @@ sealed class Dimens {
   static double get iconUltraLarge => 48.scale;
 
   /// adaptive size of 55
-  static double get iconTileLarge => 55.scale;
+  static double get iconTileMedium => 55.scale;
+
+  /// adaptive size of 65
+  static double get iconTileLarge => 65.scale;
 
   /// size of 2
   static const double sizeMini = 2;

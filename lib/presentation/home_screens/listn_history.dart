@@ -17,12 +17,8 @@ class ListeningHistory extends StatelessWidget {
       bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
       child: Column(
         children: [
-          Text(
-            StringRes.listnHisSubtitle,
-            style: TextStyle(
-                color: scheme.textColorLight,
-                fontSize: Dimens.fontXXXLarge - 1),
-          ),
+          Text(StringRes.listnHisSubtitle,
+              style: TextStyle(color: scheme.textColorLight)),
           ToolTipWidget.placeHolder(
             icon: ImageRes.musicAlt,
             title: StringRes.emptyListnHistory,

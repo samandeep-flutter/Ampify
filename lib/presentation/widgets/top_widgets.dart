@@ -194,7 +194,7 @@ class MyAvatar extends StatelessWidget {
 
 class SubtitleWidget extends StatelessWidget {
   final TextStyle? style;
-  final String type;
+  final String? type;
   final String subtitle;
   final bool expanded;
   const SubtitleWidget({
@@ -214,17 +214,19 @@ class SubtitleWidget extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            type,
-            style: TextStyle(
-                color: style?.color ?? scheme.textColorLight,
-                fontSize: Dimens.fontDefault),
-          ),
-          PaginationDots(
-            current: true,
-            margin: Dimens.sizeSmall,
-            color: style?.color ?? scheme.textColorLight,
-          ),
+          if (type != null) ...[
+            Text(
+              type!,
+              style: TextStyle(
+                  color: style?.color ?? scheme.textColorLight,
+                  fontSize: Dimens.fontDefault),
+            ),
+            PaginationDots(
+              current: true,
+              margin: Dimens.sizeSmall,
+              color: style?.color ?? scheme.textColorLight,
+            )
+          ],
           if (expanded) Expanded(child: sub(context)) else sub(context),
         ],
       ),

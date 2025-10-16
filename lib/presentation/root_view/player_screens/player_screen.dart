@@ -20,7 +20,7 @@ class PlayerScreen extends StatelessWidget {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          SliverSafeArea(sliver: SliverSizedBox()),
+          SliverSafeArea(sliver: SliverSizedBox(height: Dimens.sizeSmall)),
           SliverAppBar(
             forceMaterialTransparency: true,
             leading: IconButton(
@@ -296,7 +296,6 @@ class PlayerScreen extends StatelessWidget {
     final state = context.read<PlayerBloc>().state;
     showModalBottomSheet(
         context: context,
-        showDragHandle: true,
         useRootNavigator: true,
         builder: (context) =>
             TrackBottomSheet(state.track.asTrack, liked: state.isLiked));

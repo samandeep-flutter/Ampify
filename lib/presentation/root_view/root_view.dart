@@ -57,18 +57,24 @@ class _RootViewState extends State<RootView> {
                 }),
                 DecoratedBox(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      stops: [.2, .6, .8, 1],
-                      colors: [
-                        scheme.surface,
-                        scheme.surface.withAlpha(200),
-                        scheme.surface.withAlpha(80),
-                        scheme.surface.withAlpha(0),
-                      ],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                    ),
-                  ),
+                      gradient: LinearGradient(
+                        stops: [.2, .6, .8, 1],
+                        colors: [
+                          scheme.surface,
+                          scheme.surface.withAlpha(200),
+                          scheme.surface.withAlpha(80),
+                          scheme.surface.withAlpha(0),
+                        ],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          spreadRadius: Dimens.sizeDefault,
+                          blurRadius: Dimens.sizeMidLarge,
+                        )
+                      ]),
                   child: BlocBuilder<RootBloc, RootState>(
                       buildWhen: (pr, cr) => pr.isConnected != cr.isConnected,
                       builder: (context, state) {

@@ -103,10 +103,8 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: Dimens.sizeSmall),
-                      Text(
-                        state.title ?? '',
-                        style: Utils.defTitleStyle(context),
-                      ),
+                      Text(state.title ?? '',
+                          style: Utils.titleStyleLarge(context)),
                       if (state.details?.description?.isNotEmpty ?? false) ...[
                         const SizedBox(height: Dimens.sizeExtraSmall),
                         Text(
@@ -429,7 +427,6 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
   void _toMoreDetails(MusicGroupBloc bloc, MusicGroupState state) {
     showModalBottomSheet(
       context: context,
-      showDragHandle: true,
       useRootNavigator: true,
       builder: (context) {
         return BlocProvider.value(
