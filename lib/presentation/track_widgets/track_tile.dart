@@ -1,11 +1,8 @@
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:ampify/data/utils/dimens.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/track_widgets/track_bottom_sheet.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,73 +12,24 @@ class TrackTile extends StatelessWidget {
   final Track track;
   final bool? liked;
   final bool? showImage;
-  const TrackTile(this.track, {this.liked, this.showImage, super.key});
+  final bool _isQueue;
+  final bool _isSearch;
+  const TrackTile(this.track, {this.liked, this.showImage, super.key})
+      : _isQueue = false,
+        _isSearch = false;
+  const TrackTile.queue(this.track, {this.liked, this.showImage, super.key})
+      : _isQueue = true,
+        _isSearch = false;
+  const TrackTile.search(this.track, {this.liked, this.showImage, super.key})
+      : _isQueue = true,
+        _isSearch = true;
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<PlayerBloc>();
-    final sliderBloc = context.read<PlayerSliderBloc>();
     final scheme = context.scheme;
 
-    final widget = InkWell(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-        bloc.add(PlayerTrackChanged(track, liked: liked));
-        sliderBloc.add(const PlayerSliderChange(0));
-      },
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          Dimens.sizeDefault,
-          Dimens.sizeSmall,
-          Dimens.sizeSmall,
-          Dimens.sizeSmall,
-        ),
-        child: Row(
-          children: [
-            if (showImage ?? true) ...[
-              MyCachedImage(
-                track.album?.image,
-                borderRadius: 2,
-                height: 40,
-                width: 40,
-              ),
-              const SizedBox(width: Dimens.sizeDefault),
-            ],
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    track.name ?? '',
-                    style: TextStyle(
-                        color: scheme.textColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Dimens.fontLarge),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SubtitleWidget(
-                    style: TextStyle(color: scheme.textColorLight),
-                    type: track.type?.capitalize ?? '',
-                    subtitle: track.artists?.asString ?? '',
-                  ),
-                ],
-              ),
-            ),
-            IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                    context: context,
-                    showDragHandle: true,
-                    useRootNavigator: true,
-                    builder: (_) => TrackBottomSheet(track, liked: liked));
-              },
-              icon: const Icon(Icons.more_vert_outlined),
-            )
-          ],
-        ),
-      ),
-    );
+    if (_isQueue) return _builder(context);
 
     return Dismissible(
       key: ValueKey(track.id ?? ''),
@@ -95,11 +43,117 @@ class TrackTile extends StatelessWidget {
       dismissThresholds: const {DismissDirection.startToEnd: .3},
       background: Container(
         alignment: Alignment.centerLeft,
-        color: scheme.primary,
+        color: scheme.primaryAdaptive,
         padding: const EdgeInsets.only(left: Dimens.sizeLarge),
-        child: Icon(Icons.add_to_queue, color: scheme.onPrimary),
+        child: Icon(Icons.add_to_queue,
+            color: scheme.onPrimary, size: Dimens.iconDefault),
       ),
-      child: widget,
+      child: _builder(context),
+    );
+  }
+
+  Widget _builder(BuildContext context) {
+    final sliderBloc = context.read<PlayerSliderBloc>();
+    final bloc = context.read<PlayerBloc>();
+    final scheme = context.scheme;
+
+    return InkWell(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        bloc.add(PlayerTrackChanged(track, liked: liked));
+        sliderBloc.add(PlayerSliderReset());
+      },
+      child: Padding(
+        padding: Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
+        child: Row(
+          children: [
+            if (showImage ?? true) ...[
+              Builder(
+                builder: (context) {
+                  final dimen = Dimens.iconUltraLarge;
+                  return SizedBox.square(
+                      dimension: dimen,
+                      child: MyCachedImage(track.album?.image,
+                          borderRadius: Dimens.sizeMini));
+                },
+              ),
+              const SizedBox(width: Dimens.sizeDefault),
+            ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BlocBuilder<PlayerBloc, PlayerState>(
+                    buildWhen: (pr, cr) {
+                      final playing = pr.playerState != cr.playerState;
+                      final _track = pr.track.id != cr.track.id;
+                      final isRelevant =
+                          cr.track.id == track.id || pr.track.id == track.id;
+
+                      return (playing || _track) && isRelevant;
+                    },
+                    builder: (context, state) {
+                      return RichText(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          children: [
+                            // if (state.track.id == track.id) ...[
+                            //   WidgetSpan(
+                            //       child: SizedBox.square(
+                            //     dimension: Dimens.iconMedSmall,
+                            //     child: Image.asset(
+                            //         state.playerState.isPlaying
+                            //             ? ImageRes.musicWave
+                            //             : ImageRes.musicWavePaused,
+                            //         fit: BoxFit.cover,
+                            //         color: scheme.primary),
+                            //   )),
+                            //   const WidgetSpan(
+                            //       child:
+                            //           SizedBox(width: Dimens.sizeExtraSmall)),
+                            // ],
+                            TextSpan(
+                              text: track.name ?? '',
+                              style: TextStyle(
+                                color: state.track.id == track.id
+                                    ? scheme.primary
+                                    : scheme.textColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: Dimens.fontXXXLarge,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: Dimens.sizeMini),
+                  SubtitleWidget(
+                    style: TextStyle(
+                      color: scheme.textColorLight,
+                      fontSize: Dimens.fontDefault - 1,
+                    ),
+                    type: _isSearch ? track.type?.capitalize ?? '' : null,
+                    subtitle: track.artists?.asString ?? '',
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  useRootNavigator: true,
+                  builder: (_) => TrackBottomSheet(track, liked: liked),
+                );
+              },
+              iconSize: Dimens.iconDefault,
+              icon: const Icon(Icons.more_vert_outlined),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -108,43 +162,94 @@ class TrackDetailsTile extends StatelessWidget {
   final TrackDetails track;
   final Widget? title;
   final Widget? trailing;
-  const TrackDetailsTile({
-    super.key,
-    required this.track,
-    this.title,
-    this.trailing,
-  });
+  final bool isPlaying;
+  const TrackDetailsTile(this.track, {super.key, this.title, this.trailing})
+      : isPlaying = false;
+  const TrackDetailsTile.playing(this.track, {super.key, this.trailing})
+      : title = null,
+        isPlaying = true;
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    return ListTile(
-      leading: MyCachedImage(
-        track.image,
-        borderRadius: 2,
-        height: 40,
-        width: 40,
-      ),
-      title: title ??
-          Text(
-            track.title ?? '',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          vertical: Dimens.sizeSmall, horizontal: Dimens.sizeDefault),
+      child: Row(
+        children: [
+          Builder(
+            builder: (context) {
+              final dimen = Dimens.iconUltraLarge;
+              return SizedBox.square(
+                  dimension: dimen,
+                  child: MyCachedImage(track.image,
+                      borderRadius: Dimens.sizeMini));
+            },
           ),
-      titleTextStyle: TextStyle(
-        color: scheme.textColor,
-        fontWeight: FontWeight.w500,
-        fontSize: Dimens.fontLarge,
+          const SizedBox(width: Dimens.sizeDefault),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Builder(builder: (context) {
+                  if (!isPlaying) {
+                    if (title != null) return title!;
+                    return Text(
+                      track.title ?? '',
+                      style: TextStyle(
+                        color: scheme.textColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: Dimens.fontXXXLarge,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                  }
+                  return RichText(
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textScaler: MediaQuery.textScalerOf(context),
+                      text: TextSpan(
+                          style: TextStyle(
+                              color: scheme.primary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.fontXXXLarge),
+                          children: [
+                            WidgetSpan(
+                                child: SizedBox.square(
+                              dimension: Dimens.iconMedSmall,
+                              child: BlocBuilder<PlayerBloc, PlayerState>(
+                                  buildWhen: (pr, cr) {
+                                return pr.playerState != cr.playerState;
+                              }, builder: (_, state) {
+                                return Image.asset(
+                                    state.playerState.isPlaying
+                                        ? ImageRes.musicWave
+                                        : ImageRes.musicWavePaused,
+                                    fit: BoxFit.cover,
+                                    color: scheme.primary);
+                              }),
+                            )),
+                            const WidgetSpan(
+                                child: SizedBox(width: Dimens.sizeExtraSmall)),
+                            TextSpan(text: track.title ?? ''),
+                          ]));
+                }),
+                Text(
+                  track.subtitle ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: scheme.textColorLight,
+                    fontSize: Dimens.fontDefault,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (trailing != null) trailing!,
+        ],
       ),
-      subtitle: Text(
-        track.subtitle ?? '',
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitleTextStyle: TextStyle(
-        color: scheme.textColorLight,
-      ),
-      trailing: trailing,
     );
   }
 }

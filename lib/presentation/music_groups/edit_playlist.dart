@@ -1,19 +1,37 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/base_widget.dart';
-import 'package:ampify/presentation/widgets/loading_widgets.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../config/routes/app_routes.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
 
-class EditPlaylistScreen extends StatelessWidget {
-  const EditPlaylistScreen({super.key});
+class EditPlaylistScreen extends StatefulWidget {
+  final String id;
+  final String? title;
+  final String? image;
+  final String? desc;
+  const EditPlaylistScreen(
+      {super.key,
+      required this.id,
+      required this.title,
+      required this.image,
+      required this.desc});
+
+  @override
+  State<EditPlaylistScreen> createState() => _EditPlaylistScreenState();
+}
+
+class _EditPlaylistScreenState extends State<EditPlaylistScreen> {
+  @override
+  void initState() {
+    final bloc = context.read<EditPlaylistBloc>();
+    bloc.add(EditPlaylistInitial(
+      id: widget.id,
+      title: widget.title,
+      image: widget.image,
+      desc: widget.desc,
+    ));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,36 +39,41 @@ class EditPlaylistScreen extends StatelessWidget {
     final width = context.width * .6;
     final bloc = context.read<EditPlaylistBloc>();
     return BaseWidget(
-      appBar: AppBar(),
-      padding: Utils.paddingHoriz(Dimens.sizeExtraLarge),
+      appBar: AppBar(backgroundColor: scheme.background),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeExtraLarge),
       child: BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
         buildWhen: (pr, cr) => pr.id != cr.id,
         builder: (context, state) {
           return ListView(
+            physics: const BouncingScrollPhysics(),
             children: [
               const SizedBox(height: Dimens.sizeSmall),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  MyCachedImage(
-                    state.image,
-                    height: width,
-                    width: width,
-                    borderRadius: Dimens.sizeExtraSmall,
-                  ),
+                  MyCachedImage(state.image,
+                      height: width,
+                      width: width,
+                      borderRadius: Dimens.sizeExtraSmall),
                 ],
               ),
               const SizedBox(height: Dimens.sizeExtraLarge),
               TextFormField(
-                decoration: const InputDecoration(label: Text('Title')),
+                decoration: InputDecoration(
+                  label: Text('Title'),
+                  labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
+                ),
+                style: TextStyle(fontSize: Dimens.fontXXXLarge),
                 controller: bloc.titleContr,
               ),
               const SizedBox(height: Dimens.sizeMidLarge),
               TextFormField(
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   label: Text('Describe your vibe!'),
+                  labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
                   constraints: BoxConstraints(maxHeight: 100),
                 ),
+                style: TextStyle(fontSize: Dimens.fontXXXLarge),
                 controller: bloc.descContr,
                 expands: true,
                 maxLines: null,
@@ -61,30 +84,26 @@ class EditPlaylistScreen extends StatelessWidget {
                 style: TextStyle(
                     color: scheme.textColorLight,
                     fontWeight: FontWeight.w500,
-                    fontSize: Dimens.fontLarge),
+                    fontSize: Dimens.fontDefault),
               ),
               BlocListener<EditPlaylistBloc, EditPlaylistState>(
                   listener: (context, state) {
                     if (state.success) {
-                      context.read<LibraryBloc>().add(LibraryInitial());
+                      context.read<LibraryBloc>().add(LibraryRefresh());
                       context.goNamed(AppRoutes.libraryView);
                     }
                   },
                   child: SizedBox(height: context.height * .1)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
-                      builder: (context, state) {
+              BlocBuilder<EditPlaylistBloc, EditPlaylistState>(
+                  buildWhen: (pr, cr) => pr.loading != cr.loading,
+                  builder: (context, state) {
                     return LoadingButton(
                       isLoading: state.loading,
-                      width: width,
+                      width: double.infinity,
                       onPressed: bloc.onEdited,
                       child: const Text(StringRes.submit),
                     );
-                  }),
-                ],
-              )
+                  })
             ],
           );
         },

@@ -1,20 +1,9 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/image_resources.dart';
-import 'package:ampify/data/utils/utils.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
-import 'package:ampify/presentation/widgets/my_alert_dialog.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import '../../data/utils/color_resources.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
-import '../widgets/base_widget.dart';
-import '../widgets/shimmer_widget.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -23,8 +12,9 @@ class LibraryScreen extends StatefulWidget {
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen>
-    with TickerProviderStateMixin {
+class _LibraryScreenState extends State<LibraryScreen> {
+  final AuthServices auth = getIt();
+
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<LibraryBloc>();
@@ -33,118 +23,112 @@ class _LibraryScreenState extends State<LibraryScreen>
     return BaseWidget(
       appBar: AppBar(
         backgroundColor: scheme.background,
-        title: Row(
+        leadingWidth: (Dimens.iconMedSmall * 2) + Dimens.sizeDefault,
+        leading: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            BlocBuilder<LibraryBloc, LibraryState>(
-              buildWhen: (pr, cr) => pr.profile != cr.profile,
-              builder: (context, state) {
-                return PopupMenuButton(
-                  position: PopupMenuPosition.under,
-                  splashRadius: 0,
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                        onTap: () => bloc.logout(context),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(width: Dimens.sizeSmall),
-                            Icon(Icons.logout, color: ColorRes.error),
-                            SizedBox(width: Dimens.sizeDefault),
-                            Text(StringRes.logout),
-                          ],
-                        )),
-                  ],
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: state.profile?.product == 'premium'
-                        ? const BoxDecoration(
-                            gradient: SweepGradient(colors: ColorRes.primaries),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(Dimens.borderLarge),
-                            ))
-                        : null,
-                    child: MyAvatar(
-                      padding: const EdgeInsets.all(2),
-                      bgColor: scheme.background,
-                      state.profile?.image,
-                      isAvatar: true,
-                      avatarRadius: Dimens.sizeMedium,
-                    ),
-                  ),
-                );
-              },
-            ),
             const SizedBox(width: Dimens.sizeSmall),
-            const Text(StringRes.myLibrary),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: auth.profile?.product == 'premium'
+                    ? SweepGradient(
+                        colors: [
+                          Color(0xFF6A2E8B),
+                          Color(0xFF5271FF),
+                          Color(0xFF00C2FF),
+                          Color(0xFF2D3A68),
+                          Color(0xFF7EC8FF),
+                          Color(0xFFFFB84D),
+                          Color(0xFF833AB4),
+                        ],
+                      )
+                    : null,
+                borderRadius:
+                    BorderRadius.all(Radius.circular(Dimens.borderLarge)),
+              ),
+              child: MyAvatar(
+                auth.profile?.image,
+                isAvatar: true,
+                padding: EdgeInsets.all(Dimens.sizeMini),
+                onTap: () => context.pushNamed(AppRoutes.profile),
+                avatarRadius: Dimens.iconMedSmall,
+              ),
+            )
           ],
         ),
-        titleTextStyle: Utils.defTitleStyle,
+        title: const Text(StringRes.myLibrary),
+        titleTextStyle: Utils.defTitleStyle(context),
         centerTitle: false,
         bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(Dimens.sizeExtraLarge),
-            child: BlocBuilder<LibraryBloc, LibraryState>(
-              buildWhen: (pr, cr) => pr.filterSel != cr.filterSel,
-              builder: (context, state) {
-                final items = [LibItemType.playlist, LibItemType.album];
-                return Row(
-                  children: [
-                    const SizedBox(width: Dimens.sizeDefault),
-                    ...items.map((e) {
-                      return Padding(
-                        padding: const EdgeInsets.only(right: Dimens.sizeSmall),
-                        child: TextButton(
-                          onPressed: () => bloc.add(LibraryFiltered(e)),
-                          style: defTextButtonStyle(e == state.filterSel),
-                          child: Text(e.name.capitalize),
-                        ),
-                      );
-                    }),
-                  ],
-                );
-              },
-            )),
-        actions: [
-          BlocBuilder<LibraryBloc, LibraryState>(
+          preferredSize: const Size.fromHeight(Dimens.sizeExtraLarge),
+          child: BlocBuilder<LibraryBloc, LibraryState>(
+            buildWhen: (pr, cr) => pr.filterSel != cr.filterSel,
             builder: (context, state) {
-              return TextButton.icon(
-                onPressed: () {
-                  context.pushNamed(AppRoutes.createPlaylist,
-                      pathParameters: {'userId': state.profile!.id!});
-                },
-                label: const Text(StringRes.create),
-                iconAlignment: IconAlignment.end,
-                icon: const Icon(
-                  Icons.library_add_outlined,
-                  size: Dimens.sizeLarge,
-                ),
+              return Row(
+                children: [
+                  const SizedBox(width: Dimens.sizeDefault),
+                  ...[LibItemType.playlist, LibItemType.album].map((e) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: Dimens.sizeSmall),
+                      child: TextButton(
+                        onPressed: () => bloc.add(LibraryFiltered(e)),
+                        style: defTextButtonStyle(e == state.filterSel),
+                        child: Text(
+                          e.name.capitalize,
+                          style: TextStyle(fontSize: Dimens.fontDefault),
+                        ),
+                      ),
+                    );
+                  }),
+                ],
               );
             },
           ),
-          const SizedBox(width: Dimens.sizeSmall)
+        ),
+        actions: [
+          TextButton.icon(
+            style: TextButton.styleFrom(foregroundColor: scheme.textColor),
+            onPressed: () => _toCreatePlaylist(bloc.box.uid!),
+            label: Text(
+              StringRes.create,
+              style: TextStyle(fontSize: Dimens.fontDefault),
+            ),
+            iconAlignment: IconAlignment.end,
+            icon: Icon(Icons.library_add_outlined, size: Dimens.iconMedSmall),
+          ),
+          const SizedBox(width: Dimens.sizeSmall),
         ],
       ),
-      padding: EdgeInsets.zero,
-      child: ListView(
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         controller: bloc.scrollController,
-        children: [
-          Row(
-            children: [
-              const SizedBox(width: Dimens.sizeSmall),
-              BlocBuilder<LibraryBloc, LibraryState>(
+        slivers: [
+          const SliverSizedBox(height: Dimens.sizeSmall),
+          SliverToBoxAdapter(
+            child: Row(
+              children: [
+                const SizedBox(width: Dimens.sizeSmall),
+                BlocBuilder<LibraryBloc, LibraryState>(
                   buildWhen: (pr, cr) => pr.sortby != cr.sortby,
                   builder: (context, state) {
                     return TextButton.icon(
-                      onPressed: () => sortBy(context),
+                      onPressed: sortBy,
                       style: IconButton.styleFrom(
-                          foregroundColor: scheme.textColor),
+                        foregroundColor: scheme.textColor,
+                      ),
                       label: Text(
                         state.sortby?.name.capitalize ?? StringRes.sortBy,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: Dimens.fontDefault),
                       ),
-                      icon: Image.asset(ImageRes.sort, height: 16),
+                      icon: Image.asset(ImageRes.sort,
+                          height: Dimens.iconSmall, color: scheme.textColor),
                     );
-                  }),
-            ],
+                  },
+                ),
+              ],
+            ),
           ),
           BlocBuilder<LibraryBloc, LibraryState>(
             buildWhen: (pr, cr) {
@@ -158,21 +142,17 @@ class _LibraryScreenState extends State<LibraryScreen>
             },
             builder: (context, state) {
               if (state.loading) {
-                return ListView.builder(
+                return SliverList.builder(
                   itemCount: 10,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemBuilder: (_, __) => const SongTileShimmer(iconSize: 55),
+                  itemBuilder: (_, __) =>
+                      SongTileShimmer(iconSize: Dimens.iconTileLarge),
                 );
               }
 
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+              return SliverList.builder(
                 itemCount: state.items.length,
-                itemBuilder: (context, index) {
-                  final item = state.items[index];
-                  return MusicGroupTile(item);
+                itemBuilder: (_, index) {
+                  return MusicGroupTile(state.items[index]);
                 },
               );
             },
@@ -181,12 +161,15 @@ class _LibraryScreenState extends State<LibraryScreen>
             buildWhen: (pr, cr) => pr.moreLoading != cr.moreLoading,
             builder: (context, state) {
               if (state.moreLoading) {
-                return Column(
+                return SliverToBoxAdapter(
+                  child: Column(
                     children: List.generate(3, (_) {
-                  return const SongTileShimmer(iconSize: 55);
-                }));
+                      return SongTileShimmer(iconSize: Dimens.iconTileLarge);
+                    }),
+                  ),
+                );
               }
-              return SizedBox(height: context.height * .1);
+              return SliverSizedBox(height: context.height * .15);
             },
           ),
         ],
@@ -194,47 +177,51 @@ class _LibraryScreenState extends State<LibraryScreen>
     );
   }
 
-  ButtonStyle defTextButtonStyle(bool sel) {
-    final scheme = context.scheme;
-    final defBGcolor = scheme.primaryContainer.withOpacity(.5);
-
-    return TextButton.styleFrom(
-        visualDensity: VisualDensity.compact,
-        padding: Utils.paddingHoriz(Dimens.sizeDefault),
-        backgroundColor: sel ? scheme.primary : defBGcolor,
-        foregroundColor: sel ? scheme.onPrimary : scheme.onPrimaryContainer);
+  void _toCreatePlaylist(String id) {
+    context.pushNamed(AppRoutes.createPlaylist, pathParameters: {'userId': id});
   }
 
-  void sortBy(BuildContext context) {
+  ButtonStyle defTextButtonStyle(bool sel) {
     final scheme = context.scheme;
-    final bloc = context.read<LibraryBloc>();
+    final defBGcolor = scheme.backgroundDark;
+
+    return TextButton.styleFrom(
+      visualDensity: VisualDensity.compact,
+      padding: Utils.insetsHoriz(Dimens.sizeDefault),
+      backgroundColor: sel ? scheme.primary : defBGcolor,
+      foregroundColor: sel ? scheme.onPrimary : scheme.textColor,
+    );
+  }
+
+  void sortBy() {
     showModalBottomSheet(
-        context: context,
-        showDragHandle: true,
-        useRootNavigator: true,
-        builder: (context) {
-          return MyBottomSheet(
-            title: StringRes.sortOrder,
-            vsync: this,
-            child: Column(
-              children: SortOrder.values.map((e) {
-                return ListTile(
-                  onTap: () async {
-                    bloc.add(LibrarySorted(e));
-                    await Future.delayed(const Duration(milliseconds: 200));
-                    // ignore: use_build_context_synchronously
-                    if (mounted) Navigator.pop(context);
-                  },
-                  title: Text(e.name.capitalize),
-                  titleTextStyle: TextStyle(
-                    color: scheme.textColor,
-                    fontSize: Dimens.fontLarge,
-                    fontWeight: FontWeight.w500,
-                  ),
-                );
-              }).toList(),
-            ),
-          );
-        });
+      context: context,
+      useRootNavigator: true,
+      builder: (context) {
+        return MyBottomSheet(
+          title: StringRes.sortOrder,
+          child: Column(children: [
+            ...SortOrder.values.map((e) {
+              return ListTile(
+                onTap: () async {
+                  context.read<LibraryBloc>().add(LibrarySorted(e));
+                  await Future.delayed(Durations.short4);
+                  // ignore: use_build_context_synchronously
+                  if (mounted) Navigator.pop(context);
+                },
+                leading: Icon(e.icon),
+                title: Text(e.title),
+                titleTextStyle: TextStyle(
+                  color: context.scheme.textColor,
+                  fontSize: Dimens.fontXXXLarge,
+                  fontWeight: FontWeight.w500,
+                ),
+              );
+            }),
+            const SafeArea(child: SizedBox(height: Dimens.sizeSmall))
+          ]),
+        );
+      },
+    );
   }
 }

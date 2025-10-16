@@ -1,23 +1,40 @@
+import 'dart:async';
 import 'dart:io';
-import 'package:ampify/data/repository/auth_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/config/routes/app_routes.dart';
-import 'package:ampify/services/box_services.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/data_models/profile_model.dart';
+import 'package:ampify/data/repositories/auth_repo.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:app_links/app_links.dart';
+import 'package:audio_session/audio_session.dart';
+import 'package:flutter/material.dart';
 
 class AuthServices {
   AuthServices._init();
   static AuthServices? _to;
   static AuthServices get to => _to ??= AuthServices._init();
 
-  final box = BoxServices.to;
-  final AuthRepo auth = getIt();
-  // final navigator = GlobalKey<NavigatorState>();
-  late String minVersion;
+  final navigator = GlobalKey<NavigatorState>();
+  BuildContext? get context => navigator.currentContext;
+
+  final _connectionStream = StreamController<bool>();
+  Stream<bool> get connectionStream => _connectionStream.stream;
+  bool _isConnected = true;
+
+  final AppLinks _appLinks = getIt();
+  final _box = BoxServices.instance;
+
+  AudioSession? session;
+  ProfileModel? profile;
 
   Future<AuthServices> init() async {
-    getIt<AppLinks>().uriLinkStream.listen(_dynamicLinks);
+    _appLinks.uriLinkStream.listen(_dynamicLinks);
+    try {
+      session = await AudioSession.instance;
+      session!.configure(const AudioSessionConfiguration.music());
+      _connectionStream.add(true);
+    } catch (e) {
+      logPrint(e, 'auth init');
+    }
     return this;
   }
 
@@ -35,10 +52,34 @@ class AuthServices {
 
   String get initialRoute {
     try {
-      box.read(BoxKeys.token) as String;
+      _box.read(BoxKeys.token) as String;
       return AppRoutes.homeView;
     } catch (_) {
       return AppRoutes.auth;
     }
+  }
+
+  Future<void> setConnection(bool result) async {
+    if (result == _isConnected) return;
+    _connectionStream.add(result);
+    _isConnected = result;
+  }
+
+  Future<void> getProfile() async {
+    final LibraryRepo _libRepo = getIt();
+    await _libRepo.getProfile(onSuccess: (json) {
+      profile = ProfileModel.fromJson(json);
+    });
+  }
+
+  Future<void> logout() async {
+    await _box.remove(BoxKeys.token);
+    await _box.remove(BoxKeys.uid);
+    await _box.remove(BoxKeys.refreshToken);
+    context?.goNamed(AppRoutes.auth);
+  }
+
+  void dispose() {
+    _connectionStream.close();
   }
 }

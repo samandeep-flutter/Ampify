@@ -1,16 +1,12 @@
 import 'dart:async';
-import 'package:ampify/config/routes/app_routes.dart';
 import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/playlist_model.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/data_models/search_model.dart';
-import 'package:ampify/data/repository/home_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/repositories/home_repo.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 
 abstract class HomeEvent extends Equatable {
   const HomeEvent();
@@ -65,7 +61,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   final HomeRepo repo = getIt();
 
-  _onInIt(HomeInitial event, Emitter<HomeState> emit) async {
+  Future<void> _onInIt(HomeInitial event, Emitter<HomeState> emit) async {
     final getReleases = Completer<bool>();
     final getRecentlyPlayed = Completer<bool>();
     repo.getNewReleases(
@@ -86,9 +82,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         final items = PLtracksItems.fromJson(json);
         List<Track> tracks = [];
         items.track?.forEach((e) {
-          if (e.track != null && !tracks.contains(e.track)) {
-            tracks.add(e.track!);
-          }
+          if (e.track == null) return;
+          if (!tracks.contains(e.track)) tracks.add(e.track!);
         });
         emit(state.copyWith(recentlyPlayed: tracks, recentLoading: false));
         getRecentlyPlayed.complete(true);
@@ -96,14 +91,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       onError: (error) {
         logPrint(error, 'new releases');
         emit(state.copyWith(recentLoading: false));
-        getRecentlyPlayed.complete(true);
+        getRecentlyPlayed.complete(false);
       },
     );
     await getReleases.future;
     await getRecentlyPlayed.future;
-  }
-
-  void toHistory(BuildContext context) {
-    context.pushNamed(AppRoutes.listnHistory);
+    Future(MyNotifications.initialize);
   }
 }

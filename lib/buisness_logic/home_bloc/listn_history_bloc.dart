@@ -20,5 +20,5 @@ class ListnHistoryBloc extends Bloc<ListnHistoryEvent, ListnState> {
   ListnHistoryBloc() : super(const ListnState.init()) {
     on<ListnHistoryInitial>(_onInit);
   }
-  _onInit(ListnHistoryInitial event, Emitter<ListnState> emit) {}
+  void _onInit(ListnHistoryInitial event, Emitter<ListnState> emit) {}
 }

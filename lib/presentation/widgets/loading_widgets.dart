@@ -1,6 +1,5 @@
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
-import '../../data/utils/dimens.dart';
-import '../../config/theme_services.dart';
 
 class LoadingButton extends StatelessWidget {
   final Widget child;
@@ -35,31 +34,35 @@ class LoadingButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme scheme = Theme.of(context).colorScheme;
+    final scheme = ThemeServices.of(context);
     return Container(
       margin: margin,
       width: defWidth ? null : width ?? 200,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-            backgroundColor: backgroundColor ?? scheme.primary,
-            foregroundColor: foregroundColor ?? scheme.onPrimary,
-            visualDensity: compact ? VisualDensity.compact : null,
-            shape: border != null
-                ? RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                    Radius.circular(border!),
-                  ))
-                : null,
-            padding: padding ??
-                const EdgeInsets.symmetric(vertical: Dimens.sizeDefault)),
+          backgroundColor: backgroundColor ?? scheme.primaryAdaptive,
+          foregroundColor: foregroundColor ?? scheme.onPrimary,
+          visualDensity: compact ? VisualDensity.compact : null,
+          shape: Utils.continuousBorder(border ?? Dimens.borderLarge),
+          padding: padding ??
+              (compact
+                  ? Utils.insetsHoriz(Dimens.sizeMedSmall)
+                  : EdgeInsets.all(Dimens.sizeMedSmall)),
+        ),
         onPressed: enable && !(isLoading ?? false) ? onPressed : null,
-        child: enable && (isLoading ?? false)
-            ? SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(
-                    color: loaderColor ?? scheme.primary))
-            : child,
+        child: DefaultTextStyle.merge(
+          style: TextStyle(
+              fontWeight: FontWeight.w600, fontSize: Dimens.fontXXXLarge),
+          child: Builder(builder: (context) {
+            if (isLoading ?? false) {
+              return SizedBox.square(
+                  dimension: Dimens.sizeLarge,
+                  child: CircularProgressIndicator(
+                      color: loaderColor ?? scheme.primaryAdaptive));
+            }
+            return child;
+          }),
+        ),
       ),
     );
   }
@@ -67,7 +70,7 @@ class LoadingButton extends StatelessWidget {
 
 class LoadingIcon extends StatelessWidget {
   final Widget icon;
-  final bool loading;
+  final bool? loading;
   final double? iconSize;
   final double? loaderSize;
   final Widget? selectedIcon;
@@ -77,7 +80,7 @@ class LoadingIcon extends StatelessWidget {
   const LoadingIcon({
     super.key,
     required this.icon,
-    required this.loading,
+    this.loading,
     required this.onPressed,
     this.iconSize,
     this.loaderSize,
@@ -99,19 +102,20 @@ class LoadingIcon extends StatelessWidget {
       isSelected: isSelected,
       selectedIcon: selectedIcon,
       onPressed: onPressed,
-      iconSize: iconSize,
-      icon: loading
-          ? Container(
-              height: loaderSize,
-              width: loaderSize,
-              alignment: Alignment.center,
-              child: SizedBox.square(
-                  dimension: 24,
-                  child: CircularProgressIndicator(
-                    color: scheme.primary,
-                  )),
-            )
-          : icon,
+      iconSize: iconSize ?? Dimens.iconDefault,
+      icon: Builder(builder: (context) {
+        if (!(loading ?? false)) return icon;
+        return Container(
+          height: loaderSize,
+          width: loaderSize,
+          alignment: Alignment.center,
+          child: SizedBox.square(
+              dimension: Dimens.sizeLarge,
+              child: CircularProgressIndicator(
+                color: style?.foregroundColor?.resolve({}) ?? scheme.textColor,
+              )),
+        );
+      }),
     );
   }
 }

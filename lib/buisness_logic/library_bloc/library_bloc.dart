@@ -1,23 +1,10 @@
 import 'dart:async';
-import 'package:ampify/data/data_models/profile_model.dart';
-import 'package:ampify/data/repository/library_repo.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/services/extension_services.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/utils/exports.dart';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:rxdart/rxdart.dart';
-import '../../config/routes/app_routes.dart';
 import '../../data/data_models/library_model.dart';
-import '../../data/utils/app_constants.dart';
-import '../../data/utils/color_resources.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
-import '../../presentation/widgets/my_alert_dialog.dart';
-import '../../services/box_services.dart';
-import '../../services/notification_services.dart';
 
 class LibraryEvent extends Equatable {
   const LibraryEvent();
@@ -27,6 +14,8 @@ class LibraryEvent extends Equatable {
 }
 
 class LibraryInitial extends LibraryEvent {}
+
+class LibraryRefresh extends LibraryEvent {}
 
 class LibraryLoadMore extends LibraryEvent {}
 
@@ -49,7 +38,6 @@ class LibrarySorted extends LibraryEvent {
 }
 
 class LibraryState extends Equatable {
-  final ProfileModel? profile;
   final SortOrder? sortby;
   final List<LibraryModel> items;
   final LibItemType? filterSel;
@@ -60,7 +48,6 @@ class LibraryState extends Equatable {
   final int albumCount;
 
   const LibraryState({
-    required this.profile,
     required this.sortby,
     required this.items,
     required this.filterSel,
@@ -71,8 +58,7 @@ class LibraryState extends Equatable {
     required this.albumCount,
   });
   const LibraryState.init()
-      : profile = null,
-        sortby = SortOrder.custom,
+      : sortby = SortOrder.custom,
         items = const [],
         totalLiked = null,
         filterSel = null,
@@ -82,7 +68,6 @@ class LibraryState extends Equatable {
         playlistCount = 0;
 
   LibraryState copyWith({
-    ProfileModel? profile,
     SortOrder? sortby,
     List<LibraryModel>? items,
     LibItemType? filterSel,
@@ -93,7 +78,6 @@ class LibraryState extends Equatable {
     int? albumCount,
   }) {
     return LibraryState(
-      profile: profile ?? this.profile,
       sortby: sortby ?? this.sortby,
       items: items ?? this.items,
       filterSel: filterSel,
@@ -107,7 +91,6 @@ class LibraryState extends Equatable {
 
   @override
   List<Object?> get props => [
-        profile,
         items,
         sortby,
         filterSel,
@@ -119,27 +102,38 @@ class LibraryState extends Equatable {
       ];
 }
 
-enum SortOrder { alphabetical, owner, custom }
+enum SortOrder {
+  alphabetical('Alphabetical', icon: Icons.abc),
+  owner('Owner', icon: Icons.person_outline),
+  custom('Custom', icon: Icons.sort_outlined),
+  ;
 
-EventTransformer<T> _debounce<T>(Duration duration) {
-  return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
+  final String title;
+  final IconData? icon;
+  const SortOrder(this.title, {this.icon});
 }
 
 class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   LibraryBloc() : super(const LibraryState.init()) {
     on<LibraryInitial>(_onInit);
+    on<LibraryRefresh>(_onRefresh);
     on<LibraryLoadMore>(_onLoadMore);
     on<LibraryFiltered>(_onFiltered);
-    on<LibraryLoadTrigger>(_onLoadTrigger, transformer: _debounce(duration));
+    on<LibraryLoadTrigger>(_onLoadTrigger,
+        transformer: Utils.debounce(Durations.short4));
     on<LibrarySorted>(_onSorted);
   }
   final LibraryRepo _repo = getIt();
-  final _box = BoxServices.to;
-  final duration = const Duration(milliseconds: 200);
+  final box = BoxServices.instance;
   final scrollController = ScrollController();
   List<LibraryModel> _libItems = [];
 
-  _onSorted(LibrarySorted event, Emitter<LibraryState> emit) async {
+  void _onInit(LibraryInitial event, Emitter<LibraryState> emit) {
+    // scrollController.addListener(_loadMoreItems);
+    add(LibraryRefresh());
+  }
+
+  void _onSorted(LibrarySorted event, Emitter<LibraryState> emit) {
     switch (event.order) {
       case SortOrder.alphabetical:
         final items = state.items
@@ -159,16 +153,16 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     }
   }
 
-  _loadMoreItems() {
-    if (!scrollController.hasClients || state.moreLoading) return;
-    final total = state.albumCount + state.playlistCount;
-    if (state.items.length >= total) return;
-    if (scrollController.position.extentAfter < 300) {
-      add(LibraryLoadMore());
-    }
-  }
+  // void _loadMoreItems() {
+  //   if (!scrollController.hasClients || state.moreLoading) return;
+  //   final total = state.albumCount + state.playlistCount;
+  //   if (_libItems.length >= total) return;
+  //   if (scrollController.position.extentAfter < 300) {
+  //     add(LibraryLoadMore());
+  //   }
+  // }
 
-  _onFiltered(LibraryFiltered event, Emitter<LibraryState> emit) async {
+  void _onFiltered(LibraryFiltered event, Emitter<LibraryState> emit) {
     if (state.filterSel == null) _libItems = state.items;
     if (state.filterSel == event.type) {
       emit(state.copyWith(filterSel: null, items: _libItems));
@@ -179,123 +173,98 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     emit(state.copyWith(items: items, filterSel: event.type));
   }
 
-  _onLoadMore(LibraryLoadMore event, Emitter<LibraryState> emit) async {
+  void _onLoadMore(LibraryLoadMore event, Emitter<LibraryState> emit) {
     emit(state.copyWith(moreLoading: true));
     add(LibraryLoadTrigger());
   }
 
-  _onLoadTrigger(LibraryLoadTrigger event, Emitter<LibraryState> emit) async {
+  Future<void> _onLoadTrigger(
+      LibraryLoadTrigger event, Emitter<LibraryState> emit) async {
     final plCompleter = Completer<bool>();
     final alCompleter = Completer<bool>();
     List<LibraryModel> items = state.items;
 
-    final plOffset = items.where((e) => e.type == LibItemType.playlist);
-    final alOffset = items.where((e) => e.type != LibItemType.playlist);
+    final plOffset = _libItems.where((e) => e.type.isPlaylist);
+    final alOffset = _libItems.where((e) => !e.type.isPlaylist);
 
-    if (plOffset.length < state.playlistCount) {
-      _repo.getMyPlaylists(
-          offset: plOffset.length,
-          onSuccess: (json) async {
-            final playlists = List<LibraryModel>.from(
-                json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
-            items.addAll(playlists);
-            plCompleter.complete(true);
-          });
+    try {
+      if (plOffset.length < state.playlistCount) {
+        _repo.getMyPlaylists(
+            offset: plOffset.length,
+            onSuccess: (json) async {
+              final playlists = List<LibraryModel>.from(
+                  json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
+              items.addAll(playlists);
+              plCompleter.complete(true);
+            });
+      }
+
+      if (alOffset.length < state.albumCount) {
+        _repo.getMyAlbums(
+            offset: alOffset.length,
+            onSuccess: (json) {
+              final albums = List<LibraryModel>.from(json['items']
+                      ?.map((e) => LibraryModel.fromJson(e['album'])) ??
+                  []);
+              items.addAll(albums);
+              alCompleter.complete(true);
+            });
+      }
+
+      if (plOffset.length < state.playlistCount) await plCompleter.future;
+      if (alOffset.length < state.albumCount) await alCompleter.future;
+      items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
+      _libItems = items;
+      emit(state.copyWith(items: items));
+    } catch (e) {
+      logPrint(e, 'load more');
+    } finally {
+      emit(state.copyWith(moreLoading: false));
     }
-
-    if (alOffset.length < state.albumCount) {
-      _repo.getMyAlbums(
-          offset: alOffset.length,
-          onSuccess: (json) {
-            final albums = List<LibraryModel>.from(
-                json['items']?.map((e) => LibraryModel.fromJson(e['album'])) ??
-                    []);
-            items.addAll(albums);
-            alCompleter.complete(true);
-          });
-    }
-
-    if (plOffset.length < state.playlistCount) await plCompleter.future;
-    if (alOffset.length < state.albumCount) await alCompleter.future;
-    emit(state.copyWith(items: items, moreLoading: false));
   }
 
-  _onInit(LibraryInitial event, Emitter<LibraryState> emit) async {
-    final json = _box.read(BoxKeys.profile);
-    final profile = ProfileModel.fromJson(json);
-    emit(state.copyWith(profile: profile));
+  Future<void> _onRefresh(
+      LibraryRefresh event, Emitter<LibraryState> emit) async {
     final playlistCount = Completer<int>();
     final albumCount = Completer<int>();
-    scrollController.addListener(_loadMoreItems);
-
     List<LibraryModel> items = [];
 
-    _repo.getMyPlaylists(onSuccess: (json) async {
-      final playlists = List<LibraryModel>.from(
-          json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
-      items.addAll(playlists);
-      try {
-        await _repo.getLikedSongs(
-            limit: 1,
-            onSuccess: (json) {
-              emit(state.copyWith(totalLiked: json['total']));
-            });
-      } catch (_) {}
-      playlistCount.complete((json['total'] as int?) ?? 0);
-    });
+    try {
+      _repo.getMyPlaylists(onSuccess: (json) async {
+        final playlists = List<LibraryModel>.from(
+            json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
+        items.addAll(playlists);
+        try {
+          await _repo.getLikedSongs(
+              limit: 1,
+              onSuccess: (json) {
+                emit(state.copyWith(totalLiked: json['total']));
+              });
+        } catch (_) {}
+        playlistCount.complete((json['total'] as int?) ?? 0);
+      });
 
-    _repo.getMyAlbums(onSuccess: (json) {
-      final albums = List<LibraryModel>.from(
-          json['items']?.map((e) => LibraryModel.fromJson(e['album'])) ?? []);
-      items.addAll(albums);
-      albumCount.complete((json['total'] as int?) ?? 0);
-    });
+      _repo.getMyAlbums(onSuccess: (json) {
+        final albums = List<LibraryModel>.from(
+            json['items']?.map((e) => LibraryModel.fromJson(e['album'])) ?? []);
+        items.addAll(albums);
+        albumCount.complete((json['total'] as int?) ?? 0);
+      });
 
-    final plCount = await playlistCount.future;
-    final alCount = await albumCount.future;
+      final plCount = await playlistCount.future;
+      final alCount = await albumCount.future;
 
-    if ((state.totalLiked ?? 0) > 0) {
-      items.add(Utils.likedSongs(count: state.totalLiked));
+      if ((state.totalLiked ?? 0) > 0) {
+        items.add(Utils.likedSongs(count: state.totalLiked));
+      }
+      items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
+      _libItems = items;
+      emit(state.copyWith(
+          items: items, playlistCount: plCount, albumCount: alCount));
+    } catch (e) {
+      logPrint(e, 'refresh');
+    } finally {
+      emit(state.copyWith(loading: false));
     }
-    items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
-    emit(state.copyWith(
-        items: items,
-        loading: false,
-        playlistCount: plCount,
-        albumCount: alCount));
-
-    Future(MyNotifications.initialize);
-  }
-
-  void logout(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return MyAlertDialog(
-            title: '${StringRes.logout} ?',
-            content: const Text(StringRes.logoutDesc),
-            actionPadding: const EdgeInsets.only(
-                right: Dimens.sizeDefault, bottom: Dimens.sizeSmall),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                style: TextButton.styleFrom(
-                  foregroundColor: context.scheme.textColor,
-                ),
-                child: const Text(StringRes.cancel),
-              ),
-              TextButton(
-                onPressed: () {
-                  BoxServices.to.remove(BoxKeys.token);
-                  context.goNamed(AppRoutes.auth);
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: ColorRes.error,
-                ),
-                child: Text(StringRes.logout.toUpperCase()),
-              ),
-            ],
-          );
-        });
   }
 }

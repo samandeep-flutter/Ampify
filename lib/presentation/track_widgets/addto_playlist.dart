@@ -1,91 +1,90 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/config/routes/app_routes.dart';
-import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/loading_widgets.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/presentation/widgets/top_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../buisness_logic/root_bloc/addto_playlist_bloc.dart';
 
-class AddtoPlaylistSheet extends StatelessWidget {
-  const AddtoPlaylistSheet({super.key});
+class AddtoPlaylistSheet extends StatefulWidget {
+  final String uri;
+  const AddtoPlaylistSheet(this.uri, {super.key});
+
+  @override
+  State<AddtoPlaylistSheet> createState() => _AddtoPlaylistSheetState();
+}
+
+class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
+  final _box = BoxServices.instance;
+
+  @override
+  void initState() {
+    final bloc = context.read<AddtoPlaylistBloc>();
+    bloc.add(PlaylistInitial(widget.uri));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<AddtoPlaylistBloc>();
     final scheme = context.scheme;
-    return SizedBox(
-      height: context.height * .55,
+    return MyBottomSheet(
+      customTitle: Row(
+        children: [
+          const SizedBox(width: Dimens.sizeLarge),
+          Text(
+            StringRes.addtoPlaylist,
+            style: TextStyle(
+              color: scheme.textColor,
+              fontSize: Dimens.fontXXXLarge,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Spacer(),
+          ElevatedButton.icon(
+            onPressed: () => _toCreatePlaylist(context),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.primaryAdaptive,
+                foregroundColor: scheme.onPrimary,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.only(
+                    left: Dimens.sizeSmall, right: Dimens.sizeDefault)),
+            icon: Icon(Icons.add_outlined, size: Dimens.iconMedSmall),
+            label: Text(StringRes.playlist,
+                style: TextStyle(fontSize: Dimens.fontDefault)),
+          ),
+          const SizedBox(width: Dimens.sizeDefault),
+        ],
+      ),
       child: BlocBuilder<LibraryBloc, LibraryState>(
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
             final playlists = state.items.where((e) {
-              final isPlaylist = e.type == LibItemType.playlist;
-              final myPlaylists = e.owner?.id == state.profile?.id;
-              return isPlaylist && myPlaylists;
+              final myPlaylists = e.owner?.id == _box.uid!;
+              return e.type.isPlaylist && myPlaylists;
             }).toList();
             return Column(
               children: [
-                Row(
-                  children: [
-                    const SizedBox(width: Dimens.sizeLarge),
-                    Text(
-                      StringRes.addtoPlaylist,
-                      style: TextStyle(
-                        color: scheme.textColor,
-                        fontSize: Dimens.fontLarge,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const Spacer(),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        context.pushNamed(AppRoutes.createPlaylist,
-                            pathParameters: {'userId': state.profile!.id!});
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: scheme.primary,
-                          foregroundColor: scheme.onPrimary,
-                          visualDensity: VisualDensity.compact,
-                          padding: const EdgeInsets.only(
-                              left: Dimens.sizeSmall,
-                              right: Dimens.sizeDefault)),
-                      icon: const Icon(Icons.add_outlined),
-                      label: const Text(StringRes.playlist),
-                    ),
-                    const SizedBox(width: Dimens.sizeDefault),
-                  ],
-                ),
-                const SizedBox(height: Dimens.sizeSmall),
-                const MyDivider(),
-                const SizedBox(height: Dimens.sizeDefault),
                 BlocBuilder<AddtoPlaylistBloc, AddtoPlaylistState>(
                     builder: (context, state) {
                   if (playlists.isEmpty) {
                     return const Expanded(
                         child: ToolTipWidget(title: StringRes.noPlaylists));
                   }
-                  return Flexible(
+                  return SizedBox(
+                    height: context.height * .4,
                     child: GridView.builder(
-                      padding: Utils.paddingHoriz(Dimens.sizeDefault),
+                      padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                      physics: const BouncingScrollPhysics(),
                       scrollDirection: playlists.length > 2
                           ? Axis.horizontal
                           : Axis.vertical,
-                      gridDelegate:
-                          Utils.fixedCrossAxis(2, spacing: Dimens.sizeSmall),
+                      gridDelegate: Utils.fixedCrossAxis(2,
+                          spacing: Dimens.sizeDefault, aspectRatio: 1.2),
                       itemCount: playlists.length,
                       itemBuilder: (context, index) {
                         final item = playlists[index];
 
                         return Stack(
-                          fit: StackFit.expand,
+                          alignment: Alignment.topRight,
                           children: [
                             Column(
                               mainAxisSize: MainAxisSize.min,
@@ -93,19 +92,20 @@ class AddtoPlaylistSheet extends StatelessWidget {
                                 Expanded(
                                     child: InkWell(
                                   onTap: () => bloc.onItemAdded(item.id!),
-                                  borderRadius: BorderRadius.circular(100),
+                                  borderRadius: BorderRadius.circular(
+                                      Dimens.circularBoder),
                                   child: LayoutBuilder(
                                     builder: (context, constraints) {
                                       return MyCachedImage(
                                         item.image,
                                         height: constraints.maxHeight,
                                         width: constraints.maxHeight,
-                                        borderRadius: 100,
+                                        borderRadius: Dimens.circularBoder,
                                       );
                                     },
                                   ),
                                 )),
-                                const SizedBox(height: Dimens.sizeExtraSmall),
+                                const SizedBox(height: Dimens.sizeSmall),
                                 Text(
                                   item.name ?? '',
                                   maxLines: 1,
@@ -116,26 +116,28 @@ class AddtoPlaylistSheet extends StatelessWidget {
                                       fontSize: Dimens.fontDefault,
                                       fontWeight: FontWeight.w500),
                                 ),
+                                const SizedBox(height: Dimens.sizeSmall),
                               ],
                             ),
                             if (state.playlists.contains(item.id))
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: ShadowWidget(
-                                  borderRadius: Dimens.sizeLarge,
-                                  margin:
-                                      const EdgeInsets.all(Dimens.sizeMedSmall),
-                                  color: Colors.black26,
-                                  spread: Dimens.sizeExtraSmall,
-                                  child: CircleAvatar(
-                                    radius: Dimens.sizeMedSmall,
-                                    backgroundColor: scheme.primary,
-                                    child: Icon(
-                                      Icons.check_outlined,
+                              Container(
+                                margin: const EdgeInsets.all(Dimens.sizeSmall),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        Dimens.borderLarge),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: scheme.surface,
+                                        blurRadius: Dimens.sizeDefault,
+                                        spreadRadius: Dimens.sizeExtraSmall,
+                                      ),
+                                    ]),
+                                child: CircleAvatar(
+                                  radius: Dimens.iconExtraSmall,
+                                  backgroundColor: scheme.primary,
+                                  child: Icon(Icons.check_outlined,
                                       color: scheme.onPrimary,
-                                      size: Dimens.sizeDefault,
-                                    ),
-                                  ),
+                                      size: Dimens.iconMedSmall),
                                 ),
                               )
                           ],
@@ -148,7 +150,7 @@ class AddtoPlaylistSheet extends StatelessWidget {
                     listener: (context, state) {
                       if (state.success) {
                         Navigator.pop(context);
-                        context.read<LibraryBloc>().add(LibraryInitial());
+                        context.read<LibraryBloc>().add(LibraryRefresh());
                       }
                     },
                     child: const SizedBox(height: Dimens.sizeDefault)),
@@ -159,22 +161,26 @@ class AddtoPlaylistSheet extends StatelessWidget {
                     return loading || ids;
                   },
                   builder: (context, state) {
-                    return SafeArea(
-                      child: LoadingButton(
-                        enable: state.playlists.isNotEmpty,
-                        isLoading: state.loading,
-                        loaderColor: scheme.primary,
-                        onPressed: () => bloc.add(AddTracktoPlaylists()),
-                        backgroundColor: scheme.primary,
-                        foregroundColor: scheme.onPrimary,
-                        child: const Text(StringRes.submit),
-                      ),
+                    return LoadingButton(
+                      margin: Utils.insetsHoriz(Dimens.sizeDefault),
+                      width: double.infinity,
+                      isLoading: state.loading,
+                      enable: state.playlists.isNotEmpty,
+                      onPressed: () => bloc.add(AddTracktoPlaylists()),
+                      child: const Text(StringRes.submit),
                     );
                   },
-                )
+                ),
+                const SafeArea(child: SizedBox(height: Dimens.sizeSmall))
               ],
             );
           }),
     );
+  }
+
+  void _toCreatePlaylist(BuildContext context) {
+    Navigator.pop(context);
+    context.pushNamed(AppRoutes.createPlaylist,
+        pathParameters: {'userId': _box.uid!});
   }
 }

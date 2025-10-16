@@ -23,11 +23,15 @@ sealed class StringRes {
   static const String queue = 'Queue';
   static const String goBack = 'go back';
   static const String sortOrder = 'Sort Order';
+  static const String themeMode = 'Theme Mode';
+  static const String followers = 'Followers';
   static const String sortBy = 'Sort by';
+  static const String clear = 'Clear';
   static const String commingSoon = 'Comming Soon';
   static const String newReleases = 'New Releases for you';
   static const String recentlyPlayed = 'Recently played';
-  static const String spotifyRecent = 'Recently played on Spotify';
+  static const String spotifyRecent = 'Recently Played on Spotify';
+  static const String authSpotify = 'Authenticate via Spotify';
   static const String createPlaylist = 'Create Playlist';
   static const String pubPlaylist = 'Public Playlist';
   static const String priPlaylist = 'Private Playlist';
@@ -36,6 +40,7 @@ sealed class StringRes {
   static const String nowPlaying = 'Now Playing';
   static const String nextQueue = 'Next in Queue';
   static const String clearQueue = 'Clear Queue';
+  static const String upNext = 'Up Next';
   static const String queueTitle = 'Playing from play queue';
   static const String myLibrary = 'My Library';
   static const String editCover = 'Edit Cover';
@@ -70,6 +75,8 @@ sealed class StringRes {
       ' please login again';
 
   // long texts
+  static const String notiDesc =
+      'Notification related to media playback in the application';
   static const String authDesc = 'Log in with Spotify to connect and amplify'
       ' your music journey. You\'ll be redirected to a browser for authentication';
   static const String logoutDesc = 'Are you sure you want to log out? You’ll'
@@ -92,4 +99,12 @@ sealed class StringRes {
       ' personalize your playlist.';
   static const String noSpotifyTracks = 'There are currenlty no tracks to show'
       ', tracks will begin to appear as you listen to them!';
+  static const String noNewTracks =
+      'No new tracks available. Stay tuned for updates.';
+  static const String cannotbePlayed =
+      'This track cannot be played at the moment.';
+  static const String cannotbeAdded =
+      'This track cannot be added to queue at the moment.';
+  static const String errorPage = 'The specified page cannot be found, '
+      'please try again or contact the developer';
 }

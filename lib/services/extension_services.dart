@@ -1,140 +1,247 @@
-import 'package:ampify/config/theme_services.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
+import 'package:ampify/data/data_models/common/tracks_model.dart';
+import 'package:ampify/services/theme_services.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:rxdart/rxdart.dart';
 
 extension MyContext on BuildContext {
-  ThemeServiceState get scheme => ThemeServices.of(this);
   Color get background => ThemeServices.of(this).background;
   double get height => MediaQuery.sizeOf(this).height;
   double get width => MediaQuery.sizeOf(this).width;
   Orientation get orientation => MediaQuery.orientationOf(this);
+  double get bottomInsets => MediaQuery.viewInsetsOf(this).bottom;
+  bool get isDarkMode =>
+      MediaQuery.platformBrightnessOf(this) == Brightness.dark;
+
+  void close(int count) {
+    int popped = 0;
+    Navigator.of(this).popUntil((route) => popped++ >= count);
+  }
 }
 
-extension MyList on List<String> {
-  String get asString => _removeBraces(this);
-
-  String _removeBraces(List<String> list) {
-    return list.toString().replaceAll(RegExp(r'[\[\]]'), '');
+extension MyIterable on Iterable<String> {
+  String get asString {
+    return toString().replaceAll(RegExp(r'[\[\]]'), '');
   }
+}
+
+extension ListToString on List<String> {
+  String get asString => toString().replaceAll(RegExp(r'[\[\]]'), '');
 }
 
 extension ArtistNames on List<Artist> {
-  String get asString => _toString(this);
+  String get asString => List<String>.from(map((e) => e.name)).asString;
+}
 
-  _toString(List<Artist> artists) {
-    final list = List<String>.from(artists.map((e) => e.name));
-    return list.asString;
+extension MyMusicState on MusicState? {
+  bool get isHidden => this == MusicState.hidden;
+  bool get isPlaying => this == MusicState.playing;
+  bool get isLoading => this == MusicState.loading;
+}
+
+extension MyLibItem on LibItemType? {
+  bool get isPlaylist => this == LibItemType.playlist;
+  bool get isTrack => this == LibItemType.track;
+  // bool get isAlbum =>
+  //     this == LibItemType.album ||
+  //     this == LibItemType.compilation ||
+  //     this == LibItemType.single;
+}
+
+extension MyMediaItems on MediaItem {
+  AudioSource get toAudioSource {
+    return AudioSource.uri(Uri.parse(extras!['uri'] as String), tag: extras);
   }
 }
 
-extension MusicDuration on Duration {
+extension MyQueue on ValueStream<List<MediaItem>> {
+  bool isLast(List<TrackDetails> queue) {
+    if (value.isEmpty || queue.isEmpty) return false;
+    return queue.first.id == value.last.id;
+  }
+}
+
+extension MyList<T> on List<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (T element in this) {
+      if (test(element)) return element;
+    }
+    return null;
+  }
+
+  T? get firstElement => isEmpty ? null : first;
+}
+
+extension MyPlaybackState on PlaybackState {
+  /// Helper method to get the adjacent [MusicState] from [AudioProcessingState].
+  ///
+  /// [MusicState] is a music player's status.
+  MusicState get playerState {
+    switch (processingState) {
+      case AudioProcessingState.loading:
+        return MusicState.loading;
+
+      case AudioProcessingState.buffering:
+        return MusicState.playing;
+
+      case AudioProcessingState.ready:
+        return playing ? MusicState.playing : MusicState.pause;
+
+      case AudioProcessingState.completed:
+      case AudioProcessingState.error:
+      case AudioProcessingState.idle:
+        return MusicState.hidden;
+    }
+  }
+}
+
+extension MyRepeatMode on LoopMode {
+  /// Helper method to get the adjacent [AudioServiceRepeatMode] from [LoopMode].
+  ///
+  /// [AudioServiceRepeatMode] is from [audio_service].
+  AudioServiceRepeatMode get toRepeatMode {
+    switch (this) {
+      case LoopMode.off:
+        return AudioServiceRepeatMode.none;
+      case LoopMode.all:
+        return AudioServiceRepeatMode.all;
+      case LoopMode.one:
+        return AudioServiceRepeatMode.one;
+    }
+  }
+}
+
+extension MyLoopMode on AudioServiceRepeatMode {
+  /// Helper method to get the adjacent [LoopMode] from [AudioServiceRepeatMode].
+  ///
+  /// [LoopMode] is from [just_audio].
+  /// [AudioServiceRepeatMode] is from [audio_service].
+  MusicLoopMode? get toLoopMode {
+    switch (this) {
+      case AudioServiceRepeatMode.none:
+        return MusicLoopMode.off;
+      case AudioServiceRepeatMode.all:
+        return MusicLoopMode.all;
+      case AudioServiceRepeatMode.one:
+        return MusicLoopMode.once;
+
+      default:
+        return null;
+    }
+  }
+}
+
+extension ExtendedMusicLoopMode on MusicLoopMode {
+  bool get isOff => this == MusicLoopMode.off;
+
+  /// Helper method to get the adjacent [AudioServiceRepeatMode] from [MusicLoopMode].
+  ///
+  /// [MusicLoopMode] is music player's loop mode.
+  AudioServiceRepeatMode get toAudioState {
+    switch (this) {
+      case MusicLoopMode.off:
+        return AudioServiceRepeatMode.none;
+      case MusicLoopMode.all:
+        return AudioServiceRepeatMode.all;
+      case MusicLoopMode.once:
+        return AudioServiceRepeatMode.one;
+    }
+  }
+}
+
+extension MyAudioProcessingState on ProcessingState {
+  AudioProcessingState get toAudioState {
+    switch (this) {
+      case ProcessingState.idle:
+        return AudioProcessingState.idle;
+      case ProcessingState.loading:
+        return AudioProcessingState.loading;
+      case ProcessingState.buffering:
+        return AudioProcessingState.buffering;
+      case ProcessingState.ready:
+        return AudioProcessingState.ready;
+      case ProcessingState.completed:
+        return AudioProcessingState.completed;
+    }
+  }
+}
+
+extension MusicDuration on Duration? {
+  bool get isZero => (this?.inSeconds ?? 0) == 0;
   String format() => _format(this);
 
-  String _format(Duration time) {
+  double widthFactor(Duration? total) {
+    if ((total?.inSeconds ?? 0) == 0) return 0;
+    return (this?.inSeconds ?? 0) / total!.inSeconds;
+  }
+
+  String _format(Duration? time) {
+    if (time == null) return '0:00';
     if (time.inMinutes >= 60) {
       final min = time.inMinutes - (time.inHours * 60);
-      return '${time.inHours}:${_formatInt(min)}';
+      return '${time.inHours}:${min.digit2}';
     }
     if (time.inSeconds >= 60) {
       final sec = time.inSeconds - (time.inMinutes * 60);
-      return '${time.inMinutes}:${_formatInt(sec)}';
+      return '${time.inMinutes}:${sec.digit2}';
     }
-    return '0:${_formatInt(time.inSeconds)}';
+    return '0:${time.inSeconds.digit2}';
   }
+}
 
-  String _formatInt(int num) {
-    if (num < 10) return '0$num';
-    return num.toString();
+extension MyDuration on Duration {
+  Duration ceil() {
+    final _seconds = (inMilliseconds / 1000).ceil();
+    return Duration(seconds: _seconds);
   }
 }
 
 extension MyDateTime on DateTime {
   String toJson() => _dateTime(this);
-  String get formatTime => _formatedTime(this);
-  String get formatDate => _formatedDate(this);
+  String get formatDate => '${_months[month - 1]} ${day.digit2}, $year';
+  String get formatTime => '${hour.digit2}:${minute.digit2}';
+  String get formatLongTime =>
+      '${hour.digit2}:${minute.digit2}:${second.digit2}';
 
   String _dateTime(DateTime now) {
-    String date = '${now.year}${_format(now.month)}${_format(now.day)}';
-    String time = '${_format(now.hour)}${_format(now.minute)}'
-        '${_format(now.second)}${_formatMili(now.millisecond)}';
+    String date = '${now.year}${now.month.digit2}${now.day.digit2}';
+    String time = '${now.hour.digit2}${now.minute.digit2}'
+        '${now.second.digit2}${now.millisecond.digit3}';
     return date + time;
   }
 
-  String _formatMili(int number) {
-    String int = number.toString();
-    switch (int.length) {
-      case 2:
-        return '0$int';
-      case 1:
-        return '00$int';
-      default:
-        return int;
-    }
-  }
-
-  String _formatedTime(DateTime time) {
-    String hour = _format(time.hour);
-    String min = _format(time.minute);
-
-    return '$hour:$min';
-  }
-
-  String _formatedDate(DateTime time) {
-    String day = _format(time.day);
-
-    return '${_formatMonth(time.month)} $day, ${time.year}';
-  }
-
-  String _format(int number) {
-    String int = number.toString();
-    String result = int.length > 1 ? int : '0$int';
-    return result;
-  }
-
-  String _formatMonth(int month) {
-    switch (month) {
-      case 1:
-        return 'January';
-      case 2:
-        return 'February';
-      case 3:
-        return 'March';
-      case 4:
-        return 'April';
-      case 5:
-        return 'May';
-      case 6:
-        return 'June';
-      case 7:
-        return 'July';
-      case 8:
-        return 'August';
-      case 9:
-        return 'September';
-      case 10:
-        return 'October';
-      case 11:
-        return 'November';
-      case 12:
-        return 'December';
-
-      default:
-        return '$month';
-    }
-  }
+  List<String> get _months => [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
 }
 
 extension MyString on String {
   DateTime get toDateTime => _formJson(this);
   bool get isEmail => _emailRegExp(this);
   bool get isStringPass => _passRegExp(this);
-  String get capitalize => _capitilize(this);
-  String get unescape => _unescape(this);
-  String get removeCoprights => _removeCopyright(this);
-  String get noSpace => replaceAll(' ', '');
   int queryMatch(String query) => _calculateMatch(this, query);
+
+  String get removeCoprights =>
+      replaceAll(RegExp(r'(?<!\w)[CcPp](?!\w)|\([CcPp]\)'), '');
+  String get capitalize => '${this[0].toUpperCase()}${substring(1)}';
+  String get unescape => HtmlUnescape().convert(this);
+  String get noSpace => replaceAll(' ', '');
 
   DateTime _formJson(String datetime) {
     int year = int.parse(datetime.substring(0, 4));
@@ -147,28 +254,15 @@ extension MyString on String {
     return DateTime(year, month, day, hour, min, sec, milli);
   }
 
-  _emailRegExp(String text) {
+  bool _emailRegExp(String text) {
     final emailExp =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     return emailExp.hasMatch(text);
   }
 
-  _passRegExp(String text) {
+  bool _passRegExp(String text) {
     final passExp = RegExp(r'^(?=.*[A-Z])(?=.*\d).{6,}$');
     return passExp.hasMatch(text);
-  }
-
-  String _capitilize(String text) {
-    final RegExp regExp = RegExp(r'[a-zA-Z]');
-    return text.replaceFirstMapped(regExp, (match) {
-      return match.group(0)!.toUpperCase();
-    });
-  }
-
-  String _unescape(String text) => HtmlUnescape().convert(text);
-
-  String _removeCopyright(String text) {
-    return text.replaceAll(RegExp(r'\b[CcPp]|\([CcPp]\)'), '');
   }
 
   int _calculateMatch(String item, String searchText) {
@@ -185,18 +279,39 @@ extension MyString on String {
   }
 }
 
+extension MyBrightness on ThemeMode {
+  Brightness get brightness {
+    switch (this) {
+      case ThemeMode.dark:
+        return Brightness.dark;
+      case ThemeMode.light:
+        return Brightness.light;
+      case ThemeMode.system:
+        return WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ThemeMode.light:
+        return Icons.light_mode;
+      case ThemeMode.dark:
+        return Icons.dark_mode;
+      case ThemeMode.system:
+        return Icons.contrast;
+    }
+  }
+}
+
 extension SortMusicGroup on List<LibraryModel> {
   void sortLibrary(String query) => sort((a, b) {
-        int first = 0;
-        int second = 0;
-
         final fName = a.name?.queryMatch(query) ?? 0;
         final fArtist = a.owner?.name?.queryMatch(query) ?? 0;
-        first = fName.compareTo(fArtist);
+        final first = fName.compareTo(fArtist);
 
         final sName = b.name?.queryMatch(query) ?? 0;
         final sArtist = b.owner?.name?.queryMatch(query) ?? 0;
-        second = sName.compareTo(sArtist);
+        final second = sName.compareTo(sArtist);
 
         return second.compareTo(first);
       });
@@ -204,6 +319,19 @@ extension SortMusicGroup on List<LibraryModel> {
 
 extension MyInt on int {
   String get format => _format(this);
+  String get digit2 => this < 10 ? '0${toString()}' : toString();
+  String get digit3 => _digit3(this);
+
+  String _digit3(int count) {
+    switch (count) {
+      case < 10:
+        return '00${toString()}';
+      case < 100:
+        return '0${toString()}';
+      default:
+        return toString();
+    }
+  }
 
   String _format(int count) {
     if (count > 999999) {

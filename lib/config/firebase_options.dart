@@ -51,7 +51,7 @@ class DefaultFBOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBdssOYzAwW_t25V0TBgGylH0lOnXyZRnU',
-    appId: '1:962828708485:android:bd7dfa5a4e9eb311e097ec',
+    appId: '1:962828708485:android:156869661d21e804e097ec',
     messagingSenderId: '962828708485',
     projectId: 'ampify-samtech',
     storageBucket: 'ampify-samtech.firebasestorage.app',
@@ -59,7 +59,7 @@ class DefaultFBOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAKCjfvFna8L9KiOS8aF38neUD9KfYYtgY',
-    appId: '1:962828708485:ios:26b7dd048d0c96efe097ec',
+    appId: '1:962828708485:ios:d7b056145c33df15e097ec',
     messagingSenderId: '962828708485',
     projectId: 'ampify-samtech',
     storageBucket: 'ampify-samtech.firebasestorage.app',

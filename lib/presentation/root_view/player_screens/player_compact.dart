@@ -1,13 +1,11 @@
+import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:flutter/material.dart';
-import 'package:ampify/data/utils/dimens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:ampify/presentation/widgets/loading_widgets.dart';
-import 'package:ampify/presentation/widgets/my_cached_image.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import '../../../buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/presentation/root_view/player_screens/player_screen.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
-import 'player_screen.dart';
 
 class PlayerCompact extends StatelessWidget {
   const PlayerCompact({super.key});
@@ -16,170 +14,192 @@ class PlayerCompact extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final bloc = context.read<PlayerBloc>();
-    final sliderBloc = context.read<PlayerSliderBloc>();
 
-    const duration = Duration(milliseconds: 300);
-    const double playerHeight = 60;
-    const double padding = 5;
-
-    return BlocConsumer<PlayerBloc, PlayerState>(
+    return BlocBuilder<PlayerBloc, PlayerState>(
       buildWhen: (pr, cr) {
         final track = pr.track != cr.track;
-        final isShow = pr.showPlayer != cr.showPlayer;
-        final isDuration = pr.durationLoading != cr.durationLoading;
-        final isStateChange = pr.playerState != cr.playerState;
-        return track || isShow || isStateChange || isDuration;
-      },
-      listener: (context, state) {
-        if (state.playerState == MusicState.loading || state.durationLoading) {
-          sliderBloc.add(const PlayerSliderChange(0));
-          return;
-        }
-        if (state.playerState == MusicState.playing) {
-          bloc.positionStream?.listen((duration) {
-            final current = duration.inSeconds;
-            sliderBloc.add(PlayerSliderChange(current));
-          });
-        }
+        return track || pr.playerState != cr.playerState;
       },
       builder: (context, state) {
-        final bgColor = state.track.bgColor?.withOpacity(.15) ?? Colors.white;
-        final selected = state.playerState == MusicState.playing;
-        final loading = state.playerState == MusicState.loading;
+        final _bg =
+            context.isDarkMode ? state.track.darkBgColor : state.track.bgColor;
+        final bgColor = _bg?.withAlpha(150) ?? scheme.background;
+        final selected = state.playerState.isPlaying;
+        final loading = state.playerState.isLoading;
 
-        return AnimatedSlide(
-          duration: duration,
-          offset: Offset(0.0, state.showPlayer ?? false ? 0.08 : 1),
-          child: Container(
-            height: playerHeight,
-            width: double.infinity,
-            margin: const EdgeInsets.only(
-                bottom: Dimens.kNavBarHeight,
-                left: Dimens.sizeSmall,
-                right: Dimens.sizeSmall),
-            padding: const EdgeInsets.fromLTRB(padding, padding, padding, 0),
-            decoration: BoxDecoration(
-              color: Color.alphaBlend(bgColor, Colors.white),
-              borderRadius: BorderRadius.circular(Dimens.sizeSmall - 2),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 20,
-                  spreadRadius: 5,
-                )
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Expanded(
-                  child: Row(
+        return AnimatedContainer(
+          duration: Durations.long2,
+          margin: Utils.insetsOnly(Dimens.sizeSmall, bottom: Dimens.zero),
+          padding: Utils.insetsOnly(Dimens.sizeExtraSmall, bottom: Dimens.zero),
+          decoration: BoxDecoration(
+            color: Color.alphaBlend(bgColor, scheme.surface),
+            borderRadius: BorderRadius.circular(Dimens.sizeExtraSmall),
+            boxShadow: [
+              BoxShadow(
+                color: scheme.surface.withAlpha(150),
+                offset: Offset(0, Dimens.sizeLarge),
+                blurRadius: Dimens.sizeMedium,
+                spreadRadius: Dimens.sizeLarge,
+              ),
+              BoxShadow(
+                color: scheme.surface.withAlpha(100),
+                blurRadius: Dimens.sizeMedium,
+                spreadRadius: Dimens.sizeLarge,
+              ),
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: Dimens.sizeMedium,
+                spreadRadius: Dimens.sizeExtraSmall,
+              ),
+            ],
+          ),
+          child: GestureDetector(
+            onTap: () => toPlayerScreen(context),
+            onHorizontalDragEnd: (details) {
+              if ((details.primaryVelocity ?? 0) < 0) {
+                bloc.add(PlayerNextTrack());
+              } else if ((details.primaryVelocity ?? 0) > 0) {
+                bloc.add(PlayerPreviousTrack());
+              }
+            },
+            child: ColoredBox(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
                     children: [
                       Expanded(
-                          child: GestureDetector(
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            enableDrag: true,
-                            builder: (_) => const PlayerScreen(),
-                          );
-                        },
-                        child: ColoredBox(
-                          color: Colors.transparent,
                           child: Row(
-                            children: [
-                              MyCachedImage(
-                                state.track.image,
-                                width: playerHeight - padding * 2,
-                                borderRadius: 2,
-                              ),
-                              const SizedBox(width: Dimens.sizeSmall),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      state.track.title ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      state.track.subtitle ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: scheme.textColorLight,
-                                          fontSize: Dimens.fontMed),
-                                    )
-                                  ],
+                        children: [
+                          Builder(builder: (context) {
+                            return DecoratedBox(
+                              decoration: BoxDecoration(boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  blurRadius: Dimens.sizeMedium,
+                                  spreadRadius: Dimens.sizeExtraSmall,
                                 ),
+                              ]),
+                              child: MyCachedImage(
+                                state.track.image,
+                                borderRadius: Dimens.sizeMini,
+                                width: Dimens.iconUltraLarge,
                               ),
-                            ],
+                            );
+                          }),
+                          const SizedBox(width: Dimens.sizeSmall),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  state.track.title ?? '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: Dimens.fontDefault + 1,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  state.track.subtitle ?? '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: scheme.textColor.withAlpha(200),
+                                      fontSize: Dimens.fontDefault - 1),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       )),
                       const SizedBox(width: Dimens.sizeSmall),
                       LoadingIcon(
                         loading: loading,
                         onPressed: bloc.onPlayPause,
-                        iconSize: Dimens.sizeMidLarge,
+                        iconSize: Dimens.iconXLarge,
                         isSelected: selected,
                         selectedIcon: const Icon(Icons.pause),
                         style: IconButton.styleFrom(
+                            foregroundColor: scheme.textColor,
                             splashFactory: NoSplash.splashFactory),
                         icon: const Icon(Icons.play_arrow),
                       ),
                       const SizedBox(width: Dimens.sizeSmall),
                     ],
                   ),
-                ),
-                BlocListener<PlayerSliderBloc, PlayerSliderState>(
-                  listenWhen: (pr, cr) {
-                    final ended = cr.current == state.length;
-                    final length = state.length != 0 && cr.current != 0;
-                    return ended && length;
-                  },
-                  listener: (_, slider) => bloc.onTrackEnded(slider),
-                  child: const SizedBox.shrink(),
-                ),
-                const SizedBox(height: Dimens.sizeExtraSmall),
-                LayoutBuilder(builder: (context, constraints) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
-                    child: Container(
-                      width: constraints.maxWidth,
-                      height: Dimens.sizeExtraSmall - 1,
-                      alignment: AlignmentDirectional.centerStart,
-                      color: Color.alphaBlend(bgColor, Colors.grey[100]!),
-                      child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
-                          builder: (context, slider) {
-                        Duration duration = Duration.zero;
-                        double width = 0;
-                        if (state.length != 0) {
-                          width = (slider.current / (state.length ?? 0)) *
-                              constraints.maxWidth;
-                        }
-
-                        if (state.length != 0 && slider.current != 0) {
-                          duration = const Duration(seconds: 1);
-                        }
-                        return AnimatedContainer(
-                          duration: duration,
-                          color: scheme.primary,
-                          width: width,
-                        );
-                      }),
-                    ),
-                  );
-                })
-              ],
+                  Builder(builder: (context) {
+                    final bloc = context.read<PlayerSliderBloc>();
+                    return BlocListener<PlayerBloc, PlayerState>(
+                      listenWhen: (pr, cr) => pr.track != cr.track,
+                      listener: (context, state) {
+                        bloc.streamSub?.cancel();
+                        bloc.add(PlayerSliderReset());
+                        bloc.streamSub = bloc.durationStream.listen((duration) {
+                          if (duration is! Duration) return;
+                          final _duration = state.track.duration;
+                          if (duration <= (_duration ?? Duration.zero)) {
+                            bloc.add(PlayerSliderChange(duration));
+                          }
+                        });
+                      },
+                      child: SizedBox.shrink(),
+                    );
+                  }),
+                  BlocListener<PlayerSliderBloc, PlayerSliderState>(
+                    listenWhen: (pr, cr) {
+                      final ended = cr.current == state.track.duration;
+                      final notSame = pr.current != cr.current;
+                      return ended && notSame && !cr.current.isZero;
+                    },
+                    listener: (context, slider) {
+                      if (state.playerState.isLoading) return;
+                      if (slider.current == state.track.duration) {
+                        bloc.add(PlayerTrackEnded());
+                      }
+                    },
+                    child: const SizedBox.shrink(),
+                  ),
+                  const SizedBox(height: Dimens.sizeExtraSmall),
+                  SizedBox(
+                    height: Dimens.sizeExtraSmall - 1,
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(Dimens.sizeMini),
+                        child: Container(
+                          width: constraints.maxWidth,
+                          alignment: AlignmentDirectional.centerStart,
+                          color: Color.alphaBlend(
+                              bgColor, scheme.textColorLight.withAlpha(150)),
+                          child:
+                              BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
+                                  builder: (context, slider) {
+                            final factor = slider.current
+                                .widthFactor(state.track.duration);
+                            return AnimatedContainer(
+                                duration: slider.animate,
+                                width: factor * constraints.maxWidth,
+                                color: scheme.textColor);
+                          }),
+                        ),
+                      );
+                    }),
+                  )
+                ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  void toPlayerScreen(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => const PlayerScreen(),
     );
   }
 }

@@ -1,14 +1,8 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/presentation/widgets/base_widget.dart';
-import 'package:ampify/presentation/widgets/loading_widgets.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import '../../buisness_logic/root_bloc/playlist_bloc.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class CreatePlaylistView extends StatelessWidget {
   final String userId;
@@ -21,6 +15,7 @@ class CreatePlaylistView extends StatelessWidget {
 
     return BaseWidget(
         appBar: AppBar(backgroundColor: scheme.background),
+        bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
         child: ListView(
           children: [
             SizedBox(height: context.height * .1),
@@ -33,9 +28,8 @@ class CreatePlaylistView extends StatelessWidget {
               key: bloc.titleKey,
               controller: bloc.titleController,
               textCapitalization: TextCapitalization.sentences,
-              style: const TextStyle(
-                  fontSize: Dimens.fontExtraTripleLarge,
-                  fontWeight: FontWeight.w500),
+              style: TextStyle(
+                  fontSize: Dimens.fontExtraLarge, fontWeight: FontWeight.w500),
               validator: (value) {
                 if (value?.isEmpty ?? true) {
                   return StringRes.errorEmpty('Name');
@@ -46,44 +40,45 @@ class CreatePlaylistView extends StatelessWidget {
             BlocListener<PlaylistBloc, PlaylistState>(
               listener: (context, state) {
                 if (state.success) {
-                  context.read<LibraryBloc>().add(LibraryInitial());
+                  context.read<LibraryBloc>().add(LibraryRefresh());
                   context.pop();
                 }
               },
               child: SizedBox(height: context.height * .1),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: Dimens.sizeDefault,
-                          horizontal: Dimens.sizeMidLarge),
-                      foregroundColor: scheme.onPrimaryContainer,
-                      backgroundColor: scheme.background,
-                      shape: RoundedRectangleBorder(
-                          side: BorderSide(color: scheme.primary),
-                          borderRadius: BorderRadius.circular(
-                            Dimens.borderLarge,
-                          ))),
-                  onPressed: context.pop,
-                  child: const Text(StringRes.cancel),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        elevation: Dimens.zero,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: Dimens.sizeDefault),
+                        foregroundColor: scheme.textColor,
+                        backgroundColor: scheme.background,
+                        shape: Utils.continuousBorder(Dimens.borderLarge,
+                            border: scheme.primaryAdaptive)),
+                    onPressed: context.pop,
+                    child: Text(
+                      StringRes.cancel,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: Dimens.fontXXXLarge),
+                    ),
+                  ),
                 ),
-                BlocBuilder<PlaylistBloc, PlaylistState>(
-                  builder: (context, state) {
-                    return LoadingButton(
-                      isLoading: state.loading,
-                      loaderColor: scheme.primary,
-                      width: 110,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: Dimens.sizeDefault,
-                          horizontal: Dimens.sizeMidLarge),
-                      onPressed: () => bloc.createPlaylist(userId),
-                      child: const Text(StringRes.submit),
-                    );
-                  },
+                const SizedBox(width: Dimens.sizeDefault),
+                Expanded(
+                  child: BlocBuilder<PlaylistBloc, PlaylistState>(
+                    buildWhen: (pr, cr) => pr.loading != cr.loading,
+                    builder: (context, state) {
+                      return LoadingButton(
+                        isLoading: state.loading,
+                        onPressed: () => bloc.createPlaylist(userId),
+                        child: const Text(StringRes.submit),
+                      );
+                    },
+                  ),
                 ),
               ],
             )

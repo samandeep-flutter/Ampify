@@ -1,9 +1,6 @@
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
-import '../../config/theme_services.dart';
 
 class MyTextField extends StatefulWidget {
   final Key? fieldKey;
@@ -100,6 +97,7 @@ class _MyTextFieldState extends State<MyTextField> {
   @override
   Widget build(BuildContext context) {
     final scheme = ThemeServices.of(context);
+
     return TextFormField(
       key: widget.fieldKey,
       controller: widget.controller,
@@ -122,19 +120,17 @@ class _MyTextFieldState extends State<MyTextField> {
                       splashRadius: 10,
                       selectedIcon: const Icon(Icons.visibility),
                       isSelected: isSelected,
-                      onPressed: () {
-                        setState(() {
-                          isSelected = !isSelected;
-                          obscureText = !obscureText;
-                        });
-                      },
+                      onPressed: _toggleVisibility,
                       icon: const Icon(Icons.visibility_off))
                   : null,
               label: Text(widget.title),
+              contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
+              labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
               border: const OutlineInputBorder(),
               focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: scheme.primary),
+                borderSide: BorderSide(color: scheme.primaryAdaptive),
               )),
+      style: TextStyle(fontSize: Dimens.fontXXXLarge),
       inputFormatters: widget.inputFormatters,
       validator: widget.customValidator ??
           (value) {
@@ -151,6 +147,13 @@ class _MyTextFieldState extends State<MyTextField> {
             return null;
           },
     );
+  }
+
+  void _toggleVisibility() {
+    setState(() {
+      isSelected = !isSelected;
+      obscureText = !obscureText;
+    });
   }
 }
 
@@ -186,7 +189,6 @@ class SearchTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = ThemeServices.of(context);
-    // ignore: no_leading_underscores_for_local_identifiers
     final _borderRadius = BorderRadius.circular(
       borderRadius ?? Dimens.borderLarge,
     );
@@ -194,16 +196,12 @@ class SearchTextField extends StatelessWidget {
     InputBorder border() {
       return OutlineInputBorder(
         borderRadius: _borderRadius,
-        borderSide: BorderSide(color: Colors.grey[200]!),
+        borderSide: BorderSide(color: scheme.backgroundDark),
       );
     }
 
-    return Container(
-      margin: margin,
-      decoration: BoxDecoration(
-        color: backgroundColor ?? Colors.white,
-        borderRadius: _borderRadius,
-      ),
+    return Padding(
+      padding: margin ?? EdgeInsets.zero,
       child: MyTextField._search(
         title: title,
         fieldKey: fieldKey,
@@ -217,7 +215,11 @@ class SearchTextField extends StatelessWidget {
         },
         decoration: InputDecoration(
             hintText: title,
-            hintStyle: TextStyle(color: scheme.disabled),
+            fillColor: backgroundColor,
+            filled: backgroundColor != null,
+            contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
+            hintStyle: TextStyle(
+                color: scheme.disabled, fontSize: Dimens.fontXXXLarge),
             focusedBorder: border(),
             enabledBorder: border(),
             prefixIcon: Icon(Icons.search, color: scheme.disabled),
@@ -269,15 +271,12 @@ class CustomTextField extends StatelessWidget {
     InputBorder inputBorder() {
       return OutlineInputBorder(
         borderRadius: borderRadius ?? radius,
-        borderSide: BorderSide(color: backgroundColor ?? Colors.white),
+        borderSide: BorderSide(color: backgroundColor ?? scheme.background),
       );
     }
 
-    return Container(
-      margin: margin,
-      decoration: BoxDecoration(
-          color: backgroundColor ?? Colors.white,
-          borderRadius: borderRadius ?? radius),
+    return Padding(
+      padding: margin ?? EdgeInsets.zero,
       child: MyTextField._custom(
         title: title,
         fieldKey: fieldKey,
@@ -291,11 +290,13 @@ class CustomTextField extends StatelessWidget {
         inputFormatters: inputFormatters,
         decoration: InputDecoration(
           hintText: title,
+          fillColor: backgroundColor,
+          filled: backgroundColor != null,
           hintStyle: TextStyle(color: scheme.disabled),
+          contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
           focusedBorder: defaultBorder ?? false
               ? OutlineInputBorder(
-                  borderSide: BorderSide(color: scheme.primary),
-                )
+                  borderSide: BorderSide(color: scheme.primaryAdaptive))
               : inputBorder(),
           enabledBorder: defaultBorder ?? false
               ? OutlineInputBorder(

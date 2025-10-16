@@ -1,13 +1,10 @@
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import '../../data/data_models/search_model.dart';
-import 'package:ampify/data/repository/search_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/repositories/search_repo.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rxdart/transformers.dart';
 
 class SearchEvent extends Equatable {
   const SearchEvent();
@@ -69,26 +66,22 @@ class SearchState extends Equatable {
   List<Object?> get props => [query, isLoading, isError, results];
 }
 
-EventTransformer<T> _debounce<T>(Duration duration) {
-  return (events, mapper) => events.debounceTime(duration).flatMap(mapper);
-}
-
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
   SearchBloc() : super(const SearchState.init()) {
-    on<SearchTrigerred>(_onSearchTrigerred, transformer: _debounce(_duration));
+    on<SearchTrigerred>(_onSearchTrigerred,
+        transformer: Utils.debounce(Durations.extralong2));
     on<SearchInputChanged>(_onInputChanged);
     on<SearchInitial>(_onInit);
     on<SearchCleared>(_onSearchClear);
   }
   final SearchRepo _searchRepo = getIt();
-  final _duration = const Duration(milliseconds: 800);
   final searchContr = TextEditingController();
   final focusNode = FocusNode();
 
-  _onSearchTextChanged() => add(SearchInputChanged(searchContr.text));
-  onSearchClear() => add(SearchCleared());
+  void _onSearchTextChanged() => add(SearchInputChanged(searchContr.text));
+  void onSearchClear() => add(SearchCleared());
 
-  _onInit(SearchInitial event, Emitter<SearchState> emit) {
+  void _onInit(SearchInitial event, Emitter<SearchState> emit) {
     searchContr.addListener(_onSearchTextChanged);
   }
 
@@ -98,7 +91,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     emit(state.copyWith(isLoading: false, results: null));
   }
 
-  _onInputChanged(SearchInputChanged event, Emitter<SearchState> emit) async {
+  Future<void> _onInputChanged(
+      SearchInputChanged event, Emitter<SearchState> emit) async {
     if (state.query == event.query) return;
     if (searchContr.text.isEmpty) {
       emit(state.copyWith(isLoading: false, results: null, query: ''));
@@ -108,7 +102,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     add(SearchTrigerred());
   }
 
-  _onSearchTrigerred(SearchTrigerred event, Emitter<SearchState> emit) async {
+  Future<void> _onSearchTrigerred(
+      SearchTrigerred event, Emitter<SearchState> emit) async {
     if (searchContr.text.isEmpty) {
       emit(state.copyWith(isLoading: false, results: null, query: ''));
       return;

@@ -1,11 +1,9 @@
 # <img src="https://github.com/samanjhutty/ampify/blob/main/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" width="30" height="30"> Ampify
 
-![Version](https://img.shields.io/github/v/release/samanjhutty/ampify)
+![Version](https://img.shields.io/github/v/release/samandeep-flutter/ampify)
 ![License](https://img.shields.io/github/license/samanjhutty/ampify)
-![repo size](https://img.shields.io/github/repo-size/samanjhutty/ampify)
-![Release Date](https://img.shields.io/github/release-date/samanjhutty/ampify)
-
-**Ampify: Turn Up the Volume on Your Music Journey!**
+![repo size](https://img.shields.io/github/repo-size/samandeep-flutter/ampify)
+![Release Date](https://img.shields.io/github/release-date/samandeep-flutter/ampify)
 
 Ampify enhances your Spotify experience by providing smarter playlist management, music discovery, and personalized features—all designed to amplify your listening journey.
 
@@ -17,18 +15,13 @@ Ampify enhances your Spotify experience by providing smarter playlist management
 
 ## Getting Started
 
-### Prerequisites
-
-- A Spotify account
-- Internet connectivity
-
 ### Setting Up Spotify App
 
 1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
 2. Log in with your Spotify account and create a new app.
 3. Provide the necessary details (e.g., App Name, Description) and click **Create**.
 4. Note down the **Client ID** and **Client Secret**.
-5. Add your app's redirect URL (e.g., `<APPNAME/UNIQUE-APP-NAME>://<REDIECT-LINK>`) in the app settings under **Redirect URIs**.
+5. Add your app's redirect URL (e.g., `myapp://spotify-login`) in the app settings under **Redirect URIs**.
 
 ### Configuring Environment Variables
 
@@ -98,4 +91,5 @@ If you encounter any issues, feel free to reach out to my [email](mailto:samande
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the [GNU GPL v3.0 License](https://github.com/samandeep-flutter/Ampify/blob/main/LICENCE).
+

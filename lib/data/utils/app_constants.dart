@@ -1,7 +1,5 @@
 import 'dart:developer' as dev;
-import 'package:ampify/data/utils/dimens.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/data/utils/utils.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 sealed class AppConstants {
   static const String baseUrl = 'https://api.spotify.com/v1/';
   static const String token = 'https://accounts.spotify.com/api/token';
+
   static const String search = 'search';
   static const String profile = 'me';
   static const String myPlaylists = 'me/playlists';
@@ -35,15 +34,29 @@ sealed class AppConstants {
 }
 
 sealed class BoxKeys {
-  static const String boxName = 'ampify';
-  static const String theme = '$boxName:theme';
-  static const String token = '$boxName:token';
-  static const String refreshToken = '$boxName:refresh-token';
-  static const String profile = '$boxName:profile';
+  static const String boxName = 'Ampify';
+  static const String theme = 'theme';
+  static const String themeMode = 'theme-mode';
+  static const String uid = 'uid';
+  static const String token = 'token';
+  static const String refreshToken = 'refresh-token';
+}
+
+sealed class EnvKeys {
+  static const String id = 'CLIENT_ID';
+  static const String secret = 'CLIENT_SECRET';
+  static const String redirect = 'REDIRECT';
 }
 
 sealed class UniqueIds {
   static const String likedSongs = '00-liked-songs';
+}
+
+sealed class PlayerActions {
+  static const String clearQueue = 'clear-queue';
+  static const String removeRange = 'remove-range';
+  static const String removeUpcomming = 'remove-upcomming';
+  static const String addToQueue = 'add-to-queue';
 }
 
 void logPrint(Object? value, [String? name]) {
@@ -52,9 +65,8 @@ void logPrint(Object? value, [String? name]) {
   dev.log(log ?? 'null', name: name ?? StringRes.appName);
 }
 
-void dprint(String? value) {
-  if (kReleaseMode) return;
-  debugPrint(value ?? 'null');
+void dprint(Object? value) {
+  if (kDebugMode) print(value ?? 'null');
 }
 
 class MyColoredBox extends StatelessWidget {
@@ -64,27 +76,25 @@ class MyColoredBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(color: color ?? Colors.black12, child: child);
+    return ColoredBox(
+        color: color ?? context.scheme.textColor.withAlpha(50), child: child);
   }
 }
 
-showToast(String text, {int? timeInSec}) async {
+Future<void> showToast(String text, {int? timeInSec}) async {
   await Fluttertoast.cancel();
-  Future.delayed(const Duration(milliseconds: 300)).then((_) {
-    Fluttertoast.showToast(
-        msg: text,
-        timeInSecForIosWeb: timeInSec ?? 1,
-        gravity: ToastGravity.SNACKBAR);
+  Future.delayed(Durations.medium2).then((_) {
+    Fluttertoast.showToast(msg: text, timeInSecForIosWeb: timeInSec ?? 1);
   });
 }
 
-showSnackBar(BuildContext context, {required String text}) {
+void showSnackBar(BuildContext context, {required String text}) {
   final messenger = ScaffoldMessenger.of(context);
   messenger.clearSnackBars();
   messenger.showSnackBar(SnackBar(
       content: Text(text),
       behavior: SnackBarBehavior.floating,
-      margin: Utils.paddingHoriz(Dimens.sizeSmall),
+      margin: Utils.insetsHoriz(Dimens.sizeSmall),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Dimens.borderSmall),
       )));

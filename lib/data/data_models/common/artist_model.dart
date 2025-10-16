@@ -1,3 +1,4 @@
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 
 class Artist extends Equatable {
@@ -29,9 +30,7 @@ class Artist extends Equatable {
         genres: json['genres']?.cast<String>(),
         href: json['href'],
         id: json['id'],
-        image: (json['images'] as List?)?.isNotEmpty ?? false
-            ? (json['images'] as List).first['url']
-            : null,
+        image: (json['images'] as List?)?.firstElement?['url'],
         name: json['name'],
         popularity: json['popularity'],
         type: json['type'],

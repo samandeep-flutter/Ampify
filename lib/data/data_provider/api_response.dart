@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 
+typedef SuccessCallback = void Function(Map<String, dynamic> json);
+typedef ErrorCallback = void Function(Map<String, dynamic> error);
+
 class ApiResponse {
   final Response? response;
   final dynamic error;
@@ -10,8 +13,8 @@ class ApiResponse {
 
   static Future<void> verify(
     ApiResponse apiResponse, {
-    required Function(Map<String, dynamic> map) onSuccess,
-    required Function(Map<String, dynamic> errorMap) onError,
+    required SuccessCallback onSuccess,
+    required SuccessCallback onError,
   }) async {
     final response = apiResponse.response;
     if (response != null) {

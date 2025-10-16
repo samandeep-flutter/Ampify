@@ -1,10 +1,5 @@
-import 'package:ampify/data/utils/utils.dart';
-import 'package:ampify/services/extension_services.dart';
 import 'package:flutter/material.dart';
-import '../../data/utils/dimens.dart';
-import '../../data/utils/string.dart';
-import '../../config/theme_services.dart';
-import 'my_cached_image.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class MyDivider extends StatelessWidget {
   final double? width;
@@ -22,12 +17,13 @@ class MyDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: Utils.paddingHoriz(margin ?? 0),
-        width: width,
-        child: Divider(
-          color: color ?? Colors.grey[350],
-          thickness: thickness,
-        ));
+      margin: Utils.insetsHoriz(margin ?? 0),
+      width: width,
+      child: Divider(
+        color: color ?? context.scheme.backgroundDark,
+        thickness: thickness,
+      ),
+    );
   }
 }
 
@@ -48,21 +44,21 @@ class PaginationDots extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = ThemeServices.of(context);
     return Padding(
-      padding: Utils.paddingHoriz(margin ?? 3),
+      padding: Utils.insetsHoriz(margin ?? 3),
       child: InkWell(
         borderRadius: BorderRadius.circular(Dimens.borderDefault),
         onTap: onTap,
         child: CircleAvatar(
-          radius: 3,
+          radius: Dimens.iconTiny,
           backgroundColor: color ??
-              (current ? scheme.primary : scheme.disabled.withOpacity(.3)),
+              (current ? scheme.primary : scheme.disabled.withAlpha(80)),
         ),
       ),
     );
   }
 }
 
-class ToolTipWidget extends StatelessWidget {
+class ToolTipWidget extends StatefulWidget {
   final EdgeInsets? margin;
   final dynamic _icon;
   final bool? _scrolable;
@@ -92,70 +88,49 @@ class ToolTipWidget extends StatelessWidget {
         alignment = null;
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = ThemeServices.of(context);
+  State<ToolTipWidget> createState() => _ToolTipWidgetState();
+}
 
-    if (_placeHolder) {
-      final widget = Container(
-        alignment: Alignment.center,
-        margin: EdgeInsets.only(
-          top: context.height * .15,
-          left: Dimens.sizeDefault,
-          right: Dimens.sizeDefault,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (_icon != null) ...[
-              Image.asset(
-                _icon,
-                width: context.width * .3,
-                color: scheme.disabled,
-              ),
-              const SizedBox(height: Dimens.sizeDefault),
-            ],
-            Text(
-              title ?? StringRes.errorUnknown,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: scheme.textColorLight),
-            )
-          ],
-        ),
-      );
-
-      if (_scrolable ?? false) {
-        return Expanded(
-            child: SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
-          child: widget,
-        ));
-      }
-
-      return widget;
-    }
-
+class _ToolTipWidgetState extends State<ToolTipWidget> {
+  Widget _builder() {
+    final scheme = context.scheme;
     return Container(
-      margin: margin ??
-          EdgeInsets.only(
-              top: context.height * .1,
-              left: Dimens.sizeDefault,
-              right: Dimens.sizeDefault),
-      alignment: alignment ?? Alignment.topCenter,
+      alignment: Alignment.center,
+      margin: EdgeInsets.only(
+        top: context.height * .15,
+        left: Dimens.sizeDefault,
+        right: Dimens.sizeDefault,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (_icon != null) ...[
-            _icon!,
+          if (widget._icon != null) ...[
+            Builder(builder: (context) {
+              if (!widget._placeHolder) return widget._icon!;
+              return Image.asset(widget._icon,
+                  width: context.width * .3, color: scheme.disabled);
+            }),
             const SizedBox(height: Dimens.sizeDefault),
           ],
           Text(
-            title ?? StringRes.errorUnknown,
+            widget.title ?? StringRes.errorUnknown,
             textAlign: TextAlign.center,
-            style: TextStyle(color: scheme.textColorLight),
+            style: TextStyle(
+                color: scheme.textColorLight, fontSize: Dimens.fontXXXLarge),
           )
         ],
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!(widget._scrolable ?? false)) return _builder();
+    return Expanded(
+        child: SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: _builder(),
+    ));
   }
 }
 
@@ -176,7 +151,6 @@ class MyAvatar extends StatelessWidget {
   final EdgeInsets? padding;
   final double? avatarRadius;
   final double? borderRadius;
-  final Color? bgColor;
   final double? height;
   final double? width;
   final BoxFit? fit;
@@ -188,7 +162,6 @@ class MyAvatar extends StatelessWidget {
     this.onTap,
     this.padding,
     this.avatarRadius,
-    this.bgColor,
     this.isAvatar,
     this.fit,
     this.borderRadius,
@@ -198,18 +171,13 @@ class MyAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = ThemeServices.of(context);
+    final radius = borderRadius ?? Dimens.borderLarge;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(borderRadius ?? 40),
-      splashColor: scheme.disabled.withOpacity(.5),
-      splashFactory: InkRipple.splashFactory,
-      child: Container(
-        padding: padding ?? const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(borderRadius ?? 40),
-            color: bgColor),
+      borderRadius: BorderRadius.circular(radius),
+      child: Padding(
+        padding: padding ?? EdgeInsets.zero,
         child: MyCachedImage(
           image,
           isAvatar: isAvatar ?? false,
@@ -226,7 +194,7 @@ class MyAvatar extends StatelessWidget {
 
 class SubtitleWidget extends StatelessWidget {
   final TextStyle? style;
-  final String type;
+  final String? type;
   final String subtitle;
   final bool expanded;
   const SubtitleWidget({
@@ -241,32 +209,38 @@ class SubtitleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
 
-    final sub = Text(
-      subtitle,
-      style: TextStyle(
-        color: style?.color ?? scheme.textColorLight,
-      ),
-      maxLines: 1,
-      overflow: TextOverflow.ellipsis,
-    );
-
     return DefaultTextStyle.merge(
       style: style,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(type,
+          if (type != null) ...[
+            Text(
+              type!,
               style: TextStyle(
-                color: style?.color ?? scheme.textColorLight,
-              )),
-          PaginationDots(
-            current: true,
-            margin: Dimens.sizeSmall,
-            color: style?.color ?? scheme.textColorLight,
-          ),
-          if (expanded) Expanded(child: sub) else sub,
+                  color: style?.color ?? scheme.textColorLight,
+                  fontSize: Dimens.fontDefault),
+            ),
+            PaginationDots(
+              current: true,
+              margin: Dimens.sizeSmall,
+              color: style?.color ?? scheme.textColorLight,
+            )
+          ],
+          if (expanded) Expanded(child: sub(context)) else sub(context),
         ],
       ),
+    );
+  }
+
+  Widget sub(BuildContext context) {
+    return Text(
+      subtitle,
+      maxLines: 1,
+      style: TextStyle(
+          color: style?.color ?? context.scheme.textColorLight,
+          fontSize: Dimens.fontDefault),
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
@@ -299,15 +273,17 @@ class ShadowWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius ?? 0),
         boxShadow: [
           BoxShadow(
-              color: color,
-              offset: offset ?? Offset.zero,
-              spreadRadius: spread ?? context.width * .35,
-              blurRadius: spread ?? context.width * .35),
+            color: color,
+            offset: offset ?? Offset.zero,
+            spreadRadius: spread ?? context.width * .5,
+            blurRadius: spread ?? context.width * .4,
+          ),
           if (darkShadow)
-            const BoxShadow(
-                color: Colors.black12,
-                spreadRadius: Dimens.sizeSmall,
-                blurRadius: Dimens.sizeExtraDoubleLarge)
+            BoxShadow(
+              color: Colors.black12,
+              spreadRadius: Dimens.sizeDefault,
+              blurRadius: Dimens.sizeMidLarge,
+            ),
         ],
       ),
       child: child,
@@ -327,18 +303,14 @@ class LikedSongsCover extends StatelessWidget {
       height: size,
       width: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(Dimens.sizeMini),
         gradient: LinearGradient(
-          colors: [scheme.primary, scheme.primaryContainer],
+          colors: [scheme.primaryAdaptive, Color(0xFFB4B5ED)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
-      child: Icon(
-        Icons.favorite,
-        color: scheme.background,
-        size: iconSize,
-      ),
+      child: Icon(Icons.favorite, size: iconSize, color: scheme.onPrimary),
     );
   }
 }
@@ -346,12 +318,14 @@ class LikedSongsCover extends StatelessWidget {
 class BottomSheetListTile extends StatelessWidget {
   final String title;
   final Widget? leading;
+  final IconData? icon;
   final bool? enable;
   final VoidCallback? onTap;
   const BottomSheetListTile({
     super.key,
     required this.title,
     this.leading,
+    this.icon,
     this.onTap,
     this.enable,
   });
@@ -362,13 +336,28 @@ class BottomSheetListTile extends StatelessWidget {
     return ListTile(
       enabled: enable ?? true,
       onTap: onTap,
-      leading: leading,
+      leading: leading ?? Icon(icon, size: Dimens.iconXXLarge),
       title: Text(title),
       horizontalTitleGap: Dimens.sizeLarge,
       titleTextStyle: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: Dimens.fontLarge,
-          color: scheme.textColor),
+        fontWeight: FontWeight.w500,
+        fontSize: Dimens.fontXXXLarge - 1,
+        color: scheme.textColor,
+      ),
     );
+  }
+}
+
+class DisabledWidget extends StatelessWidget {
+  /// defaults to true.
+  final bool? disabled;
+  final Widget child;
+  const DisabledWidget({super.key, this.disabled, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+        opacity: disabled ?? true ? .5 : 1,
+        child: AbsorbPointer(absorbing: disabled ?? true, child: child));
   }
 }

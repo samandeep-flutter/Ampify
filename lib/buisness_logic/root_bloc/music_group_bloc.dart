@@ -7,18 +7,13 @@ import 'package:ampify/data/data_models/common/album_model.dart';
 import 'package:ampify/data/data_models/common/other_models.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/data_models/profile_model.dart';
-import 'package:ampify/data/repository/music_group_repo.dart';
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/data/utils/string.dart';
-import 'package:ampify/services/getit_instance.dart';
+import 'package:ampify/data/repositories/music_group_repo.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../data/data_models/common/playlist_model.dart';
-import '../../data/utils/utils.dart';
-import '../../services/box_services.dart';
 
 class MusicGroupEvent extends Equatable {
   const MusicGroupEvent();
@@ -91,7 +86,7 @@ class MusicGroupState extends Equatable {
   final String? id;
   final double titileOpacity;
   final String? image;
-  final Color? color;
+  final Color? bgColor;
   final String? title;
   final MusicGroupDetails? details;
   final List<Track> tracks;
@@ -102,7 +97,7 @@ class MusicGroupState extends Equatable {
   const MusicGroupState({
     required this.id,
     required this.image,
-    required this.color,
+    required this.bgColor,
     required this.title,
     required this.type,
     required this.details,
@@ -117,7 +112,7 @@ class MusicGroupState extends Equatable {
         image = null,
         titileOpacity = 0,
         type = null,
-        color = Colors.white,
+        bgColor = null,
         title = null,
         details = null,
         isFav = false,
@@ -127,7 +122,7 @@ class MusicGroupState extends Equatable {
   MusicGroupState copyWith({
     String? id,
     String? image,
-    Color? color,
+    Color? bgColor,
     String? title,
     MusicGroupDetails? details,
     List<Track>? tracks,
@@ -139,7 +134,7 @@ class MusicGroupState extends Equatable {
     return MusicGroupState(
       id: id ?? this.id,
       image: image ?? this.image,
-      color: color ?? this.color,
+      bgColor: bgColor ?? this.bgColor,
       title: title ?? this.title,
       isFav: isFav,
       details: details,
@@ -153,7 +148,7 @@ class MusicGroupState extends Equatable {
   @override
   List<Object?> get props => [
         image,
-        color,
+        bgColor,
         title,
         tracks,
         type,
@@ -177,8 +172,9 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   final MusicGroupRepo _repo = getIt();
   final scrollController = ScrollController();
   final picker = ImagePicker();
-  ProfileModel? profile;
   bool libRefresh = false;
+
+  String? get uid => BoxServices.instance.uid;
 
   // @override
   // void add(MusicGroupEvent event) {
@@ -186,8 +182,9 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   //   super.add(event);
   // }
 
-  onPlay(BuildContext context) {
+  void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
+    if (player.state.musicGroupId == state.id) return player.onPlayPause();
     player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
   }
 
@@ -195,19 +192,18 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     try {
       final file =
           await picker.pickImage(source: source, maxHeight: 500, maxWidth: 500);
-      if (file != null) {
-        add(PlaylistCoverChanged(File(file.path)));
-        return true;
-      }
-      throw Exception(StringRes.noImage);
+      if (file == null) throw FormatException(StringRes.noImage);
+      add(PlaylistCoverChanged(File(file.path)));
+      return true;
+    } on FormatException catch (e) {
+      showToast(e.message);
     } catch (e) {
-      showToast(StringRes.noImage);
       logPrint(e, 'Image Picker');
-      return false;
     }
+    return false;
   }
 
-  _scrollListener() {
+  void _scrollListener() {
     if (!scrollController.hasClients) return;
     final appbarHeight = scrollController.position.extentInside * .4;
     if (scrollController.offset > (appbarHeight - kToolbarHeight)) {
@@ -221,23 +217,21 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     add(MusicGroupFav(id, type: type, liked: liked));
   }
 
-  _onInit(MusicGroupInitial event, Emitter<MusicGroupState> emit) async {
-    try {
-      final json = BoxServices.to.read(BoxKeys.profile);
-      profile = ProfileModel.fromJson(json);
-    } catch (_) {}
+  Future<void> _onInit(
+      MusicGroupInitial event, Emitter<MusicGroupState> emit) async {
     emit(state.copyWith(id: event.id, loading: true, titileOpacity: 0));
     scrollController.addListener(_scrollListener);
     libRefresh = false;
 
-    if (event.type == LibItemType.playlist) {
+    if (event.type.isPlaylist) {
       add(PlaylistInitial(event.id));
-      return;
+    } else {
+      add(AlbumInitial(id: event.id, type: event.type));
     }
-    add(AlbumInitial(id: event.id, type: event.type));
   }
 
-  _onPlaylist(PlaylistInitial event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onPlaylist(
+      PlaylistInitial event, Emitter<MusicGroupState> emit) async {
     final completer = Completer<bool>();
     _repo.playlistDetails(event.id, onSuccess: (json) async {
       final playlist = Playlist.fromJson(json);
@@ -250,10 +244,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
       }
       final color = await Utils.getImageColor(playlist.image);
       final isFav = await _repo.isFavPlaylist(event.id);
-      String? release;
-      try {
-        release = playlist.tracks?.first.addedAt;
-      } catch (_) {}
+      final release = playlist.tracks?.firstElement?.addedAt;
       final details = MusicGroupDetails(
           owner: playlist.owner,
           public: playlist.public,
@@ -264,18 +255,18 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         image: playlist.image,
         tracks: tracks,
         type: LibItemType.playlist,
-        color: color ?? Colors.grey[700],
+        bgColor: color,
         isFav: isFav,
         title: playlist.name,
         details: details,
         loading: false,
       ));
     });
-
     await completer.future;
   }
 
-  _onAlbum(AlbumInitial event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onAlbum(
+      AlbumInitial event, Emitter<MusicGroupState> emit) async {
     final completer = Completer<bool>();
 
     _repo.albumDetails(event.id, onSuccess: (json) async {
@@ -283,17 +274,17 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
       final color = await Utils.getImageColor(album.image);
       final isFav = await _repo.isFavAlbum(event.id);
       final details = MusicGroupDetails(
-          copyrights: album.copyrights,
-          releaseDate: DateTime.tryParse(album.releaseDate ?? ''),
-          owner: OwnerModel(
-            name: album.artists?.first.name,
-            id: album.artists?.first.id,
-          ));
+        copyrights: album.copyrights,
+        releaseDate: DateTime.tryParse(album.releaseDate ?? ''),
+        owner: OwnerModel(
+            name: album.artists?.firstElement?.name,
+            id: album.artists?.firstElement?.id),
+      );
       completer.complete(true);
 
       emit(state.copyWith(
         loading: false,
-        color: color,
+        bgColor: color,
         title: album.name,
         tracks: album.tracks,
         isFav: isFav,
@@ -305,39 +296,30 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     await completer.future;
   }
 
-  _onFav(MusicGroupFav event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onFav(
+      MusicGroupFav event, Emitter<MusicGroupState> emit) async {
     libRefresh = true;
-    if (event.liked) {
-      try {
-        emit(state.copyWith(isFav: false));
-        if (event.type == LibItemType.playlist) {
-          final result = await _repo.removeSavedPlaylist(event.id);
-          if (!result) throw Exception();
-          return;
-        }
-        final result = await _repo.removeSavedAlbum(event.id);
-        if (!result) throw Exception();
-      } catch (_) {
-        emit(state.copyWith(isFav: true));
-      }
-      return;
-    }
-
     try {
-      emit(state.copyWith(isFav: true));
-      if (event.type == LibItemType.playlist) {
-        final result = await _repo.savePlaylist(event.id);
-        if (!result) throw Exception();
-        return;
+      emit(state.copyWith(isFav: !event.liked));
+      if (event.liked) {
+        final success = event.type.isPlaylist
+            ? await _repo.removeSavedPlaylist(event.id)
+            : await _repo.removeSavedAlbum(event.id);
+        if (!success) throw const FormatException();
+      } else {
+        final success = event.type.isPlaylist
+            ? await _repo.savePlaylist(event.id)
+            : await _repo.saveAlbum(event.id);
+        if (!success) throw const FormatException();
       }
-      final result = await _repo.saveAlbum(event.id);
-      if (!result) throw Exception();
-    } catch (_) {
-      emit(state.copyWith(isFav: false));
+    } on FormatException {
+      emit(state.copyWith(isFav: event.liked));
+    } catch (e) {
+      logPrint(e, 'Fav');
     }
   }
 
-  _onCoverChanged(
+  Future<void> _onCoverChanged(
       PlaylistCoverChanged event, Emitter<MusicGroupState> emit) async {
     showToast(StringRes.uploading);
     emit(state.copyWith(image: ''));
@@ -346,7 +328,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     add(PlaylistInitial(state.id!));
   }
 
-  _onVisibility(PlaylistVisibility event, Emitter<MusicGroupState> emit) async {
+  Future<void> _onVisibility(
+      PlaylistVisibility event, Emitter<MusicGroupState> emit) async {
     await _repo.editPlaylist(
       id: state.id!,
       title: state.title!,
@@ -361,7 +344,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     showToast(StringRes.nowPrivate);
   }
 
-  _titleFade(MusicGroupTitleFade event, Emitter<MusicGroupState> emit) {
+  void _titleFade(MusicGroupTitleFade event, Emitter<MusicGroupState> emit) {
     emit(state.copyWith(titileOpacity: event.opacity));
   }
 }

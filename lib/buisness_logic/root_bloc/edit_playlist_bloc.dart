@@ -1,11 +1,8 @@
-import 'package:ampify/services/extension_services.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/repository/music_group_repo.dart';
-import '../../data/utils/app_constants.dart';
-import '../../data/utils/string.dart';
-import '../../services/getit_instance.dart';
+import '../../data/repositories/music_group_repo.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class EditPlaylistEvents extends Equatable {
   const EditPlaylistEvents();
@@ -102,7 +99,8 @@ class EditPlaylistBloc extends Bloc<EditPlaylistEvents, EditPlaylistState> {
         desc: descContr.text.isNotEmpty ? descContr.text : null));
   }
 
-  _onInit(EditPlaylistInitial event, Emitter<EditPlaylistState> emit) async {
+  Future<void> _onInit(
+      EditPlaylistInitial event, Emitter<EditPlaylistState> emit) async {
     titleContr.text = event.title?.unescape ?? '';
     descContr.text = event.desc?.unescape ?? '';
     emit(state.copyWith(
@@ -112,7 +110,7 @@ class EditPlaylistBloc extends Bloc<EditPlaylistEvents, EditPlaylistState> {
         image: event.image));
   }
 
-  _onEditDetails(
+  Future<void> _onEditDetails(
       EditPlaylistDetails event, Emitter<EditPlaylistState> emit) async {
     emit(state.copyWith(loading: true));
     final result = await _repo.editPlaylist(
