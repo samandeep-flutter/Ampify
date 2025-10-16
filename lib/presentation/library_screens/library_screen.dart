@@ -12,8 +12,7 @@ class LibraryScreen extends StatefulWidget {
   State<LibraryScreen> createState() => _LibraryScreenState();
 }
 
-class _LibraryScreenState extends State<LibraryScreen>
-    with TickerProviderStateMixin {
+class _LibraryScreenState extends State<LibraryScreen> {
   final AuthServices auth = getIt();
 
   @override
@@ -197,14 +196,12 @@ class _LibraryScreenState extends State<LibraryScreen>
   void sortBy() {
     showModalBottomSheet(
       context: context,
-      showDragHandle: true,
       useRootNavigator: true,
       builder: (context) {
         return MyBottomSheet(
           title: StringRes.sortOrder,
-          vsync: this,
-          child: Column(
-            children: SortOrder.values.map((e) {
+          child: Column(children: [
+            ...SortOrder.values.map((e) {
               return ListTile(
                 onTap: () async {
                   context.read<LibraryBloc>().add(LibrarySorted(e));
@@ -220,8 +217,9 @@ class _LibraryScreenState extends State<LibraryScreen>
                   fontWeight: FontWeight.w500,
                 ),
               );
-            }).toList(),
-          ),
+            }),
+            const SafeArea(child: SizedBox(height: Dimens.sizeSmall))
+          ]),
         );
       },
     );

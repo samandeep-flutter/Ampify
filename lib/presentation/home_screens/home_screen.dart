@@ -31,10 +31,12 @@ class HomeScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       const SizedBox(width: Dimens.sizeDefault),
-                      Text(StringRes.homeSubtitle,
-                          style: TextStyle(
-                              color: scheme.textColorLight,
-                              fontSize: Dimens.fontDefault + 1)),
+                      Text(
+                        StringRes.homeSubtitle,
+                        style: TextStyle(
+                            color: scheme.textColorLight,
+                            fontSize: Dimens.fontDefault),
+                      ),
                     ],
                   )),
               actions: [
@@ -174,11 +176,7 @@ class SliverGridWidget extends StatelessWidget {
           if (title?.isNotEmpty ?? false)
             Padding(
               padding: const EdgeInsets.only(left: Dimens.sizeDefault),
-              child: Text(title!,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: Dimens.fontXXLarge,
-                  )),
+              child: Text(title!, style: Utils.titleStyleLarge(context)),
             ),
           const SizedBox(height: Dimens.sizeSmall),
           SizedBox(height: context.height * .25, child: child),
@@ -218,15 +216,14 @@ class HomeAlbumTile extends StatelessWidget {
                   title ?? '',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: Dimens.fontDefault + 1,
-                      fontWeight: FontWeight.bold),
+                      fontSize: Dimens.fontDefault,
+                      fontWeight: FontWeight.w600),
                 ),
                 Text(
                   subtitle ?? '',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                      fontSize: Dimens.fontDefault,
-                      color: scheme.textColorLight),
+                      fontSize: Dimens.fontMed, color: scheme.textColorLight),
                 )
               ],
             ),

@@ -83,7 +83,7 @@ class _LikedSongsState extends State<LikedSongs> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(StringRes.likedSongs,
-                          style: Utils.defTitleStyle(context)),
+                          style: Utils.titleStyleLarge(context)),
                       const SizedBox(height: Dimens.sizeSmall),
                       Row(
                         mainAxisSize: MainAxisSize.min,

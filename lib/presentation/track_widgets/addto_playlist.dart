@@ -26,8 +26,34 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
   Widget build(BuildContext context) {
     final bloc = context.read<AddtoPlaylistBloc>();
     final scheme = context.scheme;
-    return SizedBox(
-      height: context.height * .55,
+    return MyBottomSheet(
+      customTitle: Row(
+        children: [
+          const SizedBox(width: Dimens.sizeLarge),
+          Text(
+            StringRes.addtoPlaylist,
+            style: TextStyle(
+              color: scheme.textColor,
+              fontSize: Dimens.fontXXXLarge,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const Spacer(),
+          ElevatedButton.icon(
+            onPressed: () => _toCreatePlaylist(context),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.primaryAdaptive,
+                foregroundColor: scheme.onPrimary,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.only(
+                    left: Dimens.sizeSmall, right: Dimens.sizeDefault)),
+            icon: Icon(Icons.add_outlined, size: Dimens.iconMedSmall),
+            label: Text(StringRes.playlist,
+                style: TextStyle(fontSize: Dimens.fontDefault)),
+          ),
+          const SizedBox(width: Dimens.sizeDefault),
+        ],
+      ),
       child: BlocBuilder<LibraryBloc, LibraryState>(
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
@@ -37,44 +63,14 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
             }).toList();
             return Column(
               children: [
-                Row(
-                  children: [
-                    const SizedBox(width: Dimens.sizeLarge),
-                    Text(
-                      StringRes.addtoPlaylist,
-                      style: TextStyle(
-                        color: scheme.textColor,
-                        fontSize: Dimens.fontXXXLarge,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const Spacer(),
-                    ElevatedButton.icon(
-                      onPressed: () => _toCreatePlaylist(context),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: scheme.primaryAdaptive,
-                          foregroundColor: scheme.onPrimary,
-                          visualDensity: VisualDensity.compact,
-                          padding: const EdgeInsets.only(
-                              left: Dimens.sizeSmall,
-                              right: Dimens.sizeDefault)),
-                      icon: Icon(Icons.add_outlined, size: Dimens.iconMedSmall),
-                      label: Text(StringRes.playlist,
-                          style: TextStyle(fontSize: Dimens.fontDefault)),
-                    ),
-                    const SizedBox(width: Dimens.sizeDefault),
-                  ],
-                ),
-                const SizedBox(height: Dimens.sizeSmall),
-                const MyDivider(),
-                const SizedBox(height: Dimens.sizeDefault),
                 BlocBuilder<AddtoPlaylistBloc, AddtoPlaylistState>(
                     builder: (context, state) {
                   if (playlists.isEmpty) {
                     return const Expanded(
                         child: ToolTipWidget(title: StringRes.noPlaylists));
                   }
-                  return Flexible(
+                  return SizedBox(
+                    height: context.height * .4,
                     child: GridView.builder(
                       padding: Utils.insetsHoriz(Dimens.sizeDefault),
                       physics: const BouncingScrollPhysics(),
@@ -82,13 +78,13 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                           ? Axis.horizontal
                           : Axis.vertical,
                       gridDelegate: Utils.fixedCrossAxis(2,
-                          spacing: Dimens.sizeSmall, aspectRatio: 1.1),
+                          spacing: Dimens.sizeDefault, aspectRatio: 1.2),
                       itemCount: playlists.length,
                       itemBuilder: (context, index) {
                         final item = playlists[index];
 
                         return Stack(
-                          fit: StackFit.expand,
+                          alignment: Alignment.topRight,
                           children: [
                             Column(
                               mainAxisSize: MainAxisSize.min,
@@ -125,10 +121,17 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                             ),
                             if (state.playlists.contains(item.id))
                               Container(
-                                margin: const EdgeInsets.only(
-                                    right: Dimens.sizeLarge,
-                                    top: Dimens.sizeSmall),
-                                alignment: Alignment.topRight,
+                                margin: const EdgeInsets.all(Dimens.sizeSmall),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(
+                                        Dimens.borderLarge),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: scheme.surface,
+                                        blurRadius: Dimens.sizeDefault,
+                                        spreadRadius: Dimens.sizeExtraSmall,
+                                      ),
+                                    ]),
                                 child: CircleAvatar(
                                   radius: Dimens.iconExtraSmall,
                                   backgroundColor: scheme.primary,

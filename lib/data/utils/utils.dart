@@ -21,6 +21,13 @@ sealed class Utils {
         color: context.scheme.textColor);
   }
 
+  static TextStyle titleStyleLarge(BuildContext context) {
+    return TextStyle(
+        fontSize: Dimens.fontExtraLarge,
+        fontWeight: FontWeight.w600,
+        color: context.scheme.textColor);
+  }
+
   static TextStyle titleTextStyle([Color? color]) {
     return TextStyle(
         fontSize: Dimens.fontTitle, fontWeight: FontWeight.bold, color: color);

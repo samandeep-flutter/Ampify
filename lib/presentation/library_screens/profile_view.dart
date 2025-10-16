@@ -10,9 +10,7 @@ class ProfileView extends StatefulWidget {
   State<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView>
-    with TickerProviderStateMixin {
-  final box = BoxServices.instance;
+class _ProfileViewState extends State<ProfileView> {
   final AuthServices auth = getIt();
 
   @override
@@ -144,17 +142,15 @@ class _ProfileViewState extends State<ProfileView>
         context: context,
         useRootNavigator: true,
         useSafeArea: true,
-        showDragHandle: true,
         builder: (context) {
           return MyBottomSheet(
             title: StringRes.themeMode,
-            vsync: this,
             child: Column(
               children: [
                 ...ThemeMode.values.map((e) {
                   return RadioListTile(
                     value: e,
-                    groupValue: box.themeMode,
+                    groupValue: BoxServices.instance.themeMode,
                     title: Row(
                       children: [
                         Icon(e.icon, size: Dimens.iconDefault),

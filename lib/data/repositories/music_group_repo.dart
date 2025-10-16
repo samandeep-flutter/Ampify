@@ -71,7 +71,7 @@ class MusicGroupRepo {
     required SuccessCallback onSuccess,
     ErrorCallback? onError,
   }) async {
-    final body = {'name': title, 'public': true};
+    final body = {'name': title, 'description': '', 'public': true};
     final response = await dio.post(AppConstants.userPlaylists(userId),
         options: Options(contentType: 'application/json'), data: body);
     ApiResponse.verify(response,

@@ -12,18 +12,24 @@ class TrackTile extends StatelessWidget {
   final Track track;
   final bool? liked;
   final bool? showImage;
-  final bool isQueue;
+  final bool _isQueue;
+  final bool _isSearch;
   const TrackTile(this.track, {this.liked, this.showImage, super.key})
-      : isQueue = false;
+      : _isQueue = false,
+        _isSearch = false;
   const TrackTile.queue(this.track, {this.liked, this.showImage, super.key})
-      : isQueue = true;
+      : _isQueue = true,
+        _isSearch = false;
+  const TrackTile.search(this.track, {this.liked, this.showImage, super.key})
+      : _isQueue = true,
+        _isSearch = true;
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<PlayerBloc>();
     final scheme = context.scheme;
 
-    if (isQueue) return _builder(context);
+    if (_isQueue) return _builder(context);
 
     return Dismissible(
       key: ValueKey(track.id ?? ''),
@@ -122,11 +128,13 @@ class TrackTile extends StatelessWidget {
                       );
                     },
                   ),
+                  const SizedBox(height: Dimens.sizeMini),
                   SubtitleWidget(
                     style: TextStyle(
-                        color: scheme.textColorLight,
-                        fontSize: Dimens.fontDefault),
-                    type: track.type?.capitalize ?? '',
+                      color: scheme.textColorLight,
+                      fontSize: Dimens.fontDefault - 1,
+                    ),
+                    type: _isSearch ? track.type?.capitalize ?? '' : null,
                     subtitle: track.artists?.asString ?? '',
                   ),
                 ],
@@ -136,7 +144,6 @@ class TrackTile extends StatelessWidget {
               onPressed: () {
                 showModalBottomSheet(
                   context: context,
-                  showDragHandle: true,
                   useRootNavigator: true,
                   builder: (_) => TrackBottomSheet(track, liked: liked),
                 );

@@ -34,7 +34,7 @@ class MusicGroupTile extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(
-            horizontal: Dimens.sizeDefault, vertical: Dimens.sizeSmall),
+            horizontal: Dimens.sizeDefault, vertical: Dimens.sizeSmall - 2),
         child: Row(
           children: [
             Builder(builder: (context) {
@@ -58,10 +58,12 @@ class MusicGroupTile extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                        color: scheme.textColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: Dimens.fontXXXLarge),
+                      color: scheme.textColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: Dimens.fontXXXLarge,
+                    ),
                   ),
+                  const SizedBox(height: Dimens.sizeExtraSmall),
                   SubtitleWidget(
                     style: TextStyle(
                         color: scheme.textColorLight,

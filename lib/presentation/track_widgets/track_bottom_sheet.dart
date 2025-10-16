@@ -19,83 +19,85 @@ class TrackBottomSheet extends StatelessWidget {
     final bloc = context.read<PlayerBloc>();
     final scheme = context.scheme;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          children: [
-            const SizedBox(width: Dimens.sizeDefault),
-            Builder(builder: (context) {
-              final double _height = 50;
-              final _scalar = MediaQuery.textScalerOf(context);
-              final height = _scalar.scale(_height);
-              final width = _scalar.scale(_height + Dimens.sizeMedSmall);
-              return MyCachedImage(track.album?.image,
-                  borderRadius: Dimens.sizeMini, height: height, width: width);
-            }),
-            const SizedBox(width: Dimens.sizeDefault),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    track.name ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+    return MyBottomSheet(
+      customTitle: Row(
+        children: [
+          const SizedBox(width: Dimens.sizeDefault),
+          Builder(builder: (context) {
+            final double _height = 50;
+            final _scalar = MediaQuery.textScalerOf(context);
+            final height = _scalar.scale(_height);
+            final width = _scalar.scale(_height + Dimens.sizeMedSmall);
+            return MyCachedImage(track.album?.image,
+                borderRadius: Dimens.sizeMini, height: height, width: width);
+          }),
+          const SizedBox(width: Dimens.sizeDefault),
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  track.name ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: scheme.textColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: Dimens.fontXXXLarge),
+                ),
+                const SizedBox(height: Dimens.sizeExtraSmall),
+                Text(track.artists?.asString ?? '',
                     style: TextStyle(
-                        color: scheme.textColor,
-                        fontWeight: FontWeight.w600,
-                        fontSize: Dimens.fontXXXLarge),
-                  ),
-                  const SizedBox(height: Dimens.sizeExtraSmall),
-                  Text(track.artists?.asString ?? '',
-                      style: TextStyle(
-                        color: scheme.textColorLight,
-                        fontSize: Dimens.fontXXXLarge - 1,
-                      ))
-                ],
-              ),
+                      color: scheme.textColorLight,
+                      fontSize: Dimens.fontXXXLarge - 1,
+                    ))
+              ],
             ),
-            const SizedBox(width: Dimens.sizeDefault),
-          ],
-        ),
-        const SizedBox(height: Dimens.sizeSmall),
-        const MyDivider(),
-        BottomSheetListTile(
-          onTap: () => _onTrackLiked(context),
-          leading: LikedSongsCover(
-              size: Dimens.iconXLarge, iconSize: Dimens.iconSmall),
-          title: liked ?? false ? StringRes.removeLiked : StringRes.addtoLiked,
-        ),
-        BottomSheetListTile(
-            onTap: () => _addToPlaylist(context),
-            title: StringRes.addtoPlaylist,
-            icon: Icons.add_circle_outline),
-        BottomSheetListTile(
-          onTap: () {
-            bloc.add(PlayerQueueAdded(track));
-            Navigator.pop(context);
-          },
-          title: StringRes.addtoQueue,
-          icon: Icons.queue_music_outlined,
-        ),
-        BottomSheetListTile(
-            onTap: () => _toAlbum(context),
-            enable: track.album?.id != null,
-            title: StringRes.gotoAlbum,
-            icon: Icons.album_outlined),
-        BottomSheetListTile(
-          onTap: () {
-            bloc.onTrackShare(track.id!);
-            Navigator.pop(context);
-          },
-          enable: false,
-          title: StringRes.share,
-          icon: Icons.share_sharp,
-        ),
-        SizedBox(height: context.height * .05)
-      ],
+          ),
+          const SizedBox(width: Dimens.sizeDefault),
+        ],
+      ),
+      titleBottomSpacing: Dimens.sizeSmall,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          BottomSheetListTile(
+            onTap: () => _onTrackLiked(context),
+            leading: LikedSongsCover(
+                size: Dimens.iconXLarge, iconSize: Dimens.iconSmall),
+            title:
+                liked ?? false ? StringRes.removeLiked : StringRes.addtoLiked,
+          ),
+          BottomSheetListTile(
+              onTap: () => _addToPlaylist(context),
+              title: StringRes.addtoPlaylist,
+              icon: Icons.add_circle_outline),
+          BottomSheetListTile(
+            onTap: () {
+              bloc.add(PlayerQueueAdded(track));
+              Navigator.pop(context);
+            },
+            title: StringRes.addtoQueue,
+            icon: Icons.queue_music_outlined,
+          ),
+          BottomSheetListTile(
+              onTap: () => _toAlbum(context),
+              enable: track.album?.id != null,
+              title: StringRes.gotoAlbum,
+              icon: Icons.album_outlined),
+          BottomSheetListTile(
+            onTap: () {
+              bloc.onTrackShare(track.id!);
+              Navigator.pop(context);
+            },
+            enable: false,
+            title: StringRes.share,
+            icon: Icons.share_sharp,
+          ),
+          SizedBox(height: context.height * .05)
+        ],
+      ),
     );
   }
 
@@ -122,9 +124,8 @@ class TrackBottomSheet extends StatelessWidget {
     Navigator.pop(context);
     showModalBottomSheet(
       context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
       useSafeArea: true,
+      isScrollControlled: true,
       useRootNavigator: true,
       builder: (_) {
         return BlocProvider(

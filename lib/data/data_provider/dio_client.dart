@@ -13,43 +13,31 @@ class DioClient {
     dio.options.baseUrl = AppConstants.baseUrl;
     dio.interceptors
         .addAll([TokenInterceptor(dio), if (kDebugMode) LoggingInterceptor()]);
-  }
-  @protected
-  final box = BoxServices.instance;
-
-  @protected
-  Future<Response> _get(String url, {Options? options}) async {
-    final response = await dio.get(url, options: options);
-    return response;
+    dio.options.headers = {
+      'Authorization': 'Bearer ${BoxServices.instance.read(BoxKeys.token)}'
+    };
   }
 
-  @protected
-  Future<Response> _post(String url, {data, Options? options}) async {
-    final response = await dio.post(url, data: data, options: options);
-    return response;
+  Future<Response> _get(String url, {Options? options}) {
+    return dio.get(url, options: options);
   }
 
-  @protected
-  Future<Response> _put(String url, {data, Options? options}) async {
-    final response = await dio.put(url, data: data, options: options);
-    return response;
+  Future<Response> _post(String url, {data, Options? options}) {
+    return dio.post(url, data: data, options: options);
   }
 
-  @protected
-  Future<Response> _delete(String url, {data, Options? options}) async {
-    final response = await dio.delete(url, data: data, options: options);
-    return response;
+  Future<Response> _put(String url, {data, Options? options}) {
+    return dio.put(url, data: data, options: options);
+  }
+
+  Future<Response> _delete(String url, {data, Options? options}) {
+    return dio.delete(url, data: data, options: options);
   }
 
   Future<ApiResponse> get(String url, {Options? options}) async {
-    final token = box.read(BoxKeys.token);
-    final Map<String, dynamic> headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer $token'
-    };
+    final _options = Options(contentType: 'application/x-www-form-urlencoded');
     try {
-      final response =
-          await _get(url, options: options ?? Options(headers: headers));
+      final response = await _get(url, options: options ?? _options);
       return ApiResponse.withSuccess(response);
     } catch (error) {
       return ApiResponse.withError(error);
@@ -58,14 +46,10 @@ class DioClient {
 
   Future<ApiResponse> post(String url,
       {required data, Options? options}) async {
-    final token = box.read(BoxKeys.token);
-    final Map<String, dynamic> headers = {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Authorization': 'Bearer $token'
-    };
+    final _options = Options(contentType: 'application/x-www-form-urlencoded');
     try {
-      final response = await _post(url,
-          data: data, options: options ?? Options(headers: headers));
+      final response =
+          await _post(url, data: data, options: options ?? _options);
       return ApiResponse.withSuccess(response);
     } catch (error) {
       return ApiResponse.withError(error);
@@ -73,14 +57,10 @@ class DioClient {
   }
 
   Future<ApiResponse> put(String url, {dynamic data, Options? options}) async {
-    final token = box.read(BoxKeys.token);
-    final Map<String, dynamic> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
+    final _options = Options(contentType: 'application/json');
     try {
-      final response = await _put(url,
-          data: data, options: options ?? Options(headers: headers));
+      final response =
+          await _put(url, data: data, options: options ?? _options);
       return ApiResponse.withSuccess(response);
     } catch (error) {
       return ApiResponse.withError(error);
@@ -89,14 +69,10 @@ class DioClient {
 
   Future<ApiResponse> delete(String url,
       {dynamic data, Options? options}) async {
-    final token = box.read(BoxKeys.token);
-    final Map<String, dynamic> headers = {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
+    final _options = Options(contentType: 'application/json');
     try {
-      final response = await _delete(url,
-          data: data, options: options ?? Options(headers: headers));
+      final response =
+          await _delete(url, data: data, options: options ?? _options);
       return ApiResponse.withSuccess(response);
     } catch (error) {
       return ApiResponse.withError(error);
@@ -133,13 +109,13 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
             final response = await dio.fetch(err.requestOptions);
             handler.resolve(response);
           } catch (e) {
-            logPrint(e, 'token');
+            logPrint(e, 're-token');
           } finally {
             completer.complete(true);
           }
         },
         onError: (e) {
-          logPrint(e, 'token');
+          logPrint(e, 're-token');
           completer.completeError(e);
           handler.reject(err);
         },
