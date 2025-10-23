@@ -63,19 +63,21 @@ sealed class Utils {
     _repo.getDetailsFromQuery(track).then((details) {
       _details.complete(details);
     });
-    final palete = await PaletteGenerator.fromImageProvider(
-        NetworkImage(track.album?.image ?? ''),
-        size: const Size.square(200));
-
+    PaletteGenerator? palete;
+    try {
+      palete = await PaletteGenerator.fromImageProvider(
+          NetworkImage(track.album?.image ?? ''),
+          size: const Size.square(200));
+    } catch (_) {}
     final details = await _details.future;
-    final defColor = palete.dominantColor?.color;
+    final defColor = palete?.dominantColor?.color;
 
     return TrackDetails(
       id: track.id,
       albumId: track.album?.id,
       title: track.name,
-      bgColor: palete.vibrantColor?.color ?? defColor,
-      darkBgColor: palete.darkVibrantColor?.color ?? defColor,
+      bgColor: palete?.vibrantColor?.color ?? defColor,
+      darkBgColor: palete?.darkVibrantColor?.color ?? defColor,
       image: track.album?.image,
       subtitle: track.artists?.asString,
       duration: details?.duration,

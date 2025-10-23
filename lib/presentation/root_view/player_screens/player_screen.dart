@@ -28,7 +28,7 @@ class PlayerScreen extends StatelessWidget {
                 iconSize: Dimens.iconDefault,
                 icon: Transform.rotate(
                   angle: 3 * pi / 2,
-                  child: const Icon(Icons.arrow_back_ios),
+                  child: const Icon(Icons.arrow_back_ios_new),
                 )),
             actions: [
               IconButton(
@@ -287,6 +287,7 @@ class PlayerScreen extends StatelessWidget {
                   ],
                 )),
           ),
+          SliverSizedBox(width: context.height * 1),
         ],
       ),
     );

@@ -10,12 +10,14 @@ class DioClient {
   final Dio dio;
 
   DioClient({required this.dio}) {
-    dio.options.baseUrl = AppConstants.baseUrl;
+    String? token = BoxServices.instance.read(BoxKeys.token);
+    final options = BaseOptions(
+      baseUrl: AppConstants.baseUrl,
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    dio.options = options;
     dio.interceptors
         .addAll([TokenInterceptor(dio), if (kDebugMode) LoggingInterceptor()]);
-    dio.options.headers = {
-      'Authorization': 'Bearer ${BoxServices.instance.read(BoxKeys.token)}'
-    };
   }
 
   Future<Response> _get(String url, {Options? options}) {
