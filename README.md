@@ -1,9 +1,9 @@
 # <img src="https://github.com/samanjhutty/ampify/blob/main/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" width="30" height="30"> Ampify
 
-![Version](https://img.shields.io/github/v/release/samanjhutty/ampify)
+![Version](https://img.shields.io/github/v/release/samandeep-flutter/ampify)
 ![License](https://img.shields.io/github/license/samanjhutty/ampify)
-![repo size](https://img.shields.io/github/repo-size/samanjhutty/ampify)
-![Release Date](https://img.shields.io/github/release-date/samanjhutty/ampify)
+![repo size](https://img.shields.io/github/repo-size/samandeep-flutter/ampify)
+![Release Date](https://img.shields.io/github/release-date/samandeep-flutter/ampify)
 
 Ampify enhances your Spotify experience by providing smarter playlist management, music discovery, and personalized features—all designed to amplify your listening journey.
 
@@ -92,3 +92,4 @@ If you encounter any issues, feel free to reach out to my [email](mailto:samande
 ## License
 
 This project is licensed under the [GNU GPL v3.0 License](https://github.com/samandeep-flutter/Ampify/blob/main/LICENCE).
+
