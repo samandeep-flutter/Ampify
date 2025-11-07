@@ -10,15 +10,16 @@ class DioClient {
   final Dio dio;
 
   DioClient({required this.dio}) {
-    String? token = BoxServices.instance.read(BoxKeys.token);
-    final options = BaseOptions(
+    dio.options = BaseOptions(
       baseUrl: AppConstants.baseUrl,
-      headers: {'Authorization': 'Bearer $token'},
+      headers: {'Authorization': 'Bearer ${box.token}'},
     );
-    dio.options = options;
     dio.interceptors
         .addAll([TokenInterceptor(dio), if (kDebugMode) LoggingInterceptor()]);
   }
+
+  @protected
+  final box = BoxServices.instance;
 
   Future<Response> _get(String url, {Options? options}) {
     return dio.get(url, options: options);
@@ -87,6 +88,13 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
   TokenInterceptor(this.dio);
 
   @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final token = BoxServices.instance.token;
+    final _options = options..headers['Authorization'] = 'Bearer $token';
+    handler.next(_options);
+  }
+
+  @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     getIt<AuthServices>().setConnection(true);
     handler.next(response);
@@ -105,7 +113,7 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
         onSuccess: (json) async {
           try {
             dprint('refresh: ${json['access_token']}');
-            box.write(BoxKeys.token, json['access_token']);
+            await box.write(BoxKeys.token, json['access_token']);
             err.requestOptions.headers.update(
                 'Authorization', (_) => 'Bearer ${json['access_token']}');
             final response = await dio.fetch(err.requestOptions);

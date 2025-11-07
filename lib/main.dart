@@ -29,7 +29,8 @@ void main() async {
 Future<void> _initServices() async {
   dprint('initServices started...');
   try {
-    await Firebase.initializeApp(options: DefaultFBOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
     final fbCrash = FirebaseCrashlytics.instance;
     FlutterError.onError = fbCrash.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {

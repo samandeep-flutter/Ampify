@@ -21,6 +21,8 @@ class BoxServices {
 
   String? get uid => box.read<String>(BoxKeys.uid);
 
+  String? get token => box.read<String>(BoxKeys.token);
+
   Future<void> saveTheme(MyTheme theme) async {
     await box.write(BoxKeys.theme, theme.title);
   }

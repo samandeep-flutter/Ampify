@@ -34,7 +34,8 @@ class MyNotifications {
 @pragma('vm:entry-point')
 Future<dynamic> myBackgroundMessageHandler(RemoteMessage message) async {
   try {
-    await Firebase.initializeApp(options: DefaultFBOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
   } catch (e) {
     logPrint(e, 'notification');
   }

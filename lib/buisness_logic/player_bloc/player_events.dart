@@ -28,6 +28,14 @@ class PlayerMediaStream extends PlayerEvent {
   List<Object?> get props => [mediaItem, super.props];
 }
 
+class PlayerQueueStream extends PlayerEvent {
+  final List<MediaItem> queue;
+  const PlayerQueueStream(this.queue);
+
+  @override
+  List<Object?> get props => [queue, super.props];
+}
+
 class PlayerNextTrack extends PlayerEvent {}
 
 class PlayerPreviousTrack extends PlayerEvent {}
@@ -65,7 +73,7 @@ class PlayerQueueCleared extends PlayerEvent {}
 
 class PlayerUpNextCleared extends PlayerEvent {}
 
-class PlayerTrackEnded extends PlayerEvent {}
+// class PlayerTrackEnded extends PlayerEvent {}
 
 class PlayerPrepareNextTrack extends PlayerEvent {}
 

@@ -147,20 +147,20 @@ class PlayerCompact extends StatelessWidget {
                       child: SizedBox.shrink(),
                     );
                   }),
-                  BlocListener<PlayerSliderBloc, PlayerSliderState>(
-                    listenWhen: (pr, cr) {
-                      final ended = cr.current == state.track.duration;
-                      final notSame = pr.current != cr.current;
-                      return ended && notSame && !cr.current.isZero;
-                    },
-                    listener: (context, slider) {
-                      if (state.playerState.isLoading) return;
-                      if (slider.current == state.track.duration) {
-                        bloc.add(PlayerTrackEnded());
-                      }
-                    },
-                    child: const SizedBox.shrink(),
-                  ),
+                  // BlocListener<PlayerSliderBloc, PlayerSliderState>(
+                  //   listenWhen: (pr, cr) {
+                  //     final ended = cr.current == state.track.duration;
+                  //     final notSame = pr.current != cr.current;
+                  //     return ended && notSame && !cr.current.isZero;
+                  //   },
+                  //   listener: (context, slider) {
+                  //     if (state.playerState.isLoading) return;
+                  //     if (slider.current == state.track.duration) {
+                  //       bloc.add(PlayerTrackEnded());
+                  //     }
+                  //   },
+                  //   child: const SizedBox.shrink(),
+                  // ),
                   const SizedBox(height: Dimens.sizeExtraSmall),
                   SizedBox(
                     height: Dimens.sizeExtraSmall - 1,

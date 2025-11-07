@@ -56,7 +56,6 @@ sealed class PlayerActions {
   static const String clearQueue = 'clear-queue';
   static const String removeRange = 'remove-range';
   static const String removeUpcomming = 'remove-upcomming';
-  static const String addToQueue = 'add-to-queue';
 }
 
 void logPrint(Object? value, [String? name]) {

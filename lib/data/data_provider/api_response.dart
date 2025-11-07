@@ -14,7 +14,7 @@ class ApiResponse {
   static Future<void> verify(
     ApiResponse apiResponse, {
     required SuccessCallback onSuccess,
-    required SuccessCallback onError,
+    required ErrorCallback onError,
   }) async {
     final response = apiResponse.response;
     if (response != null) {

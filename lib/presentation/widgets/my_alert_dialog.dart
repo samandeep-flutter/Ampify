@@ -40,6 +40,7 @@ class MyBottomSheet extends StatefulWidget {
   final String? title;
   final Widget? customTitle;
   final double? titleBottomSpacing;
+  final bool isExpanded;
   final VoidCallback? onClose;
   final Widget child;
 
@@ -49,6 +50,7 @@ class MyBottomSheet extends StatefulWidget {
     this.onClose,
     this.customTitle,
     this.titleBottomSpacing,
+    this.isExpanded = false,
     required this.child,
   }) : assert(title != null || customTitle != null);
 
@@ -118,7 +120,7 @@ class _MyBottomSheetState extends State<MyBottomSheet>
               SizedBox(height: widget.titleBottomSpacing ?? 0),
               const MyDivider(),
               const SizedBox(height: Dimens.sizeDefault),
-              widget.child,
+              widget.isExpanded ? Expanded(child: widget.child) : widget.child
             ],
           );
         });

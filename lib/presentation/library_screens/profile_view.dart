@@ -148,7 +148,17 @@ class _ProfileViewState extends State<ProfileView> {
             child: Column(
               children: [
                 ...ThemeMode.values.map((e) {
-                  return RadioGroup(
+                  return RadioListTile(
+                    value: e,
+                    title: Row(
+                      children: [
+                        Icon(e.icon, size: Dimens.iconDefault),
+                        const SizedBox(width: Dimens.sizeLarge),
+                        Text(e.name.capitalize,
+                            style: TextStyle(fontSize: Dimens.fontXXXLarge)),
+                      ],
+                    ),
+                    controlAffinity: ListTileControlAffinity.trailing,
                     groupValue: BoxServices.instance.themeMode,
                     onChanged: (theme) async {
                       context.scheme.switchThemeMode(theme);
@@ -156,18 +166,6 @@ class _ProfileViewState extends State<ProfileView> {
                       // ignore: use_build_context_synchronously
                       if (mounted) Navigator.pop(context);
                     },
-                    child: RadioListTile(
-                      value: e,
-                      title: Row(
-                        children: [
-                          Icon(e.icon, size: Dimens.iconDefault),
-                          const SizedBox(width: Dimens.sizeLarge),
-                          Text(e.name.capitalize,
-                              style: TextStyle(fontSize: Dimens.fontXXXLarge)),
-                        ],
-                      ),
-                      controlAffinity: ListTileControlAffinity.trailing,
-                    ),
                   );
                 }),
                 SafeArea(child: SizedBox(height: Dimens.sizeDefault)),
