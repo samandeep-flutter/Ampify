@@ -89,9 +89,15 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final token = BoxServices.instance.token;
-    final _options = options..headers['Authorization'] = 'Bearer $token';
-    handler.next(_options);
+    try {
+      final key = options.headers['Authorization'] as String?;
+      if (!(key?.startsWith('Bearer') ?? false)) throw Exception();
+      final token = BoxServices.instance.token;
+      final _options = options..headers['Authorization'] = 'Bearer $token';
+      handler.next(_options);
+    } catch (_) {
+      handler.next(options);
+    }
   }
 
   @override
@@ -105,9 +111,7 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
     try {
       final box = BoxServices.instance;
       final completer = Completer<bool>();
-
-      final status = err.response?.data['error']['status'];
-      if (status != 401) throw err;
+      if (err.response?.statusCode != 401) throw err;
 
       getIt<AuthRepo>().refreshToken(
         onSuccess: (json) async {
@@ -135,6 +139,9 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
       if (e.error is SocketException) {
         getIt<AuthServices>().setConnection(false);
       }
+      logPrint(e, 'DIO');
+      handler.reject(err);
+    } catch (e) {
       logPrint(e, 'DIO');
       handler.reject(err);
     }

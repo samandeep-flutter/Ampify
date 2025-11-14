@@ -86,7 +86,8 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     on<SongRemoved>(_onRemoved);
     on<LoadMoreSongs>(_onLoadMore);
     on<LikedSongsTitleFade>(_titleFade);
-    on<LoadMoreTrigger>(_onLoadTrigger, transformer: Utils.debounce(Durations.short4));
+    on<LoadMoreTrigger>(_onLoadTrigger,
+        transformer: Utils.debounce(Durations.short4));
   }
 
   final LibraryRepo _repo = getIt();
@@ -96,8 +97,8 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
 
   void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
-    player.add(MusicGroupPlayed(
-        id: UniqueIds.likedSongs, tracks: state.tracks, liked: true));
+    player
+        .add(MusicGroupPlayed(id: UniqueIds.likedSongs, tracks: state.tracks));
   }
 
   void _titleFadeListener() {

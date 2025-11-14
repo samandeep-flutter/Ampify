@@ -171,6 +171,10 @@ extension MyAudioProcessingState on ProcessingState {
   }
 }
 
+extension MyProcesingsState on AudioProcessingState {
+  bool get isIdle => this == AudioProcessingState.idle;
+}
+
 extension MusicDuration on Duration? {
   bool get isZero => (this?.inSeconds ?? 0) == 0;
   String format() => _format(this);

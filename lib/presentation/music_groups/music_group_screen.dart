@@ -1,3 +1,4 @@
+import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
@@ -51,19 +52,21 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                 expandedHeight: context.height * .35,
                 pinned: true,
                 centerTitle: false,
-                title: BlocBuilder<MusicGroupBloc, MusicGroupState>(
-                  buildWhen: (pr, cr) => pr.titileOpacity != cr.titileOpacity,
-                  builder: (context, state) {
-                    return AnimatedOpacity(
-                      opacity: state.titileOpacity,
-                      duration: Durations.long2,
-                      child: Text(state.title ?? ''),
-                    );
+                title: PopScope(
+                  onPopInvokedWithResult: (didPop, _) {
+                    if (!bloc.libRefresh) return;
+                    context.read<LibraryBloc>().add(LibraryRefresh());
                   },
-                ),
-                leading: IconButton(
-                  onPressed: () => context.pop(bloc.libRefresh),
-                  icon: const Icon(Icons.arrow_back_outlined),
+                  child: BlocBuilder<MusicGroupBloc, MusicGroupState>(
+                    buildWhen: (pr, cr) => pr.titileOpacity != cr.titileOpacity,
+                    builder: (context, state) {
+                      return AnimatedOpacity(
+                        opacity: state.titileOpacity,
+                        duration: Durations.long2,
+                        child: Text(state.title ?? ''),
+                      );
+                    },
+                  ),
                 ),
                 backgroundColor: Color.alphaBlend(fgColor, scheme.background),
                 titleTextStyle: Utils.defTitleStyle(context),

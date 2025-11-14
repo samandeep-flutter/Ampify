@@ -1,4 +1,4 @@
-import 'package:ampify/data/utils/app_constants.dart';
+import 'package:ampify/data/utils/exports.dart';
 import '../data_provider/api_response.dart';
 import '../data_provider/dio_client.dart';
 
@@ -67,5 +67,10 @@ class LibraryRepo {
   Future<bool> removefromLikedSongs(String id) async {
     final response = await dio.delete(AppConstants.savetoLiked(id));
     return response.response?.statusCode == 200;
+  }
+
+  Future<List<bool>> isLiked(List<String> ids) async {
+    final response = await dio.get(AppConstants.checkSaved(ids.asString));
+    return List<bool>.from(response.response?.data ?? []);
   }
 }

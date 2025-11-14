@@ -136,12 +136,11 @@ class PlayerScreen extends StatelessWidget {
                     BlocBuilder<PlayerBloc, PlayerState>(
                       buildWhen: (pr, cr) => pr.track != cr.track,
                       builder: (context, state) {
-                        final loading = state.playerState.isLoading;
                         return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                             builder: (context, slider) {
                           double current = 0;
                           Duration length = Durations.extralong4;
-                          if (!loading && !state.track.duration.isZero) {
+                          if (!state.track.duration.isZero) {
                             current = slider.current.inSeconds.toDouble();
                             length =
                                 state.track.duration ?? Durations.extralong4;
@@ -159,7 +158,7 @@ class PlayerScreen extends StatelessWidget {
                                   height: Dimens.sizeMedium,
                                   child: Slider(
                                     value: current,
-                                    divisions: length.inSeconds,
+                                    // divisions: length.inSeconds,
                                     activeColor: scheme.textColor,
                                     inactiveColor: scheme.textColorLight,
                                     min: Dimens.zero,
@@ -247,25 +246,22 @@ class PlayerScreen extends StatelessWidget {
                             color: scheme.textColor,
                             icon: const Icon(Icons.skip_next_rounded),
                           ),
-                          DisabledWidget(
-                            child: BlocBuilder<PlayerBloc, PlayerState>(
-                                buildWhen: (pr, cr) =>
-                                    pr.loopMode != cr.loopMode,
-                                builder: (context, state) {
-                                  return IconButton(
-                                      onPressed: bloc.onRepeat,
-                                      isSelected: !state.loopMode.isOff,
-                                      style: IconButton.styleFrom(
-                                          backgroundColor: !state.loopMode.isOff
-                                              ? scheme.primary
-                                              : null),
-                                      iconSize: Dimens.iconDefault,
-                                      selectedIcon: Icon(state.loopMode.icon,
-                                          color: scheme.onPrimary),
-                                      icon: Icon(state.loopMode.icon,
-                                          color: scheme.textColor));
-                                }),
-                          ),
+                          BlocBuilder<PlayerBloc, PlayerState>(
+                              buildWhen: (pr, cr) => pr.loopMode != cr.loopMode,
+                              builder: (context, state) {
+                                return IconButton(
+                                    onPressed: bloc.onRepeat,
+                                    isSelected: !state.loopMode.isOff,
+                                    style: IconButton.styleFrom(
+                                        backgroundColor: !state.loopMode.isOff
+                                            ? scheme.primary
+                                            : null),
+                                    iconSize: Dimens.iconDefault,
+                                    selectedIcon: Icon(state.loopMode.icon,
+                                        color: scheme.onPrimary),
+                                    icon: Icon(state.loopMode.icon,
+                                        color: scheme.textColor));
+                              }),
                         ],
                       ),
                     ),
@@ -307,6 +303,7 @@ class PlayerScreen extends StatelessWidget {
       context: context,
       useSafeArea: true,
       isScrollControlled: true,
+      useRootNavigator: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadiusGeometry.vertical(
             top: Radius.circular(Dimens.borderLarge)),

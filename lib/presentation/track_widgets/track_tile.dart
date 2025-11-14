@@ -12,16 +12,20 @@ class TrackTile extends StatelessWidget {
   final Track track;
   final bool? liked;
   final bool? showImage;
+  final Widget? trailing;
   final bool _isQueue;
   final bool _isSearch;
   const TrackTile(this.track, {this.liked, this.showImage, super.key})
-      : _isQueue = false,
+      : trailing = null,
+        _isQueue = false,
         _isSearch = false;
-  const TrackTile.queue(this.track, {this.liked, this.showImage, super.key})
+  const TrackTile.queue(this.track,
+      {this.liked, this.showImage, this.trailing, super.key})
       : _isQueue = true,
         _isSearch = false;
   const TrackTile.search(this.track, {this.liked, this.showImage, super.key})
-      : _isQueue = true,
+      : trailing = null,
+        _isQueue = true,
         _isSearch = true;
 
   @override
@@ -64,7 +68,8 @@ class TrackTile extends StatelessWidget {
         sliderBloc.add(PlayerSliderReset());
       },
       child: Padding(
-        padding: Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
+        padding: Utils.insetsOnly(Dimens.sizeSmall,
+            left: Dimens.sizeDefault, right: Dimens.zero),
         child: Row(
           children: [
             if (showImage ?? true) ...[
@@ -93,39 +98,82 @@ class TrackTile extends StatelessWidget {
                       return (playing || _track) && isRelevant;
                     },
                     builder: (context, state) {
-                      return RichText(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          children: [
-                            // if (state.track.id == track.id) ...[
-                            //   WidgetSpan(
-                            //       child: SizedBox.square(
-                            //     dimension: Dimens.iconMedSmall,
-                            //     child: Image.asset(
-                            //         state.playerState.isPlaying
-                            //             ? ImageRes.musicWave
-                            //             : ImageRes.musicWavePaused,
-                            //         fit: BoxFit.cover,
-                            //         color: scheme.primary),
-                            //   )),
-                            //   const WidgetSpan(
-                            //       child:
-                            //           SizedBox(width: Dimens.sizeExtraSmall)),
-                            // ],
-                            TextSpan(
-                              text: track.name ?? '',
-                              style: TextStyle(
-                                color: state.track.id == track.id
-                                    ? scheme.primary
-                                    : scheme.textColor,
-                                fontWeight: FontWeight.w500,
-                                fontSize: Dimens.fontXXXLarge,
-                              ),
-                            ),
-                          ],
-                        ),
+                      final isActive = state.track.id == track.id;
+
+                      return Row(
+                        children: [
+                          AnimatedContainer(
+                            duration: Durations.short4,
+                            width: isActive ? Dimens.iconMedSmall : 0,
+                            child: Image.asset(
+                                state.playerState.isPlaying
+                                    ? ImageRes.musicWave
+                                    : ImageRes.musicWavePaused,
+                                fit: BoxFit.cover,
+                                color: scheme.primary),
+                          ),
+                          const SizedBox(width: Dimens.sizeExtraSmall),
+                          Expanded(
+                            child: TweenAnimationBuilder(
+                                tween: ColorTween(
+                                    end: isActive
+                                        ? scheme.primary
+                                        : scheme.textColor),
+                                duration: Durations.medium1,
+                                builder: (context, color, _) {
+                                  return Text(
+                                    track.name ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: color,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: Dimens.fontXXXLarge,
+                                    ),
+                                  );
+                                }),
+                          )
+                        ],
                       );
+                      // return RichText(
+                      //   maxLines: 1,
+                      //   overflow: TextOverflow.ellipsis,
+                      //   text: TextSpan(
+                      //     children: [
+                      //       WidgetSpan(
+                      //           child: AnimatedContainer(
+                      //         duration: Durations.short4,
+                      //         width: isActive ? Dimens.iconMedSmall : 0,
+                      //         child: Image.asset(
+                      //             state.playerState.isPlaying
+                      //                 ? ImageRes.musicWave
+                      //                 : ImageRes.musicWavePaused,
+                      //             fit: BoxFit.cover,
+                      //             color: scheme.primary),
+                      //       )),
+                      //       const WidgetSpan(
+                      //           child: SizedBox(width: Dimens.sizeExtraSmall)),
+                      //       WidgetSpan(
+                      //           child: TweenAnimationBuilder(
+                      //               tween: ColorTween(
+                      //                   end: isActive
+                      //                       ? scheme.primary
+                      //                       : scheme.textColor),
+                      //               duration: Durations.medium1,
+                      //               builder: (context, color, _) {
+                      //                 return Text(
+                      //                   track.name ?? '',
+                      //                   maxLines: 1,
+                      //                   style: TextStyle(
+                      //                     color: color,
+                      //                     fontWeight: FontWeight.w500,
+                      //                     fontSize: Dimens.fontXXXLarge,
+                      //                   ),
+                      //                 );
+                      //               })),
+                      //     ],
+                      //   ),
+                      // );
                     },
                   ),
                   const SizedBox(height: Dimens.sizeMini),
@@ -149,7 +197,7 @@ class TrackTile extends StatelessWidget {
                 );
               },
               iconSize: Dimens.iconDefault,
-              icon: const Icon(Icons.more_vert_outlined),
+              icon: trailing ?? Icon(Icons.more_vert_outlined),
             ),
           ],
         ),

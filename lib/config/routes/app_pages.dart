@@ -65,6 +65,7 @@ abstract class AppPage {
         },
       ),
       ShellRoute(
+          navigatorKey: _auth.shellNavigator,
           builder: (_, state, navigator) => RootView(navigator),
           routes: [
             GoRoute(
@@ -84,6 +85,7 @@ abstract class AppPage {
             GoRoute(
                 name: AppRoutes.musicGroup,
                 path: AppRoutePaths.musicGroup,
+                parentNavigatorKey: _auth.shellNavigator,
                 builder: (context, state) {
                   try {
                     String id = state.pathParameters['id']!;

@@ -57,6 +57,23 @@ class PlayerState extends Equatable {
     );
   }
 
+  PlayerState withTrack(TrackDetails track) {
+    return copyWith(
+        musicGroupId: '', track: track, playerState: MusicState.loading);
+  }
+
+  PlayerState withMusicGroup(String id,
+      {required List<Track> tracks, bool? isLiked}) {
+    return copyWith(
+      musicGroupId: id,
+      isLiked: isLiked,
+      playerState: MusicState.loading,
+      track: tracks.first.asTrackDetails,
+      upNext: tracks.skip(1).toList(),
+      queue: [],
+    );
+  }
+
   bool get isEmptyOrFinished =>
       queue.isEmpty && upNext.isEmpty && loopMode == MusicLoopMode.off;
 

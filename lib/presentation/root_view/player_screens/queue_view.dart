@@ -73,72 +73,40 @@ class QueueView extends StatelessWidget {
                 return CustomScrollView(
                   physics: const BouncingScrollPhysics(),
                   slivers: [
-                    if (state.queue.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: Row(
-                          children: [
-                            const SizedBox(width: Dimens.sizeDefault),
-                            Text(
-                              StringRes.nextQueue,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimens.fontXXXLarge),
-                            ),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: bloc.clearQueue,
-                              style: TextButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                                foregroundColor: scheme.textColorLight,
-                              ),
-                              child: const Text(StringRes.clearQueue),
-                            ),
-                            const SizedBox(width: Dimens.sizeDefault),
-                          ],
-                        ),
+                    if (state.queue.isNotEmpty) ...[
+                      TitleRow(
+                        title: StringRes.nextQueue,
+                        onClear: bloc.clearQueue,
+                        actionText: StringRes.clearQueue,
                       ),
-                    SliverReorderableList(
-                      itemCount: state.queue.length,
-                      itemBuilder: (context, index) {
-                        final item = state.queue[index];
-                        return TrackDetailsTile(
-                          item,
-                          key: ValueKey(item.id),
-                          trailing: Icon(Icons.menu_outlined,
-                              size: Dimens.iconMedSmall),
-                        );
-                      },
-                      onReorder: bloc.onQueueReorder,
-                    ),
-                    const SliverSizedBox(height: Dimens.sizeSmall),
-                    if (state.upNext.isNotEmpty)
-                      SliverToBoxAdapter(
-                        child: Row(
-                          children: [
-                            const SizedBox(width: Dimens.sizeDefault),
-                            Text(
-                              StringRes.upNext,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: Dimens.fontXXXLarge),
-                            ),
-                            const Spacer(),
-                            TextButton(
-                              onPressed: bloc.clearUpnext,
-                              style: TextButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                                foregroundColor: scheme.textColorLight,
-                              ),
-                              child: const Text(StringRes.clear),
-                            ),
-                            const SizedBox(width: Dimens.sizeDefault),
-                          ],
-                        ),
+                      SliverReorderableList(
+                        itemCount: state.queue.length,
+                        itemBuilder: (context, index) {
+                          return TrackDetailsTile(
+                            state.queue[index],
+                            key: ValueKey(state.queue[index].id),
+                            trailing: Icon(Icons.menu_outlined),
+                          );
+                        },
+                        onReorder: bloc.onQueueReorder,
                       ),
-                    SliverList.builder(
-                      itemCount: state.upNext.length,
-                      itemBuilder: (_, i) => TrackTile.queue(state.upNext[i]),
-                    ),
+                      const SliverSizedBox(height: Dimens.sizeSmall),
+                    ],
+                    if (state.upNext.isNotEmpty) ...[
+                      TitleRow(
+                          title: StringRes.upNext, onClear: bloc.clearUpnext),
+                      SliverReorderableList(
+                        itemCount: state.upNext.length,
+                        itemBuilder: (_, i) {
+                          return TrackTile.queue(
+                            state.upNext[i],
+                            key: ValueKey(state.upNext[i].id),
+                            trailing: Icon(Icons.menu_outlined),
+                          );
+                        },
+                        onReorder: bloc.onUpNextReorder,
+                      )
+                    ],
                     SliverSizedBox(height: context.height * .05)
                   ],
                 );
@@ -247,6 +215,40 @@ class _BottomPlayerState extends State<BottomPlayer> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class TitleRow extends StatelessWidget {
+  final String title;
+  final VoidCallback? onClear;
+  final String? actionText;
+  const TitleRow(
+      {super.key, required this.title, this.onClear, this.actionText});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Row(
+        children: [
+          const SizedBox(width: Dimens.sizeDefault),
+          Text(
+            title,
+            style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: Dimens.fontXXXLarge),
+          ),
+          const Spacer(),
+          TextButton(
+            onPressed: onClear,
+            style: TextButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+              foregroundColor: context.scheme.textColorLight,
+            ),
+            child: Text(actionText ?? StringRes.clear),
+          ),
+          const SizedBox(width: Dimens.sizeDefault),
+        ],
       ),
     );
   }

@@ -199,6 +199,7 @@ class PlayerCompact extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useRootNavigator: true,
       builder: (_) => const PlayerScreen(),
     );
   }

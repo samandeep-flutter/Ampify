@@ -41,7 +41,7 @@ class CreatePlaylistView extends StatelessWidget {
               listener: (context, state) {
                 if (state.success) {
                   context.read<LibraryBloc>().add(LibraryRefresh());
-                  context.pop();
+                  GoRouter.of(context).pop();
                 }
               },
               child: SizedBox(height: context.height * .1),
@@ -58,7 +58,7 @@ class CreatePlaylistView extends StatelessWidget {
                         backgroundColor: scheme.background,
                         shape: Utils.continuousBorder(Dimens.borderLarge,
                             border: scheme.primaryAdaptive)),
-                    onPressed: context.pop,
+                    onPressed: () => GoRouter.of(context).pop(),
                     child: Text(
                       StringRes.cancel,
                       style: TextStyle(

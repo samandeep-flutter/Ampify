@@ -1,3 +1,4 @@
+import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/presentation/widgets/custom_scroll_physics.dart';
 import 'package:flutter/material.dart';
@@ -53,19 +54,21 @@ class _LikedSongsState extends State<LikedSongs> {
                 expandedHeight: context.height * .05,
                 pinned: true,
                 centerTitle: false,
-                title: BlocBuilder<LikedSongsBloc, LikedSongsState>(
-                    buildWhen: (pr, cr) => pr.titileOpacity != cr.titileOpacity,
-                    builder: (context, state) {
-                      return AnimatedOpacity(
-                        opacity: state.titileOpacity,
-                        duration: Durations.long2,
-                        child: const Text(StringRes.likedSongs),
-                      );
-                    }),
-                leading: IconButton(
-                  onPressed: () => context.pop(bloc.libRefresh),
-                  iconSize: Dimens.iconDefault,
-                  icon: const Icon(Icons.arrow_back_outlined),
+                title: PopScope(
+                  onPopInvokedWithResult: (didPop, _) {
+                    if (!bloc.libRefresh) return;
+                    context.read<LibraryBloc>().add(LibraryRefresh());
+                  },
+                  child: BlocBuilder<LikedSongsBloc, LikedSongsState>(
+                      buildWhen: (pr, cr) =>
+                          pr.titileOpacity != cr.titileOpacity,
+                      builder: (context, state) {
+                        return AnimatedOpacity(
+                          opacity: state.titileOpacity,
+                          duration: Durations.long2,
+                          child: const Text(StringRes.likedSongs),
+                        );
+                      }),
                 ),
                 backgroundColor: Color.alphaBlend(fgColor, scheme.background),
                 titleTextStyle: Utils.defTitleStyle(context),

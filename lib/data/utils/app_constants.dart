@@ -13,6 +13,7 @@ sealed class AppConstants {
   static const String myPlaylists = 'me/playlists';
   static const String myAlbums = 'me/albums';
   static const String recentlyPlayed = 'me/player/recently-played';
+  static String checkSaved(String ids) => 'me/tracks/contains?ids=$ids';
   static String browse(String local) => 'browse/categories?locale=$local';
   static String severalTracks(String ids) => 'tracks?ids=$ids';
   static String severalAlbums(String ids) => 'albums?ids=$ids';
