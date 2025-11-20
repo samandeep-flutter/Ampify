@@ -138,13 +138,7 @@ class PlayerScreen extends StatelessWidget {
                       builder: (context, state) {
                         return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                             builder: (context, slider) {
-                          double current = 0;
-                          Duration length = Durations.extralong4;
-                          if (!state.track.duration.isZero) {
-                            current = slider.current.inSeconds.toDouble();
-                            length =
-                                state.track.duration ?? Durations.extralong4;
-                          }
+                          final length = state.track.duration?.inSeconds;
 
                           return SliderTheme(
                             data: const SliderThemeData(
@@ -157,12 +151,11 @@ class PlayerScreen extends StatelessWidget {
                                 SizedBox(
                                   height: Dimens.sizeMedium,
                                   child: Slider(
-                                    value: current,
-                                    // divisions: length.inSeconds,
+                                    value: slider.current.inSeconds.toDouble(),
                                     activeColor: scheme.textColor,
                                     inactiveColor: scheme.textColorLight,
                                     min: Dimens.zero,
-                                    max: length.inSeconds.toDouble(),
+                                    max: length?.toDouble() ?? 1,
                                     onChanged: bloc.onSliderChange,
                                   ),
                                 ),

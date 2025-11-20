@@ -16,17 +16,17 @@ class MyNotifications {
 
       final initialMessage = await messaging.getInitialMessage();
       if (initialMessage != null) {
-        logPrint('init ${initialMessage.notification!.body}', 'notification');
+        debugLog('init ${initialMessage.notification!.body}', 'notification');
       }
     } catch (e) {
       logPrint(e, 'fb init');
     }
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      logPrint('dataMap ${message.toMap()}', 'notification');
+      debugLog('dataMap ${message.toMap()}', 'notification');
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      logPrint('onAppOpen ${message.toMap()}', 'notification');
+      debugLog('onAppOpen ${message.toMap()}', 'notification');
     });
   }
 }

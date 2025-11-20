@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PlayerSliderEvents extends Equatable {
@@ -24,20 +23,22 @@ class PlayerSliderReset extends PlayerSliderEvents {}
 
 class PlayerSliderState extends Equatable {
   final Duration current;
-  const PlayerSliderState(this.current);
+  final Duration animate;
+  const PlayerSliderState({required this.current, required this.animate});
 
-  const PlayerSliderState.init() : current = Duration.zero;
+  const PlayerSliderState.init()
+      : current = Duration.zero,
+        animate = Duration.zero;
 
-  PlayerSliderState copyWith([Duration? current]) {
-    return PlayerSliderState(current ?? this.current);
-  }
-
-  Duration get animate {
-    return current.isZero ? Duration.zero : Durations.extralong4;
+  PlayerSliderState copyWith({Duration? current, Duration? animate}) {
+    return PlayerSliderState(
+      current: current ?? this.current,
+      animate: animate ?? this.animate,
+    );
   }
 
   @override
-  List<Object?> get props => [current];
+  List<Object?> get props => [current, animate];
 }
 
 class PlayerSliderBloc extends Bloc<PlayerSliderEvents, PlayerSliderState> {
@@ -59,12 +60,19 @@ class PlayerSliderBloc extends Bloc<PlayerSliderEvents, PlayerSliderState> {
   void _onSliderChange(
       PlayerSliderChange event, Emitter<PlayerSliderState> emit) {
     if (event.current == state.current) return;
-    emit(state.copyWith(event.current));
+    final animate = _difference(event.current, state.current);
+    emit(state.copyWith(current: event.current, animate: animate));
   }
 
   void _onSliderReset(
       PlayerSliderReset event, Emitter<PlayerSliderState> emit) {
     emit(const PlayerSliderState.init());
+  }
+
+  Duration _difference(Duration d1, Duration d2) {
+    final diff = (d1.inSeconds - d2.inSeconds).abs();
+    dprint('difference $diff');
+    return diff > 1 ? Duration.zero : Duration(seconds: 1);
   }
 
   @override

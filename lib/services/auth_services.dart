@@ -45,7 +45,7 @@ class AuthServices {
   }
 
   void _dynamicLinks(Uri uri) {
-    logPrint(uri, 'app_links');
+    debugLog(uri, 'app_links');
     switch (uri.authority) {
       case 'spotify-login':
         if (Platform.isIOS) return;

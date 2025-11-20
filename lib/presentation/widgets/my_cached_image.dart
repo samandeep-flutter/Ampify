@@ -107,7 +107,7 @@ class _MyCachedImageState extends State<MyCachedImage> {
           return _builder(widget.isAvatar, widget.loading);
         },
         errorWidget: (_, url, error) {
-          logPrint(error, 'CachedImage');
+          logPrint(error, 'cached-image');
           return _builder(widget.isAvatar, widget.loading);
         });
   }

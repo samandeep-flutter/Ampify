@@ -185,7 +185,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       await _audioHandler.customAction(PlayerActions.removeUpcomming);
       add(PlayerPrepareNextTrack());
     } catch (e) {
-      logPrint(e, 'Queue next');
+      logPrint(e, 'queue next');
     }
   }
 
@@ -201,7 +201,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       await _audioHandler.customAction(PlayerActions.removeUpcomming);
       add(PlayerPrepareNextTrack());
     } catch (e) {
-      logPrint(e, 'Queue next');
+      logPrint(e, 'upnext next');
     }
   }
 
@@ -222,7 +222,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       if (state.track.id != event.id) return;
       emit(state.copyWith(isLiked: !(event.liked ?? false)));
     } catch (e) {
-      logPrint(e, 'Liked');
+      logPrint(e, 'liked');
     }
   }
 
@@ -258,7 +258,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     } on FormatException {
       add(PlayerTrackChanged(event.track));
     } catch (e) {
-      logPrint(e, 'Queue instaneous');
+      logPrint(e, 'queue instaneous');
     }
   }
 
@@ -279,7 +279,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       await _audioHandler.stop();
       emit(PlayerState.init());
     } catch (e) {
-      logPrint(e, 'Track ended');
+      logPrint(e, 'track ended');
     }
   }
 
@@ -329,7 +329,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   Future<void> _onMusicGroup(
       MusicGroupPlayed event, Emitter<PlayerState> emit) async {
-    // await _audioHandler.customAction(PlayerActions.clearQueue);
+    _audioHandler.pause();
+    // TODO: implement clear before playing
+    await _audioHandler.customAction(PlayerActions.removeUpcomming);
     try {
       emit(state.withMusicGroup(event.id!, tracks: event.tracks));
       final track = await Utils.getTrackDetails(event.tracks.first);
@@ -367,7 +369,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onTrackChange(
       PlayerTrackChanged event, Emitter<PlayerState> emit) async {
     _audioHandler.pause();
-    // await _audioHandler.customAction(PlayerActions.removeUpcomming);
+    // TODO: implement clear before playing, also modify playMediaItem.
     emit(state.withTrack(event.track.asTrackDetails));
     final track = await Utils.getTrackDetails(event.track);
     emit(state.copyWith(track: track, isLiked: event.liked));
@@ -382,7 +384,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       showToast(StringRes.cannotbePlayed);
       emit(state.copyWith(playerState: MusicState.hidden));
     } catch (e) {
-      logPrint(e, 'Track Change');
+      logPrint(e, 'track change');
       showToast(StringRes.somethingWrong);
       emit(state.copyWith(playerState: MusicState.pause));
     }

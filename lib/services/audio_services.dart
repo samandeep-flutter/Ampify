@@ -77,8 +77,6 @@ class MyAudioHandler extends BaseAudioHandler {
   Future<void> playMediaItem(MediaItem mediaItem) async {
     try {
       await _player.setAudioSource(mediaItem.toAudioSource);
-      queue.drain();
-      this.mediaItem.drain();
       this.mediaItem.add(mediaItem);
       queue.add([mediaItem]);
       play();
@@ -128,8 +126,7 @@ class MyAudioHandler extends BaseAudioHandler {
 
   Future<void> _clearQueue() async {
     await _player.clearAudioSources();
-    queue.drain();
-    mediaItem.drain();
+    queue.add([]);
   }
 
   Future<void> _removeRange(int? start, int? end) async {
@@ -245,16 +242,18 @@ class MyAudioHandler extends BaseAudioHandler {
   Future<void> stop() async {
     final session = getIt<AuthServices>().session;
     session?.setActive(false);
-    queue.drain();
-    mediaItem.drain();
+    queue.add([]);
     await _player.stop();
     playbackState.add(playbackState.value.copyWith(
       processingState: AudioProcessingState.idle,
     ));
+    customState.add(false);
   }
 
   @override
   Future<void> onTaskRemoved() async {
+    queue.close();
+    mediaItem.close();
     await stop();
     return super.onTaskRemoved();
   }

@@ -114,7 +114,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           state.details!.description!.unescape,
                           style: TextStyle(
                             color: scheme.textColorLight,
-                            fontSize: Dimens.fontDefault,
+                            fontSize: Dimens.fontDefault - 1,
                           ),
                         ),
                       ],

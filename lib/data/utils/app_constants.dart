@@ -1,5 +1,6 @@
 import 'dart:developer' as dev;
 import 'package:ampify/data/utils/exports.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -59,11 +60,15 @@ sealed class PlayerActions {
   static const String removeUpcomming = 'remove-upcomming';
 }
 
-void logPrint(Object? value, [String? name]) {
+void _debugLog(Object? value, [String? name, bool? isError]) {
   if (kReleaseMode) return;
   final log = value is String? ? value : value.toString();
   dev.log(log ?? 'null', name: name ?? StringRes.appName);
+  if (isError ?? false) FirebaseCrashlytics.instance.log('[$name] $log');
 }
+
+void debugLog(Object? value, [String? name]) => _debugLog(value, name);
+void logPrint(Object? value, [String? name]) => _debugLog(value, name, true);
 
 void dprint(Object? value) {
   if (kDebugMode) print(value ?? 'null');

@@ -71,7 +71,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         getReleases.complete(true);
       },
       onError: (error) {
-        logPrint(error, 'new releases');
+        logPrint(error, 'releases');
         emit(state.copyWith(albumLoading: false));
         getReleases.complete(false);
       },
@@ -89,7 +89,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         getRecentlyPlayed.complete(true);
       },
       onError: (error) {
-        logPrint(error, 'new releases');
+        logPrint(error, 'recents');
         emit(state.copyWith(recentLoading: false));
         getRecentlyPlayed.complete(false);
       },

@@ -49,6 +49,8 @@ Future<void> _initServices() async {
       statusBarIconBrightness: Brightness.dark,
       systemNavigationBarIconBrightness: Brightness.light,
     ));
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     final _box = BoxServices.instance;
     if (_box.read(BoxKeys.token) == null) return;
     await getIt<AuthServices>().getProfile();

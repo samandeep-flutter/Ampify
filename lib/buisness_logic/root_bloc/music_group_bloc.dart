@@ -178,7 +178,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
   // @override
   // void add(MusicGroupEvent event) {
-  //   logPrint(event, 'Event');
+  //   debugLog(event, 'event');
   //   super.add(event);
   // }
 
@@ -198,7 +198,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     } on FormatException catch (e) {
       showToast(e.message);
     } catch (e) {
-      logPrint(e, 'Image Picker');
+      logPrint(e, 'image-picker');
     }
     return false;
   }
@@ -315,7 +315,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     } on FormatException {
       emit(state.copyWith(isFav: event.liked));
     } catch (e) {
-      logPrint(e, 'Fav');
+      logPrint(e, 'fav');
     }
   }
 
