@@ -71,7 +71,6 @@ class PlayerSliderBloc extends Bloc<PlayerSliderEvents, PlayerSliderState> {
 
   Duration _difference(Duration d1, Duration d2) {
     final diff = (d1.inSeconds - d2.inSeconds).abs();
-    dprint('difference $diff');
     return diff > 1 ? Duration.zero : Duration(seconds: 1);
   }
 

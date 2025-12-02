@@ -1,15 +1,15 @@
 library;
 
-// nessassry imports
+// configs
+export 'package:ampify/config/getit_instance.dart';
+export 'package:ampify/config/theme_services.dart';
+export 'package:ampify/config/responsive_font.dart';
 
 // services
 export 'package:ampify/services/box_services.dart';
 export 'package:ampify/services/extension_services.dart';
-export 'package:ampify/services/getit_instance.dart';
-export 'package:ampify/services/theme_services.dart';
 export 'package:ampify/services/auth_services.dart';
 export 'package:ampify/services/notification_services.dart';
-export 'package:ampify/services/responsive_font.dart';
 
 // utils
 export '../../data/utils/dimens.dart';

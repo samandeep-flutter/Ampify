@@ -22,7 +22,7 @@ class HomeScreen extends StatelessWidget {
           physics: const BottomBounceScrollPhysics(),
           slivers: [
             SliverAppBar(
-              backgroundColor: context.background,
+              backgroundColor: context.scheme.background,
               title: const Text(StringRes.appName),
               centerTitle: false,
               titleTextStyle: Utils.defTitleStyle(context),

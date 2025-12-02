@@ -1,6 +1,5 @@
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:ampify/services/theme_services.dart';
 import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/data_models/library_model.dart';
 import 'package:audio_service/audio_service.dart';
@@ -10,7 +9,6 @@ import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
 extension MyContext on BuildContext {
-  Color get background => ThemeServices.of(this).background;
   double get height => MediaQuery.sizeOf(this).height;
   double get width => MediaQuery.sizeOf(this).width;
   Orientation get orientation => MediaQuery.orientationOf(this);
@@ -18,6 +16,7 @@ extension MyContext on BuildContext {
   bool get isDarkMode =>
       MediaQuery.platformBrightnessOf(this) == Brightness.dark;
 
+  /// closes the below routes this many times.
   void close(int count) {
     int popped = 0;
     Navigator.of(this).popUntil((route) => popped++ >= count);
