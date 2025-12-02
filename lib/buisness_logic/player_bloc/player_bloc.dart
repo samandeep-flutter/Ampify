@@ -120,8 +120,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   void _onMediaStream(
       PlayerMediaStream event, Emitter<PlayerState> emit) async {
     try {
-      final json = event.mediaItem.extras;
-      final track = TrackDetails.fromJson(json!);
+      final item = event.mediaItem;
+      if (item.id == UniqueIds.emptyTrack) return;
+      final track = TrackDetails.fromJson(item.extras!);
       emit(state.copyWith(track: track, isLiked: false));
       try {
         final isLiked = await _libRepo.isLiked([track.id!]);
@@ -330,8 +331,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onMusicGroup(
       MusicGroupPlayed event, Emitter<PlayerState> emit) async {
     _audioHandler.pause();
-    // TODO: implement clear before playing
-    await _audioHandler.customAction(PlayerActions.removeUpcomming);
+    await _audioHandler.customAction(PlayerActions.clearQueue);
     try {
       emit(state.withMusicGroup(event.id!, tracks: event.tracks));
       final track = await Utils.getTrackDetails(event.tracks.first);

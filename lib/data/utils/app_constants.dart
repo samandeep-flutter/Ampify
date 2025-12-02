@@ -52,6 +52,7 @@ sealed class EnvKeys {
 
 sealed class UniqueIds {
   static const String likedSongs = '00-liked-songs';
+  static const String emptyTrack = '00-empty-track';
 }
 
 sealed class PlayerActions {

@@ -34,7 +34,7 @@ Future<void> initGetIt() async {
       () => MusicRepo(ytMusic: getIt(), ytExplode: getIt(), dio: getIt()));
 
   // async singletons
-  getIt.registerSingletonAsync<AuthServices>(AuthServices.to.init);
+  getIt.registerSingletonAsync<AuthServices>(AuthServices.instance.init);
   await getIt.isReady<AuthServices>();
   getIt.registerSingletonAsync<AudioHandler>(audioServicesInit);
   await getIt.isReady<AudioHandler>();

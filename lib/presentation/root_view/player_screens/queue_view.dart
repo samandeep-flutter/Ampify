@@ -165,10 +165,24 @@ class _BottomPlayerState extends State<BottomPlayer> {
                             builder: (context, slider) {
                           final factor =
                               slider.current.widthFactor(state.track.duration);
-                          return AnimatedContainer(
-                              duration: slider.animate,
-                              width: factor * constraints.maxWidth,
-                              color: scheme.primary);
+                          return Stack(
+                            children: [
+                              AnimatedContainer(
+                                  duration: slider.animate,
+                                  width: factor * constraints.maxWidth,
+                                  color: scheme.primary),
+                              BlocBuilder<PlayerBloc, PlayerState>(
+                                  buildWhen: (pr, cr) {
+                                return pr.playerState != cr.playerState;
+                              }, builder: (context, state) {
+                                if (!state.playerState.isLoading) {
+                                  return SizedBox.shrink();
+                                }
+                                return LinearProgressIndicator(
+                                    color: scheme.textColorLight);
+                              }),
+                            ],
+                          );
                         }),
                       ),
                     );
@@ -189,11 +203,9 @@ class _BottomPlayerState extends State<BottomPlayer> {
                 BlocBuilder<PlayerBloc, PlayerState>(buildWhen: (pr, cr) {
                   return pr.playerState != cr.playerState;
                 }, builder: (context, state) {
-                  return LoadingIcon(
+                  return IconButton(
                     onPressed: bloc.onPlayPause,
                     iconSize: Dimens.iconXLarge,
-                    loaderSize: Dimens.iconXLarge,
-                    loading: state.playerState.isLoading,
                     isSelected: state.playerState.isPlaying,
                     selectedIcon: const Icon(Icons.pause),
                     style: IconButton.styleFrom(

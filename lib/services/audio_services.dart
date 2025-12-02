@@ -76,7 +76,7 @@ class MyAudioHandler extends BaseAudioHandler {
   @override
   Future<void> playMediaItem(MediaItem mediaItem) async {
     try {
-      await _player.setAudioSource(mediaItem.toAudioSource);
+      _player.setAudioSource(mediaItem.toAudioSource);
       this.mediaItem.add(mediaItem);
       queue.add([mediaItem]);
       play();
@@ -202,6 +202,7 @@ class MyAudioHandler extends BaseAudioHandler {
       try {
         /// current track ended
         if (duration >= queue.value[_index].duration!.ceil()) {
+          dprint('${queue.value[_index].title} ended, ${duration.format()}');
           if (_index >= queue.value.length - 1) customState.add(false);
         }
       } catch (e) {
@@ -244,6 +245,7 @@ class MyAudioHandler extends BaseAudioHandler {
     session?.setActive(false);
     queue.add([]);
     await _player.stop();
+    mediaItem.add(MediaItem(id: UniqueIds.emptyTrack, title: ''));
     playbackState.add(playbackState.value.copyWith(
       processingState: AudioProcessingState.idle,
     ));

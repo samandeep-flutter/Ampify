@@ -39,7 +39,9 @@ extension ArtistNames on List<Artist> {
 
 extension MyMusicState on MusicState? {
   bool get isHidden => this == MusicState.hidden;
-  bool get isPlaying => this == MusicState.playing;
+  bool get isPlaying =>
+      this == MusicState.playing || this == MusicState.loading;
+  bool get isPaused => this == MusicState.pause || this == MusicState.loading;
   bool get isLoading => this == MusicState.loading;
 }
 

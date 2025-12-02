@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 
 class AuthServices {
   AuthServices._init();
-  static AuthServices? _to;
-  static AuthServices get to => _to ??= AuthServices._init();
+  static AuthServices? _instance;
+  static AuthServices get instance => _instance ??= AuthServices._init();
 
   final AppLinks _appLinks = getIt();
   final Connectivity _connectivity = getIt();
@@ -33,7 +33,7 @@ class AuthServices {
 
   Future<AuthServices> init() async {
     _appLinks.uriLinkStream.listen(_dynamicLinks);
-    _connectivity.onConnectivityChanged.listen(_connectivityListener);
+    _connectivity.onConnectivityChanged.listen(checkConnectivity);
     try {
       session = await AudioSession.instance;
       session!.configure(const AudioSessionConfiguration.music());
@@ -56,7 +56,7 @@ class AuthServices {
     }
   }
 
-  void _connectivityListener(List<ConnectivityResult> results) async {
+  void checkConnectivity([List<ConnectivityResult>? _]) async {
     final _result = await _authRepo.checkConnection();
     setConnection(_result);
   }

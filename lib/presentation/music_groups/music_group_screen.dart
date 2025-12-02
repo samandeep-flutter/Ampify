@@ -307,10 +307,9 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             return pr.playerState != cr.playerState;
                           }, builder: (context, pl) {
                             final group = pl.musicGroupId == state.id;
-                            return LoadingIcon(
+                            return IconButton(
                               onPressed: () => bloc.onPlay(context),
                               iconSize: Dimens.iconXLarge,
-                              loaderSize: Dimens.iconXLarge,
                               isSelected: group && pl.playerState.isPlaying,
                               selectedIcon: const Icon(Icons.pause),
                               style: IconButton.styleFrom(

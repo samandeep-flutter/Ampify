@@ -25,7 +25,7 @@ class TrackTile extends StatelessWidget {
         _isSearch = false;
   const TrackTile.search(this.track, {this.liked, this.showImage, super.key})
       : trailing = null,
-        _isQueue = true,
+        _isQueue = false,
         _isSearch = true;
 
   @override
@@ -34,7 +34,6 @@ class TrackTile extends StatelessWidget {
     final scheme = context.scheme;
 
     if (_isQueue) return _builder(context);
-
     return Dismissible(
       key: ValueKey(track.id ?? ''),
       direction: DismissDirection.startToEnd,
@@ -106,9 +105,9 @@ class TrackTile extends StatelessWidget {
                             duration: Durations.short4,
                             width: isActive ? Dimens.iconMedSmall : 0,
                             child: Image.asset(
-                                state.playerState.isPlaying
-                                    ? ImageRes.musicWave
-                                    : ImageRes.musicWavePaused,
+                                state.playerState.isPaused
+                                    ? ImageRes.musicWavePaused
+                                    : ImageRes.musicWave,
                                 fit: BoxFit.cover,
                                 color: scheme.primary),
                           ),
@@ -271,9 +270,9 @@ class TrackDetailsTile extends StatelessWidget {
                                 return pr.playerState != cr.playerState;
                               }, builder: (_, state) {
                                 return Image.asset(
-                                    state.playerState.isPlaying
-                                        ? ImageRes.musicWave
-                                        : ImageRes.musicWavePaused,
+                                    state.playerState.isPaused
+                                        ? ImageRes.musicWavePaused
+                                        : ImageRes.musicWave,
                                     fit: BoxFit.cover,
                                     color: scheme.primary);
                               }),

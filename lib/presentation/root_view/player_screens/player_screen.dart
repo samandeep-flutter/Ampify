@@ -150,13 +150,36 @@ class PlayerScreen extends StatelessWidget {
                               children: [
                                 SizedBox(
                                   height: Dimens.sizeMedium,
-                                  child: Slider(
-                                    value: slider.current.inSeconds.toDouble(),
-                                    activeColor: scheme.textColor,
-                                    inactiveColor: scheme.textColorLight,
-                                    min: Dimens.zero,
-                                    max: length?.toDouble() ?? 1,
-                                    onChanged: bloc.onSliderChange,
+                                  child: Stack(
+                                    children: [
+                                      Slider(
+                                        value:
+                                            slider.current.inSeconds.toDouble(),
+                                        activeColor: scheme.textColor,
+                                        inactiveColor: scheme.textColorLight,
+                                        min: Dimens.zero,
+                                        max: length?.toDouble() ?? 1,
+                                        onChanged: bloc.onSliderChange,
+                                      ),
+                                      BlocBuilder<PlayerBloc, PlayerState>(
+                                          buildWhen: (pr, cr) {
+                                        return pr.playerState != cr.playerState;
+                                      }, builder: (context, state) {
+                                        if (!state.playerState.isLoading) {
+                                          return SizedBox.shrink();
+                                        }
+                                        return Container(
+                                          margin: Utils.insetsHoriz(
+                                              Dimens.sizeLarge),
+                                          padding: EdgeInsets.only(
+                                              left: Dimens.sizeExtraSmall + 1),
+                                          alignment: Alignment.center,
+                                          child: LinearProgressIndicator(
+                                              minHeight: Dimens.sizeMini,
+                                              color: scheme.onPrimary),
+                                        );
+                                      }),
+                                    ],
                                   ),
                                 ),
                                 DefaultTextStyle.merge(
@@ -219,11 +242,9 @@ class PlayerScreen extends StatelessWidget {
                               buildWhen: (pr, cr) {
                             return pr.playerState != cr.playerState;
                           }, builder: (context, state) {
-                            return LoadingIcon(
+                            return IconButton(
                               onPressed: bloc.onPlayPause,
                               iconSize: Dimens.iconExtraLarge,
-                              loaderSize: Dimens.iconExtraLarge,
-                              loading: state.playerState.isLoading,
                               isSelected: state.playerState.isPlaying,
                               selectedIcon: const Icon(Icons.pause),
                               style: IconButton.styleFrom(

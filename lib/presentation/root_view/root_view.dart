@@ -60,17 +60,17 @@ class _RootViewState extends State<RootView> {
                       gradient: LinearGradient(
                         stops: [.2, .6, .8, 1],
                         colors: [
-                          scheme.surface,
-                          scheme.surface.withAlpha(200),
-                          scheme.surface.withAlpha(80),
-                          scheme.surface.withAlpha(0),
+                          scheme.background,
+                          scheme.background.withAlpha(200),
+                          scheme.background.withAlpha(80),
+                          scheme.background.withAlpha(0),
                         ],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black26,
+                          color: scheme.background.withAlpha(66),
                           spreadRadius: Dimens.sizeDefault,
                           blurRadius: Dimens.sizeMidLarge,
                         )
@@ -92,7 +92,7 @@ class _RootViewState extends State<RootView> {
                                     elevation: Dimens.sizeExtraLarge,
                                     selectedFontSize: Dimens.fontDefault,
                                     unselectedFontSize: Dimens.fontMed,
-                                    unselectedItemColor: scheme.disabled,
+                                    unselectedItemColor: scheme.textColorLight,
                                     selectedItemColor: scheme.textColor,
                                     onTap: (index) => bloc
                                         .onIndexChange(context, index: index),

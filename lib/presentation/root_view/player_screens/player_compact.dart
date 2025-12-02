@@ -24,8 +24,6 @@ class PlayerCompact extends StatelessWidget {
         final _bg =
             context.isDarkMode ? state.track.darkBgColor : state.track.bgColor;
         final bgColor = _bg?.withAlpha(150) ?? scheme.background;
-        final selected = state.playerState.isPlaying;
-        final loading = state.playerState.isLoading;
 
         return AnimatedContainer(
           duration: Durations.long2,
@@ -115,11 +113,10 @@ class PlayerCompact extends StatelessWidget {
                         ],
                       )),
                       const SizedBox(width: Dimens.sizeSmall),
-                      LoadingIcon(
-                        loading: loading,
+                      IconButton(
                         onPressed: bloc.onPlayPause,
                         iconSize: Dimens.iconXLarge,
-                        isSelected: selected,
+                        isSelected: state.playerState.isPlaying,
                         selectedIcon: const Icon(Icons.pause),
                         style: IconButton.styleFrom(
                             foregroundColor: scheme.textColor,
@@ -177,10 +174,17 @@ class PlayerCompact extends StatelessWidget {
                                   builder: (context, slider) {
                             final factor = slider.current
                                 .widthFactor(state.track.duration);
-                            return AnimatedContainer(
-                                duration: slider.animate,
-                                width: factor * constraints.maxWidth,
-                                color: scheme.textColor);
+                            return Stack(
+                              children: [
+                                AnimatedContainer(
+                                    duration: slider.animate,
+                                    width: factor * constraints.maxWidth,
+                                    color: scheme.textColor),
+                                if (state.playerState.isLoading)
+                                  LinearProgressIndicator(
+                                      color: scheme.textColorLight),
+                              ],
+                            );
                           }),
                         ),
                       );
