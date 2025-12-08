@@ -1,10 +1,7 @@
 import 'dart:async';
-import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:ampify/data/repositories/auth_repo.dart';
 import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 sealed class AuthEvent extends Equatable {
   const AuthEvent();

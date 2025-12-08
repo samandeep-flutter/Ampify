@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
 
 class Shimmer {
   static Widget get avatar => const _Shimmer(borderRadius: 50);

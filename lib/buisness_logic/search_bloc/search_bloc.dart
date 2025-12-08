@@ -1,10 +1,5 @@
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../../data/data_models/search_model.dart';
 import 'package:ampify/data/repositories/search_repo.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SearchEvent extends Equatable {
   const SearchEvent();

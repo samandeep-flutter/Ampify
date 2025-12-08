@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
 
 class BaseWidget extends StatelessWidget {
   final PreferredSizeWidget? appBar;

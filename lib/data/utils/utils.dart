@@ -1,14 +1,9 @@
 import 'dart:async';
-import 'package:ampify/data/data_models/common/other_models.dart';
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:rxdart/rxdart.dart';
-import '../data_models/common/tracks_model.dart';
 
 sealed class Utils {
   @protected

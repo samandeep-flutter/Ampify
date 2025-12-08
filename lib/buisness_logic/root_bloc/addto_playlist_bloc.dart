@@ -1,7 +1,5 @@
 import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddtoPlaylistEvents extends Equatable {
   const AddtoPlaylistEvents();

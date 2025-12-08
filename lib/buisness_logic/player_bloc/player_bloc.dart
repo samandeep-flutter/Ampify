@@ -4,9 +4,6 @@ import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/data_models/common/tracks_model.dart';
 import 'player_events.dart';
 
 class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {

@@ -1,13 +1,9 @@
 import 'package:ampify/buisness_logic/library_bloc/liked_songs_bloc.dart';
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/track_widgets/addto_playlist.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../buisness_logic/player_bloc/player_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import '../../buisness_logic/root_bloc/addto_playlist_bloc.dart';
-import '../../data/data_models/common/tracks_model.dart';
 
 class TrackBottomSheet extends StatelessWidget {
   final Track track;

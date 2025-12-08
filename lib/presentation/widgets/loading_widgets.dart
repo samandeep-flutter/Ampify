@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
 
 class LoadingButton extends StatelessWidget {
   final Widget child;

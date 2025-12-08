@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:ampify/data/data_models/profile_model.dart';
 import 'package:ampify/data/repositories/auth_repo.dart';
 import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:app_links/app_links.dart';
 import 'package:audio_session/audio_session.dart';
-import 'package:flutter/material.dart';
 
 class AuthServices {
   AuthServices._init();

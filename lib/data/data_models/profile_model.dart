@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
 
 class ProfileModel extends Equatable {
   final String? id;

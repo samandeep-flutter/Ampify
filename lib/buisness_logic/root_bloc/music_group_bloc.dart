@@ -3,17 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
-import 'package:ampify/data/data_models/common/album_model.dart';
-import 'package:ampify/data/data_models/common/other_models.dart';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../data/data_models/common/playlist_model.dart';
 
 class MusicGroupEvent extends Equatable {
   const MusicGroupEvent();

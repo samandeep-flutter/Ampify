@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class MyDivider extends StatelessWidget {

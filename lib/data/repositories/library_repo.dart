@@ -1,6 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import '../data_provider/api_response.dart';
-import '../data_provider/dio_client.dart';
 
 class LibraryRepo {
   final DioClient dio;

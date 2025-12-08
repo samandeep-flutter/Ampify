@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PlayerSliderEvents extends Equatable {
   const PlayerSliderEvents();

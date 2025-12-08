@@ -1,7 +1,6 @@
 import 'package:ampify/buisness_logic/auth_bloc/auth_bloc.dart';
 import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
 import 'package:ampify/buisness_logic/root_bloc/music_group_bloc.dart';
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/home_screens/home_screen.dart';
 import 'package:ampify/presentation/home_screens/listn_history.dart';
 import 'package:ampify/presentation/library_screens/library_screen.dart';
@@ -11,7 +10,6 @@ import 'package:ampify/presentation/root_view/not_found_screen.dart';
 import 'package:ampify/presentation/search_screens/search_page.dart';
 import 'package:ampify/presentation/root_view/auth_screen.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/home_bloc/listn_history_bloc.dart';
 import '../../buisness_logic/root_bloc/playlist_bloc.dart';

@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
 
 class NotFoundScreen extends StatefulWidget {
   final GoRouterState state;

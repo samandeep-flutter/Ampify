@@ -4,7 +4,6 @@ import 'package:ampify/data/utils/exports.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../repositories/auth_repo.dart';
-import 'api_response.dart';
 
 class DioClient {
   final Dio dio;

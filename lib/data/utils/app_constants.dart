@@ -2,7 +2,6 @@ import 'dart:developer' as dev;
 import 'package:ampify/data/utils/exports.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 sealed class AppConstants {

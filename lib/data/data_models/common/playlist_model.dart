@@ -1,7 +1,4 @@
-import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
-import 'other_models.dart';
 
 class Playlist extends Equatable {
   final bool? collaborative;

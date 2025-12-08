@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import '../data_provider/dio_client.dart';
 
 class MusicRepo {
   final DioClient dio;

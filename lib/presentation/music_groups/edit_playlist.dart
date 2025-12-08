@@ -1,8 +1,6 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EditPlaylistScreen extends StatefulWidget {
   final String id;

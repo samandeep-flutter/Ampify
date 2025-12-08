@@ -1,12 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../data_provider/api_response.dart';
-import '../data_provider/dio_client.dart';
 
 class AuthRepo {
   final DioClient dio;

@@ -1,11 +1,6 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/data/data_models/common/album_model.dart';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:ampify/presentation/widgets/custom_scroll_physics.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
 import '../../buisness_logic/player_bloc/player_slider_bloc.dart';
 

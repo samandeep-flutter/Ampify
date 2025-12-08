@@ -1,6 +1,4 @@
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import '../../../buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/presentation/root_view/player_screens/player_screen.dart';
