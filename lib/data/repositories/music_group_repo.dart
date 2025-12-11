@@ -126,6 +126,6 @@ class MusicGroupRepo {
     final response = await dio.delete(url, data: body);
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'addto playlist'));
+        onError: onError ?? (e) => logPrint(e, 'removefrom playlist'));
   }
 }

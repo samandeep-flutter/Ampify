@@ -1,6 +1,4 @@
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import '../../../buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/presentation/root_view/player_screens/player_screen.dart';
@@ -24,8 +22,6 @@ class PlayerCompact extends StatelessWidget {
         final _bg =
             context.isDarkMode ? state.track.darkBgColor : state.track.bgColor;
         final bgColor = _bg?.withAlpha(150) ?? scheme.background;
-        final selected = state.playerState.isPlaying;
-        final loading = state.playerState.isLoading;
 
         return AnimatedContainer(
           duration: Durations.long2,
@@ -115,11 +111,10 @@ class PlayerCompact extends StatelessWidget {
                         ],
                       )),
                       const SizedBox(width: Dimens.sizeSmall),
-                      LoadingIcon(
-                        loading: loading,
+                      IconButton(
                         onPressed: bloc.onPlayPause,
                         iconSize: Dimens.iconXLarge,
-                        isSelected: selected,
+                        isSelected: state.playerState.isPlaying,
                         selectedIcon: const Icon(Icons.pause),
                         style: IconButton.styleFrom(
                             foregroundColor: scheme.textColor,
@@ -128,38 +123,6 @@ class PlayerCompact extends StatelessWidget {
                       ),
                       const SizedBox(width: Dimens.sizeSmall),
                     ],
-                  ),
-                  Builder(builder: (context) {
-                    final bloc = context.read<PlayerSliderBloc>();
-                    return BlocListener<PlayerBloc, PlayerState>(
-                      listenWhen: (pr, cr) => pr.track != cr.track,
-                      listener: (context, state) {
-                        bloc.streamSub?.cancel();
-                        bloc.add(PlayerSliderReset());
-                        bloc.streamSub = bloc.durationStream.listen((duration) {
-                          if (duration is! Duration) return;
-                          final _duration = state.track.duration;
-                          if (duration <= (_duration ?? Duration.zero)) {
-                            bloc.add(PlayerSliderChange(duration));
-                          }
-                        });
-                      },
-                      child: SizedBox.shrink(),
-                    );
-                  }),
-                  BlocListener<PlayerSliderBloc, PlayerSliderState>(
-                    listenWhen: (pr, cr) {
-                      final ended = cr.current == state.track.duration;
-                      final notSame = pr.current != cr.current;
-                      return ended && notSame && !cr.current.isZero;
-                    },
-                    listener: (context, slider) {
-                      if (state.playerState.isLoading) return;
-                      if (slider.current == state.track.duration) {
-                        bloc.add(PlayerTrackEnded());
-                      }
-                    },
-                    child: const SizedBox.shrink(),
                   ),
                   const SizedBox(height: Dimens.sizeExtraSmall),
                   SizedBox(
@@ -177,10 +140,17 @@ class PlayerCompact extends StatelessWidget {
                                   builder: (context, slider) {
                             final factor = slider.current
                                 .widthFactor(state.track.duration);
-                            return AnimatedContainer(
-                                duration: slider.animate,
-                                width: factor * constraints.maxWidth,
-                                color: scheme.textColor);
+                            return Stack(
+                              children: [
+                                AnimatedContainer(
+                                    duration: slider.animate,
+                                    width: factor * constraints.maxWidth,
+                                    color: scheme.textColor),
+                                if (state.playerState.isLoading)
+                                  LinearProgressIndicator(
+                                      color: scheme.textColorLight),
+                              ],
+                            );
                           }),
                         ),
                       );
@@ -199,6 +169,7 @@ class PlayerCompact extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useRootNavigator: true,
       builder: (_) => const PlayerScreen(),
     );
   }

@@ -1,12 +1,6 @@
 import 'dart:async';
-import 'package:ampify/data/data_models/common/album_model.dart';
-import 'package:ampify/data/data_models/common/playlist_model.dart';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:ampify/data/data_models/search_model.dart';
 import 'package:ampify/data/repositories/home_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract class HomeEvent extends Equatable {
   const HomeEvent();
@@ -71,7 +65,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         getReleases.complete(true);
       },
       onError: (error) {
-        logPrint(error, 'new releases');
+        logPrint(error, 'releases');
         emit(state.copyWith(albumLoading: false));
         getReleases.complete(false);
       },
@@ -89,7 +83,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         getRecentlyPlayed.complete(true);
       },
       onError: (error) {
-        logPrint(error, 'new releases');
+        logPrint(error, 'recents');
         emit(state.copyWith(recentLoading: false));
         getRecentlyPlayed.complete(false);
       },

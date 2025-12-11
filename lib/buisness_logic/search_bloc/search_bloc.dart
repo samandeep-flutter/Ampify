@@ -1,10 +1,5 @@
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../../data/data_models/search_model.dart';
 import 'package:ampify/data/repositories/search_repo.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SearchEvent extends Equatable {
   const SearchEvent();
@@ -126,7 +121,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
         ...albums ?? [],
         ...playlists ?? [],
       ]);
-      musicGroups.sortLibrary(searchContr.text);
+      musicGroups.sort((a, b) {
+        final fName = a.name?.queryMatch(searchContr.text) ?? 0;
+        final fArtist = a.owner?.name?.queryMatch(searchContr.text) ?? 0;
+        final first = fName.compareTo(fArtist);
+
+        final sName = b.name?.queryMatch(searchContr.text) ?? 0;
+        final sArtist = b.owner?.name?.queryMatch(searchContr.text) ?? 0;
+        final second = sName.compareTo(sArtist);
+
+        return second.compareTo(first);
+      });
       emit(state.copyWith(isLoading: false, results: musicGroups));
     }, onError: (e) {
       logPrint(e, 'search');

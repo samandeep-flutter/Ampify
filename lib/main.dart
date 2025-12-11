@@ -6,9 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get_storage/get_storage.dart';
 import 'buisness_logic/home_bloc/home_bloc.dart';
@@ -29,7 +27,8 @@ void main() async {
 Future<void> _initServices() async {
   dprint('initServices started...');
   try {
-    await Firebase.initializeApp(options: DefaultFBOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
     final fbCrash = FirebaseCrashlytics.instance;
     FlutterError.onError = fbCrash.recordFlutterFatalError;
     PlatformDispatcher.instance.onError = (error, stack) {
@@ -40,6 +39,7 @@ Future<void> _initServices() async {
     await dotenv.load();
     await getIt<YTMusic>().initialize();
     await GetStorage.init(BoxKeys.boxName);
+    LifecycleHandler.instance.init();
     FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -48,6 +48,8 @@ Future<void> _initServices() async {
       statusBarIconBrightness: Brightness.dark,
       systemNavigationBarIconBrightness: Brightness.light,
     ));
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
     final _box = BoxServices.instance;
     if (_box.read(BoxKeys.token) == null) return;
     await getIt<AuthServices>().getProfile();
@@ -138,5 +140,23 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
     );
+  }
+}
+
+class LifecycleHandler extends WidgetsBindingObserver {
+  LifecycleHandler._init();
+  static LifecycleHandler? _instance;
+  static LifecycleHandler get instance =>
+      _instance ??= LifecycleHandler._init();
+
+  final AuthServices auth = getIt();
+
+  void init() => WidgetsBinding.instance.addObserver(this);
+  void dispose() => WidgetsBinding.instance.removeObserver(this);
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) auth.checkConnectivity();
+    super.didChangeAppLifecycleState(state);
   }
 }

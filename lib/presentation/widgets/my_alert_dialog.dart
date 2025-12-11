@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class MyAlertDialog extends StatelessWidget {
@@ -41,6 +40,8 @@ class MyBottomSheet extends StatefulWidget {
   final Widget? customTitle;
   final double? titleBottomSpacing;
   final VoidCallback? onClose;
+  final bool isDragable;
+  final HeightConstraints? constraints;
   final Widget child;
 
   const MyBottomSheet({
@@ -50,7 +51,19 @@ class MyBottomSheet extends StatefulWidget {
     this.customTitle,
     this.titleBottomSpacing,
     required this.child,
-  }) : assert(title != null || customTitle != null);
+  })  : isDragable = false,
+        constraints = null,
+        assert(title != null || customTitle != null);
+  const MyBottomSheet.dragable({
+    super.key,
+    this.title,
+    this.onClose,
+    this.customTitle,
+    this.titleBottomSpacing,
+    this.constraints,
+    required this.child,
+  })  : isDragable = true,
+        assert(title != null || customTitle != null);
 
   @override
   State<MyBottomSheet> createState() => _MyBottomSheetState();
@@ -58,69 +71,163 @@ class MyBottomSheet extends StatefulWidget {
 
 class _MyBottomSheetState extends State<MyBottomSheet>
     with TickerProviderStateMixin {
+  final scrollController = DraggableScrollableController();
+
   @override
   Widget build(BuildContext context) {
-    return BottomSheet(
-        onClosing: () {},
-        animationController: BottomSheet.createAnimationController(this),
-        builder: (_) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: Dimens.sizeMedSmall),
-                    height: Dimens.sizeExtraSmall,
-                    width: Dimens.sizeUltraLarge,
-                    decoration: BoxDecoration(
-                      color: context.scheme.textColorLight,
-                      borderRadius: BorderRadius.circular(Dimens.sizeMini),
-                    ),
+    if (!widget.isDragable) {
+      return BottomSheet(
+          onClosing: () {},
+          shape: RoundedRectangleBorder(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(Dimens.borderDefault),
+              topRight: Radius.circular(Dimens.borderDefault),
+            ),
+          ),
+          animationController: BottomSheet.createAnimationController(this),
+          builder: (_) =>
+              Column(mainAxisSize: MainAxisSize.min, children: _builder()));
+    }
+    return GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: MyColoredBox(
+        color: Colors.transparent,
+        child: DraggableScrollableSheet(
+          maxChildSize: widget.constraints?.maxHeight ?? 0.8,
+          minChildSize: widget.constraints?.minHeight ?? 0.5,
+          initialChildSize: widget.constraints?.defaultHeight ?? 0.6,
+          controller: scrollController,
+          builder: (context, scrollController) {
+            return GestureDetector(
+              onTap: () {},
+              child: Container(
+                decoration: BoxDecoration(
+                  color: context.scheme.surface,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(Dimens.borderDefault),
+                    topRight: Radius.circular(Dimens.borderDefault),
                   ),
-                ],
+                ),
+                child: ListView(
+                  physics: const ClampingScrollPhysics(),
+                  controller: scrollController,
+                  children: _builder(),
+                ),
               ),
-              const SizedBox(height: Dimens.sizeDefault),
-              Builder(builder: (context) {
-                if (widget.customTitle != null) return widget.customTitle!;
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SizedBox(width: 75),
-                    Text(widget.title!,
-                        style: TextStyle(
-                          fontSize: Dimens.fontXXLarge,
-                          fontWeight: FontWeight.w600,
-                        )),
-                    PopScope(
-                      onPopInvokedWithResult: (didPop, _) =>
-                          widget.onClose?.call(),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.only(right: Dimens.sizeDefault),
-                        child: TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: TextButton.styleFrom(
-                              visualDensity: VisualDensity.compact),
-                          child: Text(
-                            StringRes.close.toUpperCase(),
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: Dimens.fontMed),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }),
-              SizedBox(height: widget.titleBottomSpacing ?? 0),
-              const MyDivider(),
-              const SizedBox(height: Dimens.sizeDefault),
-              widget.child,
-            ],
-          );
-        });
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _builder() {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: Dimens.sizeMedSmall),
+            height: Dimens.sizeExtraSmall,
+            width: Dimens.sizeUltraLarge,
+            decoration: BoxDecoration(
+              color: context.scheme.textColorLight,
+              borderRadius: BorderRadius.circular(Dimens.sizeMini),
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: Dimens.sizeDefault),
+      Builder(builder: (context) {
+        if (widget.customTitle != null) return widget.customTitle!;
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(width: 75),
+            Text(widget.title!,
+                style: TextStyle(
+                  fontSize: Dimens.fontXXLarge,
+                  fontWeight: FontWeight.w600,
+                )),
+            PopScope(
+              onPopInvokedWithResult: (didPop, _) => widget.onClose?.call(),
+              child: Padding(
+                padding: const EdgeInsets.only(right: Dimens.sizeDefault),
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                      visualDensity: VisualDensity.compact),
+                  child: Text(
+                    StringRes.close.toUpperCase(),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: Dimens.fontMed),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
+      SizedBox(height: widget.titleBottomSpacing ?? 0),
+      const MyDivider(),
+      widget.child,
+    ];
+  }
+}
+
+class HeightConstraints {
+  final double maxHeight;
+  final double minHeight;
+  final double defaultHeight;
+  HeightConstraints({
+    required this.maxHeight,
+    required this.minHeight,
+    required this.defaultHeight,
+  })  : assert(minHeight >= 0.0),
+        assert(maxHeight <= 1.0),
+        assert(minHeight <= defaultHeight),
+        assert(defaultHeight <= maxHeight);
+}
+
+class MyCustomDragableSheet extends StatelessWidget {
+  final Color? backgroundColor;
+  final HeightConstraints? constraints;
+  final Widget Function(BuildContext, ScrollController) builder;
+  const MyCustomDragableSheet({
+    super.key,
+    this.constraints,
+    this.backgroundColor,
+    required this.builder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: MyColoredBox(
+        color: Colors.transparent,
+        child: DraggableScrollableSheet(
+          maxChildSize: constraints?.maxHeight ?? 0.8,
+          minChildSize: constraints?.minHeight ?? 0.5,
+          initialChildSize: constraints?.defaultHeight ?? 0.6,
+          builder: (context, scrollController) {
+            return GestureDetector(
+              onTap: () {},
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(Dimens.borderDefault),
+                  topRight: Radius.circular(Dimens.borderDefault),
+                ),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                      color: backgroundColor ?? context.scheme.surface),
+                  child: builder(context, scrollController),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 }

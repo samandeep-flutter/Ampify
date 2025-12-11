@@ -1,25 +1,22 @@
 import 'package:ampify/buisness_logic/library_bloc/liked_songs_bloc.dart';
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/track_widgets/addto_playlist.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../buisness_logic/player_bloc/player_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
-import '../../buisness_logic/root_bloc/addto_playlist_bloc.dart';
-import '../../data/data_models/common/tracks_model.dart';
+import '../../buisness_logic/music_group_bloc/addto_playlist_bloc.dart';
 
 class TrackBottomSheet extends StatelessWidget {
   final Track track;
   final bool? liked;
-  const TrackBottomSheet(this.track, {this.liked, super.key});
+  final bool? fromPlayer;
+  const TrackBottomSheet(this.track, {super.key, this.liked, this.fromPlayer});
 
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<PlayerBloc>();
     final scheme = context.scheme;
 
-    return MyBottomSheet(
+    return MyBottomSheet.dragable(
       customTitle: Row(
         children: [
           const SizedBox(width: Dimens.sizeDefault),
@@ -62,6 +59,7 @@ class TrackBottomSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(height: Dimens.sizeSmall),
           BottomSheetListTile(
             onTap: () => _onTrackLiked(context),
             leading: LikedSongsCover(
@@ -95,14 +93,13 @@ class TrackBottomSheet extends StatelessWidget {
             title: StringRes.share,
             icon: Icons.share_sharp,
           ),
-          SizedBox(height: context.height * .05)
         ],
       ),
     );
   }
 
   void _toAlbum(BuildContext context) {
-    context.close(2);
+    context.close(fromPlayer ?? false ? 2 : 1);
     final type = LibItemType.album.name;
     context.pushNamed(AppRoutes.musicGroup,
         pathParameters: {'id': track.album!.id!, 'type': type});

@@ -1,27 +1,28 @@
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/track_widgets/track_bottom_sheet.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../buisness_logic/player_bloc/player_state.dart';
 
 class TrackTile extends StatelessWidget {
   final Track track;
   final bool? liked;
   final bool? showImage;
+  final Widget? trailing;
   final bool _isQueue;
   final bool _isSearch;
   const TrackTile(this.track, {this.liked, this.showImage, super.key})
-      : _isQueue = false,
+      : trailing = null,
+        _isQueue = false,
         _isSearch = false;
-  const TrackTile.queue(this.track, {this.liked, this.showImage, super.key})
+  const TrackTile.queue(this.track,
+      {this.liked, this.showImage, this.trailing, super.key})
       : _isQueue = true,
         _isSearch = false;
   const TrackTile.search(this.track, {this.liked, this.showImage, super.key})
-      : _isQueue = true,
+      : trailing = null,
+        _isQueue = false,
         _isSearch = true;
 
   @override
@@ -30,7 +31,6 @@ class TrackTile extends StatelessWidget {
     final scheme = context.scheme;
 
     if (_isQueue) return _builder(context);
-
     return Dismissible(
       key: ValueKey(track.id ?? ''),
       direction: DismissDirection.startToEnd,
@@ -64,7 +64,8 @@ class TrackTile extends StatelessWidget {
         sliderBloc.add(PlayerSliderReset());
       },
       child: Padding(
-        padding: Utils.insetsOnly(Dimens.sizeSmall, left: Dimens.sizeDefault),
+        padding: Utils.insetsOnly(Dimens.sizeSmall,
+            left: Dimens.sizeDefault, right: Dimens.zero),
         child: Row(
           children: [
             if (showImage ?? true) ...[
@@ -93,39 +94,82 @@ class TrackTile extends StatelessWidget {
                       return (playing || _track) && isRelevant;
                     },
                     builder: (context, state) {
-                      return RichText(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(
-                          children: [
-                            // if (state.track.id == track.id) ...[
-                            //   WidgetSpan(
-                            //       child: SizedBox.square(
-                            //     dimension: Dimens.iconMedSmall,
-                            //     child: Image.asset(
-                            //         state.playerState.isPlaying
-                            //             ? ImageRes.musicWave
-                            //             : ImageRes.musicWavePaused,
-                            //         fit: BoxFit.cover,
-                            //         color: scheme.primary),
-                            //   )),
-                            //   const WidgetSpan(
-                            //       child:
-                            //           SizedBox(width: Dimens.sizeExtraSmall)),
-                            // ],
-                            TextSpan(
-                              text: track.name ?? '',
-                              style: TextStyle(
-                                color: state.track.id == track.id
-                                    ? scheme.primary
-                                    : scheme.textColor,
-                                fontWeight: FontWeight.w500,
-                                fontSize: Dimens.fontXXXLarge,
-                              ),
-                            ),
-                          ],
-                        ),
+                      final isActive = state.track.id == track.id;
+
+                      return Row(
+                        children: [
+                          AnimatedContainer(
+                            duration: Durations.short4,
+                            width: isActive ? Dimens.iconMedSmall : 0,
+                            child: Image.asset(
+                                state.playerState.isPaused
+                                    ? ImageRes.musicWavePaused
+                                    : ImageRes.musicWave,
+                                fit: BoxFit.cover,
+                                color: scheme.primary),
+                          ),
+                          const SizedBox(width: Dimens.sizeExtraSmall),
+                          Expanded(
+                            child: TweenAnimationBuilder(
+                                tween: ColorTween(
+                                    end: isActive
+                                        ? scheme.primary
+                                        : scheme.textColor),
+                                duration: Durations.medium1,
+                                builder: (context, color, _) {
+                                  return Text(
+                                    track.name ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: color,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: Dimens.fontXXXLarge,
+                                    ),
+                                  );
+                                }),
+                          )
+                        ],
                       );
+                      // return RichText(
+                      //   maxLines: 1,
+                      //   overflow: TextOverflow.ellipsis,
+                      //   text: TextSpan(
+                      //     children: [
+                      //       WidgetSpan(
+                      //           child: AnimatedContainer(
+                      //         duration: Durations.short4,
+                      //         width: isActive ? Dimens.iconMedSmall : 0,
+                      //         child: Image.asset(
+                      //             state.playerState.isPlaying
+                      //                 ? ImageRes.musicWave
+                      //                 : ImageRes.musicWavePaused,
+                      //             fit: BoxFit.cover,
+                      //             color: scheme.primary),
+                      //       )),
+                      //       const WidgetSpan(
+                      //           child: SizedBox(width: Dimens.sizeExtraSmall)),
+                      //       WidgetSpan(
+                      //           child: TweenAnimationBuilder(
+                      //               tween: ColorTween(
+                      //                   end: isActive
+                      //                       ? scheme.primary
+                      //                       : scheme.textColor),
+                      //               duration: Durations.medium1,
+                      //               builder: (context, color, _) {
+                      //                 return Text(
+                      //                   track.name ?? '',
+                      //                   maxLines: 1,
+                      //                   style: TextStyle(
+                      //                     color: color,
+                      //                     fontWeight: FontWeight.w500,
+                      //                     fontSize: Dimens.fontXXXLarge,
+                      //                   ),
+                      //                 );
+                      //               })),
+                      //     ],
+                      //   ),
+                      // );
                     },
                   ),
                   const SizedBox(height: Dimens.sizeMini),
@@ -145,11 +189,14 @@ class TrackTile extends StatelessWidget {
                 showModalBottomSheet(
                   context: context,
                   useRootNavigator: true,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  backgroundColor: Colors.transparent,
                   builder: (_) => TrackBottomSheet(track, liked: liked),
                 );
               },
               iconSize: Dimens.iconDefault,
-              icon: const Icon(Icons.more_vert_outlined),
+              icon: trailing ?? Icon(Icons.more_vert_outlined),
             ),
           ],
         ),
@@ -223,9 +270,9 @@ class TrackDetailsTile extends StatelessWidget {
                                 return pr.playerState != cr.playerState;
                               }, builder: (_, state) {
                                 return Image.asset(
-                                    state.playerState.isPlaying
-                                        ? ImageRes.musicWave
-                                        : ImageRes.musicWavePaused,
+                                    state.playerState.isPaused
+                                        ? ImageRes.musicWavePaused
+                                        : ImageRes.musicWave,
                                     fit: BoxFit.cover,
                                     color: scheme.primary);
                               }),

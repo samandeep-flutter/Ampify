@@ -1,5 +1,3 @@
-import 'package:ampify/data/data_provider/api_response.dart';
-import 'package:ampify/data/data_provider/dio_client.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class HomeRepo {
@@ -16,7 +14,7 @@ class HomeRepo {
     final response = await dio.get('$url&limit=${limit ?? 10}');
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'new Release'));
+        onError: onError ?? (e) => logPrint(e, 'releases'));
   }
 
   Future<void> getSeveralTracks({
@@ -27,7 +25,8 @@ class HomeRepo {
     final _ids = ids.asString.noSpace;
     final response = await dio.get(AppConstants.severalTracks(_ids));
     ApiResponse.verify(response,
-        onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'tracks'));
+        onSuccess: onSuccess,
+        onError: onError ?? (e) => logPrint(e, 'many-tracks'));
   }
 
   Future<void> getSeveralAlbums({
@@ -38,7 +37,8 @@ class HomeRepo {
     final _ids = ids.asString.noSpace;
     final response = await dio.get(AppConstants.severalTracks(_ids));
     ApiResponse.verify(response,
-        onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'tracks'));
+        onSuccess: onSuccess,
+        onError: onError ?? (e) => logPrint(e, 'many-albums'));
   }
 
   Future<void> browseCategory({
@@ -56,6 +56,7 @@ class HomeRepo {
       {required SuccessCallback onSuccess, ErrorCallback? onError}) async {
     final response = await dio.get(AppConstants.recentlyPlayed);
     ApiResponse.verify(response,
-        onSuccess: onSuccess, onError: onError ?? (e) => logPrint(e, 'recent'));
+        onSuccess: onSuccess,
+        onError: onError ?? (e) => logPrint(e, 'recently'));
   }
 }

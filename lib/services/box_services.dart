@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import '../data/utils/exports.dart';
 
@@ -20,6 +19,8 @@ class BoxServices {
   }
 
   String? get uid => box.read<String>(BoxKeys.uid);
+
+  String? get token => box.read<String>(BoxKeys.token);
 
   Future<void> saveTheme(MyTheme theme) async {
     await box.write(BoxKeys.theme, theme.title);

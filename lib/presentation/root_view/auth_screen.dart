@@ -1,7 +1,5 @@
 import 'package:ampify/buisness_logic/auth_bloc/auth_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});

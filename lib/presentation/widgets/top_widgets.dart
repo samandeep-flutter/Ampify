@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class MyDivider extends StatelessWidget {
@@ -95,12 +94,13 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
   Widget _builder() {
     final scheme = context.scheme;
     return Container(
-      alignment: Alignment.center,
-      margin: EdgeInsets.only(
-        top: context.height * .15,
-        left: Dimens.sizeDefault,
-        right: Dimens.sizeDefault,
-      ),
+      alignment: widget.alignment ?? Alignment.center,
+      margin: widget.margin ??
+          EdgeInsets.only(
+            top: widget.alignment == null ? context.height * .15 : 0,
+            left: Dimens.sizeDefault,
+            right: Dimens.sizeDefault,
+          ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -116,7 +116,7 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
             widget.title ?? StringRes.errorUnknown,
             textAlign: TextAlign.center,
             style: TextStyle(
-                color: scheme.textColorLight, fontSize: Dimens.fontXXXLarge),
+                color: scheme.textColorLight, fontSize: Dimens.fontDefault),
           )
         ],
       ),

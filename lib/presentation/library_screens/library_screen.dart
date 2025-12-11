@@ -1,9 +1,6 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/data/data_models/library_model.dart';
-import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class LibraryScreen extends StatefulWidget {
   const LibraryScreen({super.key});
@@ -201,6 +198,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         return MyBottomSheet(
           title: StringRes.sortOrder,
           child: Column(children: [
+            const SizedBox(height: Dimens.sizeSmall),
             ...SortOrder.values.map((e) {
               return ListTile(
                 onTap: () async {

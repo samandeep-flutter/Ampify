@@ -1,10 +1,6 @@
 import 'dart:async';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/data/repositories/library_repo.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/data_models/library_model.dart';
 
 class LibraryEvent extends Equatable {
   const LibraryEvent();

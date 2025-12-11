@@ -1,8 +1,7 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/player_bloc/player_bloc.dart';
 import '../../buisness_logic/player_bloc/player_events.dart';
@@ -23,6 +22,7 @@ class _RootViewState extends State<RootView> {
   void initState() {
     context.read<RootBloc>().add(RootInitial());
     context.read<PlayerBloc>().add(PlayerInitial());
+    context.read<PlayerSliderBloc>().add(PlayerSliderInitial());
     context.read<SearchBloc>().add(SearchInitial());
     context.read<HomeBloc>().add(HomeInitial());
     context.read<LibraryBloc>().add(LibraryInitial());
@@ -60,17 +60,17 @@ class _RootViewState extends State<RootView> {
                       gradient: LinearGradient(
                         stops: [.2, .6, .8, 1],
                         colors: [
-                          scheme.surface,
-                          scheme.surface.withAlpha(200),
-                          scheme.surface.withAlpha(80),
-                          scheme.surface.withAlpha(0),
+                          scheme.background,
+                          scheme.background.withAlpha(200),
+                          scheme.background.withAlpha(80),
+                          scheme.background.withAlpha(0),
                         ],
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black26,
+                          color: scheme.background.withAlpha(66),
                           spreadRadius: Dimens.sizeDefault,
                           blurRadius: Dimens.sizeMidLarge,
                         )
@@ -92,7 +92,7 @@ class _RootViewState extends State<RootView> {
                                     elevation: Dimens.sizeExtraLarge,
                                     selectedFontSize: Dimens.fontDefault,
                                     unselectedFontSize: Dimens.fontMed,
-                                    unselectedItemColor: scheme.disabled,
+                                    unselectedItemColor: scheme.textColorLight,
                                     selectedItemColor: scheme.textColor,
                                     onTap: (index) => bloc
                                         .onIndexChange(context, index: index),

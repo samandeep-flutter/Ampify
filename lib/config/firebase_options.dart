@@ -14,7 +14,7 @@ import 'package:flutter/foundation.dart'
 ///   options: DefaultFirebaseOptions.currentPlatform,
 /// );
 /// ```
-class DefaultFBOptions {
+class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
       throw UnsupportedError(
@@ -63,10 +63,9 @@ class DefaultFBOptions {
     messagingSenderId: '962828708485',
     projectId: 'ampify-samtech',
     storageBucket: 'ampify-samtech.firebasestorage.app',
-    androidClientId:
-        '962828708485-4luos7db9sokjp48npuptl617g52aaq4.apps.googleusercontent.com',
-    iosClientId:
-        '962828708485-pu3uqbhm9r8dm65khtjb2dc92f14a4o0.apps.googleusercontent.com',
+    androidClientId: '962828708485-4luos7db9sokjp48npuptl617g52aaq4.apps.googleusercontent.com',
+    iosClientId: '962828708485-pu3uqbhm9r8dm65khtjb2dc92f14a4o0.apps.googleusercontent.com',
     iosBundleId: 'com.samtech.ampify',
   );
+
 }

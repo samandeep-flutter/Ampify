@@ -1,13 +1,10 @@
+import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:ampify/presentation/widgets/custom_scroll_physics.dart';
-import '../../buisness_logic/root_bloc/music_group_bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../buisness_logic/music_group_bloc/music_group_bloc.dart';
 import 'playlist_bottom_sheet.dart';
 
 class MusicGroupScreen extends StatefulWidget {
@@ -51,19 +48,21 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                 expandedHeight: context.height * .35,
                 pinned: true,
                 centerTitle: false,
-                title: BlocBuilder<MusicGroupBloc, MusicGroupState>(
-                  buildWhen: (pr, cr) => pr.titileOpacity != cr.titileOpacity,
-                  builder: (context, state) {
-                    return AnimatedOpacity(
-                      opacity: state.titileOpacity,
-                      duration: Durations.long2,
-                      child: Text(state.title ?? ''),
-                    );
+                title: PopScope(
+                  onPopInvokedWithResult: (didPop, _) {
+                    if (!bloc.libRefresh) return;
+                    context.read<LibraryBloc>().add(LibraryRefresh());
                   },
-                ),
-                leading: IconButton(
-                  onPressed: () => context.pop(bloc.libRefresh),
-                  icon: const Icon(Icons.arrow_back_outlined),
+                  child: BlocBuilder<MusicGroupBloc, MusicGroupState>(
+                    buildWhen: (pr, cr) => pr.titileOpacity != cr.titileOpacity,
+                    builder: (context, state) {
+                      return AnimatedOpacity(
+                        opacity: state.titileOpacity,
+                        duration: Durations.long2,
+                        child: Text(state.title ?? ''),
+                      );
+                    },
+                  ),
                 ),
                 backgroundColor: Color.alphaBlend(fgColor, scheme.background),
                 titleTextStyle: Utils.defTitleStyle(context),
@@ -111,7 +110,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           state.details!.description!.unescape,
                           style: TextStyle(
                             color: scheme.textColorLight,
-                            fontSize: Dimens.fontDefault,
+                            fontSize: Dimens.fontDefault - 1,
                           ),
                         ),
                       ],
@@ -254,28 +253,15 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                               );
                             },
                           ),
-                          if (bloc.uid! == state.details?.owner?.id) ...[
-                            const SizedBox(width: Dimens.sizeSmall),
-                            IconButton(
-                              onPressed: () => _toMoreDetails(bloc, state),
-                              style: IconButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                              ),
-                              iconSize: Dimens.iconDefault,
-                              icon: const Icon(Icons.more_vert),
+                          const SizedBox(width: Dimens.sizeSmall),
+                          IconButton(
+                            onPressed: () => _toMoreDetails(bloc, state),
+                            style: IconButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
                             ),
-                          ] else ...[
-                            const SizedBox(width: Dimens.sizeSmall),
-                            IconButton(
-                              onPressed: null,
-                              color: scheme.textColorLight,
-                              style: IconButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                              ),
-                              iconSize: Dimens.iconDefault,
-                              icon: const Icon(Icons.ios_share),
-                            ),
-                          ],
+                            iconSize: Dimens.iconDefault,
+                            icon: const Icon(Icons.more_vert),
+                          ),
                           const Spacer(),
                           DisabledWidget(
                             child: BlocBuilder<PlayerBloc, PlayerState>(
@@ -304,10 +290,9 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             return pr.playerState != cr.playerState;
                           }, builder: (context, pl) {
                             final group = pl.musicGroupId == state.id;
-                            return LoadingIcon(
+                            return IconButton(
                               onPressed: () => bloc.onPlay(context),
                               iconSize: Dimens.iconXLarge,
-                              loaderSize: Dimens.iconXLarge,
                               isSelected: group && pl.playerState.isPlaying,
                               selectedIcon: const Icon(Icons.pause),
                               style: IconButton.styleFrom(
@@ -428,6 +413,9 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return BlocProvider.value(
           value: bloc,

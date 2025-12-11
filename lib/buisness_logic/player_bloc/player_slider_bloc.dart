@@ -1,9 +1,7 @@
 import 'dart:async';
+
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PlayerSliderEvents extends Equatable {
   const PlayerSliderEvents();
@@ -11,6 +9,8 @@ class PlayerSliderEvents extends Equatable {
   @override
   List<Object?> get props => [];
 }
+
+class PlayerSliderInitial extends PlayerSliderEvents {}
 
 class PlayerSliderChange extends PlayerSliderEvents {
   final Duration current;
@@ -24,47 +24,68 @@ class PlayerSliderReset extends PlayerSliderEvents {}
 
 class PlayerSliderState extends Equatable {
   final Duration current;
-  const PlayerSliderState(this.current);
+  final Duration animate;
+  const PlayerSliderState({required this.current, required this.animate});
 
-  const PlayerSliderState.init() : current = Duration.zero;
+  const PlayerSliderState.init()
+      : current = Duration.zero,
+        animate = Duration.zero;
 
-  PlayerSliderState copyWith([Duration? current]) {
-    return PlayerSliderState(current ?? this.current);
-  }
-
-  Duration get animate {
-    return current.isZero ? Duration.zero : Durations.extralong4;
+  PlayerSliderState copyWith({Duration? current, Duration? animate}) {
+    return PlayerSliderState(
+      current: current ?? this.current,
+      animate: animate ?? this.animate,
+    );
   }
 
   @override
-  List<Object?> get props => [current];
+  List<Object?> get props => [current, animate];
 }
 
 class PlayerSliderBloc extends Bloc<PlayerSliderEvents, PlayerSliderState> {
   PlayerSliderBloc() : super(const PlayerSliderState.init()) {
+    on<PlayerSliderInitial>(_onInit);
     on<PlayerSliderChange>(_onSliderChange);
     on<PlayerSliderReset>(_onSliderReset);
   }
 
-  // @override
-  // void onEvent(PlayerSliderEvents event) {
-  //   dprint(event.runtimeType.toString());
-  //   super.onEvent(event);
-  // }
-
   final AudioHandler _audioHandler = getIt();
   StreamSubscription? streamSub;
-  Stream get durationStream => _audioHandler.customEvent;
+  MediaItem? _mediaItem;
+
+  void _onInit(
+      PlayerSliderInitial event, Emitter<PlayerSliderState> emit) async {
+    _audioHandler.mediaItem.listen((mediaItem) {
+      if (isClosed || mediaItem == null) return;
+      if (mediaItem.id == _mediaItem?.id) return;
+      streamSub?.cancel();
+      add(PlayerSliderReset());
+      streamSub = _audioHandler.customEvent.listen((duration) {
+        if (duration is! Duration) return;
+        final _duration = _mediaItem?.duration;
+        if (duration <= (_duration ?? Duration.zero)) {
+          add(PlayerSliderChange(duration));
+        }
+      });
+      _mediaItem = mediaItem;
+    });
+  }
 
   void _onSliderChange(
       PlayerSliderChange event, Emitter<PlayerSliderState> emit) {
     if (event.current == state.current) return;
-    emit(state.copyWith(event.current));
+    final animate = _difference(event.current, state.current);
+    emit(state.copyWith(current: event.current, animate: animate));
   }
 
   void _onSliderReset(
       PlayerSliderReset event, Emitter<PlayerSliderState> emit) {
     emit(const PlayerSliderState.init());
+  }
+
+  Duration _difference(Duration d1, Duration d2) {
+    final diff = (d1.inSeconds - d2.inSeconds).abs();
+    return diff > 1 ? Duration.zero : Duration(seconds: 1);
   }
 
   @override

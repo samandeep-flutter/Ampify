@@ -1,4 +1,4 @@
-import 'package:ampify/services/responsive_font.dart';
+import 'package:ampify/config/responsive_font.dart';
 
 sealed class Dimens {
   /// size of 0

@@ -1,12 +1,10 @@
 import 'dart:math';
 import 'package:ampify/presentation/root_view/player_screens/queue_view.dart';
-import 'package:flutter/material.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
 import '../../../buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../track_widgets/track_bottom_sheet.dart';
 
 class PlayerScreen extends StatelessWidget {
@@ -28,7 +26,7 @@ class PlayerScreen extends StatelessWidget {
                 iconSize: Dimens.iconDefault,
                 icon: Transform.rotate(
                   angle: 3 * pi / 2,
-                  child: const Icon(Icons.arrow_back_ios),
+                  child: const Icon(Icons.arrow_back_ios_new),
                 )),
             actions: [
               IconButton(
@@ -136,16 +134,9 @@ class PlayerScreen extends StatelessWidget {
                     BlocBuilder<PlayerBloc, PlayerState>(
                       buildWhen: (pr, cr) => pr.track != cr.track,
                       builder: (context, state) {
-                        final loading = state.playerState.isLoading;
                         return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                             builder: (context, slider) {
-                          double current = 0;
-                          Duration length = Durations.extralong4;
-                          if (!loading && !state.track.duration.isZero) {
-                            current = slider.current.inSeconds.toDouble();
-                            length =
-                                state.track.duration ?? Durations.extralong4;
-                          }
+                          final length = state.track.duration?.inSeconds;
 
                           return SliderTheme(
                             data: const SliderThemeData(
@@ -157,14 +148,36 @@ class PlayerScreen extends StatelessWidget {
                               children: [
                                 SizedBox(
                                   height: Dimens.sizeMedium,
-                                  child: Slider(
-                                    value: current,
-                                    divisions: length.inSeconds,
-                                    activeColor: scheme.textColor,
-                                    inactiveColor: scheme.textColorLight,
-                                    min: Dimens.zero,
-                                    max: length.inSeconds.toDouble(),
-                                    onChanged: bloc.onSliderChange,
+                                  child: Stack(
+                                    children: [
+                                      Slider(
+                                        value:
+                                            slider.current.inSeconds.toDouble(),
+                                        activeColor: scheme.textColor,
+                                        inactiveColor: scheme.textColorLight,
+                                        min: Dimens.zero,
+                                        max: length?.toDouble() ?? 1,
+                                        onChanged: bloc.onSliderChange,
+                                      ),
+                                      BlocBuilder<PlayerBloc, PlayerState>(
+                                          buildWhen: (pr, cr) {
+                                        return pr.playerState != cr.playerState;
+                                      }, builder: (context, state) {
+                                        if (!state.playerState.isLoading) {
+                                          return SizedBox.shrink();
+                                        }
+                                        return Container(
+                                          margin: Utils.insetsHoriz(
+                                              Dimens.sizeLarge),
+                                          padding: EdgeInsets.only(
+                                              left: Dimens.sizeExtraSmall + 1),
+                                          alignment: Alignment.center,
+                                          child: LinearProgressIndicator(
+                                              minHeight: Dimens.sizeMini,
+                                              color: scheme.onPrimary),
+                                        );
+                                      }),
+                                    ],
                                   ),
                                 ),
                                 DefaultTextStyle.merge(
@@ -227,11 +240,9 @@ class PlayerScreen extends StatelessWidget {
                               buildWhen: (pr, cr) {
                             return pr.playerState != cr.playerState;
                           }, builder: (context, state) {
-                            return LoadingIcon(
+                            return IconButton(
                               onPressed: bloc.onPlayPause,
                               iconSize: Dimens.iconExtraLarge,
-                              loaderSize: Dimens.iconExtraLarge,
-                              loading: state.playerState.isLoading,
                               isSelected: state.playerState.isPlaying,
                               selectedIcon: const Icon(Icons.pause),
                               style: IconButton.styleFrom(
@@ -247,25 +258,22 @@ class PlayerScreen extends StatelessWidget {
                             color: scheme.textColor,
                             icon: const Icon(Icons.skip_next_rounded),
                           ),
-                          DisabledWidget(
-                            child: BlocBuilder<PlayerBloc, PlayerState>(
-                                buildWhen: (pr, cr) =>
-                                    pr.loopMode != cr.loopMode,
-                                builder: (context, state) {
-                                  return IconButton(
-                                      onPressed: bloc.onRepeat,
-                                      isSelected: !state.loopMode.isOff,
-                                      style: IconButton.styleFrom(
-                                          backgroundColor: !state.loopMode.isOff
-                                              ? scheme.primary
-                                              : null),
-                                      iconSize: Dimens.iconDefault,
-                                      selectedIcon: Icon(state.loopMode.icon,
-                                          color: scheme.onPrimary),
-                                      icon: Icon(state.loopMode.icon,
-                                          color: scheme.textColor));
-                                }),
-                          ),
+                          BlocBuilder<PlayerBloc, PlayerState>(
+                              buildWhen: (pr, cr) => pr.loopMode != cr.loopMode,
+                              builder: (context, state) {
+                                return IconButton(
+                                    onPressed: bloc.onRepeat,
+                                    isSelected: !state.loopMode.isOff,
+                                    style: IconButton.styleFrom(
+                                        backgroundColor: !state.loopMode.isOff
+                                            ? scheme.primary
+                                            : null),
+                                    iconSize: Dimens.iconDefault,
+                                    selectedIcon: Icon(state.loopMode.icon,
+                                        color: scheme.onPrimary),
+                                    icon: Icon(state.loopMode.icon,
+                                        color: scheme.textColor));
+                              }),
                         ],
                       ),
                     ),
@@ -287,6 +295,7 @@ class PlayerScreen extends StatelessWidget {
                   ],
                 )),
           ),
+          SliverSizedBox(width: context.height * 1),
         ],
       ),
     );
@@ -296,21 +305,21 @@ class PlayerScreen extends StatelessWidget {
     final state = context.read<PlayerBloc>().state;
     showModalBottomSheet(
         context: context,
+        useSafeArea: true,
         useRootNavigator: true,
-        builder: (context) =>
-            TrackBottomSheet(state.track.asTrack, liked: state.isLiked));
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => TrackBottomSheet(state.track.asTrack,
+            liked: state.isLiked, fromPlayer: true));
   }
 
   void _toQueue(BuildContext context) {
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
+      useRootNavigator: true,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.vertical(
-            top: Radius.circular(Dimens.borderLarge)),
-      ),
-      backgroundColor: context.scheme.background,
+      backgroundColor: Colors.transparent,
       builder: (_) => const QueueView(),
     );
   }

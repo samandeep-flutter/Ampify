@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
 
 class Artist extends Equatable {
   final int? followers;

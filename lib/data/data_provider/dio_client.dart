@@ -4,19 +4,21 @@ import 'package:ampify/data/utils/exports.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../repositories/auth_repo.dart';
-import 'api_response.dart';
 
 class DioClient {
   final Dio dio;
 
   DioClient({required this.dio}) {
-    dio.options.baseUrl = AppConstants.baseUrl;
+    dio.options = BaseOptions(
+      baseUrl: AppConstants.baseUrl,
+      headers: {'Authorization': 'Bearer ${box.token}'},
+    );
     dio.interceptors
         .addAll([TokenInterceptor(dio), if (kDebugMode) LoggingInterceptor()]);
-    dio.options.headers = {
-      'Authorization': 'Bearer ${BoxServices.instance.read(BoxKeys.token)}'
-    };
   }
+
+  @protected
+  final box = BoxServices.instance;
 
   Future<Response> _get(String url, {Options? options}) {
     return dio.get(url, options: options);
@@ -85,6 +87,19 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
   TokenInterceptor(this.dio);
 
   @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    try {
+      final key = options.headers['Authorization'] as String?;
+      if (!(key?.startsWith('Bearer') ?? false)) throw Exception();
+      final token = BoxServices.instance.token;
+      final _options = options..headers['Authorization'] = 'Bearer $token';
+      handler.next(_options);
+    } catch (_) {
+      handler.next(options);
+    }
+  }
+
+  @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     getIt<AuthServices>().setConnection(true);
     handler.next(response);
@@ -95,15 +110,13 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
     try {
       final box = BoxServices.instance;
       final completer = Completer<bool>();
-
-      final status = err.response?.data['error']['status'];
-      if (status != 401) throw err;
+      if (err.response?.statusCode != 401) throw err;
 
       getIt<AuthRepo>().refreshToken(
         onSuccess: (json) async {
           try {
             dprint('refresh: ${json['access_token']}');
-            box.write(BoxKeys.token, json['access_token']);
+            await box.write(BoxKeys.token, json['access_token']);
             err.requestOptions.headers.update(
                 'Authorization', (_) => 'Bearer ${json['access_token']}');
             final response = await dio.fetch(err.requestOptions);
@@ -125,6 +138,9 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
       if (e.error is SocketException) {
         getIt<AuthServices>().setConnection(false);
       }
+      logPrint(e, 'DIO');
+      handler.reject(err);
+    } catch (e) {
       logPrint(e, 'DIO');
       handler.reject(err);
     }

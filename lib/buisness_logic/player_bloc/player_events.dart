@@ -28,6 +28,14 @@ class PlayerMediaStream extends PlayerEvent {
   List<Object?> get props => [mediaItem, super.props];
 }
 
+// class PlayerQueueStream extends PlayerEvent {
+//   final List<MediaItem> queue;
+//   const PlayerQueueStream(this.queue);
+
+//   @override
+//   List<Object?> get props => [queue, super.props];
+// }
+
 class PlayerNextTrack extends PlayerEvent {}
 
 class PlayerPreviousTrack extends PlayerEvent {}
@@ -52,6 +60,16 @@ class PlayerQueueReordered extends PlayerEvent {
   List<Object?> get props => [previous, current, super.props];
 }
 
+class PlayerUpNextReordered extends PlayerEvent {
+  final int previous;
+  final int current;
+
+  const PlayerUpNextReordered({required this.previous, required this.current});
+
+  @override
+  List<Object?> get props => [previous, current, super.props];
+}
+
 class PlayerQueueAdded extends PlayerEvent {
   final Track track;
 
@@ -65,7 +83,13 @@ class PlayerQueueCleared extends PlayerEvent {}
 
 class PlayerUpNextCleared extends PlayerEvent {}
 
-class PlayerTrackEnded extends PlayerEvent {}
+class PlayerTrackEnded extends PlayerEvent {
+  final dynamic id;
+  const PlayerTrackEnded(this.id);
+
+  @override
+  List<Object?> get props => [id, super.props];
+}
 
 class PlayerPrepareNextTrack extends PlayerEvent {}
 
@@ -74,12 +98,11 @@ class PlayerUpNextHandler extends PlayerEvent {}
 class MusicGroupPlayed extends PlayerEvent {
   final String? id;
   final List<Track> tracks;
-  final bool? liked;
 
-  const MusicGroupPlayed({required this.id, required this.tracks, this.liked});
+  const MusicGroupPlayed({required this.id, required this.tracks});
 
   @override
-  List<Object?> get props => [id, tracks, liked, super.props];
+  List<Object?> get props => [id, tracks, super.props];
 }
 
 class PlayerTrackChanged extends PlayerEvent {

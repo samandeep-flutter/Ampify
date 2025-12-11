@@ -1,6 +1,5 @@
 import 'package:ampify/data/utils/exports.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 
 class MyCachedImage extends StatefulWidget {
   final String? image;
@@ -107,7 +106,7 @@ class _MyCachedImageState extends State<MyCachedImage> {
           return _builder(widget.isAvatar, widget.loading);
         },
         errorWidget: (_, url, error) {
-          logPrint(error, 'CachedImage');
+          logPrint(error, 'cached-image');
           return _builder(widget.isAvatar, widget.loading);
         });
   }

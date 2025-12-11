@@ -1,7 +1,5 @@
 import 'package:ampify/buisness_logic/root_bloc/root_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -147,10 +145,10 @@ class _ProfileViewState extends State<ProfileView> {
             title: StringRes.themeMode,
             child: Column(
               children: [
+                const SizedBox(height: Dimens.sizeSmall),
                 ...ThemeMode.values.map((e) {
                   return RadioListTile(
                     value: e,
-                    groupValue: BoxServices.instance.themeMode,
                     title: Row(
                       children: [
                         Icon(e.icon, size: Dimens.iconDefault),
@@ -160,6 +158,7 @@ class _ProfileViewState extends State<ProfileView> {
                       ],
                     ),
                     controlAffinity: ListTileControlAffinity.trailing,
+                    groupValue: BoxServices.instance.themeMode,
                     onChanged: (theme) async {
                       context.scheme.switchThemeMode(theme);
                       await Future.delayed(Durations.medium4);

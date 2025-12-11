@@ -2,6 +2,7 @@ import 'package:ampify/data/repositories/home_repo.dart';
 import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/services/audio_services.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/repositories/search_repo.dart';
@@ -20,6 +21,7 @@ Future<void> initGetIt() async {
   getIt.registerLazySingleton<Dio>(() => Dio());
   getIt.registerLazySingleton<AppLinks>(() => AppLinks());
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
+  getIt.registerLazySingleton<Connectivity>(() => Connectivity());
   getIt.registerLazySingleton<YoutubeExplode>(() => YoutubeExplode());
   getIt.registerLazySingleton<DioClient>(() => DioClient(dio: getIt()));
   getIt.registerLazySingleton<AuthRepo>(() => AuthRepo(dio: getIt()));
@@ -32,7 +34,7 @@ Future<void> initGetIt() async {
       () => MusicRepo(ytMusic: getIt(), ytExplode: getIt(), dio: getIt()));
 
   // async singletons
-  getIt.registerSingletonAsync<AuthServices>(AuthServices.to.init);
+  getIt.registerSingletonAsync<AuthServices>(AuthServices.instance.init);
   await getIt.isReady<AuthServices>();
   getIt.registerSingletonAsync<AudioHandler>(audioServicesInit);
   await getIt.isReady<AudioHandler>();

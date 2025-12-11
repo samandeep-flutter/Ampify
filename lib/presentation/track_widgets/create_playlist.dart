@@ -1,7 +1,5 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../buisness_logic/root_bloc/playlist_bloc.dart';
+import '../../buisness_logic/music_group_bloc/playlist_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class CreatePlaylistView extends StatelessWidget {
@@ -41,7 +39,7 @@ class CreatePlaylistView extends StatelessWidget {
               listener: (context, state) {
                 if (state.success) {
                   context.read<LibraryBloc>().add(LibraryRefresh());
-                  context.pop();
+                  GoRouter.of(context).pop();
                 }
               },
               child: SizedBox(height: context.height * .1),
@@ -58,7 +56,7 @@ class CreatePlaylistView extends StatelessWidget {
                         backgroundColor: scheme.background,
                         shape: Utils.continuousBorder(Dimens.borderLarge,
                             border: scheme.primaryAdaptive)),
-                    onPressed: context.pop,
+                    onPressed: () => GoRouter.of(context).pop(),
                     child: Text(
                       StringRes.cancel,
                       style: TextStyle(

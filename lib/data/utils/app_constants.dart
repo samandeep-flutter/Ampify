@@ -1,7 +1,7 @@
 import 'dart:developer' as dev;
 import 'package:ampify/data/utils/exports.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 sealed class AppConstants {
@@ -13,6 +13,7 @@ sealed class AppConstants {
   static const String myPlaylists = 'me/playlists';
   static const String myAlbums = 'me/albums';
   static const String recentlyPlayed = 'me/player/recently-played';
+  static String checkSaved(String ids) => 'me/tracks/contains?ids=$ids';
   static String browse(String local) => 'browse/categories?locale=$local';
   static String severalTracks(String ids) => 'tracks?ids=$ids';
   static String severalAlbums(String ids) => 'albums?ids=$ids';
@@ -50,20 +51,24 @@ sealed class EnvKeys {
 
 sealed class UniqueIds {
   static const String likedSongs = '00-liked-songs';
+  static const String emptyTrack = '00-empty-track';
 }
 
 sealed class PlayerActions {
   static const String clearQueue = 'clear-queue';
   static const String removeRange = 'remove-range';
   static const String removeUpcomming = 'remove-upcomming';
-  static const String addToQueue = 'add-to-queue';
 }
 
-void logPrint(Object? value, [String? name]) {
+void _debugLog(Object? value, [String? name, bool? isError]) {
   if (kReleaseMode) return;
   final log = value is String? ? value : value.toString();
   dev.log(log ?? 'null', name: name ?? StringRes.appName);
+  if (isError ?? false) FirebaseCrashlytics.instance.log('[$name] $log');
 }
+
+void debugLog(Object? value, [String? name]) => _debugLog(value, name);
+void logPrint(Object? value, [String? name]) => _debugLog(value, name, true);
 
 void dprint(Object? value) {
   if (kDebugMode) print(value ?? 'null');

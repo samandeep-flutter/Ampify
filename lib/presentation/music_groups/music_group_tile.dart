@@ -1,10 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/data/data_models/library_model.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MusicGroupTile extends StatelessWidget {
   final LibraryModel item;
@@ -17,19 +11,13 @@ class MusicGroupTile extends StatelessWidget {
     final scheme = context.scheme;
 
     return InkWell(
-      onTap: () async {
+      onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(Durations.short4);
-        bool? result;
         if (isLikedSongs) {
-          result = await context.pushNamed<bool>(AppRoutes.likedSongs);
+          context.pushNamed<bool>(AppRoutes.likedSongs);
         } else {
-          result = await context.pushNamed<bool>(AppRoutes.musicGroup,
+          context.pushNamed<bool>(AppRoutes.musicGroup,
               pathParameters: {'id': item.id!, 'type': item.type?.name ?? ''});
-        }
-
-        if (result ?? false) {
-          context.read<LibraryBloc>().add(LibraryRefresh());
         }
       },
       child: Padding(

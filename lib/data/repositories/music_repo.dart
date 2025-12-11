@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import '../data_provider/dio_client.dart';
 
 class MusicRepo {
   final DioClient dio;
@@ -15,20 +13,6 @@ class MusicRepo {
       {required this.ytMusic, required this.ytExplode, required this.dio});
 
   final _ytClients = [YoutubeApiClient.androidVr];
-
-  // Future<Uri?> searchSong(String query) async {
-  //   try {
-  //     final _query = query.split('-').map((e) => e.trim()).toList();
-  //     final song = await _search(QuerySong(_query[0], _query[1]));
-  //     final manifest = await ytExplode.videos.streams
-  //         .getManifest(song!.videoId, ytClients: _ytClients);
-  //     return manifest.adaptiveUri;
-  //   } catch (e) {
-  //     logPrint(e, 'ytExplode');
-  //     return null;
-  //   }
-  // }
-
   Future<SongYtDetails?> getDetailsFromQuery(Track track) async {
     try {
       final artist =

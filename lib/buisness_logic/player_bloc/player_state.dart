@@ -57,6 +57,23 @@ class PlayerState extends Equatable {
     );
   }
 
+  PlayerState withTrack(TrackDetails track) {
+    return copyWith(
+        musicGroupId: '', track: track, playerState: MusicState.loading);
+  }
+
+  PlayerState withMusicGroup(String id,
+      {required List<Track> tracks, bool? isLiked}) {
+    return copyWith(
+      musicGroupId: id,
+      isLiked: isLiked,
+      playerState: MusicState.loading,
+      track: tracks.first.asTrackDetails,
+      upNext: tracks.skip(1).toList(),
+      queue: [],
+    );
+  }
+
   bool get isEmptyOrFinished =>
       queue.isEmpty && upNext.isEmpty && loopMode == MusicLoopMode.off;
 
@@ -72,20 +89,20 @@ class PlayerState extends Equatable {
         playerState,
       ];
 
-  // @override
-  // String toString() {
-  //   return '''{
-  //     'musicGroupId': $musicGroupId,
-  //     'track': ${track.title} ${track.id},
-  //     'length': $length,
-  //     'shuffle': $shuffle,
-  //     'loopMode': ${loopMode.name},
-  //     'liked': $liked,
-  //     'queue': ${queue.length},
-  //     'upNext': ${upNext.length},
-  //     'playerState': ${playerState?.name},
-  //   }''';
-  // }
+  @override
+  String toString() {
+    final items = {
+      'musicGroupId': musicGroupId,
+      'track': '${track.title} [${track.videoId}]',
+      'shuffle': shuffle,
+      'loopMode': loopMode.name,
+      'liked': isLiked,
+      'queue': queue.length,
+      'upNext': upNext.length,
+      'playerState': playerState?.name,
+    };
+    return jsonEncode(items);
+  }
 }
 
 enum MusicState { playing, pause, loading, hidden }

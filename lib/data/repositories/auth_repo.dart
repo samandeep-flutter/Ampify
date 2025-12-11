@@ -1,11 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../data_provider/api_response.dart';
-import '../data_provider/dio_client.dart';
 
 class AuthRepo {
   final DioClient dio;
@@ -76,5 +74,14 @@ class AuthRepo {
     final response = await dio.post(AppConstants.token,
         data: data, options: Options(headers: header));
     ApiResponse.verify(response, onSuccess: onSuccess, onError: onError);
+  }
+
+  Future<bool> checkConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 }

@@ -1,8 +1,4 @@
-import 'package:ampify/data/data_models/common/album_model.dart';
-import 'package:ampify/data/data_models/common/artist_model.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 
 class Track extends Equatable {
   final Album? album;
