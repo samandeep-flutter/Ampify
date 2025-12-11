@@ -89,20 +89,20 @@ class PlayerState extends Equatable {
         playerState,
       ];
 
-  // @override
-  // String toString() {
-  //   return '''{
-  //     'musicGroupId': $musicGroupId,
-  //     'track': ${track.title} ${track.id},
-  //     'length': $length,
-  //     'shuffle': $shuffle,
-  //     'loopMode': ${loopMode.name},
-  //     'liked': $liked,
-  //     'queue': ${queue.length},
-  //     'upNext': ${upNext.length},
-  //     'playerState': ${playerState?.name},
-  //   }''';
-  // }
+  @override
+  String toString() {
+    final items = {
+      'musicGroupId': musicGroupId,
+      'track': '${track.title} [${track.videoId}]',
+      'shuffle': shuffle,
+      'loopMode': loopMode.name,
+      'liked': isLiked,
+      'queue': queue.length,
+      'upNext': upNext.length,
+      'playerState': playerState?.name,
+    };
+    return jsonEncode(items);
+  }
 }
 
 enum MusicState { playing, pause, loading, hidden }

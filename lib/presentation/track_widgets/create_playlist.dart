@@ -1,5 +1,5 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import '../../buisness_logic/root_bloc/playlist_bloc.dart';
+import '../../buisness_logic/music_group_bloc/playlist_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class CreatePlaylistView extends StatelessWidget {

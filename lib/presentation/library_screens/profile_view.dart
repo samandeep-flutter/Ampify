@@ -145,6 +145,7 @@ class _ProfileViewState extends State<ProfileView> {
             title: StringRes.themeMode,
             child: Column(
               children: [
+                const SizedBox(height: Dimens.sizeSmall),
                 ...ThemeMode.values.map((e) {
                   return RadioListTile(
                     value: e,

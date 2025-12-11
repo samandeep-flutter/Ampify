@@ -1,6 +1,6 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../../buisness_logic/root_bloc/addto_playlist_bloc.dart';
+import '../../buisness_logic/music_group_bloc/addto_playlist_bloc.dart';
 
 class AddtoPlaylistSheet extends StatefulWidget {
   final String uri;
@@ -61,6 +61,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
             }).toList();
             return Column(
               children: [
+                const SizedBox(height: Dimens.sizeDefault),
                 BlocBuilder<AddtoPlaylistBloc, AddtoPlaylistState>(
                     builder: (context, state) {
                   if (playlists.isEmpty) {

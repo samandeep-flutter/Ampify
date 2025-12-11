@@ -274,6 +274,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       add(PlayerPrepareNextTrack());
     } on FormatException {
       if (state.loopMode != MusicLoopMode.off) return;
+      logPrint(state, 'track ended');
       await _audioHandler.stop();
       emit(PlayerState.init());
     } catch (e) {
@@ -341,6 +342,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       emit(state.copyWith(upNext: event.tracks.skip(1).toList()));
       showToast(StringRes.cannotbePlayed);
       add(PlayerUpNextHandler());
+    } catch (e) {
+      logPrint(e, 'music-group');
     }
   }
 
@@ -366,7 +369,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onTrackChange(
       PlayerTrackChanged event, Emitter<PlayerState> emit) async {
     _audioHandler.pause();
-    // TODO: implement clear before playing, also modify playMediaItem.
+    await _audioHandler.customAction(PlayerActions.clearQueue);
     emit(state.withTrack(event.track.asTrackDetails));
     final track = await Utils.getTrackDetails(event.track);
     emit(state.copyWith(track: track, isLiked: event.liked));
@@ -377,6 +380,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       if (uri == null) throw FormatException();
       final _media = Utils.toMediaItem(track, uri: uri);
       await _audioHandler.playMediaItem(_media);
+      add(PlayerPrepareNextTrack());
     } on FormatException {
       showToast(StringRes.cannotbePlayed);
       emit(state.copyWith(playerState: MusicState.hidden));

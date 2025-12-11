@@ -4,7 +4,7 @@ import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../../buisness_logic/root_bloc/music_group_bloc.dart';
+import '../../buisness_logic/music_group_bloc/music_group_bloc.dart';
 import 'playlist_bottom_sheet.dart';
 
 class MusicGroupScreen extends StatefulWidget {
@@ -253,28 +253,15 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                               );
                             },
                           ),
-                          if (bloc.uid! == state.details?.owner?.id) ...[
-                            const SizedBox(width: Dimens.sizeSmall),
-                            IconButton(
-                              onPressed: () => _toMoreDetails(bloc, state),
-                              style: IconButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                              ),
-                              iconSize: Dimens.iconDefault,
-                              icon: const Icon(Icons.more_vert),
+                          const SizedBox(width: Dimens.sizeSmall),
+                          IconButton(
+                            onPressed: () => _toMoreDetails(bloc, state),
+                            style: IconButton.styleFrom(
+                              visualDensity: VisualDensity.compact,
                             ),
-                          ] else ...[
-                            const SizedBox(width: Dimens.sizeSmall),
-                            IconButton(
-                              onPressed: null,
-                              color: scheme.textColorLight,
-                              style: IconButton.styleFrom(
-                                visualDensity: VisualDensity.compact,
-                              ),
-                              iconSize: Dimens.iconDefault,
-                              icon: const Icon(Icons.ios_share),
-                            ),
-                          ],
+                            iconSize: Dimens.iconDefault,
+                            icon: const Icon(Icons.more_vert),
+                          ),
                           const Spacer(),
                           DisabledWidget(
                             child: BlocBuilder<PlayerBloc, PlayerState>(
@@ -426,6 +413,9 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return BlocProvider.value(
           value: bloc,

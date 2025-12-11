@@ -13,107 +13,138 @@ class QueueView extends StatelessWidget {
     final bloc = context.read<PlayerBloc>();
     final scheme = context.scheme;
 
-    return BaseWidget(
-      color: scheme.background,
-      resizeBottom: false,
-      shapeRadius:
-          BorderRadius.vertical(top: Radius.circular(Dimens.borderMedium)),
-      bottom: const BottomPlayer(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              BlocListener<PlayerBloc, PlayerState>(
-                listener: (context, state) {
-                  if (state.playerState.isHidden) Navigator.pop(context);
+    return MyCustomDragableSheet(
+        constraints:
+            HeightConstraints(maxHeight: 1, minHeight: .6, defaultHeight: .7),
+        builder: (context, scrollController) {
+          return CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              SliverAppBar(
+                  pinned: true,
+                  backgroundColor: scheme.surface,
+                  toolbarHeight: 130,
+                  automaticallyImplyLeading: false,
+                  titleSpacing: Dimens.zero,
+                  title: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          BlocListener<PlayerBloc, PlayerState>(
+                            listener: (context, state) {
+                              if (state.playerState.isHidden) {
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: Container(
+                              margin: EdgeInsets.only(top: Dimens.sizeMedSmall),
+                              height: Dimens.sizeExtraSmall,
+                              width: Dimens.sizeUltraLarge,
+                              decoration: BoxDecoration(
+                                color: context.scheme.textColorLight,
+                                borderRadius:
+                                    BorderRadius.circular(Dimens.sizeMini),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      ListTile(
+                        visualDensity: VisualDensity.compact,
+                        title: Text(StringRes.queue),
+                        titleTextStyle: TextStyle(
+                          fontSize: Dimens.fontXLarge,
+                          fontWeight: FontWeight.bold,
+                          color: scheme.textColor,
+                        ),
+                        subtitle: Text(StringRes.queueTitle),
+                        subtitleTextStyle: TextStyle(
+                          color: scheme.textColorLight,
+                          fontWeight: FontWeight.w500,
+                          fontSize: Dimens.fontDefault,
+                        ),
+                      ),
+                      BlocBuilder<PlayerBloc, PlayerState>(
+                        buildWhen: (pr, cr) => pr.track != cr.track,
+                        builder: (_, state) => TrackDetailsTile.playing(
+                          state.track,
+                          trailing: BlocBuilder<PlayerBloc, PlayerState>(
+                              buildWhen: (pr, cr) {
+                            return pr.playerState != cr.playerState;
+                          }, builder: (context, state) {
+                            return IconButton(
+                              onPressed: bloc.onPlayPause,
+                              iconSize: Dimens.iconDefault,
+                              isSelected: state.playerState.isPlaying,
+                              selectedIcon: const Icon(Icons.pause),
+                              style: IconButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  visualDensity: VisualDensity.compact,
+                                  backgroundColor: scheme.textColor,
+                                  foregroundColor: scheme.surface,
+                                  splashFactory: NoSplash.splashFactory),
+                              icon: const Icon(Icons.play_arrow),
+                            );
+                          }),
+                        ),
+                      ),
+                    ],
+                  )),
+              const SliverSizedBox(height: Dimens.sizeMedSmall),
+              BlocBuilder<PlayerBloc, PlayerState>(
+                buildWhen: (pr, cr) {
+                  final next = pr.upNext != cr.upNext;
+                  dprint('next: ${pr.queue != cr.queue || next}');
+                  return pr.queue != cr.queue || next;
                 },
-                child: Container(
-                  margin: EdgeInsets.only(top: Dimens.sizeMedSmall),
-                  height: Dimens.sizeExtraSmall,
-                  width: Dimens.sizeUltraLarge,
-                  decoration: BoxDecoration(
-                    color: scheme.textColorLight,
-                    borderRadius: BorderRadius.circular(Dimens.sizeMini),
-                  ),
-                ),
-              )
+                builder: (context, state) {
+                  final color = scheme.disabled.withAlpha(150);
+                  return SliverMainAxisGroup(
+                    slivers: [
+                      if (state.queue.isNotEmpty) ...[
+                        TitleRow(
+                          title: StringRes.nextQueue,
+                          onClear: bloc.clearQueue,
+                          actionText: StringRes.clearQueue,
+                        ),
+                        SliverReorderableList(
+                          itemCount: state.queue.length,
+                          itemBuilder: (context, index) {
+                            return TrackDetailsTile(
+                              state.queue[index],
+                              key: ValueKey(state.queue[index].id),
+                              trailing: Icon(Icons.menu_outlined, color: color),
+                            );
+                          },
+                          onReorder: bloc.onQueueReorder,
+                        ),
+                        const SliverSizedBox(height: Dimens.sizeSmall),
+                      ],
+                      if (state.upNext.isNotEmpty) ...[
+                        TitleRow(
+                            title: StringRes.upNext, onClear: bloc.clearUpnext),
+                        SliverReorderableList(
+                          itemCount: state.upNext.length,
+                          itemBuilder: (_, i) {
+                            return TrackTile.queue(
+                              state.upNext[i],
+                              key: ValueKey(state.upNext[i].id),
+                              trailing: Icon(Icons.menu_outlined, color: color),
+                            );
+                          },
+                          onReorder: bloc.onUpNextReorder,
+                        )
+                      ],
+                      SliverSizedBox(height: context.height * .05)
+                    ],
+                  );
+                },
+              ),
             ],
-          ),
-          ListTile(
-            visualDensity: VisualDensity.compact,
-            title: Text(StringRes.queue),
-            titleTextStyle: TextStyle(
-              fontSize: Dimens.fontXLarge,
-              fontWeight: FontWeight.bold,
-              color: scheme.textColor,
-            ),
-            subtitle: Text(StringRes.queueTitle),
-            subtitleTextStyle: TextStyle(
-              color: scheme.textColorLight,
-              fontWeight: FontWeight.w500,
-              fontSize: Dimens.fontDefault,
-            ),
-          ),
-          BlocBuilder<PlayerBloc, PlayerState>(
-            buildWhen: (pr, cr) => pr.track != cr.track,
-            builder: (_, state) => TrackDetailsTile.playing(state.track),
-          ),
-          const SizedBox(height: Dimens.sizeMedSmall),
-          Expanded(
-            child: BlocBuilder<PlayerBloc, PlayerState>(
-              buildWhen: (pr, cr) {
-                final next = pr.upNext != cr.upNext;
-                return pr.queue != cr.queue || next;
-              },
-              builder: (context, state) {
-                return CustomScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  slivers: [
-                    if (state.queue.isNotEmpty) ...[
-                      TitleRow(
-                        title: StringRes.nextQueue,
-                        onClear: bloc.clearQueue,
-                        actionText: StringRes.clearQueue,
-                      ),
-                      SliverReorderableList(
-                        itemCount: state.queue.length,
-                        itemBuilder: (context, index) {
-                          return TrackDetailsTile(
-                            state.queue[index],
-                            key: ValueKey(state.queue[index].id),
-                            trailing: Icon(Icons.menu_outlined),
-                          );
-                        },
-                        onReorder: bloc.onQueueReorder,
-                      ),
-                      const SliverSizedBox(height: Dimens.sizeSmall),
-                    ],
-                    if (state.upNext.isNotEmpty) ...[
-                      TitleRow(
-                          title: StringRes.upNext, onClear: bloc.clearUpnext),
-                      SliverReorderableList(
-                        itemCount: state.upNext.length,
-                        itemBuilder: (_, i) {
-                          return TrackTile.queue(
-                            state.upNext[i],
-                            key: ValueKey(state.upNext[i].id),
-                            trailing: Icon(Icons.menu_outlined),
-                          );
-                        },
-                        onReorder: bloc.onUpNextReorder,
-                      )
-                    ],
-                    SliverSizedBox(height: context.height * .05)
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+          );
+        });
   }
 }
 

@@ -189,6 +189,9 @@ class TrackTile extends StatelessWidget {
                 showModalBottomSheet(
                   context: context,
                   useRootNavigator: true,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  backgroundColor: Colors.transparent,
                   builder: (_) => TrackBottomSheet(track, liked: liked),
                 );
               },

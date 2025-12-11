@@ -1,5 +1,6 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/player_bloc/player_bloc.dart';
@@ -21,6 +22,7 @@ class _RootViewState extends State<RootView> {
   void initState() {
     context.read<RootBloc>().add(RootInitial());
     context.read<PlayerBloc>().add(PlayerInitial());
+    context.read<PlayerSliderBloc>().add(PlayerSliderInitial());
     context.read<SearchBloc>().add(SearchInitial());
     context.read<HomeBloc>().add(HomeInitial());
     context.read<LibraryBloc>().add(LibraryInitial());

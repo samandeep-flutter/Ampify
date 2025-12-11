@@ -198,6 +198,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         return MyBottomSheet(
           title: StringRes.sortOrder,
           child: Column(children: [
+            const SizedBox(height: Dimens.sizeSmall),
             ...SortOrder.values.map((e) {
               return ListTile(
                 onTap: () async {

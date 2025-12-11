@@ -13,20 +13,6 @@ class MusicRepo {
       {required this.ytMusic, required this.ytExplode, required this.dio});
 
   final _ytClients = [YoutubeApiClient.androidVr];
-
-  // Future<Uri?> searchSong(String query) async {
-  //   try {
-  //     final _query = query.split('-').map((e) => e.trim()).toList();
-  //     final song = await _search(QuerySong(_query[0], _query[1]));
-  //     final manifest = await ytExplode.videos.streams
-  //         .getManifest(song!.videoId, ytClients: _ytClients);
-  //     return manifest.adaptiveUri;
-  //   } catch (e) {
-  //     logPrint(e, 'ytExplode');
-  //     return null;
-  //   }
-  // }
-
   Future<SongYtDetails?> getDetailsFromQuery(Track track) async {
     try {
       final artist =

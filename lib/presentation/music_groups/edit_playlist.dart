@@ -1,5 +1,5 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/buisness_logic/root_bloc/edit_playlist_bloc.dart';
+import 'package:ampify/buisness_logic/music_group_bloc/edit_playlist_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class EditPlaylistScreen extends StatefulWidget {

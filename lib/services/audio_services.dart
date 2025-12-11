@@ -241,21 +241,24 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> stop() async {
-    final session = getIt<AuthServices>().session;
-    session?.setActive(false);
-    queue.add([]);
-    await _player.stop();
-    mediaItem.add(MediaItem(id: UniqueIds.emptyTrack, title: ''));
-    playbackState.add(playbackState.value.copyWith(
-      processingState: AudioProcessingState.idle,
-    ));
-    customState.add(false);
+    try {
+      final session = getIt<AuthServices>().session;
+      session?.setActive(false);
+      queue.add([]);
+      await _player.stop();
+      mediaItem.add(MediaItem(id: UniqueIds.emptyTrack, title: ''));
+      playbackState.add(playbackState.value.copyWith(
+        processingState: AudioProcessingState.idle,
+      ));
+    } catch (e) {
+      logPrint(e, 'audio-stop');
+    }
   }
 
   @override
   Future<void> onTaskRemoved() async {
-    queue.close();
     mediaItem.close();
+    queue.close();
     await stop();
     return super.onTaskRemoved();
   }

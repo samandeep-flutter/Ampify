@@ -305,22 +305,21 @@ class PlayerScreen extends StatelessWidget {
     final state = context.read<PlayerBloc>().state;
     showModalBottomSheet(
         context: context,
+        useSafeArea: true,
         useRootNavigator: true,
-        builder: (context) =>
-            TrackBottomSheet(state.track.asTrack, liked: state.isLiked));
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => TrackBottomSheet(state.track.asTrack,
+            liked: state.isLiked, fromPlayer: true));
   }
 
   void _toQueue(BuildContext context) {
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
-      isScrollControlled: true,
       useRootNavigator: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.vertical(
-            top: Radius.circular(Dimens.borderLarge)),
-      ),
-      backgroundColor: context.scheme.background,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (_) => const QueueView(),
     );
   }

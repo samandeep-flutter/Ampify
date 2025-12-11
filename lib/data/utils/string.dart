@@ -45,6 +45,7 @@ sealed class StringRes {
   static const String myLibrary = 'My Library';
   static const String editCover = 'Edit Cover';
   static const String addTracks = 'Add Tracks to Playlist';
+  static const String appendTracks = 'Append Tracks';
   static const String editDetails = 'Edit Details';
   static const String noImage = 'No Image Selected';
   static const String uploading = 'Uploading...';
@@ -60,6 +61,7 @@ sealed class StringRes {
   static const String addtoLiked = 'Add to Liked Songs';
   static const String removeLiked = 'Remove from Liked Songs';
   static const String addtoPlaylist = 'Add to Playlist';
+  static const String gotoRadio = 'Go to Song Radio';
   static const String gotoAlbum = 'Go to Album';
   static const String addtoQueue = 'Add to Queue';
 

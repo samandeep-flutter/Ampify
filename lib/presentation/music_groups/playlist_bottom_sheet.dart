@@ -1,8 +1,8 @@
 import 'package:ampify/data/utils/exports.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../buisness_logic/root_bloc/music_group_bloc.dart';
+import '../../buisness_logic/music_group_bloc/music_group_bloc.dart';
 
-class PlaylistBottomSheet extends StatelessWidget {
+class PlaylistBottomSheet extends StatefulWidget {
   final String? id;
   final String? image;
   final String? title;
@@ -16,9 +16,22 @@ class PlaylistBottomSheet extends StatelessWidget {
   });
 
   @override
+  State<PlaylistBottomSheet> createState() => _PlaylistBottomSheetState();
+}
+
+class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
+  String? get uid => BoxServices.instance.uid;
+  bool get isOwner => widget.details?.owner?.id == uid;
+
+  @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    return MyBottomSheet(
+    return MyBottomSheet.dragable(
+      constraints: HeightConstraints(
+        maxHeight: isOwner ? 0.9 : 0.5,
+        minHeight: isOwner ? 0.5 : 0.3,
+        defaultHeight: isOwner ? 0.5 : 0.4,
+      ),
       customTitle: Row(
         children: [
           const SizedBox(width: Dimens.sizeDefault),
@@ -28,7 +41,7 @@ class PlaylistBottomSheet extends StatelessWidget {
             final double height = _scalar.scale(_dimen);
             final width = _scalar.scale(_dimen + Dimens.sizeMedSmall);
 
-            return MyCachedImage(image,
+            return MyCachedImage(widget.image,
                 borderRadius: Dimens.sizeMini, height: height, width: width);
           }),
           const SizedBox(width: Dimens.sizeDefault),
@@ -38,7 +51,7 @@ class PlaylistBottomSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title ?? '',
+                  widget.title ?? '',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -54,14 +67,14 @@ class PlaylistBottomSheet extends StatelessWidget {
                   child: Row(
                     children: [
                       Flexible(
-                          child: Text(details?.owner?.name ?? '',
+                          child: Text(widget.details?.owner?.name ?? '',
                               maxLines: 1, overflow: TextOverflow.ellipsis)),
                       PaginationDots(
                         current: true,
                         color: scheme.textColorLight,
                         margin: Dimens.sizeSmall,
                       ),
-                      Text(details?.public ?? false
+                      Text(widget.details?.public ?? false
                           ? StringRes.pubPlaylist
                           : StringRes.priPlaylist),
                     ],
@@ -77,36 +90,50 @@ class PlaylistBottomSheet extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(height: Dimens.sizeSmall),
           BottomSheetListTile(
             enable: false,
             onTap: () {
-              // TODO: implement add tracks to playlist.
+              // TODO: implement append tracks to upNext.
             },
-            title: StringRes.addTracks,
-            icon: Icons.music_note_outlined,
+            title: StringRes.appendTracks,
+            icon: Icons.library_music_outlined,
           ),
-          BottomSheetListTile(
-            onTap: () => _pickCoverImage(context),
-            title: StringRes.editCover,
-            icon: Icons.photo_outlined,
-          ),
-          BottomSheetListTile(
-            onTap: () => _toEditDetails(context),
-            title: StringRes.editDetails,
-            icon: Icons.title,
-          ),
-          if (details?.public ?? false)
+          if (widget.details?.owner?.id == uid)
             BottomSheetListTile(
-              onTap: () => _toggleVisibility(context, false),
-              title: 'Make Private',
-              icon: Icons.lock_outline,
-            )
-          else
-            BottomSheetListTile(
-              onTap: () => _toggleVisibility(context, true),
-              title: 'Make Public',
-              icon: Icons.public,
+              enable: false,
+              onTap: () {
+                // TODO: implement add tracks to playlist.
+              },
+              title: StringRes.addTracks,
+              icon: Icons.music_note_outlined,
             ),
+          if (widget.details?.owner?.id == uid)
+            BottomSheetListTile(
+              onTap: () => _pickCoverImage(context),
+              title: StringRes.editCover,
+              icon: Icons.photo_outlined,
+            ),
+          if (widget.details?.owner?.id == uid)
+            BottomSheetListTile(
+              onTap: () => _toEditDetails(context),
+              title: StringRes.editDetails,
+              icon: Icons.title,
+            ),
+          if (widget.details?.owner?.id == uid) ...[
+            if (widget.details?.public ?? false)
+              BottomSheetListTile(
+                onTap: () => _toggleVisibility(context, false),
+                title: 'Make Private',
+                icon: Icons.lock_outline,
+              )
+            else
+              BottomSheetListTile(
+                onTap: () => _toggleVisibility(context, true),
+                title: 'Make Public',
+                icon: Icons.public,
+              ),
+          ],
           BottomSheetListTile(
             enable: false,
             onTap: () {
@@ -115,7 +142,6 @@ class PlaylistBottomSheet extends StatelessWidget {
             title: StringRes.share,
             icon: Icons.ios_share,
           ),
-          const SafeArea(child: SizedBox(height: Dimens.sizeSmall))
         ],
       ),
     );
@@ -129,11 +155,11 @@ class PlaylistBottomSheet extends StatelessWidget {
 
   void _toEditDetails(BuildContext context) {
     Navigator.pop(context);
-    final pathParams = {'id': id!};
+    final pathParams = {'id': widget.id!};
     final params = {
-      'image': image,
-      'title': title,
-      'desc': details?.description
+      'image': widget.image,
+      'title': widget.title,
+      'desc': widget.details?.description
     };
     context.pushNamed(AppRoutes.modifyPlaylist,
         pathParameters: pathParams, queryParameters: params);

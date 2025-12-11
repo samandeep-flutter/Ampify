@@ -39,6 +39,7 @@ Future<void> _initServices() async {
     await dotenv.load();
     await getIt<YTMusic>().initialize();
     await GetStorage.init(BoxKeys.boxName);
+    LifecycleHandler.instance.init();
     FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -139,5 +140,23 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
     );
+  }
+}
+
+class LifecycleHandler extends WidgetsBindingObserver {
+  LifecycleHandler._init();
+  static LifecycleHandler? _instance;
+  static LifecycleHandler get instance =>
+      _instance ??= LifecycleHandler._init();
+
+  final AuthServices auth = getIt();
+
+  void init() => WidgetsBinding.instance.addObserver(this);
+  void dispose() => WidgetsBinding.instance.removeObserver(this);
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) auth.checkConnectivity();
+    super.didChangeAppLifecycleState(state);
   }
 }
