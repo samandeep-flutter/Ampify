@@ -204,6 +204,11 @@ extension MyDuration on Duration {
     final _seconds = (inMilliseconds / 1000).ceil();
     return Duration(seconds: _seconds);
   }
+
+  Duration floor() {
+    final _seconds = (inMilliseconds / 1000).floor();
+    return Duration(seconds: _seconds);
+  }
 }
 
 extension MyDateTime on DateTime {
@@ -270,17 +275,63 @@ extension MyString on String {
     return passExp.hasMatch(text);
   }
 
-  int _calculateMatch(String item, String searchText) {
-    item = item.toLowerCase();
-    searchText = searchText.toLowerCase();
-    if (item == searchText) {
-      return 3;
-    } else if (item.startsWith(searchText)) {
-      return 2;
-    } else if (item.contains(searchText)) {
-      return 1;
+  int _calculateMatch(String item, String query) {
+    item = item.trim().toLowerCase();
+    query = query.trim().toLowerCase();
+
+    if (query.isEmpty) return 0;
+    int score = 0;
+
+    if (item == query) return 1000;
+    if (item.startsWith(query)) score += 500;
+
+    //  Word-boundary match
+    final index = item.indexOf(query);
+    if (index >= 0) {
+      if (index == 0 || item[index - 1] == ' ') {
+        score += 300; // beginning of a word
+      } else {
+        score += 100; // somewhere inside
+      }
     }
-    return 0;
+    int cScore = _connsecutiveMatch(item, query) * 20;
+    score += cScore;
+
+    int charCount = _characterMatch(item, query);
+    score += charCount;
+    return score;
+  }
+
+  int _characterMatch(String item, String query) {
+    int count = 0;
+    for (var ch in query.split('')) {
+      if (item.contains(ch)) count++;
+    }
+    return count;
+  }
+
+  int _connsecutiveMatch(String item, String query) {
+    int longest = 0;
+    int current = 0;
+
+    int j = 0;
+
+    for (int i = 0; i < item.length; i++) {
+      if (j < query.length && item[i] == query[j]) {
+        current++;
+        j++;
+        longest = current > longest ? current : longest;
+      } else {
+        current = 0;
+        j = 0;
+        if (item[i] == query[0]) {
+          current = 1;
+          j = 1;
+        }
+      }
+    }
+
+    return longest;
   }
 }
 
@@ -306,20 +357,6 @@ extension MyBrightness on ThemeMode {
         return Icons.contrast;
     }
   }
-}
-
-extension SortMusicGroup on List<LibraryModel> {
-  void sortLibrary(String query) => sort((a, b) {
-        final fName = a.name?.queryMatch(query) ?? 0;
-        final fArtist = a.owner?.name?.queryMatch(query) ?? 0;
-        final first = fName.compareTo(fArtist);
-
-        final sName = b.name?.queryMatch(query) ?? 0;
-        final sArtist = b.owner?.name?.queryMatch(query) ?? 0;
-        final second = sName.compareTo(sArtist);
-
-        return second.compareTo(first);
-      });
 }
 
 extension MyInt on int {

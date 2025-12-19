@@ -1,6 +1,7 @@
 import 'package:ampify/data/utils/exports.dart';
 
 class HomeRepo {
+  @protected
   final DioClient dio;
   const HomeRepo({required this.dio});
 
@@ -15,6 +16,14 @@ class HomeRepo {
     ApiResponse.verify(response,
         onSuccess: onSuccess,
         onError: onError ?? (e) => logPrint(e, 'releases'));
+  }
+
+  Future<void> getTrack(String id,
+      {required SuccessCallback onSuccess, ErrorCallback? onError}) async {
+    final response = await dio.get(AppConstants.getTrack(id));
+    ApiResponse.verify(response,
+        onSuccess: onSuccess,
+        onError: onError ?? (e) => logPrint(e, 'single-track'));
   }
 
   Future<void> getSeveralTracks({

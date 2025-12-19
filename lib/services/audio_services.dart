@@ -23,14 +23,20 @@ class MyAudioHandler extends BaseAudioHandler {
   static MyAudioHandler get instance => _instance ??= MyAudioHandler._init();
 
   final _player = AudioPlayer();
+
   int _index = 0;
+  String _trackEnded = '';
   Duration _duration = Duration.zero;
 
   MyAudioHandler init() {
-    _playerStream();
-    _positionStream();
-    _indexChanges();
-    _interruptionListener();
+    try {
+      _playerStream();
+      _positionStream();
+      _indexChanges();
+      _interruptionListener();
+    } catch (e) {
+      logPrint(e, 'audio-init');
+    }
     playbackState.add(playbackState.value.copyWith(
       systemActions: const {
         MediaAction.seek,
@@ -43,7 +49,6 @@ class MyAudioHandler extends BaseAudioHandler {
       repeatMode: _player.loopMode.toRepeatMode,
       shuffleMode: AudioServiceShuffleMode.none,
     ));
-
     AudioService.asyncError.listen((e) => logPrint(e, 'audio-services'));
     return this;
   }
@@ -76,6 +81,7 @@ class MyAudioHandler extends BaseAudioHandler {
   @override
   Future<void> playMediaItem(MediaItem mediaItem) async {
     try {
+      _trackEnded = '';
       _player.setAudioSource(mediaItem.toAudioSource);
       this.mediaItem.add(mediaItem);
       queue.add([mediaItem]);
@@ -200,10 +206,17 @@ class MyAudioHandler extends BaseAudioHandler {
       customEvent.add(duration.ceil());
       _duration = duration.ceil();
       try {
+        final item = queue.value[_index];
+        final loopOff = _player.loopMode == LoopMode.off;
+        if (_trackEnded == item.id && loopOff) return;
+        dprint('${duration.format()}, queue: ${queue.value.length},'
+            ' index: $_index, ${item.title}: ${item.duration!.floor()}');
+
         /// current track ended
-        if (duration >= queue.value[_index].duration!.ceil()) {
-          dprint('${queue.value[_index].title} ended, ${duration.format()}');
+        if (duration >= item.duration!.floor()) {
+          dprint('${item.title} ended, ${duration.format()}');
           if (_index >= queue.value.length - 1) customState.add(false);
+          _trackEnded = item.id;
         }
       } catch (e) {
         logPrint(e, 'audio position');
@@ -213,11 +226,15 @@ class MyAudioHandler extends BaseAudioHandler {
 
   void _indexChanges() {
     _player.currentIndexStream.listen((index) {
-      if (index == null || index == _index) return;
-      if (index > queue.value.length - 1) return;
-      mediaItem.add(queue.value[index]);
-      if (index > _index) customState.add(queue.value[index].id);
-      _index = index;
+      try {
+        if (index == null || index == _index) return;
+        if (index > queue.value.length - 1) return;
+        mediaItem.add(queue.value[index]);
+        if (index > _index) customState.add(queue.value[index].id);
+        _index = index;
+      } catch (e) {
+        logPrint(e, 'audio-index');
+      }
     });
   }
 
@@ -237,6 +254,12 @@ class MyAudioHandler extends BaseAudioHandler {
           break;
       }
     });
+  }
+
+  @override
+  Future<void> onNotificationDeleted() {
+    customState.add(false);
+    return super.onNotificationDeleted();
   }
 
   @override

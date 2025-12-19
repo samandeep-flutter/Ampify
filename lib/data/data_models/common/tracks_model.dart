@@ -1,7 +1,9 @@
+import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class Track extends Equatable {
   final Album? album;
+  final SongYtDetails? ytDetails;
   final List<Artist>? artists;
   final Duration? duration;
   final bool? explicit;
@@ -23,6 +25,7 @@ class Track extends Equatable {
     this.href,
     this.id,
     this.name,
+    this.ytDetails,
     this.popularity,
     this.trackNumber,
     this.irsc,
@@ -38,6 +41,9 @@ class Track extends Equatable {
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
       duration: Duration(milliseconds: json['duration_ms']),
+      ytDetails: json['ytDetails'] != null
+          ? SongYtDetails.fromJson(json['ytDetails'])
+          : null,
       explicit: json['explicit'],
       href: json['href'],
       id: json['id'],
@@ -59,6 +65,7 @@ class Track extends Equatable {
         'href': href,
         'id': id,
         'name': name,
+        'ytDetails': ytDetails?.toJson(),
         'external_ids': {'isrc': irsc},
         'popularity': popularity,
         'track_number': trackNumber,
@@ -67,6 +74,25 @@ class Track extends Equatable {
         'uri': uri,
       };
 
+  Track copyWith(SongYtDetails ytDetails) {
+    return Track(
+      album: album,
+      artists: artists,
+      duration: duration,
+      explicit: explicit,
+      href: href,
+      id: id,
+      name: name,
+      ytDetails: ytDetails,
+      popularity: popularity,
+      trackNumber: trackNumber,
+      irsc: irsc,
+      snapId: snapId,
+      type: type,
+      uri: uri,
+    );
+  }
+
   TrackDetails get asTrackDetails {
     return TrackDetails.track(
       id: id,
@@ -74,6 +100,8 @@ class Track extends Equatable {
       albumId: album?.id,
       image: album?.image,
       subtitle: artists?.asString,
+      duration: ytDetails?.duration,
+      videoId: ytDetails?.videoId,
     );
   }
 
@@ -134,9 +162,9 @@ class TrackDetails extends Equatable {
     required this.image,
     required this.title,
     required this.subtitle,
-  })  : videoId = null,
-        duration = null,
-        darkBgColor = null,
+    this.duration,
+    this.videoId,
+  })  : darkBgColor = null,
         bgColor = null;
 
   TrackDetails copyWith({
@@ -193,14 +221,14 @@ class TrackDetails extends Equatable {
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'videoId': videoId,
-        'albumId': albumId,
-        'image': image,
-        'title': title,
-        'subtitle': subtitle,
-        'duration': duration?.inSeconds,
-        'bgColor': bgColor?.toARGB32(),
-        'darkBgColor': darkBgColor?.toARGB32(),
+        if (videoId != null) 'videoId': videoId,
+        if (albumId != null) 'albumId': albumId,
+        if (image != null) 'image': image,
+        if (title != null) 'title': title,
+        if (subtitle != null) 'subtitle': subtitle,
+        if (duration != null) 'duration': duration?.inSeconds,
+        if (bgColor != null) 'bgColor': bgColor?.toARGB32(),
+        if (darkBgColor != null) 'darkBgColor': darkBgColor?.toARGB32(),
       };
 
   @override

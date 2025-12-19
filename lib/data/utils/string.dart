@@ -27,6 +27,7 @@ sealed class StringRes {
   static const String followers = 'Followers';
   static const String sortBy = 'Sort by';
   static const String clear = 'Clear';
+  static const String trackRadio = 'Track Radio';
   static const String commingSoon = 'Comming Soon';
   static const String newReleases = 'New Releases for you';
   static const String recentlyPlayed = 'Recently played';
@@ -109,4 +110,19 @@ sealed class StringRes {
       'This track cannot be added to queue at the moment.';
   static const String errorPage = 'The specified page cannot be found, '
       'please try again or contact the developer';
+  static const String errorRecommendation =
+      'Something went wrong, please try again';
+
+  static const List<String> radioLoaders = [
+    'Tuning the radio',
+    'Finding tracks that match this vibe',
+    'Scanning similar artists',
+    'Building your radio mix',
+    'Lining up great recommendations',
+    'Almost there',
+    'Good music takes a moment',
+    'Curating your station',
+    'Matching tempo and mood',
+    'Preparing your next tracks',
+  ];
 }

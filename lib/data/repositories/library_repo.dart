@@ -1,6 +1,7 @@
 import 'package:ampify/data/utils/exports.dart';
 
 class LibraryRepo {
+  @protected
   final DioClient dio;
   const LibraryRepo({required this.dio});
 

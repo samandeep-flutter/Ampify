@@ -6,6 +6,7 @@ import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class AuthRepo {
+  @protected
   final DioClient dio;
   const AuthRepo({required this.dio});
 

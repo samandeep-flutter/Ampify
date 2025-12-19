@@ -5,8 +5,11 @@ import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MusicRepo {
+  @protected
   final DioClient dio;
+  @protected
   final YTMusic ytMusic;
+  @protected
   final YoutubeExplode ytExplode;
 
   MusicRepo(
@@ -65,6 +68,18 @@ class MusicRepo {
       return null;
     }
   }
+
+  Future<List<UpNextsDetails>?> getRecomendations(Track track) async {
+    try {
+      final artist =
+          track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
+      final song = await _search(QuerySong(track.name!, artist));
+      return await ytMusic.getUpNexts(song!.videoId);
+    } catch (e) {
+      logPrint(e, 'yt-recomendations');
+      return null;
+    }
+  }
 }
 
 extension MyStream on StreamManifest {
@@ -86,6 +101,14 @@ class SongYtDetails {
   final Duration duration;
 
   SongYtDetails(this.videoId, {required this.duration});
+
+  factory SongYtDetails.fromJson(Map<String, dynamic> json) {
+    return SongYtDetails(json['videoId'],
+        duration: Duration(seconds: json['duration'] ?? 0));
+  }
+
+  Map<String, dynamic> toJson() =>
+      {'videoId': videoId, 'duration': duration.inSeconds};
 }
 
 class QuerySong {

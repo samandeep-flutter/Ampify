@@ -1,10 +1,8 @@
-import 'package:ampify/data/utils/app_constants.dart';
-import 'package:ampify/services/extension_services.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:dio/dio.dart';
-import '../data_provider/api_response.dart';
-import '../data_provider/dio_client.dart';
 
 class MusicGroupRepo {
+  @protected
   final DioClient dio;
   const MusicGroupRepo({required this.dio});
 

@@ -9,6 +9,7 @@ abstract class AppRoutes {
   static const String listnHistory = 'listening-history';
   static const String createPlaylist = 'create-playlist';
   static const String modifyPlaylist = 'modify-playlist';
+  static const String songRadio = 'song-radio';
 }
 
 abstract class AppRoutePaths {
@@ -20,4 +21,5 @@ abstract class AppRoutePaths {
   static const String profile = '/${AppRoutes.profile}';
   static const String createPlaylist = '/${AppRoutes.createPlaylist}/:userId';
   static const String modifyPlaylist = '/${AppRoutes.modifyPlaylist}/:id';
+  static const String songRadio = '/${AppRoutes.songRadio}/:id';
 }

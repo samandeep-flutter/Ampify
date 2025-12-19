@@ -105,6 +105,16 @@ class MusicGroupPlayed extends PlayerEvent {
   List<Object?> get props => [id, tracks, super.props];
 }
 
+class PlayerAppendTracks extends PlayerEvent {
+  final String? id;
+  final List<Track> tracks;
+
+  const PlayerAppendTracks(this.tracks, {this.id});
+
+  @override
+  List<Object?> get props => [id, tracks, super.props];
+}
+
 class PlayerTrackChanged extends PlayerEvent {
   final Track track;
   final bool? liked;

@@ -197,12 +197,10 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
   void _scrollListener() {
     if (!scrollController.hasClients) return;
-    final appbarHeight = scrollController.position.extentInside * .4;
-    if (scrollController.offset > (appbarHeight - kToolbarHeight)) {
-      add(const MusicGroupTitleFade(1));
-      return;
+    final scroll = Utils.titleScroll(scrollController);
+    if (scroll != state.titileOpacity) {
+      add(MusicGroupTitleFade(scroll));
     }
-    add(const MusicGroupTitleFade(0));
   }
 
   void onFav(String id, {required LibItemType type, required bool liked}) {

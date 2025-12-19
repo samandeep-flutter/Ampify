@@ -48,13 +48,16 @@ class AlbumModel extends Equatable {
       {this.href, this.limit, this.offset, this.total, this.items});
 
   factory AlbumModel.fromJson(Map<String, dynamic> json) {
+    final List<Album> items = [];
+    (json['items'] as List?)?.forEach((e) {
+      if (e != null) items.add(Album.fromJson(e));
+    });
     return AlbumModel(
       href: json['href'],
       limit: json['limit'],
       offset: json['offset'],
       total: json['total'],
-      items:
-          List<Album>.from(json['items']?.map((e) => Album.fromJson(e)) ?? []),
+      items: items,
     );
   }
 
@@ -81,13 +84,16 @@ class ArtistModel extends Equatable {
       {this.href, this.limit, this.offset, this.total, this.items});
 
   factory ArtistModel.fromJson(Map<String, dynamic> json) {
+    final List<Artist> items = [];
+    (json['items'] as List?)?.forEach((e) {
+      if (e != null) items.add(Artist.fromJson(e));
+    });
     return ArtistModel(
       href: json['href'],
       limit: json['limit'],
       offset: json['offset'],
       total: json['total'],
-      items: List<Artist>.from(
-          json['items']?.map((e) => Artist.fromJson(e)) ?? []),
+      items: items,
     );
   }
 
@@ -151,13 +157,17 @@ class TrackModel extends Equatable {
       {this.href, this.limit, this.offset, this.total, this.items});
 
   factory TrackModel.fromJson(Map<String, dynamic> json) {
+    final List<Track> items = [];
+    (json['items'] as List?)?.forEach((e) {
+      if (e != null) items.add(Track.fromJson(e));
+    });
     return TrackModel(
-        href: json['href'],
-        limit: json['limit'],
-        offset: json['offset'],
-        total: json['total'],
-        items: List<Track>.from(
-            json['items']?.map((v) => Track.fromJson(v)) ?? []));
+      href: json['href'],
+      limit: json['limit'],
+      offset: json['offset'],
+      total: json['total'],
+      items: items,
+    );
   }
 
   Map<String, dynamic> toJson() => {

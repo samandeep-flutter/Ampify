@@ -29,8 +29,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         transformer: Utils.debounce(Durations.long2));
     on<PlayerNextTrack>(_onNextTrack);
     on<PlayerPreviousTrack>(_onPreviousTrack);
-    // on<PlayerQueueStream>(_onQueueStream,
-    //     transformer: Utils.debounce(Durations.long2));
+    on<PlayerAppendTracks>(_appendTracks);
   }
 
   // @override
@@ -364,6 +363,13 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       emit(state.copyWith(upNext: state.upNext.skip(1).toList()));
       add(PlayerUpNextHandler());
     }
+  }
+
+  void _appendTracks(
+      PlayerAppendTracks event, Emitter<PlayerState> emit) async {
+    emit(state.copyWith(musicGroupId: event.id, upNext: event.tracks));
+    await _audioHandler.customAction(PlayerActions.removeUpcomming);
+    add(PlayerPrepareNextTrack());
   }
 
   Future<void> _onTrackChange(

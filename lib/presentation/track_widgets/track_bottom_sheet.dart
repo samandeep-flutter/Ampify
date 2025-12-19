@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ampify/buisness_logic/library_bloc/liked_songs_bloc.dart';
 import 'package:ampify/presentation/track_widgets/addto_playlist.dart';
 import 'package:ampify/data/utils/exports.dart';
@@ -85,6 +87,10 @@ class TrackBottomSheet extends StatelessWidget {
               title: StringRes.gotoAlbum,
               icon: Icons.album_outlined),
           BottomSheetListTile(
+              onTap: () => _toRadio(context),
+              title: StringRes.gotoRadio,
+              icon: Icons.radio_outlined),
+          BottomSheetListTile(
             onTap: () {
               bloc.onTrackShare(track.id!);
               Navigator.pop(context);
@@ -103,6 +109,12 @@ class TrackBottomSheet extends StatelessWidget {
     final type = LibItemType.album.name;
     context.pushNamed(AppRoutes.musicGroup,
         pathParameters: {'id': track.album!.id!, 'type': type});
+  }
+
+  void _toRadio(BuildContext context) {
+    context.close(fromPlayer ?? false ? 2 : 1);
+    context.pushNamed(AppRoutes.songRadio,
+        pathParameters: {'id': track.id!}, extra: jsonEncode(track.toJson()));
   }
 
   void _onTrackLiked(BuildContext context) {

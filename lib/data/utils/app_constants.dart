@@ -15,6 +15,7 @@ sealed class AppConstants {
   static const String recentlyPlayed = 'me/player/recently-played';
   static String checkSaved(String ids) => 'me/tracks/contains?ids=$ids';
   static String browse(String local) => 'browse/categories?locale=$local';
+  static String getTrack(String id) => 'tracks/$id';
   static String severalTracks(String ids) => 'tracks?ids=$ids';
   static String severalAlbums(String ids) => 'albums?ids=$ids';
   static String newReleases(int offset) => 'browse/new-releases?offset=$offset';
@@ -52,6 +53,7 @@ sealed class EnvKeys {
 sealed class UniqueIds {
   static const String likedSongs = '00-liked-songs';
   static const String emptyTrack = '00-empty-track';
+  static String radioID(String track) => 'radio:$track';
 }
 
 sealed class PlayerActions {
@@ -61,10 +63,9 @@ sealed class PlayerActions {
 }
 
 void _debugLog(Object? value, [String? name, bool? isError]) {
-  if (kReleaseMode) return;
   final log = value is String? ? value : value.toString();
-  dev.log(log ?? 'null', name: name ?? StringRes.appName);
   if (isError ?? false) FirebaseCrashlytics.instance.log('[$name] $log');
+  if (!kReleaseMode) dev.log(log ?? 'null', name: name ?? StringRes.appName);
 }
 
 void debugLog(Object? value, [String? name]) => _debugLog(value, name);

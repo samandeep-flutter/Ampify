@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:ampify/buisness_logic/auth_bloc/auth_bloc.dart';
 import 'package:ampify/buisness_logic/music_group_bloc/edit_playlist_bloc.dart';
 import 'package:ampify/buisness_logic/music_group_bloc/music_group_bloc.dart';
@@ -7,6 +9,8 @@ import 'package:ampify/presentation/library_screens/library_screen.dart';
 import 'package:ampify/presentation/library_screens/profile_view.dart';
 import 'package:ampify/presentation/music_groups/edit_playlist.dart';
 import 'package:ampify/presentation/root_view/not_found_screen.dart';
+import 'package:ampify/buisness_logic/player_bloc/track_radio_bloc.dart';
+import 'package:ampify/presentation/root_view/track_radio.dart';
 import 'package:ampify/presentation/search_screens/search_page.dart';
 import 'package:ampify/presentation/root_view/auth_screen.dart';
 import 'package:flutter/foundation.dart';
@@ -83,7 +87,6 @@ abstract class AppPage {
             GoRoute(
                 name: AppRoutes.musicGroup,
                 path: AppRoutePaths.musicGroup,
-                parentNavigatorKey: _auth.shellNavigator,
                 builder: (context, state) {
                   try {
                     String id = state.pathParameters['id']!;
@@ -97,6 +100,16 @@ abstract class AppPage {
                     logPrint(e, 'route');
                     return NotFoundScreen(state);
                   }
+                }),
+            GoRoute(
+                name: AppRoutes.songRadio,
+                path: AppRoutePaths.songRadio,
+                builder: (context, state) {
+                  final id = state.pathParameters['id'];
+                  final track = jsonDecode(state.extra as String? ?? '');
+                  return BlocProvider(
+                      create: (_) => TrackRadioBloc(),
+                      child: TrackRadio(id!, track: track));
                 }),
             GoRoute(
               name: AppRoutes.searchView,

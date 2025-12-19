@@ -41,7 +41,12 @@ class Album extends Equatable {
   });
 
   factory Album.fromJson(Map<String, dynamic> json) {
-    final albumImage = (json['images'] as List?)?.firstElement?['url'];
+    String? albumImage;
+    try {
+      albumImage = (json['images'] as List?)?.firstElement?['url'];
+    } catch (_) {
+      if (json['images'] is String) albumImage = json['images'];
+    }
     return Album(
       albumType: json['album_type'],
       totalTracks: json['total_tracks'],
@@ -50,11 +55,11 @@ class Album extends Equatable {
       image: albumImage,
       name: json['name'],
       releaseDate: json['release_date'],
-      type: LibItemType.values.firstWhere((e) => e.name == json['type']),
+      type: LibItemType.values.firstWhereOrNull((e) => e.name == json['type']),
       uri: json['uri'],
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
-      tracks: List<Track>.from(json['tracks']?['items']?.map((e) {
+      tracks: List<Track>.from((json['tracks']?['items'])?.map((e) {
             final album =
                 Album(image: albumImage, name: json['name'], id: json['id']);
             return Track.fromJson(e, image: albumImage, album: album);
@@ -81,7 +86,7 @@ class Album extends Equatable {
         'type': type?.name,
         'uri': uri,
         'artists': artists?.map((v) => v.toJson()).toList(),
-        'tracks': tracks?.map((e) => e.toJson()),
+        'tracks': {'items': tracks?.map((v) => v.toJson()).toList()},
         'copyrights': copyrights?.map((v) => v.toJson()).toList(),
         'genres': genres,
         'label': label,

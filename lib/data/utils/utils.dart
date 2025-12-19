@@ -32,6 +32,14 @@ sealed class Utils {
     return EdgeInsets.symmetric(horizontal: padding);
   }
 
+  static double titleScroll(ScrollController controller, [double? fraction]) {
+    final appbarHeight = controller.position.extentInside * (fraction ?? .4);
+    if (controller.offset > (appbarHeight - kToolbarHeight)) {
+      return 1;
+    }
+    return 0;
+  }
+
   static EdgeInsets insetsOnly(double padding,
       {double? top, double? bottom, double? left, double? right}) {
     return EdgeInsets.fromLTRB(
@@ -55,9 +63,13 @@ sealed class Utils {
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
     final _details = Completer<SongYtDetails?>();
-    _repo.getDetailsFromQuery(track).then((details) {
-      _details.complete(details);
-    });
+    if (track.ytDetails != null) {
+      _details.complete(track.ytDetails);
+    } else {
+      _repo.getDetailsFromQuery(track).then((details) {
+        _details.complete(details);
+      });
+    }
     PaletteGenerator? palete;
     try {
       palete = await PaletteGenerator.fromImageProvider(
