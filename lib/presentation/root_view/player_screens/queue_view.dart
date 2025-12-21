@@ -18,6 +18,7 @@ class QueueView extends StatelessWidget {
             HeightConstraints(maxHeight: 1, minHeight: .6, defaultHeight: .7),
         builder: (context, scrollController) {
           return CustomScrollView(
+            physics: const BottomBounceScrollPhysics(),
             controller: scrollController,
             slivers: [
               SliverAppBar(

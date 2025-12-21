@@ -47,6 +47,8 @@ extension MyMusicState on MusicState? {
 
 extension MyLibItem on LibItemType? {
   bool get isPlaylist => this == LibItemType.playlist;
+  bool get isSingle => this == LibItemType.single;
+
   bool get isTrack => this == LibItemType.track;
   // bool get isAlbum =>
   //     this == LibItemType.album ||

@@ -46,6 +46,7 @@ sealed class StringRes {
   static const String myLibrary = 'My Library';
   static const String editCover = 'Edit Cover';
   static const String addTracks = 'Add Tracks to Playlist';
+  static const String append = 'Append';
   static const String appendTracks = 'Append Tracks';
   static const String editDetails = 'Edit Details';
   static const String noImage = 'No Image Selected';
@@ -84,8 +85,8 @@ sealed class StringRes {
       ' your music journey. You\'ll be redirected to a browser for authentication';
   static const String logoutDesc = 'Are you sure you want to log out? You’ll'
       ' need to reconnect to Spotify to use Ampify again.';
-  static const String homeSubtitle = 'Turn Up the Volume on Your Music'
-      ' Journey!';
+  static const String homeSubtitle =
+      'Turn Up the Volume on Your Music Journey!';
   static const String listnHisSubtitle = 'Rediscover your vibe with a curated '
       'view of your listening history.';
   static const String emptyListnHistory = 'No tunes here yet, start  listening'
@@ -110,8 +111,11 @@ sealed class StringRes {
       'This track cannot be added to queue at the moment.';
   static const String errorPage = 'The specified page cannot be found, '
       'please try again or contact the developer';
+  static const String addedtoUpNext = 'Added to UpNext';
   static const String errorRecommendation =
       'Something went wrong, please try again';
+  static const String radioDesc = 'Plays an endless mix of songs '
+      'inspired by this track, with a similar sound and mood';
 
   static const List<String> radioLoaders = [
     'Tuning the radio',

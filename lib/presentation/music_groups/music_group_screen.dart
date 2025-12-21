@@ -254,6 +254,21 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             },
                           ),
                           const SizedBox(width: Dimens.sizeSmall),
+                          if (!state.type.isSingle) ...[
+                            ElevatedButton.icon(
+                                onPressed: () => _appendTracks(state),
+                                style: ElevatedButton.styleFrom(
+                                  padding:
+                                      Utils.insetsHoriz(Dimens.sizeDefault),
+                                  visualDensity: VisualDensity.compact,
+                                  backgroundColor: scheme.textColor,
+                                  foregroundColor: scheme.background,
+                                ),
+                                iconAlignment: IconAlignment.end,
+                                label: Text(StringRes.append),
+                                icon: Icon(Icons.library_music_outlined)),
+                            const SizedBox(width: Dimens.sizeSmall),
+                          ],
                           IconButton(
                             onPressed: () => _toMoreDetails(bloc, state),
                             style: IconButton.styleFrom(
@@ -402,6 +417,11 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
         },
       ),
     );
+  }
+
+  void _appendTracks(MusicGroupState state) {
+    final player = context.read<PlayerBloc>();
+    player.add(PlayerAppendTracks(state.tracks, id: state.id));
   }
 
   void _shuffleToggle() {

@@ -367,9 +367,17 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   void _appendTracks(
       PlayerAppendTracks event, Emitter<PlayerState> emit) async {
-    emit(state.copyWith(musicGroupId: event.id, upNext: event.tracks));
-    await _audioHandler.customAction(PlayerActions.removeUpcomming);
-    add(PlayerPrepareNextTrack());
+    showToast(StringRes.addedtoUpNext);
+    try {
+      if (state.playerState.isHidden) throw FormatException();
+      emit(state.copyWith(musicGroupId: event.id, upNext: event.tracks));
+      await _audioHandler.customAction(PlayerActions.removeUpcomming);
+      add(PlayerPrepareNextTrack());
+    } on FormatException {
+      add(MusicGroupPlayed(id: event.id, tracks: event.tracks));
+    } catch (e) {
+      logPrint(e, 'append-tracks');
+    }
   }
 
   Future<void> _onTrackChange(

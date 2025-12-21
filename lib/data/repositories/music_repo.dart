@@ -71,10 +71,13 @@ class MusicRepo {
 
   Future<List<UpNextsDetails>?> getRecomendations(Track track) async {
     try {
+      if (track.ytDetails != null) throw FormatException();
       final artist =
           track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
       final song = await _search(QuerySong(track.name!, artist));
       return await ytMusic.getUpNexts(song!.videoId);
+    } on FormatException {
+      return await ytMusic.getUpNexts(track.ytDetails!.videoId);
     } catch (e) {
       logPrint(e, 'yt-recomendations');
       return null;

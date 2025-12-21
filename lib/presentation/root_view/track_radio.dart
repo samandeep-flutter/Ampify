@@ -89,7 +89,7 @@ class _TrackRadioState extends State<TrackRadio> {
                         }),
                     const SizedBox(height: Dimens.sizeExtraSmall),
                     Text(
-                      'Desc',
+                      StringRes.radioDesc,
                       style: TextStyle(
                         color: scheme.textColorLight,
                         fontSize: Dimens.fontDefault - 1,
@@ -149,13 +149,16 @@ class _TrackRadioState extends State<TrackRadio> {
                               DisabledWidget(
                                 disabled: state.loading,
                                 child: ElevatedButton.icon(
-                                    onPressed: _appendTracks,
+                                    onPressed: () => _appendTracks(state),
                                     style: ElevatedButton.styleFrom(
-                                        visualDensity: VisualDensity.compact,
-                                        backgroundColor: scheme.textColor,
-                                        foregroundColor: scheme.background),
+                                      padding:
+                                          Utils.insetsHoriz(Dimens.sizeDefault),
+                                      visualDensity: VisualDensity.compact,
+                                      backgroundColor: scheme.textColor,
+                                      foregroundColor: scheme.background,
+                                    ),
                                     iconAlignment: IconAlignment.end,
-                                    label: Text(StringRes.appendTracks),
+                                    label: Text(StringRes.append),
                                     icon: Icon(Icons.library_music_outlined)),
                               ),
                               const Spacer(),
@@ -264,10 +267,9 @@ class _TrackRadioState extends State<TrackRadio> {
     player.add(PlayerShuffleToggle());
   }
 
-  void _appendTracks() {
+  void _appendTracks(TrackRadioState state) {
     final player = context.read<PlayerBloc>();
-    final bloc = context.read<TrackRadioBloc>();
-    player.add(PlayerAppendTracks(bloc.state.tracks, id: bloc.state.id));
+    player.add(PlayerAppendTracks(state.tracks, id: state.id));
   }
 }
 
@@ -336,10 +338,9 @@ class _LoadingWidgetState extends State<_LoadingWidget> {
             ),
             const SizedBox(height: Dimens.sizeLarge),
             Builder(builder: (context) {
-              final now = DateTime.now();
-              final diff = now.difference(elapsed).inSeconds;
+              final diff = DateTime.now().difference(elapsed);
               return Text(
-                loaders[index] + _builder(diff),
+                loaders[index] + _builder(diff.inSeconds),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     color: scheme.textColorLight, fontSize: Dimens.fontDefault),
@@ -353,10 +354,10 @@ class _LoadingWidgetState extends State<_LoadingWidget> {
 
   String _builder(int diff) {
     return switch (diff) {
-      1 => '   ',
-      2 => '.  ',
-      3 => '.. ',
-      _ => '...',
+      1 => '.  ',
+      2 => '.. ',
+      3 => '...',
+      _ => '   ',
     };
   }
 }

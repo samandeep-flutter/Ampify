@@ -40,7 +40,9 @@ class Track extends Equatable {
       album: json['album'] != null ? Album.fromJson(json['album']) : album,
       artists: List<Artist>.from(
           json['artists']?.map((e) => Artist.fromJson(e)) ?? []),
-      duration: Duration(milliseconds: json['duration_ms']),
+      duration: json['duration_ms'] != null
+          ? Duration(milliseconds: json['duration_ms'])
+          : null,
       ytDetails: json['ytDetails'] != null
           ? SongYtDetails.fromJson(json['ytDetails'])
           : null,

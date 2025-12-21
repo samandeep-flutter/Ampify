@@ -257,9 +257,9 @@ class MyAudioHandler extends BaseAudioHandler {
   }
 
   @override
-  Future<void> onNotificationDeleted() {
+  Future<void> onNotificationDeleted() async {
     customState.add(false);
-    return super.onNotificationDeleted();
+    await stop();
   }
 
   @override
