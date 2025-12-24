@@ -118,8 +118,9 @@ class PlayerAppendTracks extends PlayerEvent {
 class PlayerTrackChanged extends PlayerEvent {
   final Track track;
   final bool? liked;
+  final bool? fromQueue;
 
-  const PlayerTrackChanged(this.track, {this.liked});
+  const PlayerTrackChanged(this.track, {this.liked, this.fromQueue});
 
   @override
   List<Object?> get props => [track, liked, super.props];

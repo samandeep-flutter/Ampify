@@ -133,8 +133,8 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
         final query = '${item.title} ${item.artists.name}'.toLowerCase();
         await _searchRepo.searchTrack(query, onSuccess: (json) {
           final search = SearchModel.fromJson(json);
-          final _item = search.tracks?.items?.firstElement;
-          if (_item.verify(item)) tracks.add(_item!.copyWith(details));
+          final _item = search.tracks?.items?.verify(item);
+          if (_item != null) tracks.add(_item.copyWith(details));
         });
       }
       emit(state.copyWith(tracks: tracks));
@@ -152,14 +152,15 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
   }
 }
 
-extension VerifyTrack on Track? {
-  bool verify(UpNextsDetails details) {
-    if (this == null) return false;
-    final _name = this!.name?.queryMatch(details.title);
-    final _artist = this!.artists?.any((e) {
-      final match = e.name?.queryMatch(details.artists.name);
-      return (match ?? 0) > 400;
+extension _VerifyTrack on List<Track> {
+  Track? verify(UpNextsDetails details) {
+    return firstWhereOrNull((e) {
+      final _name = e.name?.queryMatch(details.title);
+      final _artist = e.artists?.any((e) {
+        final match = e.name?.queryMatch(details.artists.name);
+        return (match ?? 0) > 400;
+      });
+      return (_name ?? 0) > 400 && (_artist ?? false);
     });
-    return (_name ?? 0) > 400 && (_artist ?? false);
   }
 }

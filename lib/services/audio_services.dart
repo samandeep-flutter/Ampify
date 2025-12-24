@@ -43,7 +43,7 @@ class MyAudioHandler extends BaseAudioHandler {
         MediaAction.play,
         MediaAction.pause,
         MediaAction.skipToNext,
-        MediaAction.skipToPrevious
+        MediaAction.skipToPrevious,
       },
       androidCompactActionIndices: const [0, 1, 3],
       repeatMode: _player.loopMode.toRepeatMode,
@@ -55,6 +55,8 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
+    // TODO: implement better check.
+    if (queue.value.last.id == mediaItem.id) return;
     await _player.addAudioSource(mediaItem.toAudioSource);
     queue.add([...queue.value, mediaItem]);
   }
@@ -175,12 +177,8 @@ class MyAudioHandler extends BaseAudioHandler {
 
   void _playerStream() {
     _player.playerStateStream.listen((state) {
-      PlaybackState _state = playbackState.value.copyWith(
-        updatePosition: _player.position,
-        bufferedPosition: _player.bufferedPosition,
-        speed: _player.speed,
-        queueIndex: _index,
-      );
+      PlaybackState _state = playbackState.value
+          .copyWith(speed: _player.speed, queueIndex: _index);
       final processing = state.processingState.toAudioState;
       if (processing != playbackState.value.processingState) {
         _state = _state.copyWith(processingState: processing);
@@ -205,6 +203,9 @@ class MyAudioHandler extends BaseAudioHandler {
       if (duration.ceil() == _duration) return;
       customEvent.add(duration.ceil());
       _duration = duration.ceil();
+      playbackState.add(
+        playbackState.value.copyWith(updatePosition: _duration),
+      );
       try {
         final item = queue.value[_index];
         final loopOff = _player.loopMode == LoopMode.off;
@@ -240,7 +241,8 @@ class MyAudioHandler extends BaseAudioHandler {
 
   void _interruptionListener() {
     final session = getIt<AuthServices>().session;
-    session?.becomingNoisyEventStream.listen((_) => pause());
+    session?.becomingNoisyEventStream
+        .listen((_) => pause(), onDone: () => play());
     session?.interruptionEventStream.listen((event) {
       switch (event.type) {
         case AudioInterruptionType.duck:
@@ -280,8 +282,6 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> onTaskRemoved() async {
-    mediaItem.close();
-    queue.close();
     await stop();
     return super.onTaskRemoved();
   }

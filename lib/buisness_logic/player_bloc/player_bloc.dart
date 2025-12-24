@@ -141,6 +141,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
       /// to avoid emitting hidden state while playing tracks
       if (playerState.isHidden) playerState = null;
+      if (playerState == null && loop == null) return;
       emit(state.copyWith(playerState: playerState, loopMode: loop));
     } catch (e) {
       logPrint(e, 'playback stream');

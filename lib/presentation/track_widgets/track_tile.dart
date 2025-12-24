@@ -60,7 +60,7 @@ class TrackTile extends StatelessWidget {
     return InkWell(
       onTap: () {
         FocusManager.instance.primaryFocus?.unfocus();
-        bloc.add(PlayerTrackChanged(track, liked: liked));
+        bloc.add(PlayerTrackChanged(track, liked: liked, fromQueue: _isQueue));
         sliderBloc.add(PlayerSliderReset());
       },
       child: Padding(
