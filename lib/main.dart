@@ -21,7 +21,7 @@ import 'buisness_logic/search_bloc/search_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _initServices();
-  runApp(const ThemeServices(child: MyApp()));
+  runApp(const LifecycleHandler(child: MyApp()));
 }
 
 Future<void> _initServices() async {
@@ -39,7 +39,6 @@ Future<void> _initServices() async {
     await dotenv.load();
     await getIt<YTMusic>().initialize();
     await GetStorage.init(BoxKeys.boxName);
-    LifecycleHandler.instance.init();
     FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -143,20 +142,38 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LifecycleHandler extends WidgetsBindingObserver {
-  LifecycleHandler._init();
-  static LifecycleHandler? _instance;
-  static LifecycleHandler get instance =>
-      _instance ??= LifecycleHandler._init();
+class LifecycleHandler extends StatefulWidget {
+  final Widget child;
+  const LifecycleHandler({super.key, required this.child});
 
+  @override
+  State<LifecycleHandler> createState() => _LifecycleHandlerState();
+}
+
+class _LifecycleHandlerState extends State<LifecycleHandler>
+    with WidgetsBindingObserver {
   final AuthServices auth = getIt();
 
-  void init() => WidgetsBinding.instance.addObserver(this);
-  void dispose() => WidgetsBinding.instance.removeObserver(this);
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) auth.checkConnectivity();
     super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ThemeServices(child: widget.child);
   }
 }
