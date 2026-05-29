@@ -3,7 +3,7 @@ import 'package:ampify/data/utils/exports.dart';
 class HomeRepo {
   @protected
   final DioClient dio;
-  const HomeRepo({required this.dio});
+  const HomeRepo(this.dio);
 
   Future<void> getNewReleases({
     int? limit,

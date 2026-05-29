@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class AuthRepo {
   @protected
   final DioClient dio;
-  const AuthRepo({required this.dio});
+  const AuthRepo(this.dio);
 
   @protected
   static final _box = BoxServices.instance;
@@ -48,7 +46,7 @@ class AuthRepo {
       'Authorization': 'Basic ${base64Encode(utf8.encode(cred))}',
       'Content-Type': 'application/x-www-form-urlencoded'
     };
-    final response = await dio.post(AppConstants.token,
+    final response = await dio.post(dotenv.get(EnvKeys.token),
         options: Options(headers: header), data: data);
     ApiResponse.verify(response,
         onSuccess: (json) {
@@ -72,7 +70,7 @@ class AuthRepo {
       'Authorization': 'Basic ${base64Encode(utf8.encode(cred))}',
       'Content-Type': 'application/x-www-form-urlencoded'
     };
-    final response = await dio.post(AppConstants.token,
+    final response = await dio.post(dotenv.get(EnvKeys.token),
         data: data, options: Options(headers: header));
     ApiResponse.verify(response, onSuccess: onSuccess, onError: onError);
   }

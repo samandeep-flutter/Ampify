@@ -44,7 +44,7 @@ class TrackTile extends StatelessWidget {
       background: Container(
         alignment: Alignment.centerLeft,
         color: scheme.primaryAdaptive,
-        padding: const EdgeInsets.only(left: Dimens.sizeLarge),
+        padding: const EdgeInsets.only(left: Dimens.sizeXLarge),
         child: Icon(Icons.add_to_queue,
             color: scheme.onPrimary, size: Dimens.iconDefault),
       ),

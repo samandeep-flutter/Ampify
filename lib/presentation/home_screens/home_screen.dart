@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
               backgroundColor: context.scheme.background,
               title: const Text(StringRes.appName),
               centerTitle: false,
-              titleTextStyle: Utils.defTitleStyle(context),
+              titleTextStyle: Utils.defTitleStyle(scheme.textColor),
               bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(Dimens.sizeDefault),
                   child: Row(
@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(width: Dimens.sizeDefault),
               ],
             ),
-            const SliverSizedBox(height: Dimens.sizeLarge),
+            const SliverSizedBox(height: Dimens.sizeXLarge),
             SliverGridWidget(
               title: StringRes.recentlyPlayed,
               child: GridView.builder(
@@ -61,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                     );
                   }),
             ),
-            const SliverSizedBox(height: Dimens.sizeLarge),
+            const SliverSizedBox(height: Dimens.sizeXLarge),
             SliverGridWidget(
               title: StringRes.spotifyRecent,
               child: BlocBuilder<HomeBloc, HomeState>(
@@ -75,7 +75,7 @@ class HomeScreen extends StatelessWidget {
                   if (state.recentlyPlayed.isEmpty) {
                     return ToolTipWidget(
                       alignment: Alignment.center,
-                      margin: Utils.insetsHoriz(Dimens.sizeLarge),
+                      margin: Utils.insetsHoriz(Dimens.sizeXLarge),
                       title: StringRes.noSpotifyTracks,
                     );
                   }
@@ -99,7 +99,7 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
             ),
-            const SliverSizedBox(height: Dimens.sizeLarge),
+            const SliverSizedBox(height: Dimens.sizeXLarge),
             SliverGridWidget(
               title: StringRes.newReleases,
               child: BlocBuilder<HomeBloc, HomeState>(
@@ -113,7 +113,7 @@ class HomeScreen extends StatelessWidget {
                   if (state.albums.isEmpty) {
                     return ToolTipWidget(
                       alignment: Alignment.center,
-                      margin: Utils.insetsHoriz(Dimens.sizeLarge),
+                      margin: Utils.insetsHoriz(Dimens.sizeXLarge),
                       title: StringRes.noNewTracks,
                     );
                   }

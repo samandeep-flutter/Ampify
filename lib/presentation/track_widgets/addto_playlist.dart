@@ -27,7 +27,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
     return MyBottomSheet(
       customTitle: Row(
         children: [
-          const SizedBox(width: Dimens.sizeLarge),
+          const SizedBox(width: Dimens.sizeXLarge),
           Text(
             StringRes.addtoPlaylist,
             style: TextStyle(

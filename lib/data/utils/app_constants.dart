@@ -2,12 +2,9 @@ import 'dart:developer' as dev;
 import 'package:ampify/data/utils/exports.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:oktoast/oktoast.dart';
 
 sealed class AppConstants {
-  static const String baseUrl = 'https://api.spotify.com/v1/';
-  static const String token = 'https://accounts.spotify.com/api/token';
-
   static const String search = 'search';
   static const String profile = 'me';
   static const String myPlaylists = 'me/playlists';
@@ -48,6 +45,10 @@ sealed class EnvKeys {
   static const String id = 'CLIENT_ID';
   static const String secret = 'CLIENT_SECRET';
   static const String redirect = 'REDIRECT';
+  static const String bundleID = 'BUNDLE_ID';
+
+  static const String baseURL = 'BASE_URL';
+  static const String token = 'TOKEN';
 }
 
 sealed class UniqueIds {
@@ -87,11 +88,25 @@ class MyColoredBox extends StatelessWidget {
   }
 }
 
-Future<void> showToast(String text, {int? timeInSec}) async {
-  await Fluttertoast.cancel();
-  Future.delayed(Durations.medium2).then((_) {
-    Fluttertoast.showToast(msg: text, timeInSecForIosWeb: timeInSec ?? 1);
-  });
+void showToast(String text, {int? timeInSec}) {
+  if (text.trim().isEmpty) return;
+  dismissAllToast();
+
+  final brightness = BoxServices.instance.themeMode.brightness;
+  showToastWidget(
+    Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+      decoration: BoxDecoration(
+        color: brightness.isDark ? Colors.grey.shade700 : Colors.black87,
+        borderRadius: BorderRadius.circular(Dimens.sizeSmall),
+      ),
+      child: Text(text, style: TextStyle(color: Colors.white)),
+    ),
+    duration: Duration(seconds: timeInSec ?? 2),
+    position: ToastPosition.bottom,
+    dismissOtherToast: true,
+  );
 }
 
 void showSnackBar(BuildContext context, {required String text}) {

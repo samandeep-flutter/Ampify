@@ -12,8 +12,8 @@ class AuthScreen extends StatelessWidget {
 
     return BaseWidget(
       appBar: AppBar(
-          backgroundColor: scheme.background, toolbarHeight: Dimens.sizeLarge),
-      bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
+          backgroundColor: scheme.background, toolbarHeight: Dimens.sizeXLarge),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeXLarge),
       child: Column(
         children: [
           const Spacer(),

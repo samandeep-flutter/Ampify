@@ -62,7 +62,7 @@ class MusicGroupTile extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: Dimens.sizeLarge),
+            const SizedBox(width: Dimens.sizeXLarge),
           ],
         ),
       ),

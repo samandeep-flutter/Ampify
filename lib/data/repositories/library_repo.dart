@@ -3,7 +3,7 @@ import 'package:ampify/data/utils/exports.dart';
 class LibraryRepo {
   @protected
   final DioClient dio;
-  const LibraryRepo({required this.dio});
+  const LibraryRepo(this.dio);
 
   Future<void> getProfile(
       {required SuccessCallback onSuccess, ErrorCallback? onError}) async {

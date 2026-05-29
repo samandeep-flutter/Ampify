@@ -1,10 +1,9 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:dio/dio.dart';
 
 class MusicGroupRepo {
   @protected
   final DioClient dio;
-  const MusicGroupRepo({required this.dio});
+  const MusicGroupRepo(this.dio);
 
   Future<bool> isFavPlaylist(String id) async {
     final response = await dio.get(AppConstants.isFollowPlaylist(id));

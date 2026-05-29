@@ -54,7 +54,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
           ],
         ),
         title: const Text(StringRes.myLibrary),
-        titleTextStyle: Utils.defTitleStyle(context),
+        titleTextStyle: Utils.defTitleStyle(scheme.textColor),
         centerTitle: false,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(Dimens.sizeExtraLarge),

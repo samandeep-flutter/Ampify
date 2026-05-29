@@ -1,16 +1,12 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:ampify/data/utils/exports.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../repositories/auth_repo.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class DioClient {
   final Dio dio;
-
   DioClient({required this.dio}) {
     dio.options = BaseOptions(
-      baseUrl: AppConstants.baseUrl,
+      baseUrl: dotenv.get(EnvKeys.baseURL),
       headers: {'Authorization': 'Bearer ${box.token}'},
     );
     dio.interceptors
@@ -100,12 +96,6 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    getIt<AuthServices>().setConnection(true);
-    handler.next(response);
-  }
-
-  @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     try {
       final box = BoxServices.instance;
@@ -134,12 +124,6 @@ class TokenInterceptor extends QueuedInterceptorsWrapper {
         },
       );
       await completer.future;
-    } on DioException catch (e) {
-      if (e.error is SocketException) {
-        getIt<AuthServices>().setConnection(false);
-      }
-      logPrint(e, 'DIO');
-      handler.reject(err);
     } catch (e) {
       logPrint(e, 'DIO');
       handler.reject(err);
@@ -151,8 +135,26 @@ class LoggingInterceptor extends InterceptorsWrapper {
   // @override
   // void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
   //   final path = options.uri.path;
-  //   dprint('$path\n ${options.data}');
+  //   dprint('$path ${options.data != null ? '\n${_data(options.data)}' : ''}',
+  //       name: 'DIO-request', extra: _data(options.data));
   //   super.onRequest(options, handler);
+  // }
+
+  // String _data(dynamic data) {
+  // if (data is FormData) {
+  //   final fields = Map.fromEntries(data.fields.map((e) {
+  //     return MapEntry(e.key, e.value.trunacate());
+  //   }));
+  //   final files = Map.fromEntries(
+  //       data.files.map((e) => MapEntry(e.key, e.value.filename)));
+  //   return {...fields, ...files}.toString();
+  // } else if (data is Map) {
+  //   return data.map((e, v) {
+  //     final value = v.toString().trunacate();
+  //     return MapEntry(e.toString(), value);
+  //   }).toString();
+  // }
+  // return data.toString();
   // }
 
   // @override

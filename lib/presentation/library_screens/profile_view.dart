@@ -18,10 +18,10 @@ class _ProfileViewState extends State<ProfileView> {
       appBar: AppBar(
         backgroundColor: scheme.background,
         title: const Text(StringRes.profile),
-        titleTextStyle: Utils.defTitleStyle(context),
+        titleTextStyle: Utils.defTitleStyle(scheme.textColor),
         centerTitle: false,
       ),
-      bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeXLarge),
       child: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
@@ -30,7 +30,7 @@ class _ProfileViewState extends State<ProfileView> {
             children: [
               MyCachedImage(auth.profile?.image,
                   isAvatar: true, avatarRadius: context.width * .1),
-              const SizedBox(width: Dimens.sizeLarge),
+              const SizedBox(width: Dimens.sizeXLarge),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -72,7 +72,7 @@ class _ProfileViewState extends State<ProfileView> {
               )
             ],
           ),
-          const SizedBox(height: Dimens.sizeLarge),
+          const SizedBox(height: Dimens.sizeXLarge),
           Card(
             color: scheme.surface,
             child: Column(
@@ -106,7 +106,7 @@ class _ProfileViewState extends State<ProfileView> {
         context: context,
         builder: (context) {
           return MyAlertDialog(
-            title: '${StringRes.logout} ?',
+            titleText: '${StringRes.logout} ?',
             content: Text(StringRes.logoutDesc,
                 style: TextStyle(fontSize: Dimens.fontDefault)),
             actionPadding: const EdgeInsets.only(
@@ -147,17 +147,7 @@ class _ProfileViewState extends State<ProfileView> {
               children: [
                 const SizedBox(height: Dimens.sizeSmall),
                 ...ThemeMode.values.map((e) {
-                  return RadioListTile(
-                    value: e,
-                    title: Row(
-                      children: [
-                        Icon(e.icon, size: Dimens.iconDefault),
-                        const SizedBox(width: Dimens.sizeLarge),
-                        Text(e.name.capitalize,
-                            style: TextStyle(fontSize: Dimens.fontXXXLarge)),
-                      ],
-                    ),
-                    controlAffinity: ListTileControlAffinity.trailing,
+                  return RadioGroup(
                     groupValue: BoxServices.instance.themeMode,
                     onChanged: (theme) async {
                       context.scheme.switchThemeMode(theme);
@@ -165,6 +155,18 @@ class _ProfileViewState extends State<ProfileView> {
                       // ignore: use_build_context_synchronously
                       if (mounted) Navigator.pop(context);
                     },
+                    child: RadioListTile(
+                      value: e,
+                      title: Row(
+                        children: [
+                          Icon(e.icon, size: Dimens.iconDefault),
+                          const SizedBox(width: Dimens.sizeXLarge),
+                          Text(e.name.capitalize,
+                              style: TextStyle(fontSize: Dimens.fontXXXLarge)),
+                        ],
+                      ),
+                      controlAffinity: ListTileControlAffinity.trailing,
+                    ),
                   );
                 }),
                 SafeArea(child: SizedBox(height: Dimens.sizeDefault)),

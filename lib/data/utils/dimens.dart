@@ -85,11 +85,20 @@ sealed class Dimens {
   /// size of 4
   static const double sizeExtraSmall = 4;
 
+  /// size of 6
+  static const double sizeXSmall = 6;
+
   /// size of 8
   static const double sizeSmall = 8;
 
+  /// size of 10
+  static const double sizeXMedSmall = 10;
+
   /// size of 12
   static const double sizeMedSmall = 12;
+
+  /// size of 14
+  static const double sizeXDefault = 14;
 
   /// size of 16
   static const double sizeDefault = 16;
@@ -98,7 +107,10 @@ sealed class Dimens {
   static const double sizeMedium = 20;
 
   /// size of 24
-  static const double sizeLarge = 24;
+  static const double sizeXLarge = 24;
+
+  /// size of 28
+  static const double sizeLarge = 28;
 
   /// size of 32
   static const double sizeMidLarge = 32;
@@ -112,8 +124,17 @@ sealed class Dimens {
   /// size of 60
   static const double sizeUltraLarge = 60;
 
+  /// size of 70
+  static const double sizeXMaxLarge = 70;
+
+  /// size of 80
+  static const double sizeMaxLarge = 80;
+
   /// size of .75
   static const double borderWidthDefault = .75;
+
+  /// size of 4
+  static const double borderMini = 4;
 
   /// size of 8
   static const double borderSmall = 8;

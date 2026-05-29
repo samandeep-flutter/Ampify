@@ -4,7 +4,7 @@ import '../data_provider/dio_client.dart';
 
 class SearchRepo {
   final DioClient dio;
-  const SearchRepo({required this.dio});
+  const SearchRepo(this.dio);
 
   Future<void> search(
     String query, {

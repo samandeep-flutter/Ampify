@@ -13,7 +13,7 @@ class CreatePlaylistView extends StatelessWidget {
 
     return BaseWidget(
         appBar: AppBar(backgroundColor: scheme.background),
-        bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
+        bodyPadding: Utils.insetsHoriz(Dimens.sizeXLarge),
         child: ListView(
           children: [
             SizedBox(height: context.height * .1),

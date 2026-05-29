@@ -39,15 +39,20 @@ class ThemeServiceState extends State<ThemeServices> {
   late Color _onPrimary;
   late Color _background;
   late Color _backgroundDark;
+  late Color _bgDarkAdaptive;
+  late Color _popupMenu;
   late Color _surface;
   late Color _textColor;
   late Color _textColorLight;
   late Color _error;
   late Color _onError;
+  late Color _errorAdaptive;
   late Color _success;
   late Color _onSuccess;
   late Color _shimmer;
   late Color _disabled;
+  late Color _darkShade;
+  late Color _lightShade;
   late ThemeMode _themeMode;
 
   String get text => _text;
@@ -56,15 +61,20 @@ class ThemeServiceState extends State<ThemeServices> {
   Color get onPrimary => _onPrimary;
   Color get background => _background;
   Color get backgroundDark => _backgroundDark;
+  Color get bgDarkAdaptive => _bgDarkAdaptive;
+  Color get popupMenu => _popupMenu;
   Color get surface => _surface;
   Color get textColor => _textColor;
   Color get textColorLight => _textColorLight;
   Color get disabled => _disabled;
   Color get error => _error;
   Color get onError => _onError;
+  Color get errorAdaptive => _errorAdaptive;
   Color get success => _success;
   Color get onSuccess => _onSuccess;
   Color get shimmer => _shimmer;
+  Color get darkShade => _darkShade;
+  Color get lightShade => _lightShade;
   ThemeMode get themeMode => _themeMode;
 
   @override
@@ -96,28 +106,36 @@ class ThemeServiceState extends State<ThemeServices> {
         _primaryAdaptive = theme.primaryDark;
         _background = const Color(0xFF171717);
         _backgroundDark = const Color(0xFF353535);
+        _bgDarkAdaptive = const Color(0xFF373737);
+        _popupMenu = const Color(0xFF4F4F4F);
         _surface = const Color(0xFF252525);
         _textColor = const Color(0xFFEEEEEE);
         _textColorLight = const Color(0xFF9B9B9B);
         _onError = const Color(0xFF523C40);
         _onSuccess = const Color(0xFF4C5E4A);
         _shimmer = const Color(0xFF212121);
+        _errorAdaptive = const Color(0xFFE57373);
         break;
       case Brightness.light:
         _primaryAdaptive = theme.primary;
         _background = const Color(0xFFFAFAFA);
         _backgroundDark = const Color(0xFFE0E0E0);
+        _bgDarkAdaptive = const Color(0xFFFAFAFA);
+        _popupMenu = const Color(0xFFFFFFFF);
         _surface = Colors.white;
         _textColor = const Color(0xFF212121);
         _textColorLight = const Color(0xFF868686);
         _onError = const Color(0xFFFFEBEE);
         _onSuccess = const Color(0xFFD1EFCE);
         _shimmer = Color(0xFFE0E0E0);
+        _errorAdaptive = const Color(0xFFB71C1C);
         break;
     }
     _disabled = Colors.grey;
     _error = const Color(0xFFB71C1C);
     _success = const Color(0xFF2B722E);
+    _darkShade = const Color(0xFF212121);
+    _lightShade = const Color(0xFFEEEEEE);
     if (reload ?? false) setState(() {});
   }
 

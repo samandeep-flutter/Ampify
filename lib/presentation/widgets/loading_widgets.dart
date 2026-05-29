@@ -55,7 +55,7 @@ class LoadingButton extends StatelessWidget {
           child: Builder(builder: (context) {
             if (isLoading ?? false) {
               return SizedBox.square(
-                  dimension: Dimens.sizeLarge,
+                  dimension: Dimens.sizeXLarge,
                   child: CircularProgressIndicator(
                       color: loaderColor ?? scheme.primaryAdaptive));
             }
@@ -109,7 +109,7 @@ class LoadingIcon extends StatelessWidget {
           width: loaderSize,
           alignment: Alignment.center,
           child: SizedBox.square(
-              dimension: Dimens.sizeLarge,
+              dimension: Dimens.sizeXLarge,
               child: CircularProgressIndicator(
                 color: style?.foregroundColor?.resolve({}) ?? scheme.textColor,
               )),

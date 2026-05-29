@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:ampify/data/repositories/library_repo.dart';
 
 class LibraryEvent extends Equatable {
   const LibraryEvent();

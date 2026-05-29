@@ -44,7 +44,7 @@ class PlayerScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(height: Dimens.sizeLarge),
+                    const SizedBox(height: Dimens.sizeXLarge),
                     GestureDetector(
                       onHorizontalDragEnd: (details) {
                         if ((details.primaryVelocity ?? 0) < 0) {
@@ -168,7 +168,7 @@ class PlayerScreen extends StatelessWidget {
                                         }
                                         return Container(
                                           margin: Utils.insetsHoriz(
-                                              Dimens.sizeLarge),
+                                              Dimens.sizeXLarge),
                                           padding: EdgeInsets.only(
                                               left: Dimens.sizeExtraSmall + 1),
                                           alignment: Alignment.center,
@@ -193,7 +193,7 @@ class PlayerScreen extends StatelessWidget {
                                       Text(slider.current.format()),
                                       const Spacer(),
                                       Text(state.track.duration.format()),
-                                      const SizedBox(width: Dimens.sizeLarge),
+                                      const SizedBox(width: Dimens.sizeXLarge),
                                     ],
                                   ),
                                 )

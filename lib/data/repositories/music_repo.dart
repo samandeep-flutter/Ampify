@@ -5,15 +5,10 @@ import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MusicRepo {
-  @protected
   final DioClient dio;
-  @protected
   final YTMusic ytMusic;
-  @protected
   final YoutubeExplode ytExplode;
-
-  MusicRepo(
-      {required this.ytMusic, required this.ytExplode, required this.dio});
+  MusicRepo(this.dio, {required this.ytMusic, required this.ytExplode});
 
   final _ytClients = [YoutubeApiClient.androidVr];
   Future<SongYtDetails?> getDetailsFromQuery(Track track) async {

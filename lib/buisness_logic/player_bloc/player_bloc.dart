@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:ampify/data/repositories/library_repo.dart';
-import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'player_events.dart';

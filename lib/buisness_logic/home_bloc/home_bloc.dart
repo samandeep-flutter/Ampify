@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:ampify/data/repositories/home_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 abstract class HomeEvent extends Equatable {
@@ -90,6 +89,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
     await getReleases.future;
     await getRecentlyPlayed.future;
-    Future(MyNotifications.initialize);
+    Future(NotiServices.instance.initialize);
   }
 }

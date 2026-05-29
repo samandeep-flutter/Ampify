@@ -33,14 +33,14 @@ class PlayerCompact extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: scheme.surface.withAlpha(150),
-                offset: Offset(0, Dimens.sizeLarge),
+                offset: Offset(0, Dimens.sizeXLarge),
                 blurRadius: Dimens.sizeMedium,
-                spreadRadius: Dimens.sizeLarge,
+                spreadRadius: Dimens.sizeXLarge,
               ),
               BoxShadow(
                 color: scheme.surface.withAlpha(100),
                 blurRadius: Dimens.sizeMedium,
-                spreadRadius: Dimens.sizeLarge,
+                spreadRadius: Dimens.sizeXLarge,
               ),
               BoxShadow(
                 color: Colors.black26,

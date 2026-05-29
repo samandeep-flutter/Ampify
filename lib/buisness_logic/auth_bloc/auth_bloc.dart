@@ -1,11 +1,7 @@
 import 'dart:async';
-import 'package:ampify/data/repositories/auth_repo.dart';
-import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 sealed class AuthEvent extends Equatable {
-  const AuthEvent();
-
   @override
   List<Object?> get props => [];
 }

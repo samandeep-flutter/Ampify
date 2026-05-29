@@ -27,6 +27,8 @@ sealed class StringRes {
   static const String followers = 'Followers';
   static const String sortBy = 'Sort by';
   static const String clear = 'Clear';
+  static const String deviceInfo = 'Device Information';
+  static const String copiedToClipboard = 'Copied to clipboard';
   static const String trackRadio = 'Track Radio';
   static const String commingSoon = 'Comming Soon';
   static const String newReleases = 'New Releases for you';
@@ -79,6 +81,9 @@ sealed class StringRes {
       ' please login again';
 
   // long texts
+  static const String devModeToggle = 'You are now in developer mode';
+  static const String offlineDesc =
+      'No internet connection, Please reconnect and try again.';
   static const String notiDesc =
       'Notification related to media playback in the application';
   static const String authDesc = 'Log in with Spotify to connect and amplify'
@@ -128,5 +133,20 @@ sealed class StringRes {
     'Curating your station',
     'Matching tempo and mood',
     'Preparing your next tracks',
+  ];
+
+  static const List<String> months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 }

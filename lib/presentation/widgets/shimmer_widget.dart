@@ -123,7 +123,7 @@ class MusicGroupShimmer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: Dimens.sizeLarge,
+                height: Dimens.sizeXLarge,
                 width: context.width * .6,
                 child: Shimmer.box,
               ),

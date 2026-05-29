@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:ampify/data/repositories/search_repo.dart';
 
 class SearchEvent extends Equatable {
   const SearchEvent();

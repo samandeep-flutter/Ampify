@@ -1,20 +1,26 @@
-import 'package:ampify/config/firebase_options.dart';
+import 'dart:io';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import '../data/utils/app_constants.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class MyNotifications {
-  @protected
-  static final messaging = FirebaseMessaging.instance;
+class NotiServices {
+  static NotiServices? _instance;
+  static NotiServices get instance => _instance ??= NotiServices._init();
+  NotiServices._init();
 
-  static Future<void> initialize() async {
+  static final _messaging = FirebaseMessaging.instance;
+  final _plugin = FlutterLocalNotificationsPlugin();
+  // final _box = BoxServices.instance;
+
+  Future<void> initialize() async {
     try {
-      await messaging.requestPermission();
-      await messaging.setForegroundNotificationPresentationOptions(
+      // if (Platform.isWindows || Platform.isMacOS) return _init();
+      await _messaging.requestPermission();
+      await _messaging.setForegroundNotificationPresentationOptions(
           alert: true, badge: true, sound: true);
 
-      final initialMessage = await messaging.getInitialMessage();
+      final initialMessage = await _messaging.getInitialMessage();
       if (initialMessage != null) {
         debugLog('init ${initialMessage.notification!.body}', 'notification');
       }
@@ -28,6 +34,51 @@ class MyNotifications {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       debugLog('onAppOpen ${message.toMap()}', 'notification');
     });
+  }
+
+  // Future<void> _init() async {
+  //   try {
+  //     final _device = _box.read(BoxKeys.deviceInfo);
+  //     final initDarwin = DarwinInitializationSettings();
+  //     final initWin = WindowsInitializationSettings(
+  //       appName: StringRes.appName,
+  //       appUserModelId: dotenv.get(EnvKeys.bundleID),
+  //       guid: _device?['deviceId'] ?? '',
+  //     );
+  //     await _plugin.initialize(
+  //         settings: InitializationSettings(macOS: initDarwin, windows: initWin),
+  //         onDidReceiveNotificationResponse: _onDidReceiveResponse);
+  //   } catch (e) {
+  //     logPrint(e, 'noti-init');
+  //   }
+  // }
+
+  // void _onDidReceiveResponse(NotificationResponse response) async {
+  //   if (response.payload != null) dprint(response.payload, name: 'noti');
+  // }
+
+  // Future<void> showNotification(NotiModel noti, {String? payload}) async {
+  //   if (noti.title?.trim().isEmpty ?? true) return;
+  //   await _plugin.show(
+  //     id: int.parse(noti.id),
+  //     title: noti.title?.unescape,
+  //     body: noti.message?.unescape,
+  //     payload: payload,
+  // );
+  // }
+
+  Future<bool?> checkPermission() async {
+    if (!Platform.isMacOS) return null;
+    final macos = _plugin.resolvePlatformSpecificImplementation<
+        MacOSFlutterLocalNotificationsPlugin>();
+    return await macos?.requestPermissions(
+        alert: true, badge: true, sound: true);
+  }
+
+  void openSettings() {
+    if (!Platform.isMacOS) return;
+    Process.run('open',
+        ['x-apple.systempreferences:com.apple.preference.notifications']);
   }
 }
 

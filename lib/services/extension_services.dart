@@ -1,10 +1,8 @@
 import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:ampify/data/data_models/common/artist_model.dart';
-import 'package:ampify/data/data_models/library_model.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/material.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -21,6 +19,34 @@ extension MyContext on BuildContext {
     int popped = 0;
     Navigator.of(this).popUntil((route) => popped++ >= count);
   }
+}
+
+extension MyBrightness on ThemeMode {
+  Brightness get brightness {
+    switch (this) {
+      case ThemeMode.dark:
+        return Brightness.dark;
+      case ThemeMode.light:
+        return Brightness.light;
+      case ThemeMode.system:
+        return WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ThemeMode.light:
+        return Icons.light_mode;
+      case ThemeMode.dark:
+        return Icons.dark_mode;
+      case ThemeMode.system:
+        return Icons.contrast;
+    }
+  }
+}
+
+extension DarkModeHelper on Brightness {
+  bool get isDark => this == Brightness.dark;
 }
 
 extension MyIterable on Iterable<String> {
@@ -78,6 +104,10 @@ extension MyList<T> on List<T> {
   }
 
   T? get firstElement => isEmpty ? null : first;
+}
+
+extension MyConnectionChecker on InternetStatus {
+  bool get isConnected => this == InternetStatus.connected;
 }
 
 extension MyPlaybackState on PlaybackState {
@@ -214,37 +244,21 @@ extension MyDuration on Duration {
 }
 
 extension MyDateTime on DateTime {
-  String toJson() => _dateTime(this);
   String get formatDate => '${_months[month - 1]} ${day.digit2}, $year';
   String get formatTime => '${hour.digit2}:${minute.digit2}';
   String get formatLongTime =>
       '${hour.digit2}:${minute.digit2}:${second.digit2}';
+  String get formatDateSt => _formatedDateShort(this);
 
-  String _dateTime(DateTime now) {
-    String date = '${now.year}${now.month.digit2}${now.day.digit2}';
-    String time = '${now.hour.digit2}${now.minute.digit2}'
-        '${now.second.digit2}${now.millisecond.digit3}';
-    return date + time;
+  String _formatedDateShort(DateTime time) {
+    String day = time.day.digit2;
+    return '${_months[time.month - 1].substring(0, 3)} $day, ${time.year}';
   }
 
-  List<String> get _months => [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-        'July',
-        'August',
-        'September',
-        'October',
-        'November',
-        'December',
-      ];
+  List<String> get _months => StringRes.months;
 }
 
 extension MyString on String {
-  DateTime get toDateTime => _formJson(this);
   bool get isEmail => _emailRegExp(this);
   bool get isStringPass => _passRegExp(this);
   int queryMatch(String query) => _calculateMatch(this, query);
@@ -254,17 +268,6 @@ extension MyString on String {
   String get capitalize => '${this[0].toUpperCase()}${substring(1)}';
   String get unescape => HtmlUnescape().convert(this);
   String get noSpace => replaceAll(' ', '');
-
-  DateTime _formJson(String datetime) {
-    int year = int.parse(datetime.substring(0, 4));
-    int month = int.parse(datetime.substring(4, 6));
-    int day = int.parse(datetime.substring(6, 8));
-    int hour = int.parse(datetime.substring(8, 10));
-    int min = int.parse(datetime.substring(10, 12));
-    int sec = int.parse(datetime.substring(12, 14));
-    int milli = int.parse(datetime.substring(14, 17));
-    return DateTime(year, month, day, hour, min, sec, milli);
-  }
 
   bool _emailRegExp(String text) {
     final emailExp =
@@ -337,45 +340,10 @@ extension MyString on String {
   }
 }
 
-extension MyBrightness on ThemeMode {
-  Brightness get brightness {
-    switch (this) {
-      case ThemeMode.dark:
-        return Brightness.dark;
-      case ThemeMode.light:
-        return Brightness.light;
-      case ThemeMode.system:
-        return WidgetsBinding.instance.platformDispatcher.platformBrightness;
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case ThemeMode.light:
-        return Icons.light_mode;
-      case ThemeMode.dark:
-        return Icons.dark_mode;
-      case ThemeMode.system:
-        return Icons.contrast;
-    }
-  }
-}
-
 extension MyInt on int {
   String get format => _format(this);
-  String get digit2 => this < 10 ? '0${toString()}' : toString();
-  String get digit3 => _digit3(this);
-
-  String _digit3(int count) {
-    switch (count) {
-      case < 10:
-        return '00${toString()}';
-      case < 100:
-        return '0${toString()}';
-      default:
-        return toString();
-    }
-  }
+  String get digit2 => toString().padLeft(2, '0');
+  String get digit3 => toString().padLeft(3, '0');
 
   String _format(int count) {
     if (count > 999999) {

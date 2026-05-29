@@ -1,19 +1,23 @@
 import 'package:ampify/data/utils/exports.dart';
 
 class MyAlertDialog extends StatelessWidget {
-  final String title;
+  final Widget? title;
+  final String? titleText;
   final TextStyle? titleTextStyle;
   final Widget? content;
   final List<Widget>? actions;
   final EdgeInsets? actionPadding;
+  final EdgeInsets? insetPadding;
   final EdgeInsets? contentPadding;
 
   const MyAlertDialog({
     super.key,
-    required this.title,
+    this.title,
+    this.titleText,
     this.content,
     this.actions,
     this.actionPadding,
+    this.insetPadding,
     this.contentPadding,
     this.titleTextStyle,
   });
@@ -23,15 +27,21 @@ class MyAlertDialog extends StatelessWidget {
 
     return AlertDialog(
         backgroundColor: scheme.surface,
-        title: Text(title, style: TextStyle(fontSize: Dimens.fontLarge)),
+        title: title ?? _title,
         titleTextStyle: titleTextStyle,
         content: content,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(Dimens.borderDefault)),
         buttonPadding: const EdgeInsets.only(right: Dimens.sizeDefault),
         contentPadding: contentPadding,
+        insetPadding: insetPadding,
         actionsPadding: actionPadding,
         actions: actions);
+  }
+
+  Widget? get _title {
+    if (titleText == null) return null;
+    return Text(titleText!, style: TextStyle(fontSize: Dimens.fontXLarge));
   }
 }
 

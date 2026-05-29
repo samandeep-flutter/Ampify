@@ -62,7 +62,7 @@ class _TrackRadioState extends State<TrackRadio> {
                 },
               ),
               backgroundColor: Color.alphaBlend(fgColor, scheme.background),
-              titleTextStyle: Utils.defTitleStyle(context),
+              titleTextStyle: Utils.defTitleStyle(scheme.textColor),
             ),
             SliverToBoxAdapter(
               child: Container(
@@ -226,7 +226,7 @@ class _TrackRadioState extends State<TrackRadio> {
                       itemBuilder: (_, index) =>
                           TrackTile(state.tracks[index]));
                 }),
-            const SliverSizedBox(height: Dimens.sizeLarge),
+            const SliverSizedBox(height: Dimens.sizeXLarge),
             BlocBuilder<TrackRadioBloc, TrackRadioState>(
                 buildWhen: (pr, cr) => pr.loading != cr.loading,
                 builder: (context, state) {
@@ -328,15 +328,15 @@ class _LoadingWidgetState extends State<_LoadingWidget> {
             Stack(
               children: [
                 CupertinoActivityIndicator.partiallyRevealed(
-                    progress: progress / 10, radius: Dimens.sizeLarge),
+                    progress: progress / 10, radius: Dimens.sizeXLarge),
                 Opacity(
                   opacity: .3,
                   child: CupertinoActivityIndicator.partiallyRevealed(
-                      progress: .9, radius: Dimens.sizeLarge),
+                      progress: .9, radius: Dimens.sizeXLarge),
                 ),
               ],
             ),
-            const SizedBox(height: Dimens.sizeLarge),
+            const SizedBox(height: Dimens.sizeXLarge),
             Builder(builder: (context) {
               final diff = DateTime.now().difference(elapsed);
               return Text(

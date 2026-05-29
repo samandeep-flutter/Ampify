@@ -1,4 +1,3 @@
-import 'package:ampify/data/repositories/music_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class Track extends Equatable {

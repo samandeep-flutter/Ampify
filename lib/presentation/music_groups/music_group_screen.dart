@@ -65,7 +65,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   ),
                 ),
                 backgroundColor: Color.alphaBlend(fgColor, scheme.background),
-                titleTextStyle: Utils.defTitleStyle(context),
+                titleTextStyle: Utils.defTitleStyle(scheme.textColor),
                 flexibleSpace: FlexibleSpaceBar(
                   titlePadding: Utils.insetsHoriz(Dimens.sizeDefault),
                   background: Align(
@@ -338,7 +338,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   return TrackTile(track, showImage: state.type.isPlaylist);
                 },
               ),
-              const SliverSizedBox(height: Dimens.sizeLarge),
+              const SliverSizedBox(height: Dimens.sizeXLarge),
               if (state.details?.releaseDate != null)
                 SliverToBoxAdapter(
                   child: DefaultTextStyle.merge(

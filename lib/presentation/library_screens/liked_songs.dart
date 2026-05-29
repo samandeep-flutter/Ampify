@@ -68,7 +68,7 @@ class _LikedSongsState extends State<LikedSongs> {
                       }),
                 ),
                 backgroundColor: Color.alphaBlend(fgColor, scheme.background),
-                titleTextStyle: Utils.defTitleStyle(context),
+                titleTextStyle: Utils.defTitleStyle(scheme.textColor),
               ),
               SliverToBoxAdapter(
                 child: Container(

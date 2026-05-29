@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 
-typedef SuccessCallback = void Function(Map<String, dynamic> json);
+typedef SuccessCallback = FutureOr<void> Function(Map<String, dynamic> json);
 typedef ErrorCallback = void Function(Map<String, dynamic> error);
 
 class ApiResponse {
@@ -18,9 +19,13 @@ class ApiResponse {
   }) async {
     final response = apiResponse.response;
     if (response != null) {
-      Map<String, dynamic> json = response.data;
+      final json = response.data;
       if (response.statusCode == 200 || response.statusCode == 201) {
-        onSuccess(json);
+        try {
+          await onSuccess(json);
+        } catch (error) {
+          onError({'error': error.toString()});
+        }
         return;
       }
     }

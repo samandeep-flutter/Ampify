@@ -10,10 +10,10 @@ class ListeningHistory extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: scheme.background,
         title: const Text(StringRes.listenHistory),
-        titleTextStyle: Utils.defTitleStyle(context),
+        titleTextStyle: Utils.defTitleStyle(scheme.textColor),
         centerTitle: false,
       ),
-      bodyPadding: Utils.insetsHoriz(Dimens.sizeLarge),
+      bodyPadding: Utils.insetsHoriz(Dimens.sizeXLarge),
       child: Column(
         children: [
           Text(StringRes.listnHisSubtitle,
