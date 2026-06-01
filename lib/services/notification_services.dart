@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotiServices {
   static NotiServices? _instance;
@@ -10,12 +8,12 @@ class NotiServices {
   NotiServices._init();
 
   static final _messaging = FirebaseMessaging.instance;
-  final _plugin = FlutterLocalNotificationsPlugin();
+  // final _plugin = FlutterLocalNotificationsPlugin();
   // final _box = BoxServices.instance;
 
   Future<void> initialize() async {
     try {
-      // if (Platform.isWindows || Platform.isMacOS) return _init();
+      // if (Platform.isWindows) return _init();
       await _messaging.requestPermission();
       await _messaging.setForegroundNotificationPresentationOptions(
           alert: true, badge: true, sound: true);
@@ -25,7 +23,7 @@ class NotiServices {
         debugLog('init ${initialMessage.notification!.body}', 'notification');
       }
     } catch (e) {
-      logPrint(e, 'fb init');
+      logPrint(e, 'fb-init');
     }
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugLog('dataMap ${message.toMap()}', 'notification');
@@ -67,19 +65,19 @@ class NotiServices {
   // );
   // }
 
-  Future<bool?> checkPermission() async {
-    if (!Platform.isMacOS) return null;
-    final macos = _plugin.resolvePlatformSpecificImplementation<
-        MacOSFlutterLocalNotificationsPlugin>();
-    return await macos?.requestPermissions(
-        alert: true, badge: true, sound: true);
-  }
+  // Future<bool?> checkPermission() async {
+  //   if (!Platform.isMacOS) return null;
+  //   final macos = _plugin.resolvePlatformSpecificImplementation<
+  //       MacOSFlutterLocalNotificationsPlugin>();
+  //   return await macos?.requestPermissions(
+  //       alert: true, badge: true, sound: true);
+  // }
 
-  void openSettings() {
-    if (!Platform.isMacOS) return;
-    Process.run('open',
-        ['x-apple.systempreferences:com.apple.preference.notifications']);
-  }
+  // void openSettings() {
+  //   if (!Platform.isMacOS) return;
+  //   Process.run('open',
+  //       ['x-apple.systempreferences:com.apple.preference.notifications']);
+  // }
 }
 
 @pragma('vm:entry-point')

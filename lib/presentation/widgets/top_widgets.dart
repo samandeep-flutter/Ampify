@@ -5,24 +5,28 @@ class MyDivider extends StatelessWidget {
   final double? thickness;
   final double? margin;
   final Color? color;
-  const MyDivider({
-    super.key,
-    this.width,
-    this.thickness,
-    this.margin,
-    this.color,
-  });
+  final bool dotted;
+  const MyDivider(
+      {super.key, this.width, this.thickness, this.margin, this.color})
+      : dotted = false;
+  const MyDivider.dotted(
+      {super.key, this.width, this.thickness, this.margin, this.color})
+      : dotted = true;
 
   @override
   Widget build(BuildContext context) {
+    final bg = context.scheme.backgroundDark;
     return Container(
-      margin: Utils.insetsHoriz(margin ?? 0),
-      width: width,
-      child: Divider(
-        color: color ?? context.scheme.backgroundDark,
-        thickness: thickness,
-      ),
-    );
+        width: width,
+        margin: Utils.insetsHoriz(margin ?? 0),
+        decoration: BoxDecoration(
+          border: dotted
+              ? DottedBoxBorder(topSide: DottedBorderSide(color: color ?? bg))
+              : null,
+        ),
+        child: dotted
+            ? SizedBox(height: thickness, width: double.infinity)
+            : Divider(color: color ?? bg, height: thickness ?? 2));
   }
 }
 
@@ -138,6 +142,12 @@ class SliverSizedBox extends StatelessWidget {
   final double? height;
   final double? width;
   const SliverSizedBox({super.key, this.height, this.width});
+  const SliverSizedBox.shrink({super.key})
+      : height = 0,
+        width = 0;
+  const SliverSizedBox.square({super.key, double? dimension})
+      : height = dimension,
+        width = dimension;
 
   @override
   Widget build(BuildContext context) {
@@ -338,7 +348,7 @@ class BottomSheetListTile extends StatelessWidget {
       onTap: onTap,
       leading: leading ?? Icon(icon, size: Dimens.iconXXLarge),
       title: Text(title),
-      horizontalTitleGap: Dimens.sizeLarge,
+      horizontalTitleGap: Dimens.sizeXLarge,
       titleTextStyle: TextStyle(
         fontWeight: FontWeight.w500,
         fontSize: Dimens.fontXXXLarge - 1,
@@ -349,15 +359,87 @@ class BottomSheetListTile extends StatelessWidget {
 }
 
 class DisabledWidget extends StatelessWidget {
-  /// defaults to true.
   final bool? disabled;
+  final String? tooltip;
   final Widget child;
-  const DisabledWidget({super.key, this.disabled, required this.child});
+  const DisabledWidget(
+      {super.key, this.disabled, this.tooltip, required this.child});
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-        opacity: disabled ?? true ? .5 : 1,
-        child: AbsorbPointer(absorbing: disabled ?? true, child: child));
+    if (!(disabled ?? false)) return child;
+    if (tooltip?.trim().isEmpty ?? true) return _builder();
+    return Tooltip(message: tooltip ?? '', child: _builder());
+  }
+
+  Widget _builder() {
+    return AnimatedOpacity(
+      opacity: disabled ?? true ? 0.5 : 1.0,
+      duration: const Duration(milliseconds: 200),
+      child: AbsorbPointer(
+        absorbing: disabled ?? true,
+        child: child,
+      ),
+    );
+  }
+}
+
+class MyOpacity extends StatelessWidget {
+  final double? opacity;
+  final Widget child;
+  const MyOpacity({super.key, this.opacity, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+        opacity: opacity ?? 1, duration: Durations.short3, child: child);
+  }
+}
+
+class InfoWidget extends StatelessWidget {
+  final String title;
+  final String? content;
+  const InfoWidget(this.title, {this.content, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(title,
+              style: TextStyle(color: context.scheme.textColorLight)),
+        ),
+        const SizedBox(width: Dimens.sizeSmall),
+        Text(':'),
+        const SizedBox(width: Dimens.sizeSmall),
+        Expanded(
+          flex: 4,
+          child: Text(
+            content ?? 'NA',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ClampingWidget extends StatelessWidget {
+  final bool? large;
+  final Widget child;
+  const ClampingWidget({super.key, required this.child}) : large = false;
+
+  const ClampingWidget.large({super.key, required this.child}) : large = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+        child: SizedBox(
+            width: large ?? false
+                ? Utils.largeClamp(context)
+                : Utils.defClamp(context),
+            child: child));
   }
 }

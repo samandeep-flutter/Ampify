@@ -50,7 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       } catch (_) {}
       _box.listen(BoxKeys.token, (_) => add(AuthFinished()));
     } catch (e) {
-      logPrint(e, 'auth init');
+      logPrint(e, 'auth-init');
     } finally {
       emit(state.copyWith(isLoading: false));
     }

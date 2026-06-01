@@ -33,12 +33,20 @@ sealed class AppConstants {
 }
 
 sealed class BoxKeys {
-  static const String boxName = 'Ampify';
   static const String theme = 'theme';
   static const String themeMode = 'theme-mode';
+  static const String deviceInfo = 'device-info';
+  static const String logger = 'logger';
+  static const String log = 'log';
+
   static const String uid = 'uid';
   static const String token = 'token';
   static const String refreshToken = 'refresh-token';
+
+  static bool isGlobal(String key) =>
+      [theme, themeMode, log, logger, deviceInfo].contains(key);
+  static String get boxName =>
+      StringRes.appName.toLowerCase().replaceAll(' ', '-');
 }
 
 sealed class EnvKeys {
@@ -63,17 +71,30 @@ sealed class PlayerActions {
   static const String removeUpcomming = 'remove-upcomming';
 }
 
-void _debugLog(Object? value, [String? name, bool? isError]) {
-  final log = value is String? ? value : value.toString();
-  if (isError ?? false) FirebaseCrashlytics.instance.log('[$name] $log');
-  if (!kReleaseMode) dev.log(log ?? 'null', name: name ?? StringRes.appName);
+void _debugLog(Object? value, [String? name, LogType? type]) {
+  try {
+    final log = value is String? ? value : value.toString();
+    if (type == LogType.error) FirebaseCrashlytics.instance.log('[$name] $log');
+    if (!kReleaseMode) dev.log(log ?? 'null', name: name ?? StringRes.appName);
+    // getIt<LoggerServices>().addLog(log, name: name, type: type);
+  } catch (_) {}
 }
 
-void debugLog(Object? value, [String? name]) => _debugLog(value, name);
-void logPrint(Object? value, [String? name]) => _debugLog(value, name, true);
+void debugLog(Object? value, [String? name]) =>
+    _debugLog(value, name, LogType.info);
+void logPrint(Object? value, [String? name]) =>
+    _debugLog(value, name, LogType.error);
 
-void dprint(Object? value) {
-  if (kDebugMode) print(value ?? 'null');
+// TODO: add sepreate log type for network logs
+void dprint(Object? value, {String? name, String? extra}) {
+  final _name = name != null ? '[$name]' : '';
+  final log = value is String? ? value : value.toString();
+  if (!kReleaseMode) debugPrint('$_name ${log ?? 'null'}');
+  // try {
+  // if (!getIt.isRegistered<AuthServices>()) return;
+  // final LoggerServices auth = getIt();
+  // auth.addLog(log, name: name, extra: extra, type: LogType.info);
+  // } catch (_) {}
 }
 
 class MyColoredBox extends StatelessWidget {

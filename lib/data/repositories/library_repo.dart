@@ -55,7 +55,7 @@ class LibraryRepo {
     final response = await dio.get('$url&limit=${limit ?? 20}');
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'liked songs'));
+        onError: onError ?? (e) => logPrint(e, 'liked-songs'));
   }
 
   Future<bool> addtoLikedSongs(String id) async {

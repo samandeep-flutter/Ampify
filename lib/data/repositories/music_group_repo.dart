@@ -42,7 +42,7 @@ class MusicGroupRepo {
     final response = await dio.get(AppConstants.playlistDetails(id));
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'playlist details'));
+        onError: onError ?? (e) => logPrint(e, 'playlist-details'));
   }
 
   Future<void> albumDetails(String id,
@@ -50,7 +50,7 @@ class MusicGroupRepo {
     final response = await dio.get(AppConstants.albumDetails(id));
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'album details'));
+        onError: onError ?? (e) => logPrint(e, 'album-details'));
   }
 
   Future<void> getUserPlaylists(String? id,
@@ -59,7 +59,7 @@ class MusicGroupRepo {
     final response = await dio.get(AppConstants.userPlaylists(id));
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'user playlist'));
+        onError: onError ?? (e) => logPrint(e, 'user-playlist'));
   }
 
   Future<void> createPlaylist(
@@ -73,7 +73,7 @@ class MusicGroupRepo {
         options: Options(contentType: 'application/json'), data: body);
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'create playlist'));
+        onError: onError ?? (e) => logPrint(e, 'create-playlist'));
   }
 
   Future<bool> editPlaylist({
@@ -108,7 +108,7 @@ class MusicGroupRepo {
     final response = await dio.post(url, data: body);
     ApiResponse.verify(response,
         onSuccess: onSuccess ?? (_) {},
-        onError: onError ?? (e) => logPrint(e, 'addto playlist'));
+        onError: onError ?? (e) => logPrint(e, 'addto-playlist'));
   }
 
   Future<void> removeTrackfromPlaylist(
@@ -123,6 +123,6 @@ class MusicGroupRepo {
     final response = await dio.delete(url, data: body);
     ApiResponse.verify(response,
         onSuccess: onSuccess,
-        onError: onError ?? (e) => logPrint(e, 'removefrom playlist'));
+        onError: onError ?? (e) => logPrint(e, 'removefrom-playlist'));
   }
 }

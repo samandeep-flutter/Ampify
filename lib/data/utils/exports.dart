@@ -13,6 +13,7 @@ export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:equatable/equatable.dart';
 export 'package:flutter/material.dart';
+export 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 export '../data_provider/api_response.dart';
 export '../data_provider/dio_client.dart';
 
@@ -26,7 +27,6 @@ export '../../services/audio_services.dart';
 export '../../services/auth_services.dart';
 export '../../services/box_services.dart';
 export '../../services/extension_services.dart';
-export '../../services/logger_services.dart';
 export '../../services/notification_services.dart';
 
 // utils

@@ -89,7 +89,7 @@ class MyAudioHandler extends BaseAudioHandler {
       queue.add([mediaItem]);
       play();
     } catch (e) {
-      logPrint(e, 'audio play');
+      logPrint(e, 'audio-play');
     }
   }
 
@@ -100,7 +100,7 @@ class MyAudioHandler extends BaseAudioHandler {
       await _player.seekToNext();
       play();
     } catch (e) {
-      logPrint(e, 'audio next');
+      logPrint(e, 'audio-next');
     }
   }
 
@@ -128,7 +128,7 @@ class MyAudioHandler extends BaseAudioHandler {
         await _removeUpcomming();
         break;
       default:
-        logPrint('no action set', 'audio actions');
+        logPrint('no action set', 'audio-actions');
     }
   }
 
@@ -142,7 +142,7 @@ class MyAudioHandler extends BaseAudioHandler {
       await _player.removeAudioSourceRange(start!, end!);
       queue.value.removeRange(start, end);
     } catch (_) {
-      logPrint('range not specified', 'audio range');
+      logPrint('range not specified', 'audio-range');
     }
   }
 
@@ -153,7 +153,7 @@ class MyAudioHandler extends BaseAudioHandler {
       await _player.removeAudioSourceRange(_index + 1, _end);
       queue.value.removeRange(_index + 1, queue.value.length);
     } catch (e) {
-      logPrint(e, 'audio queue');
+      logPrint(e, 'audio-queue');
     }
   }
 
@@ -220,7 +220,7 @@ class MyAudioHandler extends BaseAudioHandler {
           _trackEnded = item.id;
         }
       } catch (e) {
-        logPrint(e, 'audio position');
+        logPrint(e, 'audio-position');
       }
     });
   }

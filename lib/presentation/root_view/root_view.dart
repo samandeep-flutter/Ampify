@@ -74,15 +74,15 @@ class _RootViewState extends State<RootView> {
                           blurRadius: Dimens.sizeMidLarge,
                         )
                       ]),
-                  child: BlocBuilder<RootBloc, RootState>(
-                      buildWhen: (pr, cr) => pr.isConnected != cr.isConnected,
-                      builder: (context, state) {
+                  child: ValueListenableBuilder(
+                      valueListenable: bloc.auth.connectivity,
+                      builder: (context, value, _) {
                         return Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             MediaQuery.removePadding(
                               context: context,
-                              removeBottom: !state.isConnected,
+                              removeBottom: !value,
                               child: BlocBuilder<RootBloc, RootState>(
                                 buildWhen: (pr, cr) => pr.index != cr.index,
                                 builder: (context, state) {
@@ -102,7 +102,7 @@ class _RootViewState extends State<RootView> {
                               ),
                             ),
                             Container(
-                              height: state.isConnected ? 0 : null,
+                              height: value ? 0 : null,
                               padding: EdgeInsets.only(
                                   top: Dimens.sizeSmall,
                                   bottom: Dimens.sizeDefault),

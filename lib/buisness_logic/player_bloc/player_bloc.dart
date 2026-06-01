@@ -125,7 +125,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         logPrint(e, 'liked');
       }
     } catch (e) {
-      logPrint(e, 'media stream');
+      logPrint(e, 'media-stream');
     }
   }
 
@@ -142,7 +142,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       if (playerState == null && loop == null) return;
       emit(state.copyWith(playerState: playerState, loopMode: loop));
     } catch (e) {
-      logPrint(e, 'playback stream');
+      logPrint(e, 'playback-stream');
     }
   }
 
@@ -181,7 +181,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       await _audioHandler.customAction(PlayerActions.removeUpcomming);
       add(PlayerPrepareNextTrack());
     } catch (e) {
-      logPrint(e, 'queue next');
+      logPrint(e, 'queue-next');
     }
   }
 
@@ -197,7 +197,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       await _audioHandler.customAction(PlayerActions.removeUpcomming);
       add(PlayerPrepareNextTrack());
     } catch (e) {
-      logPrint(e, 'upnext next');
+      logPrint(e, 'upnext-next');
     }
   }
 
@@ -254,7 +254,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     } on FormatException {
       add(PlayerTrackChanged(event.track));
     } catch (e) {
-      logPrint(e, 'queue instaneous');
+      logPrint(e, 'queue-instaneous');
     }
   }
 
@@ -272,11 +272,11 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       add(PlayerPrepareNextTrack());
     } on FormatException {
       if (state.loopMode != MusicLoopMode.off) return;
-      logPrint(state, 'track ended');
+      logPrint(state, 'track-ended');
       await _audioHandler.stop();
       emit(PlayerState.init());
     } catch (e) {
-      logPrint(e, 'track ended');
+      logPrint(e, 'track-ended');
     }
   }
 
@@ -307,7 +307,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         }
       }
     } catch (e) {
-      logPrint(e, 'preloading track');
+      logPrint(e, 'preloading-track');
     }
   }
 
@@ -398,7 +398,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       showToast(StringRes.cannotbePlayed);
       emit(state.copyWith(playerState: MusicState.hidden));
     } catch (e) {
-      logPrint(e, 'track change');
+      logPrint(e, 'track-change');
       showToast(StringRes.somethingWrong);
       emit(state.copyWith(playerState: MusicState.pause));
     }

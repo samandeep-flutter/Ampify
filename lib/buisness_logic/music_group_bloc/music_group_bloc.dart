@@ -3,9 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
-import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 
 class MusicGroupEvent extends Equatable {
   const MusicGroupEvent();
@@ -163,7 +162,6 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   }
   final MusicGroupRepo _repo = getIt();
   final scrollController = ScrollController();
-  final picker = ImagePicker();
   bool libRefresh = false;
 
   String? get uid => BoxServices.instance.uid;
@@ -180,12 +178,13 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
   }
 
-  Future<bool> pickImage(ImageSource source) async {
+  Future<bool> pickImage() async {
     try {
-      final file =
-          await picker.pickImage(source: source, maxHeight: 500, maxWidth: 500);
+      final result = await FilePicker.pickFiles(
+          allowMultiple: false, type: FileType.image);
+      final file = result?.files.firstElement;
       if (file == null) throw FormatException(StringRes.noImage);
-      add(PlaylistCoverChanged(File(file.path)));
+      add(PlaylistCoverChanged(File(file.path!)));
       return true;
     } on FormatException catch (e) {
       showToast(e.message);

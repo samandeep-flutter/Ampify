@@ -2,7 +2,6 @@ import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:html_unescape/html_unescape.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 

@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:ampify/data/repositories/auth_repo.dart';
-import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:app_links/app_links.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AuthServices {
   AuthServices._init();
@@ -13,37 +11,43 @@ class AuthServices {
   static AuthServices get instance => _instance ??= AuthServices._init();
 
   final AppLinks _appLinks = getIt();
-  final Connectivity _connectivity = getIt();
-  final AuthRepo _authRepo = getIt();
   final _box = BoxServices.instance;
 
   final navigator = GlobalKey<NavigatorState>();
   final shellNavigator = GlobalKey<NavigatorState>();
+
   // BuildContext? get context => navigator.currentContext;
   // BuildContext? get shellContext => shellNavigator.currentContext;
 
-  final _connectionStream = StreamController<bool>();
-  Stream<bool> get connectionStream => _connectionStream.stream;
-  bool _isConnected = true;
+  final connectivity = ValueNotifier<bool>(true);
+  bool get isOffline => !connectivity.value;
+  final InternetConnection _connectivity = getIt();
+  StreamSubscription? _connectivitySub;
 
   AudioSession? session;
   ProfileModel? profile;
+  DeviceInfoModel? deviceInfo;
+  Directory? internalDir;
+
+  final _buffer = Duration(seconds: 1);
 
   Future<AuthServices> init() async {
-    _appLinks.uriLinkStream.listen(_dynamicLinks);
-    _connectivity.onConnectivityChanged.listen(checkConnectivity);
     try {
+      _appLinks.uriLinkStream.listen(_dynamicLinks);
       session = await AudioSession.instance;
       session!.configure(const AudioSessionConfiguration.music());
-      _connectionStream.add(true);
+      internalDir = await getApplicationDocumentsDirectory();
+      await getDeviceInfo();
+      _verifyConectivity();
+      _initStreams();
     } catch (e) {
-      logPrint(e, 'auth init');
+      logPrint(e, 'auth-init');
     }
     return this;
   }
 
   void _dynamicLinks(Uri uri) {
-    debugLog(uri, 'app_links');
+    debugLog(uri, 'app-links');
     switch (uri.authority) {
       case 'spotify-login':
         if (Platform.isIOS) return;
@@ -52,11 +56,6 @@ class AuthServices {
         authRepo.getToken(code!);
         break;
     }
-  }
-
-  void checkConnectivity([List<ConnectivityResult>? _]) async {
-    final _result = await _authRepo.checkConnection();
-    setConnection(_result);
   }
 
   String get initialRoute {
@@ -68,27 +67,58 @@ class AuthServices {
     }
   }
 
-  Future<void> setConnection(bool result) async {
-    if (result == _isConnected) return;
-    _connectionStream.add(result);
-    _isConnected = result;
-  }
-
-  Future<void> getProfile() async {
-    final LibraryRepo _libRepo = getIt();
-    await _libRepo.getProfile(onSuccess: (json) {
-      profile = ProfileModel.fromJson(json);
+  Future<void> _initStreams() async {
+    _connectivitySub = _connectivity.onStatusChange.listen((status) {
+      _verifyConectivity(status.isConnected);
     });
   }
 
+  Future<void> onStateChanged(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) _verifyConectivity();
+  }
+
+  Future<void> _verifyConectivity([bool? value]) async {
+    try {
+      if (value != null) {
+        if (value == connectivity.value) return;
+        connectivity.value = value;
+        if (!value) Future.delayed(_buffer, _verifyConectivity);
+      } else {
+        final result = await _connectivity.hasInternetAccess;
+        connectivity.value = result;
+      }
+    } catch (e) {
+      logPrint(e, 'connectivity');
+    }
+  }
+
+  Future<void> getDeviceInfo() async {
+    try {
+      final json = _box.read(BoxKeys.deviceInfo);
+      deviceInfo = DeviceInfoModel.fromJson(json);
+    } catch (_) {
+      deviceInfo = await Future.microtask(DeviceInfoService.getInfo);
+      _box.write(BoxKeys.deviceInfo, deviceInfo?.toJson());
+    }
+  }
+
   Future<void> logout() async {
-    await _box.remove(BoxKeys.token);
-    await _box.remove(BoxKeys.uid);
-    await _box.remove(BoxKeys.refreshToken);
-    navigator.currentContext?.goNamed(AppRoutes.auth);
+    try {
+      List<String> list = [];
+      for (var key in _box.keys) {
+        if (BoxKeys.isGlobal(key)) continue;
+        list.add(key);
+      }
+      await _box.removeAll(list);
+    } catch (e) {
+      logPrint(e, 'logout');
+    } finally {
+      navigator.currentContext?.goNamed(AppRoutes.auth);
+    }
   }
 
   void dispose() {
-    _connectionStream.close();
+    connectivity.dispose();
+    _connectivitySub?.cancel();
   }
 }

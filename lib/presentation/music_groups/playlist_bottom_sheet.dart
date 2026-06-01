@@ -1,5 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../buisness_logic/music_group_bloc/music_group_bloc.dart';
 
 class PlaylistBottomSheet extends StatefulWidget {
@@ -167,41 +166,41 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
 
   void _pickCoverImage(BuildContext context) {
     Navigator.pop(context);
-    final bloc = context.read<MusicGroupBloc>();
-    showDialog(
-        context: context,
-        builder: (context) {
-          return MyAlertDialog(
-            title: 'Choose Image',
-            actionPadding: EdgeInsets.zero,
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  onTap: () {
-                    Navigator.pop(context);
-                    bloc.pickImage(ImageSource.gallery);
-                  },
-                  contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
-                  leading: Icon(Icons.photo_library_outlined,
-                      size: Dimens.iconDefault),
-                  title: Text(StringRes.gallery,
-                      style: TextStyle(fontSize: Dimens.fontXXXLarge)),
-                ),
-                ListTile(
-                  onTap: () {
-                    Navigator.pop(context);
-                    bloc.pickImage(ImageSource.camera);
-                  },
-                  contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
-                  leading: Icon(Icons.photo_camera_outlined,
-                      size: Dimens.iconDefault),
-                  title: Text(StringRes.camera,
-                      style: TextStyle(fontSize: Dimens.fontXXXLarge)),
-                ),
-              ],
-            ),
-          );
-        });
+    context.read<MusicGroupBloc>().pickImage();
+    // showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return MyAlertDialog(
+    //         titleText: 'Choose Image',
+    //         actionPadding: EdgeInsets.zero,
+    //         content: Column(
+    //           mainAxisSize: MainAxisSize.min,
+    //           children: [
+    //             ListTile(
+    //               onTap: () {
+    //                 Navigator.pop(context);
+    //                 bloc.pickImage(ImageSource.gallery);
+    //               },
+    //               contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
+    //               leading: Icon(Icons.photo_library_outlined,
+    //                   size: Dimens.iconDefault),
+    //               title: Text(StringRes.gallery,
+    //                   style: TextStyle(fontSize: Dimens.fontXXXLarge)),
+    //             ),
+    //             ListTile(
+    //               onTap: () {
+    //                 Navigator.pop(context);
+    //                 bloc.pickImage(ImageSource.camera);
+    //               },
+    //               contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
+    //               leading: Icon(Icons.photo_camera_outlined,
+    //                   size: Dimens.iconDefault),
+    //               title: Text(StringRes.camera,
+    //                   style: TextStyle(fontSize: Dimens.fontXXXLarge)),
+    //             ),
+    //           ],
+    //         ),
+    //       );
+    // });
   }
 }
