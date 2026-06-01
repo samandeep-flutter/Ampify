@@ -22,8 +22,17 @@
                     "projectId": "ampify-samtech",
                     "configurations": {
                         "android": "1:962828708485:android:156869661d21e804e097ec",
-                        "ios": "1:962828708485:ios:d7b056145c33df15e097ec"
+                        "ios": "1:962828708485:ios:d7b056145c33df15e097ec",
+                        "macos": "1:962828708485:ios:d7b056145c33df15e097ec"
                     }
+                }
+            },
+            "macos": {
+                "default": {
+                    "projectId": "ampify-samtech",
+                    "appId": "1:962828708485:ios:d7b056145c33df15e097ec",
+                    "uploadDebugSymbols": true,
+                    "fileOutput": "macos/Runner/GoogleService-Info.plist"
                 }
             }
         }

@@ -12,12 +12,7 @@
           "package_name": "com.samtech.ampify"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "962828708485-caeecoqgs1cu88kg1rd245hun3th95a4.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyBdssOYzAwW_t25V0TBgGylH0lOnXyZRnU"
@@ -26,10 +21,6 @@
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
-            {
-              "client_id": "962828708485-caeecoqgs1cu88kg1rd245hun3th95a4.apps.googleusercontent.com",
-              "client_type": 3
-            },
             {
               "client_id": "962828708485-pu3uqbhm9r8dm65khtjb2dc92f14a4o0.apps.googleusercontent.com",
               "client_type": 2,

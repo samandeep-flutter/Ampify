@@ -28,10 +28,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -58,6 +55,17 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAKCjfvFna8L9KiOS8aF38neUD9KfYYtgY',
+    appId: '1:962828708485:ios:d7b056145c33df15e097ec',
+    messagingSenderId: '962828708485',
+    projectId: 'ampify-samtech',
+    storageBucket: 'ampify-samtech.firebasestorage.app',
+    androidClientId: '962828708485-4luos7db9sokjp48npuptl617g52aaq4.apps.googleusercontent.com',
+    iosClientId: '962828708485-pu3uqbhm9r8dm65khtjb2dc92f14a4o0.apps.googleusercontent.com',
+    iosBundleId: 'com.samtech.ampify',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAKCjfvFna8L9KiOS8aF38neUD9KfYYtgY',
     appId: '1:962828708485:ios:d7b056145c33df15e097ec',
     messagingSenderId: '962828708485',
