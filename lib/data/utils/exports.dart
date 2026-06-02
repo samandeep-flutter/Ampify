@@ -1,7 +1,6 @@
 library;
 
 // configs
-export '../../config/device_info.dart';
 export '../../config/firebase_options.dart';
 export '../../config/getit_instance.dart';
 export '../../config/responsive_font.dart';
@@ -42,7 +41,6 @@ export '../../data/data_models/common/artist_model.dart';
 export '../../data/data_models/common/other_models.dart';
 export '../../data/data_models/common/playlist_model.dart';
 export '../../data/data_models/common/tracks_model.dart';
-export '../../data/data_models/device_info_model.dart';
 export '../../data/data_models/library_model.dart';
 export '../../data/data_models/profile_model.dart';
 export '../../data/data_models/search_model.dart';

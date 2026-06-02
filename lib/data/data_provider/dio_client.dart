@@ -172,11 +172,11 @@ class LoggingInterceptor extends InterceptorsWrapper {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final options = err.requestOptions;
-    final status = err.response?.statusCode;
+    final data = err.response?.data;
     logPrint(
-        'ERROR [$status] ${options.method} | ${options.path}'
-            '\n${err.response?.data}',
-        'DIO');
+        'ERROR [${err.error.runtimeType}] ${err.type.name} | '
+            '${options.method} | ${options.path} ${data != null ? '\n$data' : ''}',
+        'DIO-error');
     super.onError(err, handler);
   }
 }

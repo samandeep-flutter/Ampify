@@ -8,11 +8,13 @@ class AuthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.scheme;
     final bloc = context.read<AuthBloc>();
-    final spotify = context.isDarkMode ? Colors.green[900] : Colors.green;
 
     return BaseWidget(
       appBar: AppBar(
-          backgroundColor: scheme.background, toolbarHeight: Dimens.sizeXLarge),
+        backgroundColor: scheme.background,
+        foregroundColor: scheme.textColor,
+        toolbarHeight: Dimens.sizeXLarge,
+      ),
       bodyPadding: Utils.insetsHoriz(Dimens.sizeXLarge),
       child: Column(
         children: [
@@ -34,8 +36,7 @@ class AuthScreen extends StatelessWidget {
                 width: double.infinity,
                 enable: !state.isSuccess,
                 isLoading: state.isLoading,
-                loaderColor: spotify,
-                backgroundColor: spotify,
+                backgroundColor: scheme.primary,
                 onPressed: () => bloc.add(AuthInitial()),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -10,7 +10,7 @@ class AuthServices {
   static AuthServices? _instance;
   static AuthServices get instance => _instance ??= AuthServices._init();
 
-  final AppLinks _appLinks = getIt();
+  final _appLinks = AppLinks();
   final _box = BoxServices.instance;
 
   final navigator = GlobalKey<NavigatorState>();
@@ -21,12 +21,11 @@ class AuthServices {
 
   final connectivity = ValueNotifier<bool>(true);
   bool get isOffline => !connectivity.value;
-  final InternetConnection _connectivity = getIt();
+  final _connectivity = InternetConnection();
   StreamSubscription? _connectivitySub;
 
   AudioSession? session;
   ProfileModel? profile;
-  DeviceInfoModel? deviceInfo;
   Directory? internalDir;
 
   final _buffer = Duration(seconds: 1);
@@ -37,7 +36,6 @@ class AuthServices {
       session = await AudioSession.instance;
       session!.configure(const AudioSessionConfiguration.music());
       internalDir = await getApplicationDocumentsDirectory();
-      await getDeviceInfo();
       _verifyConectivity();
       _initStreams();
     } catch (e) {
@@ -89,16 +87,6 @@ class AuthServices {
       }
     } catch (e) {
       logPrint(e, 'connectivity');
-    }
-  }
-
-  Future<void> getDeviceInfo() async {
-    try {
-      final json = _box.read(BoxKeys.deviceInfo);
-      deviceInfo = DeviceInfoModel.fromJson(json);
-    } catch (_) {
-      deviceInfo = await Future.microtask(DeviceInfoService.getInfo);
-      _box.write(BoxKeys.deviceInfo, deviceInfo?.toJson());
     }
   }
 
