@@ -13,7 +13,7 @@ class HomeInitial extends HomeEvent {}
 class HomeState extends Equatable {
   final bool albumLoading;
   final bool recentLoading;
-  final List<Album> albums;
+  final List<MyHomeSection> albums;
   final List<Track> recentlyPlayed;
   const HomeState({
     required this.albums,
@@ -32,7 +32,7 @@ class HomeState extends Equatable {
     bool? albumLoading,
     bool? recentLoading,
     List<Track>? recentlyPlayed,
-    List<Album>? albums,
+    List<MyHomeSection>? albums,
   }) {
     return HomeState(
       albums: albums ?? this.albums,
@@ -52,43 +52,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeInitial>(_onInIt);
   }
 
-  final HomeRepo repo = getIt();
+  final YTMusic _provider = getIt();
 
   Future<void> _onInIt(HomeInitial event, Emitter<HomeState> emit) async {
-    final getReleases = Completer<bool>();
-    final getRecentlyPlayed = Completer<bool>();
-    repo.getNewReleases(
-      onSuccess: (json) {
-        final album = AlbumModel.fromJson(json['albums']);
-        emit(state.copyWith(albums: album.items, albumLoading: false));
-        getReleases.complete(true);
-      },
-      onError: (error) {
-        logPrint(error, 'releases');
-        emit(state.copyWith(albumLoading: false));
-        getReleases.complete(false);
-      },
-    );
-
-    repo.recentlyPlayed(
-      onSuccess: (json) {
-        final items = PLtracksItems.fromJson(json);
-        List<Track> tracks = [];
-        items.track?.forEach((e) {
-          if (e.track == null) return;
-          if (!tracks.contains(e.track)) tracks.add(e.track!);
-        });
-        emit(state.copyWith(recentlyPlayed: tracks, recentLoading: false));
-        getRecentlyPlayed.complete(true);
-      },
-      onError: (error) {
-        logPrint(error, 'recents');
-        emit(state.copyWith(recentLoading: false));
-        getRecentlyPlayed.complete(false);
-      },
-    );
-    await getReleases.future;
-    await getRecentlyPlayed.future;
+    try {
+      final _list = await _provider.getHomeSections();
+      final list = _list.map((e) => MyHomeSection.fromYT(e)).toList();
+      emit(state.copyWith(
+          albums: list, albumLoading: false, recentLoading: false));
+    } catch (e) {
+      logPrint(e, 'home');
+      emit(state.copyWith(albumLoading: false, recentLoading: false));
+    }
     Future(NotiServices.instance.initialize);
   }
 }

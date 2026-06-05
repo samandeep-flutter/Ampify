@@ -268,6 +268,16 @@ extension MyString on String {
   String get unescape => HtmlUnescape().convert(this);
   String get noSpace => replaceAll(' ', '');
 
+  String trunacate([int length = 800]) {
+    if (length > this.length) return this;
+    final buffer = StringBuffer();
+    for (int i = 0; i < length; i += length) {
+      final end = (i + length < length) ? i + length : length;
+      buffer.write(substring(i, end));
+    }
+    return buffer.toString();
+  }
+
   bool _emailRegExp(String text) {
     final emailExp =
         RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');

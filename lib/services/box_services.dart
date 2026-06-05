@@ -24,7 +24,11 @@ class BoxServices {
   }
 
   String? get uid => read<String>(BoxKeys.uid);
-  String? get token => read<String>(BoxKeys.token);
+
+  UserModel? get profile {
+    if (!exist(BoxKeys.profile)) return null;
+    return UserModel.fromJson(read(BoxKeys.profile));
+  }
 
   Future<void> saveTheme(MyTheme theme) async {
     await write(BoxKeys.theme, theme.title);

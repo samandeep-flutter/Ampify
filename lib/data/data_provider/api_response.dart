@@ -24,7 +24,11 @@ class ApiResponse {
         try {
           await onSuccess(json);
         } catch (error) {
-          onError({'error': error.toString()});
+          if (error is Map<String, dynamic>) {
+            onError(error);
+          } else {
+            onError({'error': error.toString()});
+          }
         }
         return;
       }

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MusicRepo {
@@ -70,9 +69,9 @@ class MusicRepo {
       final artist =
           track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
       final song = await _search(QuerySong(track.name!, artist));
-      return await ytMusic.getUpNexts(song!.videoId);
+      return ytMusic.getUpNexts(song!.videoId);
     } on FormatException {
-      return await ytMusic.getUpNexts(track.ytDetails!.videoId);
+      return ytMusic.getUpNexts(track.ytDetails!.videoId);
     } catch (e) {
       logPrint(e, 'yt-recomendations');
       return null;
@@ -85,35 +84,4 @@ extension MyStream on StreamManifest {
     if (Platform.isIOS) return muxed.first.url;
     return audioOnly.first.url;
   }
-}
-
-class SongDetails {
-  final Uri uri;
-  final Duration duration;
-
-  SongDetails(this.uri, {required this.duration});
-}
-
-class SongYtDetails {
-  final String videoId;
-  final Duration duration;
-
-  SongYtDetails(this.videoId, {required this.duration});
-
-  factory SongYtDetails.fromJson(Map<String, dynamic> json) {
-    return SongYtDetails(json['videoId'],
-        duration: Duration(seconds: json['duration'] ?? 0));
-  }
-
-  Map<String, dynamic> toJson() =>
-      {'videoId': videoId, 'duration': duration.inSeconds};
-}
-
-class QuerySong {
-  final String title;
-  final Iterable<String> artists;
-
-  QuerySong(this.title, this.artists);
-
-  String get text => '$title ${artists.first}';
 }

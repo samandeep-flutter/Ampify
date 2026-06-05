@@ -5,16 +5,6 @@ class LibraryRepo {
   final DioClient dio;
   const LibraryRepo(this.dio);
 
-  Future<void> getProfile(
-      {required SuccessCallback onSuccess, ErrorCallback? onError}) async {
-    final response = await dio.get(AppConstants.profile);
-    ApiResponse.verify(
-      response,
-      onSuccess: onSuccess,
-      onError: onError ?? (e) => logPrint(e, 'profile'),
-    );
-  }
-
   /// limit default to 10.
   Future<void> getMyPlaylists({
     int? offset,

@@ -16,6 +16,7 @@ class MyTextField extends StatefulWidget {
   final bool isEmail;
   final bool isPass;
   final bool isNumber;
+  final Color? backgroundColor;
   final String? Function(String? value)? customValidator;
   final List<TextInputFormatter>? inputFormatters;
   const MyTextField(
@@ -33,6 +34,7 @@ class MyTextField extends StatefulWidget {
       this.isPass = false,
       this.customValidator,
       this.inputFormatters,
+      this.backgroundColor,
       this.obscureText = false})
       : expands = false,
         decoration = null;
@@ -53,25 +55,26 @@ class MyTextField extends StatefulWidget {
         isEmail = false,
         isPass = false,
         isNumber = false,
+        backgroundColor = null,
         maxLines = 1;
 
-  const MyTextField._custom({
-    this.fieldKey,
-    required this.title,
-    this.controller,
-    this.keyboardType,
-    this.focusNode,
-    this.capitalization,
-    this.customValidator,
-    this.inputFormatters,
-    this.expands,
-    this.maxLines,
-    this.decoration,
-  })  : maxLength = null,
-        obscureText = false,
-        isEmail = false,
-        isPass = false,
-        isNumber = false;
+  // const MyTextField._custom({
+  //   this.fieldKey,
+  //   required this.title,
+  //   this.controller,
+  //   this.keyboardType,
+  //   this.focusNode,
+  //   this.capitalization,
+  //   this.customValidator,
+  //   this.inputFormatters,
+  //   this.expands,
+  //   this.maxLines,
+  //   this.decoration,
+  // })  : maxLength = null,
+  //       obscureText = false,
+  //       isEmail = false,
+  //       isPass = false,
+  //       isNumber = false;
 
   @override
   State<MyTextField> createState() => _MyTextFieldState();
@@ -111,24 +114,26 @@ class _MyTextFieldState extends State<MyTextField> {
       textCapitalization: widget.capitalization ?? TextCapitalization.none,
       decoration: widget.decoration ??
           InputDecoration(
-              suffixIcon: widget.obscureText
-                  ? IconButton(
-                      style: IconButton.styleFrom(
-                          fixedSize: const Size.square(10)),
-                      padding: EdgeInsets.zero,
-                      splashRadius: 10,
-                      selectedIcon: const Icon(Icons.visibility),
-                      isSelected: isSelected,
-                      onPressed: _toggleVisibility,
-                      icon: const Icon(Icons.visibility_off))
-                  : null,
-              label: Text(widget.title),
-              contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
-              labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
-              border: const OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: scheme.primaryAdaptive),
-              )),
+            suffixIcon: widget.obscureText
+                ? IconButton(
+                    style:
+                        IconButton.styleFrom(fixedSize: const Size.square(10)),
+                    padding: EdgeInsets.zero,
+                    splashRadius: 10,
+                    selectedIcon: const Icon(Icons.visibility),
+                    isSelected: isSelected,
+                    onPressed: _toggleVisibility,
+                    icon: const Icon(Icons.visibility_off))
+                : null,
+            label: Text(widget.title),
+            fillColor: widget.backgroundColor,
+            filled: widget.backgroundColor != null,
+            contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
+            labelStyle: TextStyle(fontSize: Dimens.fontXXXLarge),
+            border: _border(),
+            enabledBorder: _border(),
+            focusedBorder: _border(scheme.primaryAdaptive),
+          ),
       style: TextStyle(fontSize: Dimens.fontXXXLarge),
       inputFormatters: widget.inputFormatters,
       validator: widget.customValidator ??
@@ -145,6 +150,14 @@ class _MyTextFieldState extends State<MyTextField> {
             }
             return null;
           },
+    );
+  }
+
+  OutlineInputBorder _border([Color? color]) {
+    final bg = widget.backgroundColor ?? context.scheme.disabled;
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(Dimens.borderSmall),
+      borderSide: BorderSide(color: color ?? bg),
     );
   }
 
@@ -228,84 +241,84 @@ class SearchTextField extends StatelessWidget {
   }
 }
 
-class CustomTextField extends StatelessWidget {
-  final EdgeInsets? margin;
-  final String title;
-  final Key? fieldKey;
-  final TextInputType? keyboardType;
-  final TextEditingController? controller;
-  final FocusNode? focusNode;
-  final bool? expands;
-  final int? maxLines;
-  final TextCapitalization? capitalization;
-  final String? Function(String? value)? validator;
-  final List<TextInputFormatter>? inputFormatters;
-  final bool? defaultBorder;
-  final BorderRadius? borderRadius;
-  final Color? backgroundColor;
+// class CustomTextField extends StatelessWidget {
+//   final EdgeInsets? margin;
+//   final String title;
+//   final Key? fieldKey;
+//   final TextInputType? keyboardType;
+//   final TextEditingController? controller;
+//   final FocusNode? focusNode;
+//   final bool? expands;
+//   final int? maxLines;
+//   final TextCapitalization? capitalization;
+//   final String? Function(String? value)? validator;
+//   final List<TextInputFormatter>? inputFormatters;
+//   final bool? defaultBorder;
+//   final BorderRadius? borderRadius;
+//   final Color? backgroundColor;
 
-  const CustomTextField({
-    super.key,
-    this.margin,
-    required this.title,
-    this.fieldKey,
-    this.keyboardType,
-    this.controller,
-    this.focusNode,
-    this.expands,
-    this.maxLines,
-    this.capitalization,
-    this.validator,
-    this.inputFormatters,
-    this.backgroundColor,
-    this.defaultBorder,
-    this.borderRadius,
-  });
+//   const CustomTextField({
+//     super.key,
+//     this.margin,
+//     required this.title,
+//     this.fieldKey,
+//     this.keyboardType,
+//     this.controller,
+//     this.focusNode,
+//     this.expands,
+//     this.maxLines,
+//     this.capitalization,
+//     this.validator,
+//     this.inputFormatters,
+//     this.backgroundColor,
+//     this.defaultBorder,
+//     this.borderRadius,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    final scheme = ThemeServices.of(context);
-    final radius = BorderRadius.circular(Dimens.borderDefault);
+//   @override
+//   Widget build(BuildContext context) {
+//     final scheme = ThemeServices.of(context);
+//     final radius = BorderRadius.circular(Dimens.borderDefault);
 
-    InputBorder inputBorder() {
-      return OutlineInputBorder(
-        borderRadius: borderRadius ?? radius,
-        borderSide: BorderSide(color: backgroundColor ?? scheme.background),
-      );
-    }
+//     InputBorder inputBorder() {
+//       return OutlineInputBorder(
+//         borderRadius: borderRadius ?? radius,
+//         borderSide: BorderSide(color: backgroundColor ?? scheme.background),
+//       );
+//     }
 
-    return Padding(
-      padding: margin ?? EdgeInsets.zero,
-      child: MyTextField._custom(
-        title: title,
-        fieldKey: fieldKey,
-        keyboardType: keyboardType,
-        controller: controller,
-        focusNode: focusNode,
-        maxLines: maxLines,
-        expands: expands ?? false,
-        capitalization: capitalization,
-        customValidator: validator ?? (value) => null,
-        inputFormatters: inputFormatters,
-        decoration: InputDecoration(
-          hintText: title,
-          fillColor: backgroundColor,
-          filled: backgroundColor != null,
-          hintStyle: TextStyle(color: scheme.disabled),
-          contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
-          focusedBorder: defaultBorder ?? false
-              ? OutlineInputBorder(
-                  borderSide: BorderSide(color: scheme.primaryAdaptive))
-              : inputBorder(),
-          enabledBorder: defaultBorder ?? false
-              ? OutlineInputBorder(
-                  borderSide: BorderSide(
-                  color: scheme.disabled,
-                  width: 1.5,
-                ))
-              : inputBorder(),
-        ),
-      ),
-    );
-  }
-}
+//     return Padding(
+//       padding: margin ?? EdgeInsets.zero,
+//       child: MyTextField._custom(
+//         title: title,
+//         fieldKey: fieldKey,
+//         keyboardType: keyboardType,
+//         controller: controller,
+//         focusNode: focusNode,
+//         maxLines: maxLines,
+//         expands: expands ?? false,
+//         capitalization: capitalization,
+//         customValidator: validator ?? (value) => null,
+//         inputFormatters: inputFormatters,
+//         decoration: InputDecoration(
+//           hintText: title,
+//           fillColor: backgroundColor,
+//           filled: backgroundColor != null,
+//           hintStyle: TextStyle(color: scheme.disabled),
+//           contentPadding: Utils.insetsHoriz(Dimens.sizeDefault),
+//           focusedBorder: defaultBorder ?? false
+//               ? OutlineInputBorder(
+//                   borderSide: BorderSide(color: scheme.primaryAdaptive))
+//               : inputBorder(),
+//           enabledBorder: defaultBorder ?? false
+//               ? OutlineInputBorder(
+//                   borderSide: BorderSide(
+//                   color: scheme.disabled,
+//                   width: 1.5,
+//                 ))
+//               : inputBorder(),
+//         ),
+//       ),
+//     );
+//   }
+// }

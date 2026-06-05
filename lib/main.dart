@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:dart_ytmusic_api/dart_ytmusic_api.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -40,13 +39,13 @@ Future<void> _initServices() async {
     await BoxServices.initialize();
     await getIt<YTMusic>().initialize();
     FirebaseMessaging.onBackgroundMessage(myBackgroundMessageHandler);
-    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    // SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    //   systemNavigationBarColor: Colors.transparent,
-    //   statusBarColor: Colors.transparent,
-    //   statusBarIconBrightness: Brightness.dark,
-    //   systemNavigationBarIconBrightness: Brightness.light,
-    // ));
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarIconBrightness: Brightness.light,
+    ));
     if (Platform.isIOS || Platform.isAndroid) {
       SystemChrome.setPreferredOrientations(
           [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);

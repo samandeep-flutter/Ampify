@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
+import 'package:ampify/services/device_info.dart';
 import 'package:app_links/app_links.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AuthServices {
@@ -12,6 +14,7 @@ class AuthServices {
 
   final _appLinks = AppLinks();
   final _box = BoxServices.instance;
+  final _auth = FirebaseAuth.instance;
 
   final navigator = GlobalKey<NavigatorState>();
   final shellNavigator = GlobalKey<NavigatorState>();
@@ -25,7 +28,7 @@ class AuthServices {
   StreamSubscription? _connectivitySub;
 
   AudioSession? session;
-  ProfileModel? profile;
+  DeviceInfoModel? deviceInfo;
   Directory? internalDir;
 
   final _buffer = Duration(seconds: 1);
@@ -36,6 +39,7 @@ class AuthServices {
       session = await AudioSession.instance;
       session!.configure(const AudioSessionConfiguration.music());
       internalDir = await getApplicationDocumentsDirectory();
+      await getDeviceInfo();
       _verifyConectivity();
       _initStreams();
     } catch (e) {
@@ -47,18 +51,18 @@ class AuthServices {
   void _dynamicLinks(Uri uri) {
     debugLog(uri, 'app-links');
     switch (uri.authority) {
-      case 'spotify-login':
-        if (Platform.isIOS) return;
-        final AuthRepo authRepo = getIt();
-        final code = uri.queryParameters['code'];
-        authRepo.getToken(code!);
-        break;
+      // case 'spotify-login':
+      //   if (Platform.isIOS) return;
+      // final AuthRepo authRepo = getIt();
+      // final code = uri.queryParameters['code'];
+      // authRepo.getToken(code!);
+      // break;
     }
   }
 
   String get initialRoute {
     try {
-      _box.read(BoxKeys.token) as String;
+      _auth.currentUser as User;
       return AppRoutes.homeView;
     } catch (_) {
       return AppRoutes.auth;
@@ -90,6 +94,16 @@ class AuthServices {
     }
   }
 
+  Future<void> getDeviceInfo() async {
+    try {
+      final json = _box.read(BoxKeys.deviceInfo);
+      deviceInfo = DeviceInfoModel.fromJson(json);
+    } catch (_) {
+      deviceInfo = await Future.microtask(DeviceInfoService.getInfo);
+      _box.write(BoxKeys.deviceInfo, deviceInfo?.toJson());
+    }
+  }
+
   Future<void> logout() async {
     try {
       List<String> list = [];
@@ -97,6 +111,7 @@ class AuthServices {
         if (BoxKeys.isGlobal(key)) continue;
         list.add(key);
       }
+      await _auth.signOut();
       await _box.removeAll(list);
     } catch (e) {
       logPrint(e, 'logout');

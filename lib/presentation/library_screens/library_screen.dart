@@ -10,8 +10,7 @@ class LibraryScreen extends StatefulWidget {
 }
 
 class _LibraryScreenState extends State<LibraryScreen> {
-  final AuthServices auth = getIt();
-
+  final _box = BoxServices.instance;
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<LibraryBloc>();
@@ -25,31 +24,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(width: Dimens.sizeSmall),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: auth.profile?.product == 'premium'
-                    ? SweepGradient(
-                        colors: [
-                          Color(0xFF6A2E8B),
-                          Color(0xFF5271FF),
-                          Color(0xFF00C2FF),
-                          Color(0xFF2D3A68),
-                          Color(0xFF7EC8FF),
-                          Color(0xFFFFB84D),
-                          Color(0xFF833AB4),
-                        ],
-                      )
-                    : null,
-                borderRadius:
-                    BorderRadius.all(Radius.circular(Dimens.borderLarge)),
-              ),
-              child: MyAvatar(
-                auth.profile?.image,
-                isAvatar: true,
-                padding: EdgeInsets.all(Dimens.sizeMini),
-                onTap: () => context.pushNamed(AppRoutes.profile),
-                avatarRadius: Dimens.iconMedSmall,
-              ),
+            MyAvatar(
+              _box.profile?.image,
+              isAvatar: true,
+              padding: EdgeInsets.all(Dimens.sizeMini),
+              onTap: () => context.pushNamed(AppRoutes.profile),
+              avatarRadius: Dimens.iconMedSmall,
             )
           ],
         ),

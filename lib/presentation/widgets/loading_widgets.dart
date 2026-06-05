@@ -42,7 +42,7 @@ class LoadingButton extends StatelessWidget {
           backgroundColor: backgroundColor ?? scheme.primaryAdaptive,
           foregroundColor: foregroundColor ?? scheme.onPrimary,
           visualDensity: compact ? VisualDensity.compact : null,
-          shape: Utils.continuousBorder(border ?? Dimens.borderLarge),
+          shape: Utils.roundedBorder(border ?? Dimens.borderDefault),
           padding: padding ??
               (compact
                   ? Utils.insetsHoriz(Dimens.sizeMedSmall)
@@ -55,7 +55,7 @@ class LoadingButton extends StatelessWidget {
           child: Builder(builder: (context) {
             if (isLoading ?? false) {
               return SizedBox.square(
-                  dimension: Dimens.sizeXLarge,
+                  dimension: Dimens.sizeMedium,
                   child: CircularProgressIndicator(
                       color: loaderColor ?? scheme.primaryAdaptive));
             }
@@ -115,6 +115,64 @@ class LoadingIcon extends StatelessWidget {
               )),
         );
       }),
+    );
+  }
+}
+
+class LoadingTextButton extends StatelessWidget {
+  final bool? loading;
+  final double? loaderSize;
+  final double? width;
+  final Color? fgColor;
+  final Color? border;
+  final Widget child;
+  final bool compact;
+  final EdgeInsets? padding;
+  final VoidCallback onPressed;
+  const LoadingTextButton({
+    super.key,
+    this.loading,
+    this.fgColor,
+    this.border,
+    this.width,
+    this.loaderSize,
+    this.padding,
+    this.compact = false,
+    required this.child,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: width ?? Dimens.sizeMaxLarge,
+      child: TextButton(
+          onPressed: !(loading ?? false) ? onPressed : null,
+          style: TextButton.styleFrom(
+            foregroundColor: fgColor,
+            visualDensity: compact ? VisualDensity.compact : null,
+            padding: padding ??
+                (compact
+                    ? Utils.insetsHoriz(Dimens.sizeMedSmall)
+                    : EdgeInsets.all(Dimens.sizeMedSmall)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(Dimens.borderDefault),
+              side:
+                  border != null ? BorderSide(color: border!) : BorderSide.none,
+            ),
+          ),
+          child: DefaultTextStyle.merge(
+            style: TextStyle(
+                fontWeight: FontWeight.w600, fontSize: Dimens.fontXXXLarge),
+            child: Builder(builder: (context) {
+              if (loading ?? false) {
+                return SizedBox.square(
+                    dimension: loaderSize ?? Dimens.sizeXLarge,
+                    child: CircularProgressIndicator(color: fgColor));
+              }
+              return child;
+            }),
+          )),
     );
   }
 }

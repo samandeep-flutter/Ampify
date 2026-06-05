@@ -14,7 +14,7 @@ class NotiServices {
   Future<void> initialize() async {
     try {
       // if (Platform.isWindows) return _init();
-      await _messaging.requestPermission();
+      await _messaging.requestPermission(provisional: true);
       await _messaging.setForegroundNotificationPresentationOptions(
           alert: true, badge: true, sound: true);
 

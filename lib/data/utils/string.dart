@@ -1,7 +1,7 @@
 sealed class StringRes {
   static const String appName = 'Ampify';
 
-  static const String auth = 'Authenticate';
+  static const String welcome = 'Welcome';
   static const String submit = 'Submit';
   static const String success = 'Success';
   static const String home = 'Home';
@@ -27,6 +27,9 @@ sealed class StringRes {
   static const String followers = 'Followers';
   static const String sortBy = 'Sort by';
   static const String clear = 'Clear';
+  static const String login = 'Login';
+  static const String emailContinue = 'Continue with Email';
+  static const String googleContinue = 'Continue with Google';
   static const String deviceInfo = 'Device Information';
   static const String copiedToClipboard = 'Copied to clipboard';
   static const String trackRadio = 'Track Radio';
@@ -79,6 +82,16 @@ sealed class StringRes {
   static const String errorLoad = 'Failed to load data, refresh to load again';
   static const String errorCredentials = 'Something went wrong,'
       ' please login again';
+  static const String errorInvalidCred = 'Incorrect Email or Passowrd.';
+  static const String errorUserDisabled = 'The user account is disabled,'
+      ' kindly try a different login method.';
+  static const String errorAccExist = 'An account already exists with '
+      'this email using a different sign-in method.';
+  static const String errorLoginIntrupted =
+      'Sign-in was interrupted, please try again.';
+  static const String errorLoginUnavailable =
+      'Sign-in unavailable right now, please try again.';
+  static const String errorLoginFailed = 'Sign-In failed, please try again.';
 
   // long texts
   static const String devModeToggle = 'You are now in developer mode';
@@ -86,8 +99,8 @@ sealed class StringRes {
       'No internet connection, Please reconnect and try again.';
   static const String notiDesc =
       'Notification related to media playback in the application';
-  static const String authDesc = 'Log in with Spotify to connect and amplify'
-      ' your music journey. You\'ll be redirected to a browser for authentication';
+  static const String authDesc = 'Build your personal music collection, '
+      'create playlists, and enjoy recommendations tailored to your taste. Sign in to get started.';
   static const String logoutDesc = 'Are you sure you want to log out? You’ll'
       ' need to reconnect to Spotify to use Ampify again.';
   static const String homeSubtitle =

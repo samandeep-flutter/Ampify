@@ -10,6 +10,7 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView> {
   final AuthServices auth = getIt();
+  final _box = BoxServices.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -28,45 +29,27 @@ class _ProfileViewState extends State<ProfileView> {
           const SizedBox(height: Dimens.sizeDefault),
           Row(
             children: [
-              MyCachedImage(auth.profile?.image,
+              MyCachedImage(_box.profile?.image,
                   isAvatar: true, avatarRadius: context.width * .1),
               const SizedBox(width: Dimens.sizeXLarge),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        auth.profile?.displayName ?? '',
-                        style: TextStyle(
-                          color: scheme.textColor,
-                          fontSize: Dimens.fontXXLarge,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: Dimens.sizeSmall),
-                      Builder(builder: (context) {
-                        final tier = auth.profile?.product;
-                        return Container(
-                          padding: Utils.insetsHoriz(Dimens.sizeSmall),
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.borderLarge),
-                              color: tier == 'premium'
-                                  ? Colors.amber
-                                  : scheme.backgroundDark),
-                          child: Text(tier?.toUpperCase() ?? '',
-                              style: TextStyle(fontSize: Dimens.fontDefault)),
-                        );
-                      })
-                    ],
+                  Text(
+                    _box.profile?.displayName ?? '',
+                    style: TextStyle(
+                      color: scheme.textColor,
+                      fontSize: Dimens.fontXXLarge,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(
-                    '${auth.profile?.followers ?? ''} ${StringRes.followers}',
+                    _box.profile?.email ?? '',
                     style: TextStyle(
-                        color: scheme.textColorLight,
-                        fontSize: Dimens.fontDefault,
-                        fontWeight: FontWeight.w500),
+                      color: scheme.textColorLight,
+                      fontSize: Dimens.fontDefault,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               )

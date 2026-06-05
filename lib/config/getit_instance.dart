@@ -1,7 +1,6 @@
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
-import 'package:dart_ytmusic_api/yt_music.dart';
 import 'package:get_it/get_it.dart';
 
 GetIt getIt = GetIt.instance;
@@ -9,8 +8,6 @@ GetIt getIt = GetIt.instance;
 Future<void> initGetIt() async {
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<DioClient>(() => DioClient(dio: Dio()));
-  getIt.registerLazySingleton<AuthRepo>(() => AuthRepo(getIt()));
-  getIt.registerLazySingleton<HomeRepo>(() => HomeRepo(getIt()));
   getIt.registerLazySingleton<SearchRepo>(() => SearchRepo(getIt()));
   getIt.registerLazySingleton<LibraryRepo>(() => LibraryRepo(getIt()));
   getIt.registerLazySingleton<MusicGroupRepo>(() => MusicGroupRepo(getIt()));

@@ -8,6 +8,8 @@ export '../../config/theme_services.dart';
 
 // extras
 export 'package:dio/dio.dart';
+export 'package:dart_ytmusic_api/types.dart';
+export 'package:dart_ytmusic_api/yt_music.dart';
 export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:equatable/equatable.dart';
@@ -41,13 +43,14 @@ export '../../data/data_models/common/artist_model.dart';
 export '../../data/data_models/common/other_models.dart';
 export '../../data/data_models/common/playlist_model.dart';
 export '../../data/data_models/common/tracks_model.dart';
+export '../../data/data_models/device_info_model.dart';
 export '../../data/data_models/library_model.dart';
 export '../../data/data_models/profile_model.dart';
 export '../../data/data_models/search_model.dart';
+export '../../data/data_models/user_model.dart';
+export '../../data/data_models/yt_models.dart';
 
 // repos
-export '../../data/repositories/auth_repo.dart';
-export '../../data/repositories/home_repo.dart';
 export '../../data/repositories/library_repo.dart';
 export '../../data/repositories/music_group_repo.dart';
 export '../../data/repositories/music_repo.dart';

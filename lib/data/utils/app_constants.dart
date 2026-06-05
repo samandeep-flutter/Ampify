@@ -1,21 +1,18 @@
 import 'dart:developer' as dev;
 import 'package:ampify/data/utils/exports.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:oktoast/oktoast.dart';
 
+typedef FirestoreRef = CollectionReference<Map<String, dynamic>>;
+
 sealed class AppConstants {
   static const String search = 'search';
   static const String profile = 'me';
-  static const String myPlaylists = 'me/playlists';
   static const String myAlbums = 'me/albums';
-  static const String recentlyPlayed = 'me/player/recently-played';
+  static const String myPlaylists = 'me/playlists';
   static String checkSaved(String ids) => 'me/tracks/contains?ids=$ids';
-  static String browse(String local) => 'browse/categories?locale=$local';
-  static String getTrack(String id) => 'tracks/$id';
-  static String severalTracks(String ids) => 'tracks?ids=$ids';
-  static String severalAlbums(String ids) => 'albums?ids=$ids';
-  static String newReleases(int offset) => 'browse/new-releases?offset=$offset';
   static String userPlaylists(String id) => 'users/$id/playlists';
   static String addtoPlaylist(String id, {required String uris}) =>
       'playlists/$id/tracks?uris=$uris';
@@ -30,6 +27,14 @@ sealed class AppConstants {
   static String isFollowAlbum(String id) => 'me/albums/contains?ids=$id';
   static String isFollowPlaylist(String id) =>
       'playlists/$id/followers/contains';
+
+  static FirestoreRef get usersCollection =>
+      FirebaseFirestore.instance.collection(_FBKeys.users);
+}
+
+sealed class _FBKeys {
+  // static const String about = 'about';
+  static const String users = 'users';
 }
 
 sealed class BoxKeys {
@@ -40,8 +45,7 @@ sealed class BoxKeys {
   static const String log = 'log';
 
   static const String uid = 'uid';
-  static const String token = 'token';
-  static const String refreshToken = 'refresh-token';
+  static const String profile = 'profile';
 
   static bool isGlobal(String key) =>
       [theme, themeMode, log, logger, deviceInfo].contains(key);
@@ -85,7 +89,6 @@ void debugLog(Object? value, [String? name]) =>
 void logPrint(Object? value, [String? name]) =>
     _debugLog(value, name, LogType.error);
 
-// TODO: add sepreate log type for network logs
 void dprint(Object? value, {String? name, String? extra}) {
   final _name = name != null ? '[$name]' : '';
   final log = value is String? ? value : value.toString();

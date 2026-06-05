@@ -46,6 +46,10 @@ sealed class Utils {
     return clampDouble(context.width * .7, 600, 1000);
   }
 
+  static EdgeInsets paddingClamp(BuildContext context) {
+    return insetsHoriz((context.width - defClamp(context)) * .5);
+  }
+
   static EdgeInsets insetsHoriz(double padding) {
     return EdgeInsets.symmetric(horizontal: padding);
   }

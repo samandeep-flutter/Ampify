@@ -1,8 +1,5 @@
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../../buisness_logic/player_bloc/player_events.dart';
-import '../../buisness_logic/player_bloc/player_slider_bloc.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -62,98 +59,45 @@ class HomeScreen extends StatelessWidget {
                   }),
             ),
             const SliverSizedBox(height: Dimens.sizeXLarge),
-            SliverGridWidget(
-              title: StringRes.spotifyRecent,
-              child: BlocBuilder<HomeBloc, HomeState>(
-                buildWhen: (pr, cr) {
-                  final tracks = pr.recentlyPlayed != cr.recentlyPlayed;
-                  final loading = pr.recentLoading != cr.recentLoading;
-                  return tracks || loading;
-                },
-                builder: (context, state) {
-                  if (state.recentLoading) return const AlbumShimmer();
-                  if (state.recentlyPlayed.isEmpty) {
-                    return ToolTipWidget(
-                      alignment: Alignment.center,
-                      margin: Utils.insetsHoriz(Dimens.sizeXLarge),
-                      title: StringRes.noSpotifyTracks,
-                    );
-                  }
-
-                  return GridView.builder(
-                      padding: Utils.insetsHoriz(Dimens.sizeDefault),
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      gridDelegate: Utils.fixedCrossAxis(1,
-                          aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                      itemCount: state.recentlyPlayed.length,
-                      itemBuilder: (context, index) {
-                        final item = state.recentlyPlayed[index];
-                        return HomeAlbumTile(
-                          title: item.name,
-                          subtitle: item.artists?.asString,
-                          image: item.album?.image,
-                          onTap: () => playRecentlyPlayed(context, track: item),
-                        );
-                      });
-                },
-              ),
-            ),
-            const SliverSizedBox(height: Dimens.sizeXLarge),
-            SliverGridWidget(
-              title: StringRes.newReleases,
-              child: BlocBuilder<HomeBloc, HomeState>(
-                buildWhen: (pr, cr) {
-                  final albums = pr.albums != cr.albums;
-                  final loading = pr.albumLoading != cr.albumLoading;
-                  return albums || loading;
-                },
-                builder: (context, state) {
-                  if (state.albumLoading) return const AlbumShimmer();
-                  if (state.albums.isEmpty) {
-                    return ToolTipWidget(
+            BlocBuilder<HomeBloc, HomeState>(
+              buildWhen: (pr, cr) {
+                final loading = pr.albumLoading != cr.albumLoading;
+                return pr.albums != cr.albums || loading;
+              },
+              builder: (context, state) {
+                if (state.albumLoading) {
+                  return SliverGridWidget(child: const AlbumShimmer());
+                } else if (state.albums.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: ToolTipWidget(
                       alignment: Alignment.center,
                       margin: Utils.insetsHoriz(Dimens.sizeXLarge),
                       title: StringRes.noNewTracks,
-                    );
-                  }
-
-                  return GridView.builder(
-                      padding: Utils.insetsHoriz(Dimens.sizeDefault),
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      gridDelegate: Utils.fixedCrossAxis(1,
-                          aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                      itemCount: state.albums.length,
-                      itemBuilder: (context, index) {
-                        final item = state.albums[index];
-
-                        return HomeAlbumTile(
-                          image: item.image,
-                          title: item.name,
-                          onTap: () => toMusicGroup(context, album: item),
-                          subtitle: item.artists?.asString,
-                        );
-                      });
-                },
-              ),
+                    ),
+                  );
+                }
+                return SliverList.builder(
+                  itemCount: state.albums.length,
+                  itemBuilder: (_, i) => HomeSectionBuilder(state.albums[i]),
+                );
+              },
             ),
             SliverSizedBox(height: context.height * .15),
           ],
         ));
   }
 
-  void toMusicGroup(BuildContext context, {required Album album}) {
-    context.pushNamed(AppRoutes.musicGroup,
-        pathParameters: {'id': album.id!, 'type': album.type?.name ?? ''});
-  }
+  // void _toMusicGroup(BuildContext context, {required Album album}) {
+  //   context.pushNamed(AppRoutes.musicGroup,
+  //       pathParameters: {'id': album.id!, 'type': album.type?.name ?? ''});
+  // }
 
-  void playRecentlyPlayed(BuildContext context, {required Track track}) {
-    final player = context.read<PlayerBloc>();
-    final slider = context.read<PlayerSliderBloc>();
-    player.add(PlayerTrackChanged(track));
-    slider.add(PlayerSliderReset());
-  }
+  // void _playTrack(BuildContext context, {required Track track}) {
+  //   final player = context.read<PlayerBloc>();
+  //   final slider = context.read<PlayerSliderBloc>();
+  //   player.add(PlayerTrackChanged(track));
+  //   slider.add(PlayerSliderReset());
+  // }
 }
 
 class SliverGridWidget extends StatelessWidget {
@@ -168,12 +112,13 @@ class SliverGridWidget extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-          if (title?.isNotEmpty ?? false)
+          if (title?.isNotEmpty ?? false) ...[
             Padding(
               padding: const EdgeInsets.only(left: Dimens.sizeDefault),
               child: Text(title!, style: Utils.titleStyleLarge(context)),
             ),
-          const SizedBox(height: Dimens.sizeSmall),
+            const SizedBox(height: Dimens.sizeSmall),
+          ],
           SizedBox(height: context.height * .25, child: child),
         ]));
   }
@@ -225,6 +170,39 @@ class HomeAlbumTile extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class HomeSectionBuilder extends StatelessWidget {
+  final MyHomeSection section;
+  const HomeSectionBuilder(this.section, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: Dimens.sizeDefault),
+          child: Text(section.title, style: Utils.titleStyleLarge(context)),
+        ),
+        const SizedBox(height: Dimens.sizeSmall),
+        SizedBox(
+          height: context.height * .25,
+          child: GridView.builder(
+              padding: Utils.insetsHoriz(Dimens.sizeDefault),
+              physics: const BouncingScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              gridDelegate: Utils.fixedCrossAxis(1,
+                  aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
+              itemCount: section.contents.length,
+              itemBuilder: (context, index) {
+                final item = section.contents[index];
+                return Placeholder();
+              }),
+        ),
+      ],
     );
   }
 }
