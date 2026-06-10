@@ -155,53 +155,6 @@ class SliverSizedBox extends StatelessWidget {
   }
 }
 
-class MyAvatar extends StatelessWidget {
-  final String? image;
-  final bool? isAvatar;
-  final EdgeInsets? padding;
-  final double? avatarRadius;
-  final double? borderRadius;
-  final double? height;
-  final double? width;
-  final BoxFit? fit;
-  final VoidCallback? onTap;
-
-  const MyAvatar(
-    this.image, {
-    super.key,
-    this.onTap,
-    this.padding,
-    this.avatarRadius,
-    this.isAvatar,
-    this.fit,
-    this.borderRadius,
-    this.height,
-    this.width,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final radius = borderRadius ?? Dimens.borderLarge;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(radius),
-      child: Padding(
-        padding: padding ?? EdgeInsets.zero,
-        child: MyCachedImage(
-          image,
-          isAvatar: isAvatar ?? false,
-          height: height,
-          width: width,
-          fit: fit,
-          avatarRadius: avatarRadius,
-          borderRadius: borderRadius,
-        ),
-      ),
-    );
-  }
-}
-
 class SubtitleWidget extends StatelessWidget {
   final TextStyle? style;
   final String? type;
@@ -237,13 +190,13 @@ class SubtitleWidget extends StatelessWidget {
               color: style?.color ?? scheme.textColorLight,
             )
           ],
-          if (expanded) Expanded(child: sub(context)) else sub(context),
+          if (expanded) Expanded(child: _sub(context)) else _sub(context),
         ],
       ),
     );
   }
 
-  Widget sub(BuildContext context) {
+  Widget _sub(BuildContext context) {
     return Text(
       subtitle,
       maxLines: 1,

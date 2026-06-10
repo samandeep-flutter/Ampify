@@ -29,7 +29,7 @@ class Artist extends Equatable {
         genres: json['genres']?.cast<String>(),
         href: json['href'],
         id: json['id'],
-        image: (json['images'] as List?)?.firstElement?['url'],
+        image: (json['images'] as List?)?.firstOrNull?['url'],
         name: json['name'],
         popularity: json['popularity'],
         type: json['type'],
@@ -51,4 +51,8 @@ class Artist extends Equatable {
   @override
   List<Object?> get props =>
       [followers, genres, href, id, image, name, popularity, type, uri];
+}
+
+extension ArtistNames on List<Artist> {
+  String get asString => List<String>.from(map((e) => e.name)).asString;
 }

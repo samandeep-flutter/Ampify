@@ -45,16 +45,12 @@ export '../../data/data_models/common/playlist_model.dart';
 export '../../data/data_models/common/tracks_model.dart';
 export '../../data/data_models/device_info_model.dart';
 export '../../data/data_models/library_model.dart';
-export '../../data/data_models/profile_model.dart';
-export '../../data/data_models/search_model.dart';
 export '../../data/data_models/user_model.dart';
 export '../../data/data_models/yt_models.dart';
 
 // repos
-export '../../data/repositories/library_repo.dart';
 export '../../data/repositories/music_group_repo.dart';
 export '../../data/repositories/music_repo.dart';
-export '../../data/repositories/search_repo.dart';
 
 // widgets
 export '../../presentation/widgets/base_widget.dart';

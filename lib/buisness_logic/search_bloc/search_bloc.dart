@@ -68,16 +68,18 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<SearchInitial>(_onInit);
     on<SearchCleared>(_onSearchClear);
   }
-  final SearchRepo _searchRepo = getIt();
-  final searchContr = TextEditingController();
   final focusNode = FocusNode();
+  final searchContr = TextEditingController();
 
-  void _onSearchTextChanged() => add(SearchInputChanged(searchContr.text));
-  void onSearchClear() => add(SearchCleared());
+  final YTMusic _ytMusic = getIt();
 
   void _onInit(SearchInitial event, Emitter<SearchState> emit) {
     searchContr.addListener(_onSearchTextChanged);
   }
+
+  void onSearchClear() => add(SearchCleared());
+
+  void _onSearchTextChanged() => add(SearchInputChanged(searchContr.text));
 
   void _onSearchClear(SearchCleared event, Emitter<SearchState> emit) {
     searchContr.clear();
@@ -98,43 +100,31 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   Future<void> _onSearchTrigerred(
       SearchTrigerred event, Emitter<SearchState> emit) async {
-    if (searchContr.text.isEmpty) {
-      emit(state.copyWith(isLoading: false, results: null, query: ''));
-      return;
-    }
+    try {
+      if (searchContr.text.isEmpty) throw FormatException();
 
-    await _searchRepo.search(searchContr.text, onSuccess: (json) {
-      final response = SearchModel.fromJson(json);
-      final List<LibraryModel> musicGroups = [];
-      final tracks = response.tracks?.items?.map((e) {
-        return LibraryModel.fromJson(e.toJson());
-      });
-      final albums = response.albums?.items?.map((e) {
-        return LibraryModel.fromJson(e.toJson());
-      });
-      final playlists = response.playlists?.items?.map((e) {
-        return LibraryModel.fromJson(e.toJson());
-      });
-      musicGroups.addAll([
-        ...tracks ?? [],
-        ...albums ?? [],
-        ...playlists ?? [],
-      ]);
+      final results = await _ytMusic.search(searchContr.text);
+      final musicGroups =
+          List<LibraryModel>.from(results.map((e) => LibraryModel.fromYT(e)));
+
       musicGroups.sort((a, b) {
-        final fName = a.name?.queryMatch(searchContr.text) ?? 0;
-        final fArtist = a.owner?.name?.queryMatch(searchContr.text) ?? 0;
+        final fName = a.name.queryMatch(searchContr.text);
+        final fArtist = a.artist?.name.queryMatch(searchContr.text) ?? 0;
         final first = fName.compareTo(fArtist);
 
-        final sName = b.name?.queryMatch(searchContr.text) ?? 0;
-        final sArtist = b.owner?.name?.queryMatch(searchContr.text) ?? 0;
+        final sName = b.name.queryMatch(searchContr.text);
+        final sArtist = b.artist?.name.queryMatch(searchContr.text) ?? 0;
         final second = sName.compareTo(sArtist);
 
         return second.compareTo(first);
       });
+
       emit(state.copyWith(isLoading: false, results: musicGroups));
-    }, onError: (e) {
+    } on FormatException {
+      emit(state.copyWith(isLoading: false, results: null, query: ''));
+    } catch (e) {
       logPrint(e, 'search');
       emit(state.copyWith(isLoading: false, isError: true));
-    });
+    }
   }
 }

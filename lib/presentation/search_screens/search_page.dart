@@ -77,10 +77,10 @@ class SearchPage extends StatelessWidget {
                   itemCount: state.results?.length ?? 0,
                   itemBuilder: (context, index) {
                     final item = state.results![index];
-
-                    if (item.type.isTrack) {
-                      return TrackTile.search(item.asTrack);
-                    }
+                    // TODO: implement track play from search
+                    // if (item.type.isTrack) {
+                    //   return TrackTile.search(item);
+                    // }
                     return MusicGroupTile(item,
                         imageHeight: Dimens.iconUltraLarge);
                   },

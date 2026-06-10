@@ -24,12 +24,18 @@ class _LibraryScreenState extends State<LibraryScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(width: Dimens.sizeSmall),
-            MyAvatar(
-              _box.profile?.image,
-              isAvatar: true,
-              padding: EdgeInsets.all(Dimens.sizeMini),
+            InkWell(
               onTap: () => context.pushNamed(AppRoutes.profile),
-              avatarRadius: Dimens.iconMedSmall,
+              borderRadius: BorderRadius.circular(Dimens.borderLarge),
+              child: Padding(
+                padding: EdgeInsets.all(Dimens.sizeMini),
+                child: MyCachedImage(
+                  _box.profile?.image,
+                  isAvatar: true,
+                  avatarRadius: Dimens.iconMedSmall,
+                  border: Dimens.borderLarge,
+                ),
+              ),
             )
           ],
         ),

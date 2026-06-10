@@ -1,7 +1,6 @@
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:dart_ytmusic_api/types.dart';
 
 class TrackRadioEvents extends Equatable {
   const TrackRadioEvents();
@@ -87,8 +86,6 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
   }
 
   final MusicRepo _musicRepo = getIt();
-  final SearchRepo _searchRepo = getIt();
-
   final scrollController = ScrollController();
 
   void onPlay(BuildContext context) {
@@ -125,16 +122,18 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
     try {
       final List<Track> tracks = [];
       if (event.tracks.isEmpty) throw FormatException();
-      for (final item in event.tracks) {
-        final duration = Duration(seconds: item.duration);
-        final details = SongYtDetails(item.videoId, duration: duration);
-        final query = '${item.title} ${item.artists.name}'.toLowerCase();
-        await _searchRepo.searchTrack(query, onSuccess: (json) {
-          final search = SearchModel.fromJson(json);
-          final _item = search.tracks?.items?.verify(item);
-          if (_item != null) tracks.add(_item.copyWith(details));
-        });
-      }
+      // TODO: implement search recomendations
+
+      // for (final item in event.tracks) {
+      // final duration = Duration(seconds: item.duration);
+      // final details = SongYtDetails(item.videoId, duration: duration);
+      // final query = '${item.title} ${item.artists.name}'.toLowerCase();
+      // await _searchRepo.searchTrack(query, onSuccess: (json) {
+      // final search = SearchModel.fromJson(json);
+      // final _item = search.tracks?.items?.verify(item);
+      // if (_item != null) tracks.add(_item.copyWith(details));
+      // });
+      // }
       emit(state.copyWith(tracks: tracks));
     } on FormatException {
       emit(state.copyWith(tracks: []));

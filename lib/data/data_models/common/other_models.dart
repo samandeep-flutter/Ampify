@@ -48,16 +48,41 @@ class Copyrights extends Equatable {
   List<Object?> get props => [text, type];
 }
 
+// class Artist extends Equatable {
+//   final String? id;
+//   final String? image;
+//   final String? name;
+
+//   const Artist({this.id, this.image, this.name});
+
+//   factory Artist.fromJson(Map<String, dynamic> json) {
+//     return Artist(
+//       id: json['id'],
+//       image: (json['images'] as List?)?.firstOrNull?['url'],
+//       name: json['name'],
+//     );
+//   }
+
+//   Map<String, dynamic> toJson() => {
+//         'id': id,
+//         'images': image,
+//         'name': name,
+//       };
+
+//   @override
+//   List<Object?> get props => [id, image, name];
+// }
+
 enum LogType { error, info, network }
 
-class LogModel {
+class LogModel extends Equatable {
   final String? title;
   final String? content;
   final String? extra;
   final String? time;
   final LogType? type;
 
-  LogModel({
+  const LogModel({
     required this.title,
     required this.content,
     required this.extra,
@@ -82,4 +107,7 @@ class LogModel {
         'time': time,
         'type': type?.name
       };
+
+  @override
+  List<Object?> get props => [title, content, extra, time, type];
 }

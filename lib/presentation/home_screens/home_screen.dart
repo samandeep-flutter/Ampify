@@ -14,9 +14,9 @@ class HomeScreen extends StatelessWidget {
           physics: const BottomBounceScrollPhysics(),
           slivers: [
             SliverAppBar(
+              centerTitle: false,
               backgroundColor: context.scheme.background,
               title: const Text(StringRes.appName),
-              centerTitle: false,
               titleTextStyle: Utils.defTitleStyle(scheme.textColor),
               bottom: PreferredSize(
                   preferredSize: const Size.fromHeight(Dimens.sizeDefault),
@@ -41,24 +41,16 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const SliverSizedBox(height: Dimens.sizeXLarge),
-            SliverGridWidget(
-              title: StringRes.recentlyPlayed,
-              child: GridView.builder(
-                  padding: Utils.insetsHoriz(Dimens.sizeDefault),
-                  physics: const NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  gridDelegate: Utils.fixedCrossAxis(1,
-                      aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-                  itemCount: 3,
-                  itemBuilder: (context, index) {
-                    return HomeAlbumTile(
-                      image: null,
-                      title: StringRes.commingSoon,
-                      subtitle: '',
-                    );
-                  }),
-            ),
-            const SliverSizedBox(height: Dimens.sizeXLarge),
+            SliverToBoxAdapter(
+                child: Wrap(
+              spacing: Dimens.sizeExtraSmall,
+              runSpacing: Dimens.sizeExtraSmall,
+              alignment: WrapAlignment.center,
+              children: List.generate(6, (index) {
+                return RecentlyPlayedTile(title: StringRes.commingSoon);
+              }),
+            )),
+            const SliverSizedBox(height: Dimens.sizeLarge),
             BlocBuilder<HomeBloc, HomeState>(
               buildWhen: (pr, cr) {
                 final loading = pr.albumLoading != cr.albumLoading;
@@ -66,7 +58,7 @@ class HomeScreen extends StatelessWidget {
               },
               builder: (context, state) {
                 if (state.albumLoading) {
-                  return SliverGridWidget(child: const AlbumShimmer());
+                  return SliverToBoxAdapter(child: const AlbumShimmer());
                 } else if (state.albums.isEmpty) {
                   return SliverToBoxAdapter(
                     child: ToolTipWidget(
@@ -78,7 +70,11 @@ class HomeScreen extends StatelessWidget {
                 }
                 return SliverList.builder(
                   itemCount: state.albums.length,
-                  itemBuilder: (_, i) => HomeSectionBuilder(state.albums[i]),
+                  itemBuilder: (_, i) {
+                    final item = state.albums[i];
+                    if (item.contents.isEmpty) return SizedBox.shrink();
+                    return HomeSectionBuilder(item);
+                  },
                 );
               },
             ),
@@ -86,11 +82,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ));
   }
-
-  // void _toMusicGroup(BuildContext context, {required Album album}) {
-  //   context.pushNamed(AppRoutes.musicGroup,
-  //       pathParameters: {'id': album.id!, 'type': album.type?.name ?? ''});
-  // }
 
   // void _playTrack(BuildContext context, {required Track track}) {
   //   final player = context.read<PlayerBloc>();
@@ -100,75 +91,67 @@ class HomeScreen extends StatelessWidget {
   // }
 }
 
-class SliverGridWidget extends StatelessWidget {
-  final String? title;
-  final Widget child;
-  const SliverGridWidget({super.key, this.title, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-        child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-          if (title?.isNotEmpty ?? false) ...[
-            Padding(
-              padding: const EdgeInsets.only(left: Dimens.sizeDefault),
-              child: Text(title!, style: Utils.titleStyleLarge(context)),
-            ),
-            const SizedBox(height: Dimens.sizeSmall),
-          ],
-          SizedBox(height: context.height * .25, child: child),
-        ]));
-  }
-}
-
-class HomeAlbumTile extends StatelessWidget {
-  final String? image;
+class RecentlyPlayedTile extends StatelessWidget {
   final String? title;
   final String? subtitle;
+
   final VoidCallback? onTap;
-  const HomeAlbumTile({
+  const RecentlyPlayedTile({
     super.key,
-    required this.image,
     required this.title,
-    required this.subtitle,
+    this.subtitle,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.scheme;
-    return InkWell(
-      borderRadius: BorderRadius.circular(Dimens.sizeExtraSmall),
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MyCachedImage(image, borderRadius: Dimens.sizeExtraSmall),
-          Padding(
-            padding: const EdgeInsets.only(left: Dimens.sizeExtraSmall),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: Dimens.fontDefault,
-                      fontWeight: FontWeight.w600),
-                ),
-                Text(
-                  subtitle ?? '',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: Dimens.fontMed, color: scheme.textColorLight),
-                )
-              ],
-            ),
-          )
-        ],
+    return SizedBox(
+      width: context.width * .48,
+      child: Card(
+        color: scheme.backgroundDark.withAlpha(150),
+        shape: Utils.roundedBorder(Dimens.borderSmall),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(Dimens.borderMini),
+          onTap: onTap,
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadiusGeometry.horizontal(
+                    left: Radius.circular(Dimens.borderMini + 2)),
+                child: SizedBox.square(
+                    dimension: Dimens.sizeExtraDoubleLarge,
+                    child: MyCachedImage.error(
+                      backgroundColor: scheme.backgroundDark,
+                      foregroundColor: scheme.disabled.withAlpha(100),
+                    )),
+              ),
+              const SizedBox(width: Dimens.sizeSmall),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (title != null)
+                    Text(
+                      title ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: Dimens.fontDefault,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  if (subtitle != null)
+                    Text(
+                      subtitle ?? '',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: Dimens.fontMed,
+                          color: scheme.textColorLight),
+                    )
+                ],
+              )
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -188,9 +171,10 @@ class HomeSectionBuilder extends StatelessWidget {
           child: Text(section.title, style: Utils.titleStyleLarge(context)),
         ),
         const SizedBox(height: Dimens.sizeSmall),
-        SizedBox(
-          height: context.height * .25,
-          child: GridView.builder(
+        if (section.type.isPlaylist || section.type.isAlbum)
+          SizedBox(
+            height: context.height * .25,
+            child: GridView.builder(
               padding: Utils.insetsHoriz(Dimens.sizeDefault),
               physics: const BouncingScrollPhysics(),
               scrollDirection: Axis.horizontal,
@@ -198,11 +182,66 @@ class HomeSectionBuilder extends StatelessWidget {
                   aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
               itemCount: section.contents.length,
               itemBuilder: (context, index) {
-                final item = section.contents[index];
-                return Placeholder();
-              }),
-        ),
+                return PlaylistDetailedTile(section.contents[index],
+                    onTap: (pl) => _toMusicGroup(context, pl));
+              },
+            ),
+          )
+        else
+          ToolTipWidget(
+            title: StringRes.homeSecDesc,
+            margin: EdgeInsets.all(Dimens.sizeExtraLarge),
+          ),
+        const SizedBox(height: Dimens.sizeXLarge)
       ],
+    );
+  }
+
+  void _toMusicGroup(BuildContext context, MyHomeDetailed pl) {
+    context.pushNamed(AppRoutes.musicGroup,
+        pathParameters: {'id': pl.id, 'type': pl.type.id});
+  }
+}
+
+class PlaylistDetailedTile extends StatelessWidget {
+  final MyHomeDetailed item;
+  final void Function(MyHomeDetailed pl)? onTap;
+  const PlaylistDetailedTile(this.item, {super.key, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(Dimens.sizeExtraSmall),
+      onTap: () => onTap?.call(item),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          MyCachedImage(item.thumbnails.firstOrNull?.url,
+              border: Dimens.sizeExtraSmall),
+          Padding(
+            padding: const EdgeInsets.only(left: Dimens.sizeExtraSmall),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: Dimens.fontDefault,
+                      fontWeight: FontWeight.w600),
+                ),
+                Text(
+                  item.artist.name,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontSize: Dimens.fontMed, color: scheme.textColorLight),
+                )
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }

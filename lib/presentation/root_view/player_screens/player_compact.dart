@@ -79,7 +79,7 @@ class PlayerCompact extends StatelessWidget {
                               ]),
                               child: MyCachedImage(
                                 state.track.image,
-                                borderRadius: Dimens.sizeMini,
+                                border: Dimens.sizeMini,
                                 width: Dimens.iconUltraLarge,
                               ),
                             );

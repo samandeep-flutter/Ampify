@@ -1,5 +1,44 @@
 import 'package:ampify/data/utils/exports.dart';
 
+// class Track extends Equatable {
+//   final String id;
+//   final String type;
+//   final String vidID;
+//   final String title;
+//   final ArtistBasic artist;
+//   final AlbumBasic album;
+//   final int duration;
+//   final String thumbnail;
+//   final Color? bgColor;
+//   final Color? darkBgColor;
+
+//   const Track({
+//     required this.id,
+//     required this.type,
+//     required this.vidID,
+//     required this.title,
+//     required this.artist,
+//     required this.album,
+//     required this.duration,
+//     required this.thumbnail,
+//     this.bgColor,
+//     this.darkBgColor,
+//   });
+
+//   @override
+//   List<Object?> get props => [
+//         id,
+//         type,
+//         vidID,
+//         title,
+//         artist,
+//         duration,
+//         thumbnail,
+//         bgColor,
+//         darkBgColor
+//       ];
+// }
+
 class Track extends Equatable {
   final Album? album;
   final SongYtDetails? ytDetails;
@@ -100,7 +139,7 @@ class Track extends Equatable {
       title: name,
       albumId: album?.id,
       image: album?.image,
-      subtitle: artists?.asString,
+      subtitle: artists?.map((e) => e.name).join(', '),
       duration: ytDetails?.duration,
       videoId: ytDetails?.videoId,
     );

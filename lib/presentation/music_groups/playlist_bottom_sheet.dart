@@ -41,7 +41,7 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
             final width = _scalar.scale(_dimen + Dimens.sizeMedSmall);
 
             return MyCachedImage(widget.image,
-                borderRadius: Dimens.sizeMini, height: height, width: width);
+                border: Dimens.sizeMini, height: height, width: width);
           }),
           const SizedBox(width: Dimens.sizeDefault),
           Expanded(

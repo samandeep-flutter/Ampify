@@ -56,7 +56,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
             final playlists = state.items.where((e) {
-              final myPlaylists = e.owner?.id == _box.uid!;
+              final myPlaylists = e.artist?.artistId == _box.uid!;
               return e.type.isPlaylist && myPlaylists;
             }).toList();
             return Column(
@@ -99,7 +99,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                                         item.image,
                                         height: constraints.maxHeight,
                                         width: constraints.maxHeight,
-                                        borderRadius: Dimens.circularBoder,
+                                        border: Dimens.circularBoder,
                                       );
                                     },
                                   ),

@@ -49,10 +49,11 @@ class _EditPlaylistScreenState extends State<EditPlaylistScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  MyCachedImage(state.image,
-                      height: width,
-                      width: width,
-                      borderRadius: Dimens.sizeExtraSmall),
+                  SizedBox.square(
+                    dimension: width,
+                    child: MyCachedImage(state.image,
+                        border: Dimens.sizeExtraSmall),
+                  ),
                 ],
               ),
               const SizedBox(height: Dimens.sizeExtraLarge),

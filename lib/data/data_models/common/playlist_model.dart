@@ -35,7 +35,7 @@ class Playlist extends Equatable {
       description: json['description'],
       href: json['href'],
       id: json['id'],
-      image: (json['images'] as List?)?.firstElement?['url'],
+      image: (json['images'] as List?)?.firstOrNull?['url'],
       name: json['name'],
       owner: json['owner'] != null ? OwnerModel.fromJson(json['owner']) : null,
       public: json['public'],

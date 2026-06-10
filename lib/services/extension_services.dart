@@ -58,10 +58,6 @@ extension ListToString on List<String> {
   String get asString => toString().replaceAll(RegExp(r'[\[\]]'), '');
 }
 
-extension ArtistNames on List<Artist> {
-  String get asString => List<String>.from(map((e) => e.name)).asString;
-}
-
 extension MyMusicState on MusicState? {
   bool get isHidden => this == MusicState.hidden;
   bool get isPlaying =>
@@ -72,13 +68,8 @@ extension MyMusicState on MusicState? {
 
 extension MyLibItem on LibItemType? {
   bool get isPlaylist => this == LibItemType.playlist;
-  bool get isSingle => this == LibItemType.single;
-
+  bool get isAlbum => this == LibItemType.album;
   bool get isTrack => this == LibItemType.track;
-  // bool get isAlbum =>
-  //     this == LibItemType.album ||
-  //     this == LibItemType.compilation ||
-  //     this == LibItemType.single;
 }
 
 extension MyMediaItems on MediaItem {
@@ -101,8 +92,6 @@ extension MyList<T> on List<T> {
     }
     return null;
   }
-
-  T? get firstElement => isEmpty ? null : first;
 }
 
 extension MyConnectionChecker on InternetStatus {

@@ -44,7 +44,6 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   final AudioHandler _audioHandler = getIt();
   final MusicRepo _musicRepo = getIt();
-  final LibraryRepo _libRepo = getIt();
 
   Future<void> _onInit(PlayerInitial event, Emitter<PlayerState> emit) async {
     try {
@@ -119,8 +118,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       final track = TrackDetails.fromJson(item.extras!);
       emit(state.copyWith(track: track, isLiked: false));
       try {
-        final isLiked = await _libRepo.isLiked([track.id!]);
-        emit(state.copyWith(isLiked: isLiked.firstElement));
+        // TODO: implement check isLiked
+        // final isLiked = await _libRepo.isLiked([track.id!]);
+        // emit(state.copyWith(isLiked: isLiked.firstOrNull));
       } catch (e) {
         logPrint(e, 'liked');
       }
@@ -204,15 +204,16 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onTrackLiked(
       PlayerTrackLiked event, Emitter<PlayerState> emit) async {
     try {
-      final shouldEmit = state.track.id == event.id;
+      // TODO: implement liked songs mechanism
+      // final shouldEmit = state.track.id == event.id;
       if (event.liked ?? false) {
-        if (shouldEmit) emit(state.copyWith(isLiked: false));
-        final result = await _libRepo.removefromLikedSongs(event.id);
-        if (!result) throw FormatException();
+        // if (shouldEmit) emit(state.copyWith(isLiked: false));
+        // final result = await _libRepo.removefromLikedSongs(event.id);
+        // if (!result) throw FormatException();
       } else {
-        if (shouldEmit) emit(state.copyWith(isLiked: true));
-        final result = await _libRepo.addtoLikedSongs(event.id);
-        if (!result) throw FormatException();
+        // if (shouldEmit) emit(state.copyWith(isLiked: true));
+        // final result = await _libRepo.addtoLikedSongs(event.id);
+        // if (!result) throw FormatException();
       }
     } on FormatException {
       if (state.track.id != event.id) return;

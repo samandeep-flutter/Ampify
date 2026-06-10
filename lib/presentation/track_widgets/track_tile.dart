@@ -32,7 +32,7 @@ class TrackTile extends StatelessWidget {
 
     if (_isQueue) return _builder(context);
     return Dismissible(
-      key: ValueKey(track.id ?? ''),
+      key: ValueKey(track.id),
       direction: DismissDirection.startToEnd,
       confirmDismiss: (_) async => false,
       onUpdate: (details) {
@@ -75,7 +75,7 @@ class TrackTile extends StatelessWidget {
                   return SizedBox.square(
                       dimension: dimen,
                       child: MyCachedImage(track.album?.image,
-                          borderRadius: Dimens.sizeMini));
+                          border: Dimens.sizeMini));
                 },
               ),
               const SizedBox(width: Dimens.sizeDefault),
@@ -178,8 +178,8 @@ class TrackTile extends StatelessWidget {
                       color: scheme.textColorLight,
                       fontSize: Dimens.fontDefault - 1,
                     ),
-                    type: _isSearch ? track.type?.capitalize ?? '' : null,
-                    subtitle: track.artists?.asString ?? '',
+                    type: _isSearch ? track.type?.capitalize : null,
+                    subtitle: track.artists!.asString,
                   ),
                 ],
               ),
@@ -229,8 +229,7 @@ class TrackDetailsTile extends StatelessWidget {
               final dimen = Dimens.iconUltraLarge;
               return SizedBox.square(
                   dimension: dimen,
-                  child: MyCachedImage(track.image,
-                      borderRadius: Dimens.sizeMini));
+                  child: MyCachedImage(track.image, border: Dimens.sizeMini));
             },
           ),
           const SizedBox(width: Dimens.sizeDefault),

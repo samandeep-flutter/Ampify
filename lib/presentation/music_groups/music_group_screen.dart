@@ -78,7 +78,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           loading: state.image?.isEmpty ?? true,
                           height: context.height * .3,
                           width: context.height * .3,
-                          borderRadius: Dimens.sizeExtraSmall,
+                          border: Dimens.sizeExtraSmall,
                         );
                       },
                     ),
@@ -254,21 +254,22 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             },
                           ),
                           const SizedBox(width: Dimens.sizeSmall),
-                          if (!state.type.isSingle) ...[
-                            ElevatedButton.icon(
-                                onPressed: () => _appendTracks(state),
-                                style: ElevatedButton.styleFrom(
-                                  padding:
-                                      Utils.insetsHoriz(Dimens.sizeDefault),
-                                  visualDensity: VisualDensity.compact,
-                                  backgroundColor: scheme.textColor,
-                                  foregroundColor: scheme.background,
-                                ),
-                                iconAlignment: IconAlignment.end,
-                                label: Text(StringRes.append),
-                                icon: Icon(Icons.library_music_outlined)),
-                            const SizedBox(width: Dimens.sizeSmall),
-                          ],
+                          // TODO: implement checks for single
+                          // if (!state.type.isSingle ?? false) ...[
+                          //   ElevatedButton.icon(
+                          //       onPressed: () => _appendTracks(state),
+                          //       style: ElevatedButton.styleFrom(
+                          //         padding:
+                          //             Utils.insetsHoriz(Dimens.sizeDefault),
+                          //         visualDensity: VisualDensity.compact,
+                          //         backgroundColor: scheme.textColor,
+                          //         foregroundColor: scheme.background,
+                          //       ),
+                          //       iconAlignment: IconAlignment.end,
+                          //       label: Text(StringRes.append),
+                          //       icon: Icon(Icons.library_music_outlined)),
+                          //   const SizedBox(width: Dimens.sizeSmall),
+                          // ],
                           IconButton(
                             onPressed: () => _toMoreDetails(bloc, state),
                             style: IconButton.styleFrom(
@@ -402,7 +403,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                               const WidgetSpan(child: SizedBox(width: 8)),
                               TextSpan(
                                 text:
-                                    rights?.firstElement?.text?.removeCoprights,
+                                    rights?.firstOrNull?.text?.removeCoprights,
                               ),
                             ],
                           ),

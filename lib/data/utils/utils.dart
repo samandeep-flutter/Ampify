@@ -152,7 +152,7 @@ sealed class Utils {
       bgColor: palete?.vibrantColor?.color ?? defColor,
       darkBgColor: palete?.darkVibrantColor?.color ?? defColor,
       image: track.album?.image,
-      subtitle: track.artists?.asString,
+      subtitle: track.artists?.map((e) => e.name).join(', '),
       duration: details?.duration,
       videoId: details?.videoId,
     );
@@ -171,12 +171,11 @@ sealed class Utils {
 
   static LibraryModel likedSongs({required int? count}) {
     return LibraryModel(
-      image: null,
-      id: UniqueIds.likedSongs,
-      type: LibItemType.playlist,
-      name: StringRes.likedSongs,
-      owner: OwnerModel(name: '$count songs'),
-    );
+        image: null,
+        id: UniqueIds.likedSongs,
+        type: LibItemType.playlist,
+        name: StringRes.likedSongs,
+        artist: ArtistBasic(name: '$count songs'));
   }
 
   static MediaItem toMediaItem(TrackDetails track, {required Uri uri}) {

@@ -182,7 +182,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     try {
       final result = await FilePicker.pickFiles(
           allowMultiple: false, type: FileType.image);
-      final file = result?.files.firstElement;
+      final file = result?.files.firstOrNull;
       if (file == null) throw FormatException(StringRes.noImage);
       add(PlaylistCoverChanged(File(file.path!)));
       return true;
@@ -227,13 +227,13 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
       final List<Track> tracks = [];
       for (PLitemDetails item in playlist.tracks ?? []) {
-        if (item.track != null && (item.track!.name?.isNotEmpty ?? false)) {
+        if (item.track != null && item.track!.name!.isNotEmpty) {
           tracks.add(item.track!);
         }
       }
       final color = await Utils.getImageColor(playlist.image);
       final isFav = await _repo.isFavPlaylist(event.id);
-      final release = playlist.tracks?.firstElement?.addedAt;
+      final release = playlist.tracks?.firstOrNull?.addedAt;
       final details = MusicGroupDetails(
           owner: playlist.owner,
           public: playlist.public,
@@ -266,8 +266,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         copyrights: album.copyrights,
         releaseDate: DateTime.tryParse(album.releaseDate ?? ''),
         owner: OwnerModel(
-            name: album.artists?.firstElement?.name,
-            id: album.artists?.firstElement?.id),
+            name: album.artists?.firstOrNull?.name,
+            id: album.artists?.firstOrNull?.id),
       );
       completer.complete(true);
 

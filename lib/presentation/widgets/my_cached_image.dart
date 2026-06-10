@@ -9,8 +9,9 @@ class MyCachedImage extends StatefulWidget {
   final bool isAvatar;
   final bool loading;
   final double? avatarRadius;
-  final double? borderRadius;
+  final double? border;
   final Color? foregroundColor;
+  final Color? backgroundColor;
   const MyCachedImage(this.image,
       {super.key,
       this.isAvatar = false,
@@ -19,7 +20,8 @@ class MyCachedImage extends StatefulWidget {
       this.height,
       this.width,
       this.foregroundColor,
-      this.borderRadius,
+      this.backgroundColor,
+      this.border,
       this.fit});
 
   const MyCachedImage.error(
@@ -29,7 +31,8 @@ class MyCachedImage extends StatefulWidget {
       this.height,
       this.width,
       this.foregroundColor,
-      this.borderRadius,
+      this.backgroundColor,
+      this.border,
       this.fit})
       : image = null,
         loading = false;
@@ -40,7 +43,8 @@ class MyCachedImage extends StatefulWidget {
       this.height,
       this.width,
       this.foregroundColor,
-      this.borderRadius,
+      this.backgroundColor,
+      this.border,
       this.fit})
       : image = null,
         loading = true;
@@ -57,24 +61,29 @@ class _MyCachedImageState extends State<MyCachedImage> {
       final _path = isAvatar ? ImageRes.userThumbnail : ImageRes.thumbnail;
       final _radius = widget.avatarRadius ?? Dimens.sizeXLarge;
       final _thumbnail = Padding(
-          padding: EdgeInsets.all(isAvatar ? _radius * .7 : Dimens.iconXLarge),
+          padding: EdgeInsets.all(isAvatar ? _radius * .7 : Dimens.sizeSmall),
           child: Image.asset(_path,
-              color: scheme.backgroundDark, fit: widget.fit ?? BoxFit.cover));
+              color: widget.foregroundColor ?? scheme.backgroundDark,
+              fit: widget.fit ?? BoxFit.cover));
 
       if (isAvatar) {
         return CircleAvatar(
-            backgroundColor: scheme.shimmer,
+            backgroundColor: widget.backgroundColor ?? scheme.shimmer,
             radius: widget.avatarRadius,
             child: loading ? Shimmer.avatar : _thumbnail);
       }
-      return ClipRRect(
-          borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
-          child: Container(
-              color: scheme.shimmer,
-              height: widget.height,
-              width: widget.width,
-              child: loading ? Shimmer.box : _thumbnail));
+      return _clipRect(Container(
+          color: widget.backgroundColor ?? scheme.shimmer,
+          height: widget.height,
+          width: widget.width,
+          child: loading ? Shimmer.box : _thumbnail));
     });
+  }
+
+  Widget _clipRect(Widget child) {
+    if (widget.border == null) return child;
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(widget.border!), child: child);
   }
 
   @override
@@ -94,13 +103,11 @@ class _MyCachedImageState extends State<MyCachedImage> {
                 backgroundImage: provider, radius: widget.avatarRadius);
           }
 
-          return ClipRRect(
-              borderRadius: BorderRadius.circular(widget.borderRadius ?? 0),
-              child: Image(
-                  image: provider,
-                  height: widget.height,
-                  width: widget.width,
-                  fit: widget.fit ?? BoxFit.cover));
+          return _clipRect(Image(
+              image: provider,
+              height: widget.height,
+              width: widget.width,
+              fit: widget.fit ?? BoxFit.cover));
         },
         placeholder: (_, url) {
           return _builder(widget.isAvatar, widget.loading);

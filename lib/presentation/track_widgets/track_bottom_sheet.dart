@@ -28,7 +28,7 @@ class TrackBottomSheet extends StatelessWidget {
             final height = _scalar.scale(_height);
             final width = _scalar.scale(_height + Dimens.sizeMedSmall);
             return MyCachedImage(track.album?.image,
-                borderRadius: Dimens.sizeMini, height: height, width: width);
+                border: Dimens.sizeMini, height: height, width: width);
           }),
           const SizedBox(width: Dimens.sizeDefault),
           Expanded(
@@ -106,7 +106,7 @@ class TrackBottomSheet extends StatelessWidget {
 
   void _toAlbum(BuildContext context) {
     context.close(fromPlayer ?? false ? 2 : 1);
-    final type = LibItemType.album.name;
+    final type = LibItemType.album.id;
     context.pushNamed(AppRoutes.musicGroup,
         pathParameters: {'id': track.album!.id!, 'type': type});
   }

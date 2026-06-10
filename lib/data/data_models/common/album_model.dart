@@ -43,7 +43,7 @@ class Album extends Equatable {
   factory Album.fromJson(Map<String, dynamic> json) {
     String? albumImage;
     try {
-      albumImage = (json['images'] as List?)?.firstElement?['url'];
+      albumImage = (json['images'] as List?)?.firstOrNull?['url'];
     } catch (_) {
       if (json['images'] is String) albumImage = json['images'];
     }

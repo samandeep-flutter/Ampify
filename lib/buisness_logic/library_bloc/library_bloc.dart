@@ -99,7 +99,7 @@ class LibraryState extends Equatable {
 
 enum SortOrder {
   alphabetical('Alphabetical', icon: Icons.abc),
-  owner('Owner', icon: Icons.person_outline),
+  artist('Artist', icon: Icons.person_outline),
   custom('Custom', icon: Icons.sort_outlined),
   ;
 
@@ -118,7 +118,6 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         transformer: Utils.debounce(Durations.short4));
     on<LibrarySorted>(_onSorted);
   }
-  final LibraryRepo _repo = getIt();
   final box = BoxServices.instance;
   final scrollController = ScrollController();
   List<LibraryModel> _libItems = [];
@@ -131,19 +130,17 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   void _onSorted(LibrarySorted event, Emitter<LibraryState> emit) {
     switch (event.order) {
       case SortOrder.alphabetical:
-        final items = state.items
-          ..sort((a, b) => a.name?.compareTo(b.name ?? '') ?? 0);
-        emit(state.copyWith(items: items, sortby: SortOrder.alphabetical));
+        final items = state.items..sort((a, b) => a.name.compareTo(b.name));
+        emit(state.copyWith(items: items, sortby: event.order));
         break;
-      case SortOrder.owner:
+      case SortOrder.artist:
         final items = state.items
-          ..sort((a, b) => a.owner?.name?.compareTo(b.owner?.name ?? '') ?? 0);
-        emit(state.copyWith(items: items, sortby: SortOrder.owner));
+          ..sort((a, b) => a.artist?.name.compareTo(b.artist?.name ?? '') ?? 0);
+        emit(state.copyWith(items: items, sortby: event.order));
         break;
       case SortOrder.custom:
-        final items = state.items
-          ..sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
-        emit(state.copyWith(items: items, sortby: SortOrder.custom));
+        final items = state.items..sort((a, b) => a.id.compareTo(b.id));
+        emit(state.copyWith(items: items, sortby: event.order));
         break;
     }
   }
@@ -184,31 +181,33 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
     try {
       if (plOffset.length < state.playlistCount) {
-        _repo.getMyPlaylists(
-            offset: plOffset.length,
-            onSuccess: (json) async {
-              final playlists = List<LibraryModel>.from(
-                  json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
-              items.addAll(playlists);
-              plCompleter.complete(true);
-            });
+        // TODO: implement playlist load more mechanism
+        // _repo.getMyPlaylists(
+        //     offset: plOffset.length,
+        //     onSuccess: (json) async {
+        //       final playlists = List<LibraryModel>.from(
+        //           json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
+        //       items.addAll(playlists);
+        //       plCompleter.complete(true);
+        //     });
       }
 
       if (alOffset.length < state.albumCount) {
-        _repo.getMyAlbums(
-            offset: alOffset.length,
-            onSuccess: (json) {
-              final albums = List<LibraryModel>.from(json['items']
-                      ?.map((e) => LibraryModel.fromJson(e['album'])) ??
-                  []);
-              items.addAll(albums);
-              alCompleter.complete(true);
-            });
+        // TODO: implement album load more mechanism
+        // _repo.getMyAlbums(
+        //     offset: alOffset.length,
+        //     onSuccess: (json) {
+        //       final albums = List<LibraryModel>.from(json['items']
+        //               ?.map((e) => LibraryModel.fromJson(e['album'])) ??
+        //           []);
+        //       items.addAll(albums);
+        //       alCompleter.complete(true);
+        //     });
       }
 
       if (plOffset.length < state.playlistCount) await plCompleter.future;
       if (alOffset.length < state.albumCount) await alCompleter.future;
-      items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
+      items.sort((a, b) => a.id.compareTo(b.id));
       _libItems = items;
       emit(state.copyWith(items: items));
     } catch (e) {
@@ -225,26 +224,27 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     List<LibraryModel> items = [];
 
     try {
-      _repo.getMyPlaylists(onSuccess: (json) async {
-        final playlists = List<LibraryModel>.from(
-            json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
-        items.addAll(playlists);
-        try {
-          await _repo.getLikedSongs(
-              limit: 1,
-              onSuccess: (json) {
-                emit(state.copyWith(totalLiked: json['total']));
-              });
-        } catch (_) {}
-        playlistCount.complete((json['total'] as int?) ?? 0);
-      });
+      // TODO: implement playlist/album refesh mechanism
+      // _repo.getMyPlaylists(onSuccess: (json) async {
+      //   final playlists = List<LibraryModel>.from(
+      //       json['items']?.map((e) => LibraryModel.fromJson(e)) ?? []);
+      //   items.addAll(playlists);
+      //   try {
+      //     await _repo.getLikedSongs(
+      //         limit: 1,
+      //         onSuccess: (json) {
+      //           emit(state.copyWith(totalLiked: json['total']));
+      //         });
+      //   } catch (_) {}
+      //   playlistCount.complete((json['total'] as int?) ?? 0);
+      // });
 
-      _repo.getMyAlbums(onSuccess: (json) {
-        final albums = List<LibraryModel>.from(
-            json['items']?.map((e) => LibraryModel.fromJson(e['album'])) ?? []);
-        items.addAll(albums);
-        albumCount.complete((json['total'] as int?) ?? 0);
-      });
+      // _repo.getMyAlbums(onSuccess: (json) {
+      //   final albums = List<LibraryModel>.from(
+      //       json['items']?.map((e) => LibraryModel.fromJson(e['album'])) ?? []);
+      //   items.addAll(albums);
+      //   albumCount.complete((json['total'] as int?) ?? 0);
+      // });
 
       final plCount = await playlistCount.future;
       final alCount = await albumCount.future;
@@ -252,7 +252,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       if ((state.totalLiked ?? 0) > 0) {
         items.add(Utils.likedSongs(count: state.totalLiked));
       }
-      items.sort((a, b) => a.id?.compareTo(b.id ?? '') ?? 0);
+      items.sort((a, b) => a.id.compareTo(b.id));
       _libItems = items;
       emit(state.copyWith(
           items: items, playlistCount: plCount, albumCount: alCount));

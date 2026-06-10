@@ -17,7 +17,7 @@ class MusicGroupTile extends StatelessWidget {
           context.pushNamed<bool>(AppRoutes.likedSongs);
         } else {
           context.pushNamed<bool>(AppRoutes.musicGroup,
-              pathParameters: {'id': item.id!, 'type': item.type?.name ?? ''});
+              pathParameters: {'id': item.id, 'type': item.type.id});
         }
       },
       child: Padding(
@@ -33,7 +33,7 @@ class MusicGroupTile extends StatelessWidget {
 
               return SizedBox.square(
                 dimension: dimen,
-                child: MyCachedImage(item.image, borderRadius: Dimens.sizeMini),
+                child: MyCachedImage(item.image, border: Dimens.sizeMini),
               );
             }),
             const SizedBox(width: Dimens.sizeDefault),
@@ -42,7 +42,7 @@ class MusicGroupTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.name ?? '',
+                    item.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -56,8 +56,8 @@ class MusicGroupTile extends StatelessWidget {
                     style: TextStyle(
                         color: scheme.textColorLight,
                         fontSize: Dimens.fontDefault),
-                    type: item.type?.name.capitalize ?? '',
-                    subtitle: item.owner?.name ?? '',
+                    type: item.type.name.capitalize,
+                    subtitle: item.artist?.name ?? '',
                   )
                 ],
               ),

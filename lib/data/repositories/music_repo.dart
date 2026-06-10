@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ampify/data/utils/exports.dart';
+import 'package:ampify/data/utils/exports.dart' hide SearchResult;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MusicRepo {
@@ -46,7 +46,7 @@ class MusicRepo {
             (query.artists.any((f) => _artist.contains(f)) || isSame);
       }, orElse: () => throw FormatException());
     } on FormatException {
-      return songs.firstElement;
+      return songs.firstOrNull;
     } catch (e) {
       logPrint(e, 'yt-search');
       return null;

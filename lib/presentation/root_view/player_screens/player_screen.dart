@@ -68,7 +68,7 @@ class PlayerScreen extends StatelessWidget {
                               color:
                                   Color.alphaBlend(fgColor ?? bgColor, bgColor),
                               child: MyCachedImage(state.track.image,
-                                  borderRadius: Dimens.sizeExtraSmall),
+                                  border: Dimens.sizeExtraSmall),
                             );
                           }),
                     ),

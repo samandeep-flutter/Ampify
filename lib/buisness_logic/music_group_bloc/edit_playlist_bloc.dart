@@ -100,20 +100,22 @@ class EditPlaylistBloc extends Bloc<EditPlaylistEvents, EditPlaylistState> {
     titleContr.text = event.title?.unescape ?? '';
     descContr.text = event.desc?.unescape ?? '';
     emit(state.copyWith(
-        id: event.id,
-        title: event.title,
-        desc: event.desc,
-        image: event.image));
+      id: event.id,
+      title: event.title,
+      desc: event.desc,
+      image: event.image,
+    ));
   }
 
   Future<void> _onEditDetails(
       EditPlaylistDetails event, Emitter<EditPlaylistState> emit) async {
     emit(state.copyWith(loading: true));
     final result = await _repo.editPlaylist(
-        id: state.id!,
-        title: event.title ?? state.title!,
-        desc: event.desc ?? state.desc!,
-        public: state.public);
+      id: state.id!,
+      title: event.title ?? state.title!,
+      desc: event.desc ?? state.desc!,
+      public: state.public,
+    );
 
     emit(state.copyWith(loading: false, success: result));
     showToast(StringRes.detailsUpdated);

@@ -2,15 +2,59 @@ import 'package:ampify/data/utils/exports.dart';
 
 class MyHomeSection {
   final String title;
-  final List<PlaylistDetailed> contents;
+  final LibItemType type;
+  final List<MyHomeDetailed> contents;
 
-  MyHomeSection({required this.title, required this.contents});
+  MyHomeSection(
+      {required this.title, required this.type, required this.contents});
 
   factory MyHomeSection.fromYT(HomeSection section) {
+    final first = section.contents.firstOrNull;
+
     return MyHomeSection(
       title: section.title,
-      contents: List<PlaylistDetailed>.from(section.contents),
+      type: first is PlaylistDetailed
+          ? LibItemType.playlist
+          : first is AlbumDetailed
+              ? LibItemType.album
+              : LibItemType.unknown,
+      contents: List<MyHomeDetailed>.from(
+          section.contents.map((e) => MyHomeDetailed.fromYT(e))),
     );
+  }
+}
+
+class MyHomeDetailed {
+  final String id;
+  final String title;
+  final ArtistBasic artist;
+  final LibItemType type;
+  final List<ThumbnailFull> thumbnails;
+
+  MyHomeDetailed({
+    required this.id,
+    required this.title,
+    required this.artist,
+    required this.type,
+    required this.thumbnails,
+  });
+
+  factory MyHomeDetailed.fromYT(dynamic item) {
+    final pl = item is PlaylistDetailed;
+    return MyHomeDetailed(
+      id: pl ? _pl(item).playlistId : _al(item).albumId,
+      title: pl ? _pl(item).name : _al(item).name,
+      artist: pl ? _pl(item).artist : _al(item).artist,
+      type: pl ? LibItemType.playlist : LibItemType.album,
+      thumbnails: pl ? _pl(item).thumbnails : _al(item).thumbnails,
+    );
+  }
+  static PlaylistDetailed _pl(dynamic playlist) {
+    return playlist as PlaylistDetailed;
+  }
+
+  static AlbumDetailed _al(dynamic playlist) {
+    return playlist as AlbumDetailed;
   }
 }
 

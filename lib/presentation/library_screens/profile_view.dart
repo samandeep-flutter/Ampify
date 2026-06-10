@@ -1,16 +1,8 @@
 import 'package:ampify/buisness_logic/root_bloc/root_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
-class ProfileView extends StatefulWidget {
+class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
-
-  @override
-  State<ProfileView> createState() => _ProfileViewState();
-}
-
-class _ProfileViewState extends State<ProfileView> {
-  final AuthServices auth = getIt();
-  final _box = BoxServices.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +21,14 @@ class _ProfileViewState extends State<ProfileView> {
           const SizedBox(height: Dimens.sizeDefault),
           Row(
             children: [
-              MyCachedImage(_box.profile?.image,
+              MyCachedImage(profile?.image,
                   isAvatar: true, avatarRadius: context.width * .1),
               const SizedBox(width: Dimens.sizeXLarge),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _box.profile?.displayName ?? '',
+                    profile?.displayName ?? '',
                     style: TextStyle(
                       color: scheme.textColor,
                       fontSize: Dimens.fontXXLarge,
@@ -44,7 +36,7 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                   ),
                   Text(
-                    _box.profile?.email ?? '',
+                    profile?.email ?? '',
                     style: TextStyle(
                       color: scheme.textColorLight,
                       fontSize: Dimens.fontDefault,
@@ -62,7 +54,7 @@ class _ProfileViewState extends State<ProfileView> {
               children: [
                 const SizedBox(height: Dimens.sizeExtraSmall),
                 ListTile(
-                  onTap: _switchTheme,
+                  onTap: () => _switchTheme(context),
                   leading: Icon(Icons.color_lens_outlined),
                   title: Text(StringRes.themeMode,
                       style: TextStyle(fontSize: Dimens.fontXXXLarge)),
@@ -73,7 +65,7 @@ class _ProfileViewState extends State<ProfileView> {
           ),
           const SizedBox(height: Dimens.sizeSmall),
           ListTile(
-            onTap: logout,
+            onTap: () => _logout(context),
             textColor: scheme.error,
             leading: Icon(Icons.logout, color: scheme.error),
             title: Text(StringRes.logout.toUpperCase(),
@@ -84,7 +76,9 @@ class _ProfileViewState extends State<ProfileView> {
     );
   }
 
-  void logout() {
+  UserModel? get profile => BoxServices.instance.profile;
+
+  void _logout(BuildContext context) {
     showDialog(
         context: context,
         builder: (context) {
@@ -106,7 +100,7 @@ class _ProfileViewState extends State<ProfileView> {
               TextButton(
                 onPressed: () {
                   context.read<RootBloc>().add(RootTabReset());
-                  auth.logout();
+                  getIt<AuthServices>().logout();
                 },
                 style:
                     TextButton.styleFrom(foregroundColor: context.scheme.error),
@@ -118,7 +112,7 @@ class _ProfileViewState extends State<ProfileView> {
         });
   }
 
-  void _switchTheme() {
+  void _switchTheme(BuildContext context) {
     showModalBottomSheet(
         context: context,
         useRootNavigator: true,
@@ -136,7 +130,7 @@ class _ProfileViewState extends State<ProfileView> {
                       context.scheme.switchThemeMode(theme);
                       await Future.delayed(Durations.medium4);
                       // ignore: use_build_context_synchronously
-                      if (mounted) Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                     child: RadioListTile(
                       value: e,

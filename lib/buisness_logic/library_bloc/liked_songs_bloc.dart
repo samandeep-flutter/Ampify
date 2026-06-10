@@ -84,9 +84,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
         transformer: Utils.debounce(Durations.short4));
   }
 
-  final LibraryRepo _repo = getIt();
   final scrollController = ScrollController();
-
   bool libRefresh = false;
 
   void onPlay(BuildContext context) {
@@ -117,6 +115,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   void songRemoved(String id) => add(SongRemoved(id));
 
   void _onRemoved(SongRemoved event, Emitter<LikedSongsState> emit) async {
+    // TODO: implement remove song as well
     libRefresh = true;
     List<Track> tracks = state.tracks;
     tracks.removeWhere((e) => e.id == event.id);
@@ -129,18 +128,18 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     scrollController.addListener(_titleFadeListener);
     scrollController.addListener(_loadMoreSongs);
     libRefresh = false;
-
-    await _repo.getLikedSongs(
-      onSuccess: (json) {
-        final items = PLtracksItems.fromJson(json);
-        final List<Track> tracks = [];
-        for (PLitemDetails item in items.track ?? []) {
-          if (item.track != null) tracks.add(item.track!);
-        }
-        emit(state.copyWith(
-            tracks: tracks, loading: false, totalTracks: items.total));
-      },
-    );
+    // TODO: implement liked songs
+    // await _repo.getLikedSongs(
+    //   onSuccess: (json) {
+    //     final items = PLtracksItems.fromJson(json);
+    //     final List<Track> tracks = [];
+    //     for (PLitemDetails item in items.track ?? []) {
+    //       if (item.track != null) tracks.add(item.track!);
+    //     }
+    //     emit(state.copyWith(
+    //         tracks: tracks, loading: false, totalTracks: items.total));
+    // },
+    // );
   }
 
   void _onLoadMore(LoadMoreSongs event, Emitter<LikedSongsState> emit) {
@@ -150,17 +149,18 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
 
   Future<void> _onLoadTrigger(
       LoadMoreTrigger event, Emitter<LikedSongsState> emit) async {
-    await _repo.getLikedSongs(
-      offset: state.tracks.length,
-      onSuccess: (json) {
-        final items = PLtracksItems.fromJson(json);
-        final List<Track> tracks = state.tracks;
-        for (PLitemDetails item in items.track ?? []) {
-          if (item.track != null) tracks.add(item.track!);
-        }
-        emit(state.copyWith(tracks: tracks, moreLoading: false));
-      },
-    );
+    // TODO: implement load more liked songs
+    // await _repo.getLikedSongs(
+    //   offset: state.tracks.length,
+    //   onSuccess: (json) {
+    //     final items = PLtracksItems.fromJson(json);
+    //     final List<Track> tracks = state.tracks;
+    //     for (PLitemDetails item in items.track ?? []) {
+    //       if (item.track != null) tracks.add(item.track!);
+    //     }
+    //     emit(state.copyWith(tracks: tracks, moreLoading: false));
+    //   },
+    // );
   }
 
   void _titleFade(LikedSongsTitleFade event, Emitter<LikedSongsState> emit) {

@@ -94,7 +94,6 @@ sealed class StringRes {
   static const String errorLoginFailed = 'Sign-In failed, please try again.';
 
   // long texts
-  static const String devModeToggle = 'You are now in developer mode';
   static const String offlineDesc =
       'No internet connection, Please reconnect and try again.';
   static const String notiDesc =
@@ -119,8 +118,6 @@ sealed class StringRes {
       'adding some tracks to set the vibe!';
   static const String playlistDesc = 'Add a short description to'
       ' personalize your playlist.';
-  static const String noSpotifyTracks = 'There are currenlty no tracks to show'
-      ', tracks will begin to appear as you listen to them!';
   static const String noNewTracks =
       'No new tracks available. Stay tuned for updates.';
   static const String cannotbePlayed =
@@ -130,10 +127,12 @@ sealed class StringRes {
   static const String errorPage = 'The specified page cannot be found, '
       'please try again or contact the developer';
   static const String addedtoUpNext = 'Added to UpNext';
-  static const String errorRecommendation =
-      'Something went wrong, please try again';
   static const String radioDesc = 'Plays an endless mix of songs '
       'inspired by this track, with a similar sound and mood';
+  static const String homeSecDesc = 'This feature is not supported on'
+      ' current version of the app, please update the app to access this feature.';
+  static const String placeholderDesc = 'Unsupported type, '
+      'Please update the app to see this content.';
 
   static const List<String> radioLoaders = [
     'Tuning the radio',
