@@ -48,14 +48,8 @@ extension DarkModeHelper on Brightness {
   bool get isDark => this == Brightness.dark;
 }
 
-extension MyIterable on Iterable<String> {
-  String get asString {
-    return toString().replaceAll(RegExp(r'[\[\]]'), '');
-  }
-}
-
-extension ListToString on List<String> {
-  String get asString => toString().replaceAll(RegExp(r'[\[\]]'), '');
+extension ThumbnailHelper on ThumbnailFull {
+  Thumbnail toThumbnail() => Thumbnail.fromYT(this);
 }
 
 extension MyMusicState on MusicState? {
@@ -69,6 +63,7 @@ extension MyMusicState on MusicState? {
 extension MyLibItem on LibItemType? {
   bool get isPlaylist => this == LibItemType.playlist;
   bool get isAlbum => this == LibItemType.album;
+  bool get isArtist => this == LibItemType.artist;
   bool get isTrack => this == LibItemType.track;
 }
 
@@ -81,7 +76,7 @@ extension MyMediaItems on MediaItem {
 extension MyQueue on ValueStream<List<MediaItem>> {
   bool isLast(List<TrackDetails> queue) {
     if (value.isEmpty || queue.isEmpty) return false;
-    return queue.first.id == value.last.id;
+    return queue.first.track?.id == value.last.id;
   }
 }
 
@@ -342,6 +337,7 @@ extension MyInt on int {
   String get format => _format(this);
   String get digit2 => toString().padLeft(2, '0');
   String get digit3 => toString().padLeft(3, '0');
+  Duration toDuration() => Duration(seconds: this);
 
   String _format(int count) {
     if (count > 999999) {

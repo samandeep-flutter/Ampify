@@ -1,7 +1,7 @@
 import 'package:ampify/buisness_logic/search_bloc/search_bloc.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
-import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/data/utils/exports.dart';
+import 'package:ampify/presentation/track_widgets/track_tile.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
@@ -77,10 +77,10 @@ class SearchPage extends StatelessWidget {
                   itemCount: state.results?.length ?? 0,
                   itemBuilder: (context, index) {
                     final item = state.results![index];
-                    // TODO: implement track play from search
-                    // if (item.type.isTrack) {
-                    //   return TrackTile.search(item);
-                    // }
+
+                    if (item.type.isTrack) {
+                      return TrackTile.search(Track.fromJson(item.toJson()));
+                    }
                     return MusicGroupTile(item,
                         imageHeight: Dimens.iconUltraLarge);
                   },

@@ -1,29 +1,28 @@
-import 'package:dart_ytmusic_api/types.dart';
-import 'package:equatable/equatable.dart';
+import 'package:ampify/data/utils/exports.dart';
 
 class LibraryModel extends Equatable {
   final String id;
-  final String name;
-  final String? image;
+  final String title;
+  final Thumbnail? thumbnail;
   final LibItemType type;
 
   /// in case of video or track
-  final String? vidID;
+  final String? videoId;
 
   /// only in case of track
-  final AlbumBasic? album;
+  final Album? album;
 
   /// null in case of [type] is [artist]
-  final ArtistBasic? artist;
+  final MyArtistBasic? artist;
 
   /// in case of video or track
   final Duration? duration;
 
   const LibraryModel({
     required this.id,
-    this.vidID,
-    required this.name,
-    required this.image,
+    this.videoId,
+    required this.title,
+    required this.thumbnail,
     required this.type,
     this.album,
     this.artist,
@@ -32,64 +31,61 @@ class LibraryModel extends Equatable {
 
   factory LibraryModel.fromYT(SearchResult result) {
     final type = LibItemType.values.firstWhere((e) => e.id == result.type);
+
     switch (type) {
       case LibItemType.track:
         result as SongDetailed;
         return LibraryModel(
           id: result.videoId,
-          name: result.name,
+          title: result.name,
           type: type,
-          vidID: result.videoId,
-          artist: result.artist,
-          album: result.album,
-          image: result.thumbnails.firstOrNull?.url,
-          duration: result.duration != null
-              ? Duration(seconds: result.duration!)
-              : null,
-        );
-
-      case LibItemType.album:
-        result as AlbumDetailed;
-        return LibraryModel(
-          id: result.albumId,
-          name: result.name,
-          type: type,
-          // vidID: result.playlistId,
-          artist: result.artist,
-          image: result.thumbnails.firstOrNull?.url,
-        );
-
-      case LibItemType.artist:
-        result as ArtistDetailed;
-        return LibraryModel(
-          id: result.artistId,
-          name: result.name,
-          type: type,
-          image: result.thumbnails.firstOrNull?.url,
+          videoId: result.videoId,
+          artist: MyArtistBasic.fromYT(result.artist),
+          album: result.album != null ? Album.fromYtBasic(result.album!) : null,
+          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+          duration: result.duration?.toDuration(),
         );
 
       case LibItemType.video:
         result as VideoDetailed;
         return LibraryModel(
           id: result.videoId,
-          name: result.name,
+          title: result.name,
           type: type,
-          vidID: result.videoId,
-          artist: result.artist,
-          image: result.thumbnails.firstOrNull?.url,
-          duration: result.duration != null
-              ? Duration(seconds: result.duration!)
-              : null,
+          videoId: result.videoId,
+          artist: MyArtistBasic.fromYT(result.artist),
+          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+          duration: result.duration?.toDuration(),
         );
 
       case LibItemType.playlist:
         result as PlaylistDetailed;
         return LibraryModel(
           id: result.playlistId,
-          name: result.name,
+          title: result.name,
           type: type,
-          artist: result.artist,
-          image: result.thumbnails.firstOrNull?.url,
+          artist: MyArtistBasic.fromYT(result.artist),
+          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+        );
+
+      case LibItemType.album:
+        result as AlbumDetailed;
+        return LibraryModel(
+          id: result.albumId,
+          title: result.name,
+          type: type,
+          // vidID: result.playlistId,
+          artist: MyArtistBasic.fromYT(result.artist),
+          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+        );
+
+      case LibItemType.artist:
+        result as ArtistDetailed;
+        return LibraryModel(
+          id: result.artistId,
+          title: result.name,
+          type: type,
+          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
         );
 
       case LibItemType.unknown:
@@ -97,9 +93,20 @@ class LibraryModel extends Equatable {
     }
   }
 
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'type': type.id,
+        'videoId': videoId,
+        'title': title,
+        'thumbnail': thumbnail?.toJson(),
+        'album': album?.toJson(),
+        'artist': artist?.toJson(),
+        'duration': duration?.inSeconds
+      };
+
   @override
   List<Object?> get props =>
-      [id, vidID, name, image, album, artist, type, duration];
+      [id, videoId, title, thumbnail, album, artist, type, duration];
 }
 
 enum LibItemType {
@@ -112,4 +119,27 @@ enum LibItemType {
 
   const LibItemType._(this.id);
   final String id;
+}
+
+class Thumbnail extends Equatable {
+  final String? url;
+  final int? width;
+  final int? height;
+  const Thumbnail({this.url, this.width, this.height});
+
+  factory Thumbnail.fromYT(ThumbnailFull thumbnail) {
+    return Thumbnail(
+        url: thumbnail.url, width: thumbnail.width, height: thumbnail.height);
+  }
+
+  factory Thumbnail.fromJson(Map<String, dynamic> json) {
+    return Thumbnail(
+        url: json['url'], width: json['width'], height: json['height']);
+  }
+
+  Map<String, dynamic> toJson() =>
+      {'url': url, 'width': width, 'height': height};
+
+  @override
+  List<Object?> get props => [url, width, height];
 }

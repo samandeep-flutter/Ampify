@@ -8,11 +8,11 @@ class AddtoPlaylistEvents extends Equatable {
 }
 
 class PlaylistInitial extends AddtoPlaylistEvents {
-  final String uri;
-  const PlaylistInitial(this.uri);
+  final String id;
+  const PlaylistInitial(this.id);
 
   @override
-  List<Object?> get props => [uri, super.props];
+  List<Object?> get props => [id, super.props];
 }
 
 class PlaylistSelected extends AddtoPlaylistEvents {
@@ -26,32 +26,32 @@ class PlaylistSelected extends AddtoPlaylistEvents {
 class AddTracktoPlaylists extends AddtoPlaylistEvents {}
 
 class AddtoPlaylistState extends Equatable {
-  final String? trackUri;
+  final String? trackId;
   final List<String> playlists;
   final bool loading;
   final bool success;
 
   const AddtoPlaylistState({
-    required this.trackUri,
+    required this.trackId,
     required this.playlists,
     required this.loading,
     required this.success,
   });
 
   const AddtoPlaylistState.init()
-      : trackUri = null,
+      : trackId = null,
         playlists = const [],
         loading = false,
         success = false;
 
   AddtoPlaylistState copyWith({
-    String? trackUri,
+    String? trackId,
     List<String>? playlists,
     bool? loading,
     bool? success,
   }) {
     return AddtoPlaylistState(
-      trackUri: trackUri ?? this.trackUri,
+      trackId: trackId ?? this.trackId,
       playlists: playlists ?? this.playlists,
       loading: loading ?? this.loading,
       success: success ?? this.success,
@@ -69,21 +69,20 @@ class AddtoPlaylistBloc extends Bloc<AddtoPlaylistEvents, AddtoPlaylistState> {
     on<AddTracktoPlaylists>(_onAddTrigger);
   }
 
-  final MusicGroupRepo _repo = getIt();
-
   void onItemAdded(String id) => add(PlaylistSelected(id));
 
   void _onInit(PlaylistInitial event, Emitter<AddtoPlaylistState> emit) {
-    emit(AddtoPlaylistState.init().copyWith(trackUri: event.uri));
+    emit(AddtoPlaylistState.init().copyWith(trackId: event.id));
   }
 
   Future<void> _onAddTrigger(
       AddTracktoPlaylists event, Emitter<AddtoPlaylistState> emit) async {
     emit(state.copyWith(loading: true));
     try {
-      for (final playlist in state.playlists) {
-        await _repo.addTracktoPlaylist(playlist, trackUri: [state.trackUri!]);
-      }
+      // TODO: implement add tacks to playlist
+      // for (final playlist in state.playlists) {
+      // await _repo.addTracktoPlaylist(playlist, trackUri: [state.trackId!]);
+      // }
       emit(state.copyWith(loading: false, success: true));
     } catch (_) {}
   }

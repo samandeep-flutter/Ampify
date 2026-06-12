@@ -91,7 +91,7 @@ abstract class AppPage {
                   try {
                     String id = state.pathParameters['id']!;
                     final type = LibItemType.values.firstWhere((e) {
-                      return e.name == state.pathParameters['type'];
+                      return e.id == state.pathParameters['type'];
                     }, orElse: () => LibItemType.album);
                     return BlocProvider(
                         create: (_) => MusicGroupBloc(),

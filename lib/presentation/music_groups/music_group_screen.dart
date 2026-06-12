@@ -36,7 +36,6 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
         buildWhen: (pr, cr) => pr.loading != cr.loading,
         builder: (context, state) {
           final fgColor = state.bgColor?.withAlpha(30) ?? scheme.backgroundDark;
-          final date = state.details?.releaseDate;
 
           if (state.loading) return const MusicGroupShimmer();
 
@@ -71,11 +70,11 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   background: Align(
                     alignment: Alignment.bottomCenter,
                     child: BlocBuilder<MusicGroupBloc, MusicGroupState>(
-                      buildWhen: (pr, cr) => pr.image != cr.image,
+                      buildWhen: (pr, cr) => pr.thumbnail != cr.thumbnail,
                       builder: (context, state) {
                         return MyCachedImage(
-                          state.image,
-                          loading: state.image?.isEmpty ?? true,
+                          state.thumbnail?.url,
+                          loading: state.thumbnail?.url?.isEmpty ?? true,
                           height: context.height * .3,
                           width: context.height * .3,
                           border: Dimens.sizeExtraSmall,
@@ -104,16 +103,17 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                       const SizedBox(height: Dimens.sizeSmall),
                       Text(state.title ?? '',
                           style: Utils.titleStyleLarge(context)),
-                      if (state.details?.description?.isNotEmpty ?? false) ...[
-                        const SizedBox(height: Dimens.sizeExtraSmall),
-                        Text(
-                          state.details!.description!.unescape,
-                          style: TextStyle(
-                            color: scheme.textColorLight,
-                            fontSize: Dimens.fontDefault - 1,
-                          ),
-                        ),
-                      ],
+                      // TODO: implement playlist description
+                      // if (state.details?.description?.isNotEmpty ?? false) ...[
+                      //   const SizedBox(height: Dimens.sizeExtraSmall),
+                      //   Text(
+                      //     state.details!.description!.unescape,
+                      //     style: TextStyle(
+                      //       color: scheme.textColorLight,
+                      //       fontSize: Dimens.fontDefault - 1,
+                      //     ),
+                      //   ),
+                      // ],
                       const SizedBox(height: Dimens.sizeDefault),
                       Wrap(
                         runSpacing: Dimens.sizeSmall,
@@ -168,8 +168,9 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                       children: [
                                         if (state.type.isPlaylist)
                                           const TextSpan(text: 'by '),
+                                        // TODO: implement playlist owner
                                         TextSpan(
-                                            text: state.details?.owner?.name),
+                                            text: 'state.details?.owner?.name'),
                                       ],
                                     ),
                                   ),
@@ -180,8 +181,9 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                     margin: Dimens.sizeSmall,
                                     color: scheme.textColorLight,
                                   ),
+                                  // TODO: implement playlist date
                                   Text(
-                                    '${date?.year ?? ''}',
+                                    'date?.year',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       color: scheme.textColorLight,
@@ -239,11 +241,11 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                         : null,
                                   ),
                                   iconSize: Dimens.iconSmall,
-                                  onPressed: () => bloc.onFav(
-                                    state.id!,
-                                    type: state.type!,
-                                    liked: state.isFav ?? false,
-                                  ),
+                                  onPressed: () {
+                                    bloc.add(MusicGroupFav(state.id!,
+                                        type: state.type!,
+                                        liked: state.isFav ?? false));
+                                  },
                                   isSelected: state.isFav ?? false,
                                   selectedIcon: Icon(Icons.check,
                                       color: scheme.onPrimary),
@@ -340,78 +342,81 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                 },
               ),
               const SliverSizedBox(height: Dimens.sizeXLarge),
-              if (state.details?.releaseDate != null)
-                SliverToBoxAdapter(
-                  child: DefaultTextStyle.merge(
-                    style: TextStyle(
-                        color: scheme.textColorLight,
-                        fontSize: Dimens.fontDefault + 1),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: Dimens.sizeDefault),
-                        Icon(
-                          Icons.track_changes,
-                          color: scheme.textColorLight,
-                          size: Dimens.iconMedSmall,
-                        ),
-                        const SizedBox(width: Dimens.sizeSmall),
-                        Text('${state.tracks.length} Tracks'),
-                        PaginationDots(
-                          current: true,
-                          margin: Dimens.sizeSmall,
-                          color: scheme.textColorLight,
-                        ),
-                        Text(state.details?.releaseDate?.formatDate ?? ''),
-                      ],
-                    ),
-                  ),
-                ),
-              const SliverSizedBox(height: Dimens.sizeSmall),
-              if (!state.type.isPlaylist)
-                SliverToBoxAdapter(
-                  child: Builder(
-                    builder: (context) {
-                      final rights = state.details?.copyrights;
-                      final symbols =
-                          rights?.map((e) => e.type!).toList().asString;
-                      return Padding(
-                        padding:
-                            const EdgeInsets.only(left: Dimens.sizeDefault),
-                        child: RichText(
-                          text: TextSpan(
-                            style: TextStyle(
-                              color: scheme.textColorLight,
-                              fontSize: Dimens.fontDefault + 1,
-                            ),
-                            children: [
-                              if (symbols?.contains(RegExp(r'C')) ?? false) ...[
-                                WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,
-                                  child: Image.asset(ImageRes.copyrightC,
-                                      color: scheme.textColorLight,
-                                      height: Dimens.fontMed),
-                                ),
-                                const WidgetSpan(child: SizedBox(width: 8)),
-                              ],
-                              if (symbols?.contains(RegExp(r'P')) ?? false)
-                                WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,
-                                  child: Image.asset(ImageRes.copyrightP,
-                                      color: scheme.textColorLight,
-                                      height: Dimens.fontMed),
-                                ),
-                              const WidgetSpan(child: SizedBox(width: 8)),
-                              TextSpan(
-                                text:
-                                    rights?.firstOrNull?.text?.removeCoprights,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+              // TODO: implement checks for release date or year
+              // if (state.details?.releaseDate != null)
+              //   SliverToBoxAdapter(
+              //     child: DefaultTextStyle.merge(
+              //       style: TextStyle(
+              //           color: scheme.textColorLight,
+              //           fontSize: Dimens.fontDefault + 1),
+              //       child: Row(
+              //         children: [
+              //           const SizedBox(width: Dimens.sizeDefault),
+              //           Icon(
+              //             Icons.track_changes,
+              //             color: scheme.textColorLight,
+              //             size: Dimens.iconMedSmall,
+              //           ),
+              //           const SizedBox(width: Dimens.sizeSmall),
+              //           Text('${state.tracks.length} Tracks'),
+              //           PaginationDots(
+              //             current: true,
+              //             margin: Dimens.sizeSmall,
+              //             color: scheme.textColorLight,
+              //           ),
+              //           Text(state.details?.releaseDate?.formatDate ?? ''),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // const SliverSizedBox(height: Dimens.sizeSmall),
+
+              // TODO: implement checks for copyrights or year info
+              // if (!state.type.isPlaylist)
+              //   SliverToBoxAdapter(
+              //     child: Builder(
+              //       builder: (context) {
+              //         final rights = state.details?.copyrights;
+              //         final symbols =
+              //             rights?.map((e) => e.type!).toList().asString;
+              //         return Padding(
+              //           padding:
+              //               const EdgeInsets.only(left: Dimens.sizeDefault),
+              //           child: RichText(
+              //             text: TextSpan(
+              //               style: TextStyle(
+              //                 color: scheme.textColorLight,
+              //                 fontSize: Dimens.fontDefault + 1,
+              //               ),
+              //               children: [
+              //                 if (symbols?.contains(RegExp(r'C')) ?? false) ...[
+              //                   WidgetSpan(
+              //                     alignment: PlaceholderAlignment.middle,
+              //                     child: Image.asset(ImageRes.copyrightC,
+              //                         color: scheme.textColorLight,
+              //                         height: Dimens.fontMed),
+              //                   ),
+              //                   const WidgetSpan(child: SizedBox(width: 8)),
+              //                 ],
+              //                 if (symbols?.contains(RegExp(r'P')) ?? false)
+              //                   WidgetSpan(
+              //                     alignment: PlaceholderAlignment.middle,
+              //                     child: Image.asset(ImageRes.copyrightP,
+              //                         color: scheme.textColorLight,
+              //                         height: Dimens.fontMed),
+              //                   ),
+              //                 const WidgetSpan(child: SizedBox(width: 8)),
+              //                 TextSpan(
+              //                   text:
+              //                       rights?.firstOrNull?.text?.removeCoprights,
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //         );
+              //       },
+              //     ),
+              //   ),
               SliverSizedBox(height: context.height * .2),
             ],
           );
@@ -420,10 +425,10 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
     );
   }
 
-  void _appendTracks(MusicGroupState state) {
-    final player = context.read<PlayerBloc>();
-    player.add(PlayerAppendTracks(state.tracks, id: state.id));
-  }
+  // void _appendTracks(MusicGroupState state) {
+  //   final player = context.read<PlayerBloc>();
+  //   player.add(PlayerAppendTracks(state.tracks, id: state.id));
+  // }
 
   void _shuffleToggle() {
     final player = context.read<PlayerBloc>();
@@ -442,9 +447,9 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
           value: bloc,
           child: PlaylistBottomSheet(
             id: state.id,
-            image: state.image,
+            image: state.thumbnail,
             title: state.title,
-            details: state.details,
+            // details: state.details,
           ),
         );
       },

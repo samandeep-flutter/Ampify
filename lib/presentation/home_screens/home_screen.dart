@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
@@ -173,7 +174,7 @@ class HomeSectionBuilder extends StatelessWidget {
         const SizedBox(height: Dimens.sizeSmall),
         if (section.type.isPlaylist || section.type.isAlbum)
           SizedBox(
-            height: context.height * .25,
+            height: clampDouble(context.height * .25, 150, 200),
             child: GridView.builder(
               padding: Utils.insetsHoriz(Dimens.sizeDefault),
               physics: const BouncingScrollPhysics(),
@@ -217,8 +218,7 @@ class PlaylistDetailedTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          MyCachedImage(item.thumbnails.firstOrNull?.url,
-              border: Dimens.sizeExtraSmall),
+          MyCachedImage(item.thumbnail?.url, border: Dimens.sizeExtraSmall),
           Padding(
             padding: const EdgeInsets.only(left: Dimens.sizeExtraSmall),
             child: Column(

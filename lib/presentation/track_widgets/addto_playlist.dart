@@ -3,8 +3,8 @@ import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/music_group_bloc/addto_playlist_bloc.dart';
 
 class AddtoPlaylistSheet extends StatefulWidget {
-  final String uri;
-  const AddtoPlaylistSheet(this.uri, {super.key});
+  final String id;
+  const AddtoPlaylistSheet(this.id, {super.key});
 
   @override
   State<AddtoPlaylistSheet> createState() => _AddtoPlaylistSheetState();
@@ -16,7 +16,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
   @override
   void initState() {
     final bloc = context.read<AddtoPlaylistBloc>();
-    bloc.add(PlaylistInitial(widget.uri));
+    bloc.add(PlaylistInitial(widget.id));
     super.initState();
   }
 
@@ -56,7 +56,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
             final playlists = state.items.where((e) {
-              final myPlaylists = e.artist?.artistId == _box.uid!;
+              final myPlaylists = e.artist?.id == _box.uid!;
               return e.type.isPlaylist && myPlaylists;
             }).toList();
             return Column(
@@ -90,13 +90,13 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                               children: [
                                 Expanded(
                                     child: InkWell(
-                                  onTap: () => bloc.onItemAdded(item.id!),
+                                  onTap: () => bloc.onItemAdded(item.id),
                                   borderRadius: BorderRadius.circular(
                                       Dimens.circularBoder),
                                   child: LayoutBuilder(
                                     builder: (context, constraints) {
                                       return MyCachedImage(
-                                        item.image,
+                                        item.thumbnail?.url,
                                         height: constraints.maxHeight,
                                         width: constraints.maxHeight,
                                         border: Dimens.circularBoder,
@@ -106,7 +106,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                                 )),
                                 const SizedBox(height: Dimens.sizeSmall),
                                 Text(
-                                  item.name ?? '',
+                                  item.title,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.center,

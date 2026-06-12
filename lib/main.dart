@@ -109,22 +109,29 @@ class MyApp extends StatelessWidget {
 
   Widget _builder(BuildContext context, Widget? child) {
     ResponsiveFont.init(context);
-    return ResponsiveWrapper.builder(
-      MultiBlocProvider(providers: [
-        BlocProvider(create: (_) => RootBloc()),
-        BlocProvider(create: (_) => PlayerBloc()),
-        BlocProvider(create: (_) => PlayerSliderBloc()),
-        BlocProvider(create: (_) => HomeBloc()),
-        BlocProvider(create: (_) => SearchBloc()),
-        BlocProvider(create: (_) => LibraryBloc()),
-        BlocProvider(create: (_) => LikedSongsBloc()),
-      ], child: child ?? const SizedBox.shrink()),
-      breakpoints: [
-        const ResponsiveBreakpoint.resize(450, name: MOBILE),
-        const ResponsiveBreakpoint.autoScale(600, name: TABLET),
-        const ResponsiveBreakpoint.resize(800, name: DESKTOP),
-        const ResponsiveBreakpoint.autoScale(1700, name: '4K'),
-      ],
+    final query = MediaQuery.of(context);
+    return MediaQuery(
+      data: query.copyWith(
+          textScaler: Platform.isWindows || Platform.isMacOS
+              ? TextScaler.linear(0.85)
+              : null),
+      child: ResponsiveWrapper.builder(
+        MultiBlocProvider(providers: [
+          BlocProvider(create: (_) => RootBloc()),
+          BlocProvider(create: (_) => PlayerBloc()),
+          BlocProvider(create: (_) => PlayerSliderBloc()),
+          BlocProvider(create: (_) => HomeBloc()),
+          BlocProvider(create: (_) => SearchBloc()),
+          BlocProvider(create: (_) => LibraryBloc()),
+          BlocProvider(create: (_) => LikedSongsBloc()),
+        ], child: child ?? const SizedBox.shrink()),
+        breakpoints: [
+          const ResponsiveBreakpoint.resize(450, name: MOBILE),
+          const ResponsiveBreakpoint.autoScale(600, name: TABLET),
+          const ResponsiveBreakpoint.resize(800, name: DESKTOP),
+          const ResponsiveBreakpoint.autoScale(1700, name: '4K'),
+        ],
+      ),
     );
     // return ResponsiveBreakpoints.builder(
     //   breakpoints: [

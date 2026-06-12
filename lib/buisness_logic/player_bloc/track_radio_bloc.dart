@@ -18,11 +18,6 @@ class TrackRadioInitial extends TrackRadioEvents {
   List<Object?> get props => [id, track, ...super.props];
 }
 
-class TrackRadioAdapter extends TrackRadioEvents {
-  final List<UpNextsDetails> tracks;
-  const TrackRadioAdapter({required this.tracks});
-}
-
 class RadioTitleFade extends TrackRadioEvents {
   final double opacity;
   const RadioTitleFade(this.opacity);
@@ -82,10 +77,9 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
   TrackRadioBloc() : super(const TrackRadioState.init()) {
     on<TrackRadioInitial>(_onInit);
     on<RadioTitleFade>(_titleFade);
-    on<TrackRadioAdapter>(_radioAdapter);
   }
 
-  final MusicRepo _musicRepo = getIt();
+  final YTMusic _ytMusic = getIt();
   final scrollController = ScrollController();
 
   void onPlay(BuildContext context) {
@@ -108,37 +102,16 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
     emit(state.copyWith(id: id, loading: true));
     try {
       if (event.track == null) throw Exception('track is null');
-      emit(state.copyWith(title: event.track!.name));
-      final _list = await _musicRepo.getRecomendations(event.track!);
-      add(TrackRadioAdapter(tracks: _list ?? []));
-    } catch (e) {
-      emit(state.copyWith(loading: false, error: true));
-      logPrint(e, 'radio-init');
-    }
-  }
-
-  void _radioAdapter(
-      TrackRadioAdapter event, Emitter<TrackRadioState> emit) async {
-    try {
-      final List<Track> tracks = [];
-      if (event.tracks.isEmpty) throw FormatException();
-      // TODO: implement search recomendations
-
-      // for (final item in event.tracks) {
-      // final duration = Duration(seconds: item.duration);
-      // final details = SongYtDetails(item.videoId, duration: duration);
-      // final query = '${item.title} ${item.artists.name}'.toLowerCase();
-      // await _searchRepo.searchTrack(query, onSuccess: (json) {
-      // final search = SearchModel.fromJson(json);
-      // final _item = search.tracks?.items?.verify(item);
-      // if (_item != null) tracks.add(_item.copyWith(details));
-      // });
-      // }
+      emit(state.copyWith(title: event.track!.title));
+      final _list = await _ytMusic.getUpNexts(event.track!.id);
+      if (_list.isEmpty) throw FormatException();
+      final tracks = _list.map((e) => Track.fromUpNext(e)).toList();
       emit(state.copyWith(tracks: tracks));
     } on FormatException {
       emit(state.copyWith(tracks: []));
     } catch (e) {
-      logPrint(e, 'radio-adapter');
+      emit(state.copyWith(loading: false, error: true));
+      logPrint(e, 'radio-init');
     } finally {
       emit(state.copyWith(loading: false));
     }
@@ -146,18 +119,5 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
 
   void _titleFade(RadioTitleFade event, Emitter<TrackRadioState> emit) {
     emit(state.copyWith(titileOpacity: event.opacity));
-  }
-}
-
-extension _VerifyTrack on List<Track> {
-  Track? verify(UpNextsDetails details) {
-    return firstWhereOrNull((e) {
-      final _name = e.name?.queryMatch(details.title);
-      final _artist = e.artists?.any((e) {
-        final match = e.name?.queryMatch(details.artists.name);
-        return (match ?? 0) > 400;
-      });
-      return (_name ?? 0) > 400 && (_artist ?? false);
-    });
   }
 }

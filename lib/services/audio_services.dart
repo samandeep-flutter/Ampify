@@ -210,8 +210,8 @@ class MyAudioHandler extends BaseAudioHandler {
         final item = queue.value[_index];
         final loopOff = _player.loopMode == LoopMode.off;
         if (_trackEnded == item.id && loopOff) return;
-        dprint('${duration.format()}, queue: ${queue.value.length},'
-            ' index: $_index, ${item.title}: ${item.duration!.floor()}');
+        // dprint('${duration.format()}, queue: ${queue.value.length},'
+        //     ' index: $_index, ${item.title}: ${item.duration!.floor()}');
 
         /// current track ended
         if (duration >= item.duration!.floor()) {

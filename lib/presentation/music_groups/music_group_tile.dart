@@ -1,4 +1,8 @@
+import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/utils/exports.dart';
+
+import '../../buisness_logic/player_bloc/player_slider_bloc.dart';
 
 class MusicGroupTile extends StatelessWidget {
   final LibraryModel item;
@@ -7,19 +11,9 @@ class MusicGroupTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isLikedSongs = item.id == UniqueIds.likedSongs;
     final scheme = context.scheme;
-
     return InkWell(
-      onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
-        if (isLikedSongs) {
-          context.pushNamed<bool>(AppRoutes.likedSongs);
-        } else {
-          context.pushNamed<bool>(AppRoutes.musicGroup,
-              pathParameters: {'id': item.id, 'type': item.type.id});
-        }
-      },
+      onTap: () => _onTap(context),
       child: Padding(
         padding: const EdgeInsets.symmetric(
             horizontal: Dimens.sizeDefault, vertical: Dimens.sizeSmall - 2),
@@ -33,7 +27,8 @@ class MusicGroupTile extends StatelessWidget {
 
               return SizedBox.square(
                 dimension: dimen,
-                child: MyCachedImage(item.image, border: Dimens.sizeMini),
+                child: MyCachedImage(item.thumbnail?.url,
+                    border: Dimens.sizeMini, isAvatar: item.type.isArtist),
               );
             }),
             const SizedBox(width: Dimens.sizeDefault),
@@ -42,7 +37,7 @@ class MusicGroupTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item.name,
+                    item.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -57,7 +52,7 @@ class MusicGroupTile extends StatelessWidget {
                         color: scheme.textColorLight,
                         fontSize: Dimens.fontDefault),
                     type: item.type.name.capitalize,
-                    subtitle: item.artist?.name ?? '',
+                    subtitle: item.artist?.name,
                   )
                 ],
               ),
@@ -67,5 +62,31 @@ class MusicGroupTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool get isLikedSongs => item.id == UniqueIds.likedSongs;
+
+  void _onTap(BuildContext context) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    switch (item.type) {
+      // case LibItemType.artist:
+
+      case LibItemType.video:
+      case LibItemType.track:
+        final player = context.read<PlayerBloc>();
+        final slider = context.read<PlayerSliderBloc>();
+        player.add(PlayerTrackChanged(Track.fromJson(item.toJson())));
+        slider.add(PlayerSliderReset());
+        break;
+
+      case LibItemType.playlist:
+      case LibItemType.album:
+        context.pushNamed(
+            isLikedSongs ? AppRoutes.likedSongs : AppRoutes.musicGroup,
+            pathParameters: {'id': item.id, 'type': item.type.id});
+        break;
+      default:
+        break;
+    }
   }
 }

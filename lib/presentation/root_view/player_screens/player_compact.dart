@@ -19,8 +19,9 @@ class PlayerCompact extends StatelessWidget {
         return track || pr.playerState != cr.playerState;
       },
       builder: (context, state) {
-        final _bg =
-            context.isDarkMode ? state.track.darkBgColor : state.track.bgColor;
+        final _bg = context.isDarkMode
+            ? state.details.darkBgColor
+            : state.details.bgColor;
         final bgColor = _bg?.withAlpha(150) ?? scheme.background;
 
         return AnimatedContainer(
@@ -78,7 +79,7 @@ class PlayerCompact extends StatelessWidget {
                                 ),
                               ]),
                               child: MyCachedImage(
-                                state.track.image,
+                                state.track?.thumbnail?.url,
                                 border: Dimens.sizeMini,
                                 width: Dimens.iconUltraLarge,
                               ),
@@ -90,7 +91,7 @@ class PlayerCompact extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  state.track.title ?? '',
+                                  state.track?.title ?? '',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
@@ -98,7 +99,7 @@ class PlayerCompact extends StatelessWidget {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  state.track.subtitle ?? '',
+                                  state.track?.artist.name ?? '',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
@@ -139,7 +140,7 @@ class PlayerCompact extends StatelessWidget {
                               BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                                   builder: (context, slider) {
                             final factor = slider.current
-                                .widthFactor(state.track.duration);
+                                .widthFactor(state.track?.duration);
                             return Stack(
                               children: [
                                 AnimatedContainer(

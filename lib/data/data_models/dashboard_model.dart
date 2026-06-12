@@ -1,16 +1,15 @@
 import 'package:ampify/data/utils/exports.dart';
 
-class MyHomeSection {
+class MyHomeSection extends Equatable {
   final String title;
   final LibItemType type;
   final List<MyHomeDetailed> contents;
 
-  MyHomeSection(
+  const MyHomeSection(
       {required this.title, required this.type, required this.contents});
 
   factory MyHomeSection.fromYT(HomeSection section) {
     final first = section.contents.firstOrNull;
-
     return MyHomeSection(
       title: section.title,
       type: first is PlaylistDetailed
@@ -22,21 +21,24 @@ class MyHomeSection {
           section.contents.map((e) => MyHomeDetailed.fromYT(e))),
     );
   }
+
+  @override
+  List<Object?> get props => [title, type, contents];
 }
 
-class MyHomeDetailed {
+class MyHomeDetailed extends Equatable {
   final String id;
   final String title;
   final ArtistBasic artist;
   final LibItemType type;
-  final List<ThumbnailFull> thumbnails;
+  final Thumbnail? thumbnail;
 
-  MyHomeDetailed({
+  const MyHomeDetailed({
     required this.id,
     required this.title,
     required this.artist,
     required this.type,
-    required this.thumbnails,
+    required this.thumbnail,
   });
 
   factory MyHomeDetailed.fromYT(dynamic item) {
@@ -46,45 +48,18 @@ class MyHomeDetailed {
       title: pl ? _pl(item).name : _al(item).name,
       artist: pl ? _pl(item).artist : _al(item).artist,
       type: pl ? LibItemType.playlist : LibItemType.album,
-      thumbnails: pl ? _pl(item).thumbnails : _al(item).thumbnails,
+      thumbnail: _thumb(item, pl)?.toThumbnail(),
     );
   }
-  static PlaylistDetailed _pl(dynamic playlist) {
-    return playlist as PlaylistDetailed;
+
+  static ThumbnailFull? _thumb(dynamic item, bool pl) {
+    if (pl) return _pl(item).thumbnails.firstOrNull;
+    return _al(item).thumbnails.firstOrNull;
   }
 
-  static AlbumDetailed _al(dynamic playlist) {
-    return playlist as AlbumDetailed;
-  }
-}
+  static PlaylistDetailed _pl(dynamic playlist) => playlist as PlaylistDetailed;
+  static AlbumDetailed _al(dynamic playlist) => playlist as AlbumDetailed;
 
-class SongDetails {
-  final Uri uri;
-  final Duration duration;
-
-  SongDetails(this.uri, {required this.duration});
-}
-
-class SongYtDetails {
-  final String videoId;
-  final Duration duration;
-
-  SongYtDetails(this.videoId, {required this.duration});
-
-  factory SongYtDetails.fromJson(Map<String, dynamic> json) {
-    return SongYtDetails(json['videoId'],
-        duration: Duration(seconds: json['duration'] ?? 0));
-  }
-
-  Map<String, dynamic> toJson() =>
-      {'videoId': videoId, 'duration': duration.inSeconds};
-}
-
-class QuerySong {
-  final String title;
-  final Iterable<String> artists;
-
-  QuerySong(this.title, this.artists);
-
-  String get text => '$title ${artists.first}';
+  @override
+  List<Object?> get props => [id, title, artist, type, thumbnail];
 }

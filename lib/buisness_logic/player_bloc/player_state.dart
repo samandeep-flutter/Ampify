@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'package:ampify/data/data_models/common/tracks_model.dart';
-import 'package:equatable/equatable.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PlayerState extends Equatable {
   final String? musicGroupId;
-  final TrackDetails track;
+  final TrackDetails details;
   final bool shuffle;
   final bool isLiked;
   final MusicLoopMode loopMode;
@@ -14,9 +12,11 @@ class PlayerState extends Equatable {
   final List<TrackDetails> queue;
   final List<Track> upNext;
 
+  Track? get track => details.track;
+
   const PlayerState({
     required this.musicGroupId,
-    required this.track,
+    required this.details,
     required this.isLiked,
     required this.shuffle,
     required this.loopMode,
@@ -26,7 +26,7 @@ class PlayerState extends Equatable {
   });
 
   const PlayerState.init()
-      : track = const TrackDetails.init(),
+      : details = const TrackDetails.init(),
         musicGroupId = null,
         shuffle = false,
         isLiked = false,
@@ -37,7 +37,7 @@ class PlayerState extends Equatable {
 
   PlayerState copyWith({
     String? musicGroupId,
-    TrackDetails? track,
+    TrackDetails? details,
     bool? isLiked,
     bool? shuffle,
     List<TrackDetails>? queue,
@@ -47,7 +47,7 @@ class PlayerState extends Equatable {
   }) {
     return PlayerState(
       musicGroupId: musicGroupId ?? this.musicGroupId,
-      track: track ?? this.track,
+      details: details ?? this.details,
       isLiked: isLiked ?? this.isLiked,
       queue: queue ?? this.queue,
       upNext: upNext ?? this.upNext,
@@ -57,9 +57,9 @@ class PlayerState extends Equatable {
     );
   }
 
-  PlayerState withTrack(TrackDetails track) {
+  PlayerState withTrack(TrackDetails details) {
     return copyWith(
-        musicGroupId: '', track: track, playerState: MusicState.loading);
+        musicGroupId: '', details: details, playerState: MusicState.loading);
   }
 
   PlayerState withMusicGroup(String id,
@@ -68,7 +68,7 @@ class PlayerState extends Equatable {
       musicGroupId: id,
       isLiked: isLiked,
       playerState: MusicState.loading,
-      track: tracks.first.asTrackDetails,
+      details: TrackDetails.track(tracks.first),
       upNext: tracks.skip(1).toList(),
       queue: [],
     );
@@ -80,7 +80,7 @@ class PlayerState extends Equatable {
   @override
   List<Object?> get props => [
         musicGroupId,
-        track,
+        details,
         shuffle,
         loopMode,
         isLiked,
@@ -93,7 +93,7 @@ class PlayerState extends Equatable {
   String toString() {
     final items = {
       'musicGroupId': musicGroupId,
-      'track': '${track.title} [${track.videoId}]',
+      'track': '${track?.title} [${track?.videoId}]',
       'shuffle': shuffle,
       'loopMode': loopMode.name,
       'liked': isLiked,
@@ -123,8 +123,8 @@ extension HelperState on Change<PlayerState> {
   String _changes(PlayerState pr, PlayerState cr) {
     final items = {
       if (pr.musicGroupId != cr.musicGroupId) 'musicGroupId': cr.musicGroupId,
-      if (pr.track != cr.track)
-        'track': '${cr.track.title} [${cr.track.videoId}]',
+      if (pr.details != cr.details)
+        'track': '${cr.track?.title} [${cr.track?.videoId}]',
       if (pr.shuffle != cr.shuffle) 'shuffle': cr.shuffle,
       if (pr.loopMode != cr.loopMode) 'loopMode': cr.loopMode.name,
       if (pr.isLiked != cr.isLiked) 'liked': cr.isLiked,

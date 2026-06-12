@@ -27,7 +27,7 @@ class TrackBottomSheet extends StatelessWidget {
             final _scalar = MediaQuery.textScalerOf(context);
             final height = _scalar.scale(_height);
             final width = _scalar.scale(_height + Dimens.sizeMedSmall);
-            return MyCachedImage(track.album?.image,
+            return MyCachedImage(track.album?.thumbnail?.url,
                 border: Dimens.sizeMini, height: height, width: width);
           }),
           const SizedBox(width: Dimens.sizeDefault),
@@ -37,7 +37,7 @@ class TrackBottomSheet extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  track.name ?? '',
+                  track.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -46,7 +46,7 @@ class TrackBottomSheet extends StatelessWidget {
                       fontSize: Dimens.fontXXXLarge),
                 ),
                 const SizedBox(height: Dimens.sizeExtraSmall),
-                Text(track.artists?.asString ?? '',
+                Text(track.artist.name,
                     style: TextStyle(
                       color: scheme.textColorLight,
                       fontSize: Dimens.fontXXXLarge - 1,
@@ -92,7 +92,7 @@ class TrackBottomSheet extends StatelessWidget {
               icon: Icons.radio_outlined),
           BottomSheetListTile(
             onTap: () {
-              bloc.onTrackShare(track.id!);
+              bloc.onTrackShare(track.id);
               Navigator.pop(context);
             },
             enable: false,
@@ -108,22 +108,22 @@ class TrackBottomSheet extends StatelessWidget {
     context.close(fromPlayer ?? false ? 2 : 1);
     final type = LibItemType.album.id;
     context.pushNamed(AppRoutes.musicGroup,
-        pathParameters: {'id': track.album!.id!, 'type': type});
+        pathParameters: {'id': track.album!.id, 'type': type});
   }
 
   void _toRadio(BuildContext context) {
     context.close(fromPlayer ?? false ? 2 : 1);
     context.pushNamed(AppRoutes.songRadio,
-        pathParameters: {'id': track.id!}, extra: jsonEncode(track.toJson()));
+        pathParameters: {'id': track.id}, extra: jsonEncode(track.toJson()));
   }
 
   void _onTrackLiked(BuildContext context) {
     final _player = context.read<PlayerBloc>();
-    _player.onTrackLiked(track.id!, liked);
+    _player.onTrackLiked(track.id, liked);
     if (liked ?? false) {
       try {
         final bloc = context.read<LikedSongsBloc>();
-        bloc.songRemoved(track.id!);
+        bloc.songRemoved(track.id);
       } catch (_) {}
     }
     Navigator.pop(context);
@@ -139,7 +139,7 @@ class TrackBottomSheet extends StatelessWidget {
       builder: (_) {
         return BlocProvider(
             create: (_) => AddtoPlaylistBloc(),
-            child: AddtoPlaylistSheet(track.uri!));
+            child: AddtoPlaylistSheet(track.id));
       },
     );
   }

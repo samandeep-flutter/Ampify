@@ -1,4 +1,6 @@
-class DeviceInfoModel {
+import 'package:equatable/equatable.dart';
+
+class DeviceInfoModel extends Equatable {
   final String? deviceId;
   final String? deviceType;
   final String? fcmToken;
@@ -12,7 +14,7 @@ class DeviceInfoModel {
   final String? packageName;
   final String? buildNumber;
 
-  DeviceInfoModel({
+  const DeviceInfoModel({
     required this.deviceId,
     required this.deviceType,
     required this.fcmToken,
@@ -83,4 +85,20 @@ class DeviceInfoModel {
         'appVersion': appVersion,
         'buildNumber': buildNumber,
       };
+
+  @override
+  List<Object?> get props => [
+        deviceId,
+        deviceType,
+        fcmToken,
+        appVersion,
+        appType,
+        deviceModel,
+        deviceName,
+        osVersion,
+        manufacturer,
+        lastUpdated,
+        packageName,
+        buildNumber,
+      ];
 }

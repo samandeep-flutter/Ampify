@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
@@ -76,10 +75,9 @@ class MusicGroupTitleFade extends MusicGroupEvent {
 class MusicGroupState extends Equatable {
   final String? id;
   final double titileOpacity;
-  final String? image;
+  final Thumbnail? thumbnail;
   final Color? bgColor;
   final String? title;
-  final MusicGroupDetails? details;
   final List<Track> tracks;
   final LibItemType? type;
   final bool? isFav;
@@ -87,11 +85,10 @@ class MusicGroupState extends Equatable {
 
   const MusicGroupState({
     required this.id,
-    required this.image,
+    required this.thumbnail,
     required this.bgColor,
     required this.title,
     required this.type,
-    required this.details,
     required this.titileOpacity,
     required this.isFav,
     required this.tracks,
@@ -100,22 +97,20 @@ class MusicGroupState extends Equatable {
 
   const MusicGroupState.init()
       : id = null,
-        image = null,
+        thumbnail = null,
         titileOpacity = 0,
         type = null,
         bgColor = null,
         title = null,
-        details = null,
         isFav = false,
         loading = false,
         tracks = const [];
 
   MusicGroupState copyWith({
     String? id,
-    String? image,
+    Thumbnail? thumbnail,
     Color? bgColor,
     String? title,
-    MusicGroupDetails? details,
     List<Track>? tracks,
     LibItemType? type,
     bool? isFav,
@@ -124,11 +119,11 @@ class MusicGroupState extends Equatable {
   }) {
     return MusicGroupState(
       id: id ?? this.id,
-      image: image ?? this.image,
+      thumbnail: thumbnail ?? this.thumbnail,
       bgColor: bgColor ?? this.bgColor,
       title: title ?? this.title,
       isFav: isFav,
-      details: details,
+      // details: details,
       titileOpacity: titileOpacity ?? this.titileOpacity,
       type: type ?? this.type,
       tracks: tracks ?? this.tracks,
@@ -137,17 +132,8 @@ class MusicGroupState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-        image,
-        bgColor,
-        title,
-        tracks,
-        type,
-        loading,
-        details,
-        titileOpacity,
-        isFav
-      ];
+  List<Object?> get props =>
+      [thumbnail, bgColor, title, tracks, type, loading, titileOpacity, isFav];
 }
 
 class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
@@ -160,7 +146,8 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     on<PlaylistVisibility>(_onVisibility);
     on<PlaylistCoverChanged>(_onCoverChanged);
   }
-  final MusicGroupRepo _repo = getIt();
+
+  final YTMusic _ytMusic = getIt();
   final scrollController = ScrollController();
   bool libRefresh = false;
 
@@ -202,10 +189,6 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     }
   }
 
-  void onFav(String id, {required LibItemType type, required bool liked}) {
-    add(MusicGroupFav(id, type: type, liked: liked));
-  }
-
   Future<void> _onInit(
       MusicGroupInitial event, Emitter<MusicGroupState> emit) async {
     emit(state.copyWith(id: event.id, loading: true, titileOpacity: 0));
@@ -221,139 +204,113 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
   Future<void> _onPlaylist(
       PlaylistInitial event, Emitter<MusicGroupState> emit) async {
-    final completer = Completer<bool>();
-    _repo.playlistDetails(event.id, onSuccess: (json) async {
-      final playlist = Playlist.fromJson(json);
+    try {
+      final _playlist = Completer<PlaylistFull>();
+      _ytMusic.getPlaylist(event.id).then((playlist) {
+        _playlist.complete(playlist);
+      }, onError: (e) => _playlist.completeError(e));
+      final list = await _ytMusic.getPlaylistVideos(event.id);
+      final tracks = List<Track>.from(list.map((e) => Track.fromVid(e)));
 
-      final List<Track> tracks = [];
-      for (PLitemDetails item in playlist.tracks ?? []) {
-        if (item.track != null && item.track!.name!.isNotEmpty) {
-          tracks.add(item.track!);
-        }
-      }
-      final color = await Utils.getImageColor(playlist.image);
-      final isFav = await _repo.isFavPlaylist(event.id);
-      final release = playlist.tracks?.firstOrNull?.addedAt;
-      final details = MusicGroupDetails(
-          owner: playlist.owner,
-          public: playlist.public,
-          description: playlist.description,
-          releaseDate: DateTime.tryParse(release ?? ''));
-      completer.complete(true);
+      final _pl = await _playlist.future;
+      final playlist = Playlist.fromYT(_pl);
+      final color = await Utils.getImageColor(playlist.thumbnail);
+      // TODO: implement fav item check
+      // final isFav = await _repo.isFavPlaylist(event.id);
       emit(state.copyWith(
-        image: playlist.image,
+        thumbnail: playlist.thumbnail,
         tracks: tracks,
         type: LibItemType.playlist,
         bgColor: color,
-        isFav: isFav,
-        title: playlist.name,
-        details: details,
+        // isFav: isFav,
+        title: playlist.title,
         loading: false,
       ));
-    });
-    await completer.future;
+    } catch (e) {
+      logPrint(e, 'playlist-init');
+      emit(state.copyWith(loading: false));
+    }
   }
 
   Future<void> _onAlbum(
       AlbumInitial event, Emitter<MusicGroupState> emit) async {
-    final completer = Completer<bool>();
+    try {
+      final list = await _ytMusic.getAlbum(event.id);
+      final album = Album.fromYtFull(list);
 
-    _repo.albumDetails(event.id, onSuccess: (json) async {
-      final album = Album.fromJson(json);
-      final color = await Utils.getImageColor(album.image);
-      final isFav = await _repo.isFavAlbum(event.id);
-      final details = MusicGroupDetails(
-        copyrights: album.copyrights,
-        releaseDate: DateTime.tryParse(album.releaseDate ?? ''),
-        owner: OwnerModel(
-            name: album.artists?.firstOrNull?.name,
-            id: album.artists?.firstOrNull?.id),
-      );
-      completer.complete(true);
-
+      final color = await Utils.getImageColor(album.thumbnail);
+      // TODO: implement fav item check
+      //   final isFav = await _repo.isFavAlbum(event.id);
       emit(state.copyWith(
         loading: false,
         bgColor: color,
-        title: album.name,
+        title: album.title,
         tracks: album.tracks,
-        isFav: isFav,
-        image: album.image,
+        // isFav: isFav,
+        thumbnail: album.thumbnail,
         type: event.type,
-        details: details,
       ));
-    });
-    await completer.future;
+    } catch (e) {
+      logPrint(e, 'album-init');
+      emit(state.copyWith(loading: false));
+    }
   }
 
   Future<void> _onFav(
       MusicGroupFav event, Emitter<MusicGroupState> emit) async {
-    libRefresh = true;
-    try {
-      emit(state.copyWith(isFav: !event.liked));
-      if (event.liked) {
-        final success = event.type.isPlaylist
-            ? await _repo.removeSavedPlaylist(event.id)
-            : await _repo.removeSavedAlbum(event.id);
-        if (!success) throw const FormatException();
-      } else {
-        final success = event.type.isPlaylist
-            ? await _repo.savePlaylist(event.id)
-            : await _repo.saveAlbum(event.id);
-        if (!success) throw const FormatException();
-      }
-    } on FormatException {
-      emit(state.copyWith(isFav: event.liked));
-    } catch (e) {
-      logPrint(e, 'fav');
-    }
+    // TODO: implement add to fav songs
+
+    // libRefresh = true;
+    // try {
+    //   emit(state.copyWith(isFav: !event.liked));
+    //   if (event.liked) {
+    //     final success = event.type.isPlaylist
+    //         ? await _repo.removeSavedPlaylist(event.id)
+    //         : await _repo.removeSavedAlbum(event.id);
+    //     if (!success) throw const FormatException();
+    //   } else {
+    //     final success = event.type.isPlaylist
+    //         ? await _repo.savePlaylist(event.id)
+    //         : await _repo.saveAlbum(event.id);
+    //     if (!success) throw const FormatException();
+    //   }
+    // } on FormatException {
+    //   emit(state.copyWith(isFav: event.liked));
+    // } catch (e) {
+    //   logPrint(e, 'fav');
+    // }
   }
 
   Future<void> _onCoverChanged(
       PlaylistCoverChanged event, Emitter<MusicGroupState> emit) async {
-    showToast(StringRes.uploading);
-    emit(state.copyWith(image: ''));
-    final image = await event.file.readAsBytes();
-    await _repo.changeCoverImage(id: state.id!, image: base64Encode(image));
-    add(PlaylistInitial(state.id!));
+    // TODO: implement change cover image
+
+    // showToast(StringRes.uploading);
+    // emit(state.copyWith(image: ''));
+    // final image = await event.file.readAsBytes();
+    // await _repo.changeCoverImage(id: state.id!, image: base64Encode(image));
+    // add(PlaylistInitial(state.id!));
   }
 
   Future<void> _onVisibility(
       PlaylistVisibility event, Emitter<MusicGroupState> emit) async {
-    await _repo.editPlaylist(
-      id: state.id!,
-      title: state.title!,
-      desc: state.details?.description ?? '',
-      public: event.public,
-    );
-    add(PlaylistInitial(state.id!));
-    if (event.public) {
-      showToast(StringRes.nowPublic);
-      return;
-    }
-    showToast(StringRes.nowPrivate);
+    // TODO: implement change visibility
+
+    // await _repo.editPlaylist(
+    //   id: state.id!,
+    //   title: state.title!,
+    //   desc: state.details?.description ?? '',
+    //   public: event.public,
+    // );
+    // add(PlaylistInitial(state.id!));
+    // if (event.public) {
+    //   showToast(StringRes.nowPublic);
+    //   return;
+    // }
+    // showToast(StringRes.nowPrivate);
   }
 
   void _titleFade(MusicGroupTitleFade event, Emitter<MusicGroupState> emit) {
     emit(state.copyWith(titileOpacity: event.opacity));
   }
-}
-
-class MusicGroupDetails extends Equatable {
-  final OwnerModel? owner;
-  final bool? public;
-  final String? description;
-  final DateTime? releaseDate;
-  final List<Copyrights>? copyrights;
-
-  const MusicGroupDetails({
-    this.owner,
-    this.description,
-    this.copyrights,
-    this.releaseDate,
-    this.public,
-  });
-
-  @override
-  List<Object?> get props =>
-      [owner, public, description, copyrights, releaseDate];
 }

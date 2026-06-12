@@ -130,7 +130,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   void _onSorted(LibrarySorted event, Emitter<LibraryState> emit) {
     switch (event.order) {
       case SortOrder.alphabetical:
-        final items = state.items..sort((a, b) => a.name.compareTo(b.name));
+        final items = state.items..sort((a, b) => a.title.compareTo(b.title));
         emit(state.copyWith(items: items, sortby: event.order));
         break;
       case SortOrder.artist:

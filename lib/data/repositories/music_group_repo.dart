@@ -102,7 +102,7 @@ class MusicGroupRepo {
     ErrorCallback? onError,
   }) async {
     final uris = trackUri.map((e) => e.replaceAll(':', '%3A')).toList();
-    final url = AppConstants.addtoPlaylist(id, uris: uris.asString);
+    final url = AppConstants.addtoPlaylist(id, uris: uris.join(', '));
     final body = {'uris': trackUri, 'position': 0};
 
     final response = await dio.post(url, data: body);

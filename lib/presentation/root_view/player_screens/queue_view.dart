@@ -70,7 +70,7 @@ class QueueView extends StatelessWidget {
                       BlocBuilder<PlayerBloc, PlayerState>(
                         buildWhen: (pr, cr) => pr.track != cr.track,
                         builder: (_, state) => TrackDetailsTile.playing(
-                          state.track,
+                          state.details,
                           trailing: BlocBuilder<PlayerBloc, PlayerState>(
                               buildWhen: (pr, cr) {
                             return pr.playerState != cr.playerState;
@@ -115,7 +115,7 @@ class QueueView extends StatelessWidget {
                           itemBuilder: (context, index) {
                             return TrackDetailsTile(
                               state.queue[index],
-                              key: ValueKey(state.queue[index].id),
+                              key: ValueKey(state.queue[index].track!.id),
                               trailing: Icon(Icons.menu_outlined, color: color),
                             );
                           },
@@ -194,7 +194,7 @@ class _BottomPlayerState extends State<BottomPlayer> {
                         child: BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                             builder: (context, slider) {
                           final factor =
-                              slider.current.widthFactor(state.track.duration);
+                              slider.current.widthFactor(state.track?.duration);
                           return Stack(
                             children: [
                               AnimatedContainer(

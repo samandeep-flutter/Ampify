@@ -1,3 +1,4 @@
+import 'package:ampify/services/extension_services.dart';
 import 'package:equatable/equatable.dart';
 
 class UserModel extends Equatable {
@@ -69,4 +70,43 @@ class UserModel extends Equatable {
   @override
   List<Object?> get props =>
       [id, displayName, image, email, login, deviceToken];
+}
+
+enum LogType { error, info, network }
+
+class LogModel extends Equatable {
+  final String? title;
+  final String? content;
+  final String? extra;
+  final String? time;
+  final LogType? type;
+
+  const LogModel({
+    required this.title,
+    required this.content,
+    required this.extra,
+    required this.time,
+    required this.type,
+  });
+
+  factory LogModel.fromJson(Map<String, dynamic> json) {
+    return LogModel(
+      title: json['title'],
+      content: json['content'],
+      extra: json['extra'],
+      time: json['time'],
+      type: LogType.values.firstWhereOrNull((e) => e.name == json['type']),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'content': content,
+        'extra': extra,
+        'time': time,
+        'type': type?.name
+      };
+
+  @override
+  List<Object?> get props => [title, content, extra, time, type];
 }

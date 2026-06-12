@@ -9,7 +9,7 @@ import 'package:palette_generator/palette_generator.dart';
 import 'package:rxdart/rxdart.dart';
 
 sealed class Utils {
-  static final MusicRepo _repo = getIt();
+  // static final MusicRepo _repo = getIt();
   static final _random = Random();
 
   static TextStyle defTitleStyle([Color? color]) {
@@ -128,40 +128,40 @@ sealed class Utils {
   // }
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
-    final _details = Completer<SongYtDetails?>();
-    if (track.ytDetails != null) {
-      _details.complete(track.ytDetails);
-    } else {
-      _repo.getDetailsFromQuery(track).then((details) {
-        _details.complete(details);
-      });
-    }
+    // final completer = Completer<Duration?>();
     PaletteGenerator? palete;
     try {
+      // if (track.duration == null) {
+      //   _repo.getSongDuration(track.videoId).then((e) {
+      //     completer.complete(e);
+      //   });
+      // }
+      if (track.thumbnail?.url?.isEmpty ?? true) throw Exception();
+      // await ColorScheme.fromImageProvider(
+      //     provider: NetworkImage(track.album?.thumbnail?.url ?? ''));
       palete = await PaletteGenerator.fromImageProvider(
-          NetworkImage(track.album?.image ?? ''),
+          NetworkImage(track.thumbnail?.url ?? ''),
           size: const Size.square(200));
     } catch (_) {}
-    final details = await _details.future;
     final defColor = palete?.dominantColor?.color;
 
+    // Duration? duration;
+    // if (track.duration == null) {
+    //   duration = await completer.future;
+    // }
     return TrackDetails(
-      id: track.id,
-      albumId: track.album?.id,
-      title: track.name,
+      // track: track.copyWith(duration: duration),
+      track: track,
       bgColor: palete?.vibrantColor?.color ?? defColor,
       darkBgColor: palete?.darkVibrantColor?.color ?? defColor,
-      image: track.album?.image,
-      subtitle: track.artists?.map((e) => e.name).join(', '),
-      duration: details?.duration,
-      videoId: details?.videoId,
     );
   }
 
-  static Future<Color?> getImageColor(String? image) async {
+  static Future<Color?> getImageColor(Thumbnail? image) async {
     try {
+      if (image?.url?.isEmpty ?? true) throw Exception();
       final palete = await PaletteGenerator.fromImageProvider(
-          NetworkImage(image!),
+          NetworkImage(image!.url!),
           size: const Size(200, 200));
       return palete.vibrantColor?.color ?? palete.dominantColor?.color;
     } catch (_) {
@@ -171,22 +171,23 @@ sealed class Utils {
 
   static LibraryModel likedSongs({required int? count}) {
     return LibraryModel(
-        image: null,
+        thumbnail: null,
         id: UniqueIds.likedSongs,
         type: LibItemType.playlist,
-        name: StringRes.likedSongs,
-        artist: ArtistBasic(name: '$count songs'));
+        title: StringRes.likedSongs,
+        artist: MyArtistBasic(
+            id: UniqueIds.artistId, name: '$count songs', thumbnail: null));
   }
 
-  static MediaItem toMediaItem(TrackDetails track, {required Uri uri}) {
+  static MediaItem toMediaItem(TrackDetails details, {required Uri uri}) {
     return MediaItem(
-      id: track.id ?? '',
-      album: track.albumId ?? '',
-      duration: track.duration,
-      artist: track.subtitle ?? '',
-      artUri: Uri.tryParse(track.image ?? ''),
-      title: track.title ?? '',
-      extras: {'uri': uri.toString(), ...track.toJson()},
+      id: details.track!.id,
+      album: details.track?.album?.id ?? '',
+      duration: details.track?.duration,
+      artist: details.track?.artist.name,
+      artUri: Uri.tryParse(details.track?.thumbnail?.url ?? ''),
+      title: details.track!.title,
+      extras: {'uri': uri.toString(), ...details.toJson()},
     );
   }
 

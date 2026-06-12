@@ -64,6 +64,7 @@ sealed class EnvKeys {
 }
 
 sealed class UniqueIds {
+  static const String artistId = '00-artist';
   static const String likedSongs = '00-liked-songs';
   static const String emptyTrack = '00-empty-track';
   static String radioID(String track) => 'radio:$track';

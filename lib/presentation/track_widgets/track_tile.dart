@@ -74,7 +74,7 @@ class TrackTile extends StatelessWidget {
                   final dimen = Dimens.iconUltraLarge;
                   return SizedBox.square(
                       dimension: dimen,
-                      child: MyCachedImage(track.album?.image,
+                      child: MyCachedImage(track.thumbnail?.url,
                           border: Dimens.sizeMini));
                 },
               ),
@@ -87,14 +87,14 @@ class TrackTile extends StatelessWidget {
                   BlocBuilder<PlayerBloc, PlayerState>(
                     buildWhen: (pr, cr) {
                       final playing = pr.playerState != cr.playerState;
-                      final _track = pr.track.id != cr.track.id;
+                      final _track = pr.track?.id != cr.track?.id;
                       final isRelevant =
-                          cr.track.id == track.id || pr.track.id == track.id;
+                          cr.track?.id == track.id || pr.track?.id == track.id;
 
                       return (playing || _track) && isRelevant;
                     },
                     builder: (context, state) {
-                      final isActive = state.track.id == track.id;
+                      final isActive = state.track?.id == track.id;
 
                       return Row(
                         children: [
@@ -108,7 +108,8 @@ class TrackTile extends StatelessWidget {
                                 fit: BoxFit.cover,
                                 color: scheme.primary),
                           ),
-                          const SizedBox(width: Dimens.sizeExtraSmall),
+                          if (isActive)
+                            const SizedBox(width: Dimens.sizeExtraSmall),
                           Expanded(
                             child: TweenAnimationBuilder(
                                 tween: ColorTween(
@@ -118,7 +119,7 @@ class TrackTile extends StatelessWidget {
                                 duration: Durations.medium1,
                                 builder: (context, color, _) {
                                   return Text(
-                                    track.name ?? '',
+                                    track.title,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
@@ -131,45 +132,6 @@ class TrackTile extends StatelessWidget {
                           )
                         ],
                       );
-                      // return RichText(
-                      //   maxLines: 1,
-                      //   overflow: TextOverflow.ellipsis,
-                      //   text: TextSpan(
-                      //     children: [
-                      //       WidgetSpan(
-                      //           child: AnimatedContainer(
-                      //         duration: Durations.short4,
-                      //         width: isActive ? Dimens.iconMedSmall : 0,
-                      //         child: Image.asset(
-                      //             state.playerState.isPlaying
-                      //                 ? ImageRes.musicWave
-                      //                 : ImageRes.musicWavePaused,
-                      //             fit: BoxFit.cover,
-                      //             color: scheme.primary),
-                      //       )),
-                      //       const WidgetSpan(
-                      //           child: SizedBox(width: Dimens.sizeExtraSmall)),
-                      //       WidgetSpan(
-                      //           child: TweenAnimationBuilder(
-                      //               tween: ColorTween(
-                      //                   end: isActive
-                      //                       ? scheme.primary
-                      //                       : scheme.textColor),
-                      //               duration: Durations.medium1,
-                      //               builder: (context, color, _) {
-                      //                 return Text(
-                      //                   track.name ?? '',
-                      //                   maxLines: 1,
-                      //                   style: TextStyle(
-                      //                     color: color,
-                      //                     fontWeight: FontWeight.w500,
-                      //                     fontSize: Dimens.fontXXXLarge,
-                      //                   ),
-                      //                 );
-                      //               })),
-                      //     ],
-                      //   ),
-                      // );
                     },
                   ),
                   const SizedBox(height: Dimens.sizeMini),
@@ -178,8 +140,8 @@ class TrackTile extends StatelessWidget {
                       color: scheme.textColorLight,
                       fontSize: Dimens.fontDefault - 1,
                     ),
-                    type: _isSearch ? track.type?.capitalize : null,
-                    subtitle: track.artists!.asString,
+                    type: _isSearch ? track.type.capitalize : null,
+                    subtitle: track.artist.name,
                   ),
                 ],
               ),
@@ -206,13 +168,13 @@ class TrackTile extends StatelessWidget {
 }
 
 class TrackDetailsTile extends StatelessWidget {
-  final TrackDetails track;
+  final TrackDetails details;
   final Widget? title;
   final Widget? trailing;
   final bool isPlaying;
-  const TrackDetailsTile(this.track, {super.key, this.title, this.trailing})
+  const TrackDetailsTile(this.details, {super.key, this.title, this.trailing})
       : isPlaying = false;
-  const TrackDetailsTile.playing(this.track, {super.key, this.trailing})
+  const TrackDetailsTile.playing(this.details, {super.key, this.trailing})
       : title = null,
         isPlaying = true;
 
@@ -229,7 +191,8 @@ class TrackDetailsTile extends StatelessWidget {
               final dimen = Dimens.iconUltraLarge;
               return SizedBox.square(
                   dimension: dimen,
-                  child: MyCachedImage(track.image, border: Dimens.sizeMini));
+                  child: MyCachedImage(details.track?.thumbnail?.url,
+                      border: Dimens.sizeMini));
             },
           ),
           const SizedBox(width: Dimens.sizeDefault),
@@ -241,7 +204,7 @@ class TrackDetailsTile extends StatelessWidget {
                   if (!isPlaying) {
                     if (title != null) return title!;
                     return Text(
-                      track.title ?? '',
+                      details.track?.title ?? '',
                       style: TextStyle(
                         color: scheme.textColor,
                         fontWeight: FontWeight.w500,
@@ -278,11 +241,11 @@ class TrackDetailsTile extends StatelessWidget {
                             )),
                             const WidgetSpan(
                                 child: SizedBox(width: Dimens.sizeExtraSmall)),
-                            TextSpan(text: track.title ?? ''),
+                            TextSpan(text: details.track?.title ?? ''),
                           ]));
                 }),
                 Text(
-                  track.subtitle ?? '',
+                  details.track?.artist.name ?? '',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(

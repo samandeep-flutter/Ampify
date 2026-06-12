@@ -38,15 +38,12 @@ export '../../data/utils/string.dart';
 export '../../data/utils/utils.dart';
 
 // models
-export '../../data/data_models/common/album_model.dart';
-export '../../data/data_models/common/artist_model.dart';
-export '../../data/data_models/common/other_models.dart';
-export '../../data/data_models/common/playlist_model.dart';
-export '../../data/data_models/common/tracks_model.dart';
+export '../../data/data_models/common_models.dart';
 export '../../data/data_models/device_info_model.dart';
 export '../../data/data_models/library_model.dart';
+export '../../data/data_models/track_model.dart';
 export '../../data/data_models/user_model.dart';
-export '../../data/data_models/yt_models.dart';
+export '../data_models/dashboard_model.dart';
 
 // repos
 export '../../data/repositories/music_group_repo.dart';

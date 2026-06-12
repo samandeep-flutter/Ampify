@@ -158,7 +158,7 @@ class SliverSizedBox extends StatelessWidget {
 class SubtitleWidget extends StatelessWidget {
   final TextStyle? style;
   final String? type;
-  final String subtitle;
+  final String? subtitle;
   final bool expanded;
   const SubtitleWidget({
     super.key,
@@ -184,11 +184,12 @@ class SubtitleWidget extends StatelessWidget {
                   color: style?.color ?? scheme.textColorLight,
                   fontSize: Dimens.fontDefault),
             ),
-            PaginationDots(
-              current: true,
-              margin: Dimens.sizeSmall,
-              color: style?.color ?? scheme.textColorLight,
-            )
+            if (subtitle?.isNotEmpty ?? false)
+              PaginationDots(
+                current: true,
+                margin: Dimens.sizeSmall,
+                color: style?.color ?? scheme.textColorLight,
+              )
           ],
           if (expanded) Expanded(child: _sub(context)) else _sub(context),
         ],
@@ -198,7 +199,7 @@ class SubtitleWidget extends StatelessWidget {
 
   Widget _sub(BuildContext context) {
     return Text(
-      subtitle,
+      subtitle ?? '',
       maxLines: 1,
       style: TextStyle(
           color: style?.color ?? context.scheme.textColorLight,

@@ -57,8 +57,8 @@ class PlayerScreen extends StatelessWidget {
                           buildWhen: (pre, cur) => pre.track != cur.track,
                           builder: (context, state) {
                             final _bg = context.isDarkMode
-                                ? state.track.darkBgColor
-                                : state.track.bgColor;
+                                ? state.details.darkBgColor
+                                : state.details.bgColor;
                             final fgColor = _bg?.withAlpha(150);
                             final bgColor = scheme.background;
                             return ShadowWidget(
@@ -67,7 +67,7 @@ class PlayerScreen extends StatelessWidget {
                               margin: const EdgeInsets.all(Dimens.sizeMedium),
                               color:
                                   Color.alphaBlend(fgColor ?? bgColor, bgColor),
-                              child: MyCachedImage(state.track.image,
+                              child: MyCachedImage(state.track?.thumbnail?.url,
                                   border: Dimens.sizeExtraSmall),
                             );
                           }),
@@ -91,7 +91,7 @@ class PlayerScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        state.track.title ?? '',
+                                        state.track?.title ?? '',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -100,7 +100,7 @@ class PlayerScreen extends StatelessWidget {
                                             color: scheme.textColor),
                                       ),
                                       Text(
-                                        state.track.subtitle ?? '',
+                                        state.track?.artist.name ?? '',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
@@ -117,8 +117,8 @@ class PlayerScreen extends StatelessWidget {
                             builder: (context, state) {
                               return IconButton(
                                 onPressed: () {
-                                  final id = state.track.id;
-                                  bloc.onTrackLiked(id!, state.isLiked);
+                                  final id = state.track!.id;
+                                  bloc.onTrackLiked(id, state.isLiked);
                                 },
                                 isSelected: state.isLiked,
                                 selectedIcon: const Icon(Icons.favorite),
@@ -136,7 +136,7 @@ class PlayerScreen extends StatelessWidget {
                       builder: (context, state) {
                         return BlocBuilder<PlayerSliderBloc, PlayerSliderState>(
                             builder: (context, slider) {
-                          final length = state.track.duration?.inSeconds;
+                          final length = state.track?.duration?.inSeconds;
 
                           return SliderTheme(
                             data: const SliderThemeData(
@@ -192,7 +192,8 @@ class PlayerScreen extends StatelessWidget {
                                       const SizedBox(width: Dimens.sizeMedium),
                                       Text(slider.current.format()),
                                       const Spacer(),
-                                      Text(state.track.duration.format()),
+                                      Text(state.track?.duration.format() ??
+                                          '0:00'),
                                       const SizedBox(width: Dimens.sizeXLarge),
                                     ],
                                   ),
@@ -309,7 +310,7 @@ class PlayerScreen extends StatelessWidget {
         useRootNavigator: true,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => TrackBottomSheet(state.track.asTrack,
+        builder: (context) => TrackBottomSheet(state.track!,
             liked: state.isLiked, fromPlayer: true));
   }
 

@@ -108,11 +108,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
           List<LibraryModel>.from(results.map((e) => LibraryModel.fromYT(e)));
 
       musicGroups.sort((a, b) {
-        final fName = a.name.queryMatch(searchContr.text);
+        final fName = a.title.queryMatch(searchContr.text);
         final fArtist = a.artist?.name.queryMatch(searchContr.text) ?? 0;
         final first = fName.compareTo(fArtist);
 
-        final sName = b.name.queryMatch(searchContr.text);
+        final sName = b.title.queryMatch(searchContr.text);
         final sArtist = b.artist?.name.queryMatch(searchContr.text) ?? 0;
         final second = sName.compareTo(sArtist);
 

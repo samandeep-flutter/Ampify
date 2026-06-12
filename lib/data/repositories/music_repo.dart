@@ -10,18 +10,18 @@ class MusicRepo {
   MusicRepo(this.dio, {required this.ytMusic, required this.ytExplode});
 
   final _ytClients = [YoutubeApiClient.androidVr];
-  Future<SongYtDetails?> getDetailsFromQuery(Track track) async {
-    try {
-      final artist =
-          track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
-      final song = await _search(QuerySong(track.name!, artist));
-      final duration = await _getSongDuration(song!.videoId);
-      return SongYtDetails(song.videoId, duration: duration!);
-    } catch (e) {
-      logPrint(e, 'yt-query');
-      return null;
-    }
-  }
+  // Future<SongYtDetails?> getDetailsFromQuery(Track track) async {
+  //   try {
+  //     final artist =
+  //         track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
+  //     final song = await _search(QuerySong(track.name!, artist));
+  //     final duration = await _getSongDuration(song!.videoId);
+  //     return SongYtDetails(song.videoId, duration: duration!);
+  //   } catch (e) {
+  //     logPrint(e, 'yt-query');
+  //     return null;
+  //   }
+  // }
 
   Future<Uri?> fromVideoId(String? videoId) async {
     try {
@@ -35,48 +35,33 @@ class MusicRepo {
     }
   }
 
-  Future<SongDetailed?> _search(QuerySong query) async {
-    final songs = await ytMusic.searchSongs(query.text);
-    try {
-      return songs.firstWhere((e) {
-        final _name = e.name.toLowerCase();
-        final _artist = e.artist.name.toLowerCase();
-        final isSame = _artist.contains(_name);
-        return (_name.contains(query.title.toLowerCase())) &&
-            (query.artists.any((f) => _artist.contains(f)) || isSame);
-      }, orElse: () => throw FormatException());
-    } on FormatException {
-      return songs.firstOrNull;
-    } catch (e) {
-      logPrint(e, 'yt-search');
-      return null;
-    }
-  }
+  // Future<SongDetailed?> _search(QuerySong query) async {
+  //   final songs = await ytMusic.searchSongs(query.text);
+  //   try {
+  //     return songs.firstWhere((e) {
+  //       final _name = e.name.toLowerCase();
+  //       final _artist = e.artist.name.toLowerCase();
+  //       final isSame = _artist.contains(_name);
+  //       return (_name.contains(query.title.toLowerCase())) &&
+  //           (query.artists.any((f) => _artist.contains(f)) || isSame);
+  //     }, orElse: () => throw FormatException());
+  //   } on FormatException {
+  //     return songs.firstOrNull;
+  //   } catch (e) {
+  //     logPrint(e, 'yt-search');
+  //     return null;
+  //   }
+  // }
 
-  Future<Duration?> _getSongDuration(String vidId) async {
-    try {
-      final song = await ytMusic.getSong(vidId);
-      return Duration(seconds: song.duration);
-    } catch (e) {
-      logPrint(e, 'yt-duration');
-      return null;
-    }
-  }
-
-  Future<List<UpNextsDetails>?> getRecomendations(Track track) async {
-    try {
-      if (track.ytDetails != null) throw FormatException();
-      final artist =
-          track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
-      final song = await _search(QuerySong(track.name!, artist));
-      return ytMusic.getUpNexts(song!.videoId);
-    } on FormatException {
-      return ytMusic.getUpNexts(track.ytDetails!.videoId);
-    } catch (e) {
-      logPrint(e, 'yt-recomendations');
-      return null;
-    }
-  }
+  // Future<Duration?> _getSongDuration(String vidId) async {
+  //   try {
+  //     final song = await ytMusic.getSong(vidId);
+  //     return Duration(seconds: song.duration);
+  //   } catch (e) {
+  //     logPrint(e, 'yt-duration');
+  //     return null;
+  //   }
+  // }
 }
 
 extension MyStream on StreamManifest {

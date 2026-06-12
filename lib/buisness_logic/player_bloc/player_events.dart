@@ -1,4 +1,4 @@
-import 'package:ampify/data/data_models/common/tracks_model.dart';
+import 'package:ampify/data/data_models/track_model.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:equatable/equatable.dart';
 
