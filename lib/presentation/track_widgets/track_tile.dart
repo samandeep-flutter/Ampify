@@ -1,9 +1,5 @@
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:ampify/presentation/track_widgets/track_bottom_sheet.dart';
-import '../../buisness_logic/player_bloc/player_events.dart';
-import '../../buisness_logic/player_bloc/player_state.dart';
 
 class TrackTile extends StatelessWidget {
   final Track track;

@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -29,13 +27,13 @@ class PlaylistInitial extends MusicGroupEvent {
   List<Object?> get props => [id, super.props];
 }
 
-class PlaylistVisibility extends MusicGroupEvent {
-  final bool public;
-  const PlaylistVisibility(this.public);
+// class PlaylistVisibility extends MusicGroupEvent {
+//   final bool public;
+//   const PlaylistVisibility(this.public);
 
-  @override
-  List<Object?> get props => [public, super.props];
-}
+//   @override
+//   List<Object?> get props => [public, super.props];
+// }
 
 class PlaylistCoverChanged extends MusicGroupEvent {
   final File file;
@@ -78,6 +76,9 @@ class MusicGroupState extends Equatable {
   final Thumbnail? thumbnail;
   final Color? bgColor;
   final String? title;
+  final String? subtitle;
+  final String? owner;
+  final String? description;
   final List<Track> tracks;
   final LibItemType? type;
   final bool? isFav;
@@ -88,6 +89,9 @@ class MusicGroupState extends Equatable {
     required this.thumbnail,
     required this.bgColor,
     required this.title,
+    required this.subtitle,
+    required this.owner,
+    required this.description,
     required this.type,
     required this.titileOpacity,
     required this.isFav,
@@ -102,6 +106,9 @@ class MusicGroupState extends Equatable {
         type = null,
         bgColor = null,
         title = null,
+        subtitle = null,
+        owner = null,
+        description = null,
         isFav = false,
         loading = false,
         tracks = const [];
@@ -111,6 +118,9 @@ class MusicGroupState extends Equatable {
     Thumbnail? thumbnail,
     Color? bgColor,
     String? title,
+    String? subtitle,
+    String? owner,
+    String? description,
     List<Track>? tracks,
     LibItemType? type,
     bool? isFav,
@@ -122,8 +132,10 @@ class MusicGroupState extends Equatable {
       thumbnail: thumbnail ?? this.thumbnail,
       bgColor: bgColor ?? this.bgColor,
       title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      owner: owner ?? this.owner,
+      description: description ?? this.description,
       isFav: isFav,
-      // details: details,
       titileOpacity: titileOpacity ?? this.titileOpacity,
       type: type ?? this.type,
       tracks: tracks ?? this.tracks,
@@ -132,8 +144,19 @@ class MusicGroupState extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [thumbnail, bgColor, title, tracks, type, loading, titileOpacity, isFav];
+  List<Object?> get props => [
+        thumbnail,
+        bgColor,
+        title,
+        subtitle,
+        owner,
+        description,
+        tracks,
+        type,
+        loading,
+        titileOpacity,
+        isFav
+      ];
 }
 
 class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
@@ -143,7 +166,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     on<MusicGroupFav>(_onFav);
     on<PlaylistInitial>(_onPlaylist);
     on<MusicGroupTitleFade>(_titleFade);
-    on<PlaylistVisibility>(_onVisibility);
+    // on<PlaylistVisibility>(_onVisibility);
     on<PlaylistCoverChanged>(_onCoverChanged);
   }
 
@@ -246,6 +269,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         bgColor: color,
         title: album.title,
         tracks: album.tracks,
+        subtitle: album.year?.toString(),
         // isFav: isFav,
         thumbnail: album.thumbnail,
         type: event.type,
@@ -290,24 +314,6 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     // final image = await event.file.readAsBytes();
     // await _repo.changeCoverImage(id: state.id!, image: base64Encode(image));
     // add(PlaylistInitial(state.id!));
-  }
-
-  Future<void> _onVisibility(
-      PlaylistVisibility event, Emitter<MusicGroupState> emit) async {
-    // TODO: implement change visibility
-
-    // await _repo.editPlaylist(
-    //   id: state.id!,
-    //   title: state.title!,
-    //   desc: state.details?.description ?? '',
-    //   public: event.public,
-    // );
-    // add(PlaylistInitial(state.id!));
-    // if (event.public) {
-    //   showToast(StringRes.nowPublic);
-    //   return;
-    // }
-    // showToast(StringRes.nowPrivate);
   }
 
   void _titleFade(MusicGroupTitleFade event, Emitter<MusicGroupState> emit) {

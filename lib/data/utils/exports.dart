@@ -1,61 +1,63 @@
 library;
 
-// configs
-export '../../config/firebase_options.dart';
-export '../../config/getit_instance.dart';
-export '../../config/responsive_font.dart';
-export '../../config/theme_services.dart';
-
-// extras
-export 'package:dio/dio.dart';
-export 'package:dart_ytmusic_api/types.dart';
-export 'package:dart_ytmusic_api/yt_music.dart';
-export 'package:flutter_dotenv/flutter_dotenv.dart';
+// core
+export 'package:flutter/material.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:equatable/equatable.dart';
-export 'package:flutter/material.dart';
-export 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
-export '../data_provider/api_response.dart';
-export '../data_provider/dio_client.dart';
+export 'package:flutter/cupertino.dart' hide RefreshCallback;
+export 'package:flutter/services.dart';
 
-// routes
+// routes & configs
 export 'package:go_router/go_router.dart';
-export '../../config/routes/app_routes.dart';
-export '../../config/routes/app_pages.dart';
-
-// services
-export '../../services/audio_services.dart';
-export '../../services/auth_services.dart';
-export '../../services/box_services.dart';
-export '../../services/extension_services.dart';
-export '../../services/notification_services.dart';
+export 'package:ampify/config/routes/app_routes.dart';
+export 'package:ampify/config/routes/app_pages.dart';
+export 'package:ampify/config/firebase_options.dart';
+export 'package:ampify/config/getit_instance.dart';
+export 'package:ampify/config/responsive_font.dart';
+export 'package:ampify/config/theme_services.dart';
 
 // utils
-export '../../data/utils/app_constants.dart';
-export '../../data/utils/dimens.dart';
-export '../../data/utils/image_resources.dart';
-export '../../data/utils/string.dart';
-export '../../data/utils/utils.dart';
+export 'package:ampify/data/utils/app_constants.dart';
+export 'package:ampify/data/utils/dimens.dart';
+export 'package:ampify/data/utils/image_resources.dart';
+export 'package:ampify/data/utils/string.dart';
+export 'package:ampify/data/utils/utils.dart';
 
 // models
-export '../../data/data_models/common_models.dart';
-export '../../data/data_models/device_info_model.dart';
-export '../../data/data_models/library_model.dart';
-export '../../data/data_models/track_model.dart';
-export '../../data/data_models/user_model.dart';
-export '../data_models/dashboard_model.dart';
-
-// repos
-export '../../data/repositories/music_group_repo.dart';
-export '../../data/repositories/music_repo.dart';
+export 'package:ampify/data/data_models/common_models.dart';
+export 'package:ampify/data/data_models/dashboard_model.dart';
+export 'package:ampify/data/data_models/device_info_model.dart';
+export 'package:ampify/data/data_models/firestore_models.dart';
+export 'package:ampify/data/data_models/library_model.dart';
+export 'package:ampify/data/data_models/track_model.dart';
+export 'package:ampify/data/data_models/user_model.dart';
 
 // widgets
-export '../../presentation/widgets/base_widget.dart';
-export '../../presentation/widgets/custom_scroll_physics.dart';
-export '../../presentation/widgets/dotted_border.dart';
-export '../../presentation/widgets/loading_widgets.dart';
-export '../../presentation/widgets/my_alert_dialog.dart';
-export '../../presentation/widgets/my_cached_image.dart';
-export '../../presentation/widgets/my_text_field_widget.dart';
-export '../../presentation/widgets/shimmer_widget.dart';
-export '../../presentation/widgets/top_widgets.dart';
+export 'package:ampify/presentation/widgets/base_widget.dart';
+export 'package:ampify/presentation/widgets/custom_scroll_physics.dart';
+export 'package:ampify/presentation/widgets/dotted_border.dart';
+export 'package:ampify/presentation/widgets/loading_widgets.dart';
+export 'package:ampify/presentation/widgets/my_alert_dialog.dart';
+export 'package:ampify/presentation/widgets/my_cached_image.dart';
+export 'package:ampify/presentation/widgets/my_text_field_widget.dart';
+export 'package:ampify/presentation/widgets/shimmer_widget.dart';
+export 'package:ampify/presentation/widgets/top_widgets.dart';
+
+// services
+export 'package:ampify/services/audio_services.dart';
+export 'package:ampify/services/auth_services.dart';
+export 'package:ampify/services/box_services.dart';
+export 'package:ampify/services/device_info.dart';
+export 'package:ampify/services/extension_services.dart';
+export 'package:ampify/services/notification_services.dart';
+
+// extras
+export 'package:dart_ytmusic_api/types.dart';
+export 'package:dart_ytmusic_api/yt_music.dart';
+export 'package:ampify/data/repositories/music_repo.dart';
+export 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+export 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
+export 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';
+export 'package:ampify/buisness_logic/player_bloc/player_events.dart';
+export 'package:ampify/buisness_logic/player_bloc/player_state.dart';
+export 'package:ampify/presentation/track_widgets/track_tile.dart';

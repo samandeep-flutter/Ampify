@@ -56,8 +56,8 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
           buildWhen: (pr, cr) => pr.items != cr.items,
           builder: (context, state) {
             final playlists = state.items.where((e) {
-              final myPlaylists = e.artist?.id == _box.uid!;
-              return e.type.isPlaylist && myPlaylists;
+              final myPlaylists = e.item.artist?.id == _box.uid!;
+              return e.item.type.isPlaylist && myPlaylists;
             }).toList();
             return Column(
               children: [
@@ -80,7 +80,7 @@ class _AddtoPlaylistSheetState extends State<AddtoPlaylistSheet> {
                           spacing: Dimens.sizeDefault, aspectRatio: 1.2),
                       itemCount: playlists.length,
                       itemBuilder: (context, index) {
-                        final item = playlists[index];
+                        final item = playlists[index].item;
 
                         return Stack(
                           alignment: Alignment.topRight,

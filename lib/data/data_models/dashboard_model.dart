@@ -47,14 +47,16 @@ class MyHomeDetailed extends Equatable {
       id: pl ? _pl(item).playlistId : _al(item).albumId,
       title: pl ? _pl(item).name : _al(item).name,
       artist: pl ? _pl(item).artist : _al(item).artist,
-      type: pl ? LibItemType.playlist : LibItemType.album,
-      thumbnail: _thumb(item, pl)?.toThumbnail(),
+      type: LibItemType.values.firstWhere(
+          (e) => e.id == (item as SearchResult).type,
+          orElse: () => LibItemType.unknown),
+      thumbnail: _thumb(item, pl).toThumbnail(),
     );
   }
 
-  static ThumbnailFull? _thumb(dynamic item, bool pl) {
-    if (pl) return _pl(item).thumbnails.firstOrNull;
-    return _al(item).thumbnails.firstOrNull;
+  static List<ThumbnailFull> _thumb(dynamic item, bool pl) {
+    if (pl) return _pl(item).thumbnails;
+    return _al(item).thumbnails;
   }
 
   static PlaylistDetailed _pl(dynamic playlist) => playlist as PlaylistDetailed;

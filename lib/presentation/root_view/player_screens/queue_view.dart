@@ -1,9 +1,4 @@
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../../../buisness_logic/player_bloc/player_bloc.dart';
-import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
-import '../../../buisness_logic/player_bloc/player_state.dart';
-import '../../track_widgets/track_tile.dart';
 
 class QueueView extends StatelessWidget {
   const QueueView({super.key});

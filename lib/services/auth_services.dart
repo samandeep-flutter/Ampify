@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:ampify/services/device_info.dart';
 import 'package:app_links/app_links.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,7 +11,6 @@ class AuthServices {
   static AuthServices? _instance;
   static AuthServices get instance => _instance ??= AuthServices._init();
 
-  final _appLinks = AppLinks();
   final _box = BoxServices.instance;
   final _auth = FirebaseAuth.instance;
 
@@ -22,6 +20,7 @@ class AuthServices {
   // BuildContext? get context => navigator.currentContext;
   // BuildContext? get shellContext => shellNavigator.currentContext;
 
+  final _appLinks = AppLinks();
   final connectivity = ValueNotifier<bool>(true);
   bool get isOffline => !connectivity.value;
   final _connectivity = InternetConnection();
@@ -50,14 +49,14 @@ class AuthServices {
 
   void _dynamicLinks(Uri uri) {
     debugLog(uri, 'app-links');
-    switch (uri.authority) {
-      // case 'spotify-login':
-      //   if (Platform.isIOS) return;
-      // final AuthRepo authRepo = getIt();
-      // final code = uri.queryParameters['code'];
-      // authRepo.getToken(code!);
-      // break;
-    }
+    // switch (uri.authority) {
+    //   case 'spotify-login':
+    //     if (Platform.isIOS) return;
+    //     final AuthRepo authRepo = getIt();
+    //     final code = uri.queryParameters['code'];
+    //     authRepo.getToken(code!);
+    //     break;
+    // }
   }
 
   String get initialRoute {

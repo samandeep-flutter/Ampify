@@ -55,8 +55,7 @@ class MyAudioHandler extends BaseAudioHandler {
 
   @override
   Future<void> addQueueItem(MediaItem mediaItem) async {
-    // TODO: implement better check.
-    if (queue.value.last.id == mediaItem.id) return;
+    if (queue.value.lastOrNull?.id == mediaItem.id) return;
     await _player.addAudioSource(mediaItem.toAudioSource);
     queue.add([...queue.value, mediaItem]);
   }
@@ -261,7 +260,7 @@ class MyAudioHandler extends BaseAudioHandler {
   @override
   Future<void> onNotificationDeleted() async {
     customState.add(false);
-    await stop();
+    pause().then((_) => stop());
   }
 
   @override

@@ -9,11 +9,11 @@ class PlaylistEvents extends Equatable {
 
 class CreatePlaylist extends PlaylistEvents {
   final String title;
-  final String userId;
-  const CreatePlaylist({required this.userId, required this.title});
+  final String uid;
+  const CreatePlaylist({required this.uid, required this.title});
 
   @override
-  List<Object?> get props => [userId, title, super.props];
+  List<Object?> get props => [uid, title, super.props];
 }
 
 class PlaylistState extends Equatable {
@@ -44,20 +44,21 @@ class PlaylistBloc extends Bloc<PlaylistEvents, PlaylistState> {
 
   final titleController = TextEditingController();
   final titleKey = GlobalKey<FormFieldState>();
-  final MusicGroupRepo _repo = getIt();
+  // final MusicGroupRepo _repo = getIt();
 
   void createPlaylist(String id) {
     if (!(titleKey.currentState?.validate() ?? false)) return;
-    add(CreatePlaylist(title: titleController.text, userId: id));
+    add(CreatePlaylist(title: titleController.text, uid: id));
   }
 
   Future<void> _onCreate(
       CreatePlaylist event, Emitter<PlaylistState> emit) async {
-    emit(state.copyWith(loading: true));
-    await _repo.createPlaylist(event.title, userId: event.userId,
-        onSuccess: (json) {
-      emit(state.copyWith(success: true, loading: false));
-      titleController.clear();
-    });
+    // TODO: implement create playlist
+    // emit(state.copyWith(loading: true));
+    // await _repo.createPlaylist(event.title, uid: event.uid,
+    //     onSuccess: (json) {
+    //   emit(state.copyWith(success: true, loading: false));
+    //   titleController.clear();
+    // });
   }
 }

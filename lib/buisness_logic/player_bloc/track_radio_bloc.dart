@@ -1,5 +1,3 @@
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class TrackRadioEvents extends Equatable {
@@ -110,7 +108,7 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
     } on FormatException {
       emit(state.copyWith(tracks: []));
     } catch (e) {
-      emit(state.copyWith(loading: false, error: true));
+      emit(state.copyWith(error: true));
       logPrint(e, 'radio-init');
     } finally {
       emit(state.copyWith(loading: false));

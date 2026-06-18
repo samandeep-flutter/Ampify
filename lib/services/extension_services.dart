@@ -1,4 +1,3 @@
-import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -48,8 +47,13 @@ extension DarkModeHelper on Brightness {
   bool get isDark => this == Brightness.dark;
 }
 
-extension ThumbnailHelper on ThumbnailFull {
-  Thumbnail toThumbnail() => Thumbnail.fromYT(this);
+extension ThumbnailHelper on List<ThumbnailFull> {
+  ThumbnailFull? get _last {
+    sort((a, b) => a.height.compareTo(b.height));
+    return lastOrNull;
+  }
+
+  Thumbnail? toThumbnail() => _last != null ? Thumbnail.fromYT(_last!) : null;
 }
 
 extension MyMusicState on MusicState? {
@@ -86,6 +90,16 @@ extension MyList<T> on List<T> {
       if (test(element)) return element;
     }
     return null;
+  }
+}
+
+extension DurationHelper on List<Track> {
+  Duration get duration {
+    Duration _duration = Duration.zero;
+    for (var element in this) {
+      _duration += element.duration ?? Duration.zero;
+    }
+    return _duration;
   }
 }
 
@@ -223,6 +237,12 @@ extension MyDuration on Duration {
   Duration floor() {
     final _seconds = (inMilliseconds / 1000).floor();
     return Duration(seconds: _seconds);
+  }
+
+  String get pretty {
+    if (inHours == 0) return '$inMinutes minutes';
+    final minutes = (inMinutes - (inHours * 60)).floor();
+    return '$inHours hours $minutes minutes';
   }
 }
 

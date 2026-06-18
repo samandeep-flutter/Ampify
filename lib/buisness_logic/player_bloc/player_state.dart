@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/cupertino.dart';
 
 class PlayerState extends Equatable {
   final String? musicGroupId;

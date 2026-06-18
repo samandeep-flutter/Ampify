@@ -17,13 +17,13 @@ class AuthLogin extends AuthEvent {}
 class AuthGoogleLogin extends AuthEvent {}
 
 class AuthFinished extends AuthEvent {
-  final UserCredential credentials;
+  final User? user;
   final String? token;
 
-  const AuthFinished(this.credentials, {this.token});
+  const AuthFinished(this.user, {this.token});
 
   @override
-  List<Object?> get props => [credentials, token];
+  List<Object?> get props => [user, token];
 }
 
 class AuthState extends Equatable {
@@ -84,7 +84,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final oAuth = GoogleAuthProvider.credential(
           accessToken: _auth.accessToken, idToken: user.authentication.idToken);
       final credentials = await _fbAuth.signInWithCredential(oAuth);
-      add(AuthFinished(credentials, token: auth.deviceInfo?.fcmToken));
+      add(AuthFinished(credentials.user, token: auth.deviceInfo?.fcmToken));
+    } on GoogleSignInException catch (e) {
+      emit(state.copyWith(isGoogleLoading: false));
+      _onGoogleSignInException(e);
     } catch (e) {
       emit(state.copyWith(isGoogleLoading: false));
       logPrint(e, 'google-auth');
@@ -98,10 +101,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final credentials = await _fbAuth.signInWithEmailAndPassword(
           email: emailContr.text.trim(), password: passwordContr.text.trim());
-      add(AuthFinished(credentials, token: auth.deviceInfo?.fcmToken));
+      add(AuthFinished(credentials.user, token: auth.deviceInfo?.fcmToken));
     } on FirebaseAuthException catch (e) {
       emit(state.copyWith(isEmailLoading: false));
-      onFbSignInException(e);
+      _onFbSignInException(e);
     } catch (e) {
       emit(state.copyWith(isEmailLoading: false));
       logPrint(e, 'email-auth');
@@ -109,41 +112,43 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onFinish(AuthFinished event, Emitter<AuthState> emit) async {
-    if (event.credentials.user == null) return;
-    final collection = AppConstants.usersCollection;
+    if (event.user == null) return;
+    final userRepo = AppConstants.usersCollection;
     final _box = BoxServices.instance;
 
     try {
-      final uid = event.credentials.user!.uid;
-      final json = await collection.doc(uid).get();
+      final uid = event.user!.uid;
+      final json = await userRepo.doc(uid).get();
       if (!json.exists) throw Exception();
       final user = UserModel.fromJson(json.data()!);
-      collection.doc(uid).update({'login': true});
+      userRepo.doc(uid).update({'login': true});
       if (user.deviceToken != event.token) {
-        collection.doc(uid).update({'device_token': event.token});
+        userRepo.doc(uid).update({'device_token': event.token});
       }
       _box.write(BoxKeys.profile,
           user.copyWith(login: true, deviceToken: event.token).toJson());
     } catch (e) {
       logPrint(e, 'fb-firestore');
-      var details = UserModel(
-        id: event.credentials.user!.uid,
-        displayName: event.credentials.user!.displayName ?? '',
-        email: event.credentials.user!.email!,
-        image: event.credentials.user!.photoURL,
+      final _name = event.user!.displayName;
+      final _email = event.user!.email!.split('@').first;
+      final details = UserModel(
+        id: event.user!.uid,
+        displayName: _name ?? _email,
+        email: event.user!.email!,
+        image: event.user!.photoURL,
         deviceToken: event.token,
         login: true,
       );
-      await collection.doc(details.id).set(details.toJson());
+      await userRepo.doc(details.id).set(details.toJson());
       _box.write(BoxKeys.profile, details.toJson());
     } finally {
-      _box.write(BoxKeys.uid, event.credentials.user!.uid);
+      _box.write(BoxKeys.uid, event.user!.uid);
 
       emit(AuthState.init().copyWith(isSuccess: true));
     }
   }
 
-  void onFbSignInException(FirebaseAuthException e) {
+  void _onFbSignInException(FirebaseAuthException e) {
     logPrint(e, 'fbAuth');
     switch (e.code) {
       case 'invalid-credential':
@@ -163,7 +168,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  void onGoogleSignInException(GoogleSignInException e) {
+  void _onGoogleSignInException(GoogleSignInException e) {
     logPrint(e, 'gogleAuth');
     switch (e.code) {
       case GoogleSignInExceptionCode.canceled:

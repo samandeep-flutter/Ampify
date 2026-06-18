@@ -1,10 +1,6 @@
 import 'package:ampify/buisness_logic/library_bloc/library_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
-import 'package:ampify/presentation/track_widgets/track_tile.dart';
-import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/music_group_bloc/music_group_bloc.dart';
+import 'package:ampify/data/utils/exports.dart';
 import 'playlist_bottom_sheet.dart';
 
 class MusicGroupScreen extends StatefulWidget {
@@ -74,7 +70,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                       builder: (context, state) {
                         return MyCachedImage(
                           state.thumbnail?.url,
-                          loading: state.thumbnail?.url?.isEmpty ?? true,
+                          loading: state.thumbnail?.url.isEmpty ?? true,
                           height: context.height * .3,
                           width: context.height * .3,
                           border: Dimens.sizeExtraSmall,
@@ -103,31 +99,29 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                       const SizedBox(height: Dimens.sizeSmall),
                       Text(state.title ?? '',
                           style: Utils.titleStyleLarge(context)),
-                      // TODO: implement playlist description
-                      // if (state.details?.description?.isNotEmpty ?? false) ...[
-                      //   const SizedBox(height: Dimens.sizeExtraSmall),
-                      //   Text(
-                      //     state.details!.description!.unescape,
-                      //     style: TextStyle(
-                      //       color: scheme.textColorLight,
-                      //       fontSize: Dimens.fontDefault - 1,
-                      //     ),
-                      //   ),
-                      // ],
+                      if (state.description?.isNotEmpty ?? false) ...[
+                        const SizedBox(height: Dimens.sizeExtraSmall),
+                        Text(
+                          state.description!.unescape,
+                          style: TextStyle(
+                            color: scheme.textColorLight,
+                            fontSize: Dimens.fontDefault - 1,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: Dimens.sizeDefault),
                       Wrap(
                         runSpacing: Dimens.sizeSmall,
-                        spacing: Dimens.sizeSmall,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Container(
-                            padding: state.type.isPlaylist
+                            padding: state.type.isAlbum
                                 ? const EdgeInsets.symmetric(
                                     vertical: Dimens.sizeExtraSmall,
                                     horizontal: Dimens.sizeDefault,
                                   )
                                 : EdgeInsets.zero,
-                            decoration: state.type.isPlaylist
+                            decoration: state.type.isAlbum
                                 ? BoxDecoration(
                                     border: Border.all(
                                       color: state.bgColor ?? scheme.disabled,
@@ -150,70 +144,42 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                 ),
                                 PaginationDots(
                                   current: true,
-                                  margin: Dimens.sizeSmall,
+                                  margin: Dimens.sizeMedSmall,
                                   color: scheme.textColor,
                                 ),
-                                Flexible(
-                                  child: RichText(
-                                    textScaler:
-                                        MediaQuery.textScalerOf(context),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    text: TextSpan(
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: Dimens.fontDefault,
-                                        color: scheme.textColor,
-                                      ),
-                                      children: [
-                                        if (state.type.isPlaylist)
-                                          const TextSpan(text: 'by '),
-                                        // TODO: implement playlist owner
-                                        TextSpan(
-                                            text: 'state.details?.owner?.name'),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                if (!state.type.isPlaylist) ...[
-                                  PaginationDots(
-                                    current: true,
-                                    margin: Dimens.sizeSmall,
-                                    color: scheme.textColorLight,
-                                  ),
-                                  // TODO: implement playlist date
+                                if (state.subtitle?.isNotEmpty ?? false)
                                   Text(
-                                    'date?.year',
+                                    state.subtitle ?? '',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      color: scheme.textColorLight,
                                       fontSize: Dimens.fontDefault,
+                                      color: scheme.textColorLight,
                                     ),
                                   ),
-                                ],
                               ],
                             ),
                           ),
-                          if (state.type.isPlaylist)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  Icons.track_changes,
+                          if (state.type.isAlbum)
+                            const SizedBox(width: Dimens.sizeDefault),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.track_changes,
+                                color: scheme.textColorLight,
+                                size: Dimens.iconMedSmall,
+                              ),
+                              const SizedBox(width: Dimens.sizeExtraSmall),
+                              Text(
+                                '${state.tracks.length} tracks',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
                                   color: scheme.textColorLight,
-                                  size: Dimens.iconMedSmall,
+                                  fontSize: Dimens.fontDefault,
                                 ),
-                                const SizedBox(width: Dimens.sizeExtraSmall),
-                                Text(
-                                  '${state.tracks.length} tracks',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: scheme.textColorLight,
-                                    fontSize: Dimens.fontDefault,
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                       const SizedBox(height: Dimens.sizeDefault),
@@ -256,22 +222,18 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             },
                           ),
                           const SizedBox(width: Dimens.sizeSmall),
-                          // TODO: implement checks for single
-                          // if (!state.type.isSingle ?? false) ...[
-                          //   ElevatedButton.icon(
-                          //       onPressed: () => _appendTracks(state),
-                          //       style: ElevatedButton.styleFrom(
-                          //         padding:
-                          //             Utils.insetsHoriz(Dimens.sizeDefault),
-                          //         visualDensity: VisualDensity.compact,
-                          //         backgroundColor: scheme.textColor,
-                          //         foregroundColor: scheme.background,
-                          //       ),
-                          //       iconAlignment: IconAlignment.end,
-                          //       label: Text(StringRes.append),
-                          //       icon: Icon(Icons.library_music_outlined)),
-                          //   const SizedBox(width: Dimens.sizeSmall),
-                          // ],
+                          ElevatedButton.icon(
+                              onPressed: () => _appendTracks(state),
+                              style: ElevatedButton.styleFrom(
+                                padding: Utils.insetsHoriz(Dimens.sizeDefault),
+                                visualDensity: VisualDensity.compact,
+                                backgroundColor: scheme.textColor,
+                                foregroundColor: scheme.background,
+                              ),
+                              iconAlignment: IconAlignment.end,
+                              label: Text(StringRes.append),
+                              icon: Icon(Icons.library_music_outlined)),
+                          const SizedBox(width: Dimens.sizeSmall),
                           IconButton(
                             onPressed: () => _toMoreDetails(bloc, state),
                             style: IconButton.styleFrom(
@@ -342,81 +304,34 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                 },
               ),
               const SliverSizedBox(height: Dimens.sizeXLarge),
-              // TODO: implement checks for release date or year
-              // if (state.details?.releaseDate != null)
-              //   SliverToBoxAdapter(
-              //     child: DefaultTextStyle.merge(
-              //       style: TextStyle(
-              //           color: scheme.textColorLight,
-              //           fontSize: Dimens.fontDefault + 1),
-              //       child: Row(
-              //         children: [
-              //           const SizedBox(width: Dimens.sizeDefault),
-              //           Icon(
-              //             Icons.track_changes,
-              //             color: scheme.textColorLight,
-              //             size: Dimens.iconMedSmall,
-              //           ),
-              //           const SizedBox(width: Dimens.sizeSmall),
-              //           Text('${state.tracks.length} Tracks'),
-              //           PaginationDots(
-              //             current: true,
-              //             margin: Dimens.sizeSmall,
-              //             color: scheme.textColorLight,
-              //           ),
-              //           Text(state.details?.releaseDate?.formatDate ?? ''),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // const SliverSizedBox(height: Dimens.sizeSmall),
-
-              // TODO: implement checks for copyrights or year info
-              // if (!state.type.isPlaylist)
-              //   SliverToBoxAdapter(
-              //     child: Builder(
-              //       builder: (context) {
-              //         final rights = state.details?.copyrights;
-              //         final symbols =
-              //             rights?.map((e) => e.type!).toList().asString;
-              //         return Padding(
-              //           padding:
-              //               const EdgeInsets.only(left: Dimens.sizeDefault),
-              //           child: RichText(
-              //             text: TextSpan(
-              //               style: TextStyle(
-              //                 color: scheme.textColorLight,
-              //                 fontSize: Dimens.fontDefault + 1,
-              //               ),
-              //               children: [
-              //                 if (symbols?.contains(RegExp(r'C')) ?? false) ...[
-              //                   WidgetSpan(
-              //                     alignment: PlaceholderAlignment.middle,
-              //                     child: Image.asset(ImageRes.copyrightC,
-              //                         color: scheme.textColorLight,
-              //                         height: Dimens.fontMed),
-              //                   ),
-              //                   const WidgetSpan(child: SizedBox(width: 8)),
-              //                 ],
-              //                 if (symbols?.contains(RegExp(r'P')) ?? false)
-              //                   WidgetSpan(
-              //                     alignment: PlaceholderAlignment.middle,
-              //                     child: Image.asset(ImageRes.copyrightP,
-              //                         color: scheme.textColorLight,
-              //                         height: Dimens.fontMed),
-              //                   ),
-              //                 const WidgetSpan(child: SizedBox(width: 8)),
-              //                 TextSpan(
-              //                   text:
-              //                       rights?.firstOrNull?.text?.removeCoprights,
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         );
-              //       },
-              //     ),
-              //   ),
+              SliverToBoxAdapter(
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(
+                      color: scheme.textColorLight,
+                      fontSize: Dimens.fontDefault + 1),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: Dimens.sizeDefault),
+                      Icon(
+                        Icons.track_changes,
+                        color: scheme.textColorLight,
+                        size: Dimens.iconMedSmall,
+                      ),
+                      const SizedBox(width: Dimens.sizeSmall),
+                      Text('${state.tracks.length} Tracks'),
+                      PaginationDots(
+                        current: true,
+                        margin: Dimens.sizeSmall,
+                        color: scheme.textColorLight,
+                      ),
+                      if (state.subtitle != null)
+                        Text(state.subtitle ?? '')
+                      else
+                        Text(state.tracks.duration.pretty)
+                    ],
+                  ),
+                ),
+              ),
               SliverSizedBox(height: context.height * .2),
             ],
           );
@@ -425,10 +340,10 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
     );
   }
 
-  // void _appendTracks(MusicGroupState state) {
-  //   final player = context.read<PlayerBloc>();
-  //   player.add(PlayerAppendTracks(state.tracks, id: state.id));
-  // }
+  void _appendTracks(MusicGroupState state) {
+    final player = context.read<PlayerBloc>();
+    player.add(PlayerAppendTracks(state.tracks, id: state.id));
+  }
 
   void _shuffleToggle() {
     final player = context.read<PlayerBloc>();
@@ -449,7 +364,8 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
             id: state.id,
             image: state.thumbnail,
             title: state.title,
-            // details: state.details,
+            owner: state.owner,
+            description: state.description,
           ),
         );
       },

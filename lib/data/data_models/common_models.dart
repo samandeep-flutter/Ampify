@@ -24,7 +24,7 @@ class Playlist extends Equatable {
       title: pl.name,
       artist: MyArtistBasic.fromYT(pl.artist),
       videoCount: pl.videoCount,
-      thumbnail: pl.thumbnails.firstOrNull?.toThumbnail(),
+      thumbnail: pl.thumbnails.toThumbnail(),
     );
   }
 
@@ -91,7 +91,7 @@ class Album extends Equatable {
       title: al.name,
       artist: MyArtistBasic.fromYT(al.artist),
       year: al.year,
-      thumbnail: al.thumbnails.firstOrNull?.toThumbnail(),
+      thumbnail: al.thumbnails.toThumbnail(),
       tracks: al.songs.map((e) => Track.fromYT(e)).toList(),
       // playlistId: al.playlistId
     );

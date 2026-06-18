@@ -1,13 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/buisness_logic/player_bloc/track_radio_bloc.dart';
-import 'package:ampify/presentation/track_widgets/track_tile.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:flutter/cupertino.dart';
 
 class TrackRadio extends StatefulWidget {
   final String id;

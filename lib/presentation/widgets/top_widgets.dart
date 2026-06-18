@@ -209,52 +209,6 @@ class SubtitleWidget extends StatelessWidget {
   }
 }
 
-class ShadowWidget extends StatelessWidget {
-  final Color color;
-  final EdgeInsets? margin;
-  final double? spread;
-  final Offset? offset;
-  final bool darkShadow;
-  final double? borderRadius;
-  final Widget child;
-
-  const ShadowWidget({
-    super.key,
-    this.margin,
-    this.spread,
-    this.offset,
-    this.borderRadius,
-    this.darkShadow = true,
-    required this.color,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: margin ?? const EdgeInsets.all(Dimens.sizeMedium),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius ?? 0),
-        boxShadow: [
-          BoxShadow(
-            color: color,
-            offset: offset ?? Offset.zero,
-            spreadRadius: spread ?? context.width * .5,
-            blurRadius: spread ?? context.width * .4,
-          ),
-          if (darkShadow)
-            BoxShadow(
-              color: Colors.black12,
-              spreadRadius: Dimens.sizeDefault,
-              blurRadius: Dimens.sizeMidLarge,
-            ),
-        ],
-      ),
-      child: child,
-    );
-  }
-}
-
 class LikedSongsCover extends StatelessWidget {
   final double size;
   final double? iconSize;

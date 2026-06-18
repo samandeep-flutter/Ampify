@@ -1,11 +1,8 @@
 import 'dart:math';
-import 'package:ampify/presentation/root_view/player_screens/queue_view.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
-import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
-import '../../../buisness_logic/player_bloc/player_state.dart';
+import 'dart:ui';
 import 'package:ampify/data/utils/exports.dart';
-import '../../track_widgets/track_bottom_sheet.dart';
+import 'package:ampify/presentation/root_view/player_screens/queue_view.dart';
+import 'package:ampify/presentation/track_widgets/track_bottom_sheet.dart';
 
 class PlayerScreen extends StatelessWidget {
   const PlayerScreen({super.key});
@@ -67,8 +64,7 @@ class PlayerScreen extends StatelessWidget {
                               margin: const EdgeInsets.all(Dimens.sizeMedium),
                               color:
                                   Color.alphaBlend(fgColor ?? bgColor, bgColor),
-                              child: MyCachedImage(state.track?.thumbnail?.url,
-                                  border: Dimens.sizeExtraSmall),
+                              child: state.track?.thumbnail,
                             );
                           }),
                     ),
@@ -323,5 +319,98 @@ class PlayerScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => const QueueView(),
     );
+  }
+}
+
+class ShadowWidget extends StatelessWidget {
+  final Color color;
+  final EdgeInsets? margin;
+  final double? spread;
+  final Offset? offset;
+  final bool darkShadow;
+  final double? borderRadius;
+  final Thumbnail? child;
+
+  const ShadowWidget({
+    super.key,
+    this.margin,
+    this.spread,
+    this.offset,
+    this.borderRadius,
+    this.darkShadow = true,
+    required this.color,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.scheme;
+    return LayoutBuilder(builder: (context, constraints) {
+      return Container(
+        margin: margin ?? const EdgeInsets.all(Dimens.sizeMedium),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius ?? 0),
+          boxShadow: [
+            BoxShadow(
+              color: color,
+              offset: offset ?? Offset.zero,
+              spreadRadius: spread ?? context.width * .5,
+              blurRadius: spread ?? context.width * .4,
+            ),
+            if (darkShadow)
+              BoxShadow(
+                color: Colors.black12,
+                spreadRadius: Dimens.sizeDefault,
+                blurRadius: Dimens.sizeMidLarge,
+              ),
+          ],
+        ),
+        child: Builder(builder: (context) {
+          if (!showBG(constraints)) {
+            return MyCachedImage(child?.url, border: Dimens.sizeExtraSmall);
+          }
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              _builder(
+                showBG(constraints),
+                child: MyCachedImage(
+                  child?.url,
+                  border: Dimens.sizeExtraSmall,
+                  width: double.infinity,
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+              if (showBG(constraints))
+                Container(
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(Dimens.sizeExtraSmall),
+                        border: Border.all(color: scheme.darkShade, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            spreadRadius: Dimens.sizeDefault,
+                            blurRadius: Dimens.sizeMidLarge,
+                          ),
+                        ]),
+                    child: MyCachedImage(child?.url,
+                        border: Dimens.sizeExtraSmall)),
+            ],
+          );
+        }),
+      );
+    });
+  }
+
+  Widget _builder(bool applyFilter, {required Widget child}) {
+    if (!applyFilter) return child;
+    return ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: 2, sigmaY: 2), child: child);
+  }
+
+  bool showBG(BoxConstraints constraints) {
+    return constraints.maxWidth > (child?.width ?? 0);
   }
 }

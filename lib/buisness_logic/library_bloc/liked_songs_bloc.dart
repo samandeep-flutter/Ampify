@@ -1,6 +1,4 @@
 import 'package:ampify/data/utils/exports.dart';
-import '../player_bloc/player_bloc.dart';
-import '../player_bloc/player_events.dart';
 
 class LikedSongsEvent extends Equatable {
   const LikedSongsEvent();
@@ -83,6 +81,7 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     on<LoadMoreTrigger>(_onLoadTrigger,
         transformer: Utils.debounce(Durations.short4));
   }
+  String get uid => BoxServices.instance.uid!;
 
   final scrollController = ScrollController();
   bool libRefresh = false;
@@ -128,18 +127,19 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     scrollController.addListener(_titleFadeListener);
     scrollController.addListener(_loadMoreSongs);
     libRefresh = false;
-    // TODO: implement liked songs
-    // await _repo.getLikedSongs(
-    //   onSuccess: (json) {
-    //     final items = PLtracksItems.fromJson(json);
-    //     final List<Track> tracks = [];
-    //     for (PLitemDetails item in items.track ?? []) {
-    //       if (item.track != null) tracks.add(item.track!);
-    //     }
-    //     emit(state.copyWith(
-    //         tracks: tracks, loading: false, totalTracks: items.total));
-    // },
-    // );
+    final _likedRepo = AppConstants.likedCollection(uid);
+
+    try {
+      final query = await _likedRepo
+          .limit(100)
+          .orderBy('added_at', descending: true)
+          .get();
+      final tracks = query.docs.map((e) => Track.fromJson(e.data())).toList();
+      emit(state.copyWith(tracks: tracks, loading: false));
+    } catch (e) {
+      logPrint(e, 'liked-songs');
+      emit(state.copyWith(loading: false));
+    }
   }
 
   void _onLoadMore(LoadMoreSongs event, Emitter<LikedSongsState> emit) {
@@ -149,18 +149,20 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
 
   Future<void> _onLoadTrigger(
       LoadMoreTrigger event, Emitter<LikedSongsState> emit) async {
-    // TODO: implement load more liked songs
-    // await _repo.getLikedSongs(
-    //   offset: state.tracks.length,
-    //   onSuccess: (json) {
-    //     final items = PLtracksItems.fromJson(json);
-    //     final List<Track> tracks = state.tracks;
-    //     for (PLitemDetails item in items.track ?? []) {
-    //       if (item.track != null) tracks.add(item.track!);
-    //     }
-    //     emit(state.copyWith(tracks: tracks, moreLoading: false));
-    //   },
-    // );
+    // final _likedRepo = AppConstants.likedCollection(uid);
+
+    try {
+      // TODO: refactor load more tracks
+      // final query = await _likedRepo
+      //     .limit(100)
+      //     .orderBy('added_at', descending: true)
+      //     .get();
+      // final tracks = query.docs.map((e) => Track.fromJson(e.data())).toList();
+      // emit(state.copyWith(tracks: tracks, moreLoading: false));
+    } catch (e) {
+      logPrint(e, 'liked-songs');
+      emit(state.copyWith(moreLoading: false));
+    }
   }
 
   void _titleFade(LikedSongsTitleFade event, Emitter<LikedSongsState> emit) {

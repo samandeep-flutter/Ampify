@@ -85,7 +85,7 @@ class EditPlaylistBloc extends Bloc<EditPlaylistEvents, EditPlaylistState> {
     on<EditPlaylistDetails>(_onEditDetails);
     on<EditPlaylistInitial>(_onInit);
   }
-  final MusicGroupRepo _repo = getIt();
+  // final MusicGroupRepo _repo = getIt();
   final titleContr = TextEditingController();
   final descContr = TextEditingController();
 
@@ -109,15 +109,16 @@ class EditPlaylistBloc extends Bloc<EditPlaylistEvents, EditPlaylistState> {
 
   Future<void> _onEditDetails(
       EditPlaylistDetails event, Emitter<EditPlaylistState> emit) async {
-    emit(state.copyWith(loading: true));
-    final result = await _repo.editPlaylist(
-      id: state.id!,
-      title: event.title ?? state.title!,
-      desc: event.desc ?? state.desc!,
-      public: state.public,
-    );
+    // TODO: implement edit playlist
+    // emit(state.copyWith(loading: true));
+    // final result = await _repo.editPlaylist(
+    //   id: state.id!,
+    //   title: event.title ?? state.title!,
+    //   desc: event.desc ?? state.desc!,
+    //   public: state.public,
+    // );
 
-    emit(state.copyWith(loading: false, success: result));
-    showToast(StringRes.detailsUpdated);
+    // emit(state.copyWith(loading: false, success: result));
+    // showToast(StringRes.detailsUpdated);
   }
 }

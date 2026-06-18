@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'package:ampify/buisness_logic/player_bloc/player_state.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
-import 'player_events.dart';
 
 class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   PlayerBloc() : super(const PlayerState.init()) {
@@ -114,7 +112,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       PlayerMediaStream event, Emitter<PlayerState> emit) async {
     try {
       final item = event.mediaItem;
-      if (item.id == UniqueIds.emptyTrack) return;
+      if (item.id == UniqueIds.emptyTrack) throw FormatException();
       final details = TrackDetails.fromJson(item.extras!);
       emit(state.copyWith(details: details, isLiked: false));
       try {
@@ -124,6 +122,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       } catch (e) {
         logPrint(e, 'liked');
       }
+    } on FormatException {
+      emit(PlayerState.init());
     } catch (e) {
       logPrint(e, 'media-stream');
     }
@@ -233,13 +233,6 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     // TODO: implement queue, upNext, and recomanded (upcomming) shuffle.
   }
 
-  // Future<void> _onQueueStream(
-  //     PlayerQueueStream event, Emitter<PlayerState> emit) async {
-  //   final queue =
-  //       event.queue.map((e) => TrackDetails.fromJson(e.extras!)).toList();
-  //   emit(state.copyWith(queue: [...queue, ...state.queue]));
-  // }
-
   Future<void> _onQueueAdded(
       PlayerQueueAdded event, Emitter<PlayerState> emit) async {
     try {
@@ -275,7 +268,6 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
       if (state.loopMode != MusicLoopMode.off) return;
       logPrint(state, 'track-ended');
       await _audioHandler.stop();
-      emit(PlayerState.init());
     } catch (e) {
       logPrint(e, 'track-ended');
     }

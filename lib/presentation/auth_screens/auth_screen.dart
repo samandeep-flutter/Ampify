@@ -1,8 +1,19 @@
 import 'package:ampify/buisness_logic/auth_bloc/auth_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
+
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  @override
+  initState() {
+    context.read<AuthBloc>().add(AuthInitial());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

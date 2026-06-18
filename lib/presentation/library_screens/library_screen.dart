@@ -71,7 +71,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
         actions: [
           TextButton.icon(
             style: TextButton.styleFrom(foregroundColor: scheme.textColor),
-            onPressed: () => _toCreatePlaylist(bloc.box.uid!),
+            onPressed: () => _toCreatePlaylist(bloc.uid),
             label: Text(
               StringRes.create,
               style: TextStyle(fontSize: Dimens.fontDefault),
@@ -119,9 +119,7 @@ class _LibraryScreenState extends State<LibraryScreen> {
               final loading = pr.loading != cr.loading;
               final filtered = pr.filterSel != cr.filterSel;
               final items = pr.items != cr.items;
-              final moreLoading = pr.moreLoading != cr.moreLoading;
-
-              return loading || items || sort || filtered || moreLoading;
+              return loading || items || sort || filtered;
             },
             builder: (context, state) {
               if (state.loading) {
@@ -135,33 +133,19 @@ class _LibraryScreenState extends State<LibraryScreen> {
               return SliverList.builder(
                 itemCount: state.items.length,
                 itemBuilder: (_, index) {
-                  return MusicGroupTile(state.items[index]);
+                  return MusicGroupTile(state.items[index].item);
                 },
               );
             },
           ),
-          BlocBuilder<LibraryBloc, LibraryState>(
-            buildWhen: (pr, cr) => pr.moreLoading != cr.moreLoading,
-            builder: (context, state) {
-              if (state.moreLoading) {
-                return SliverToBoxAdapter(
-                  child: Column(
-                    children: List.generate(3, (_) {
-                      return SongTileShimmer(iconSize: Dimens.iconTileLarge);
-                    }),
-                  ),
-                );
-              }
-              return SliverSizedBox(height: context.height * .15);
-            },
-          ),
+          SliverSizedBox(height: context.height * .15),
         ],
       ),
     );
   }
 
   void _toCreatePlaylist(String id) {
-    context.pushNamed(AppRoutes.createPlaylist, pathParameters: {'userId': id});
+    context.pushNamed(AppRoutes.createPlaylist, pathParameters: {'uid': id});
   }
 
   ButtonStyle defTextButtonStyle(bool sel) {

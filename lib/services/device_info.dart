@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -15,7 +14,7 @@ class DeviceInfoService {
     if (kIsWeb) {
       final _info = await _device.webBrowserInfo;
       info.addAll({
-        'deviceId': _info.userAgent,
+        'deviceId': _info.productSub,
         'deviceName': _info.browserName.name,
         'deviceModel': _info.platform ?? 'Unknown',
         'osVersion': _info.userAgent ?? 'Unknown',

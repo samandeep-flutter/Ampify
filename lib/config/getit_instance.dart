@@ -7,10 +7,8 @@ GetIt getIt = GetIt.instance;
 
 Future<void> initGetIt() async {
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
-  getIt.registerLazySingleton<DioClient>(() => DioClient(dio: Dio()));
-  getIt.registerLazySingleton<MusicGroupRepo>(() => MusicGroupRepo(getIt()));
   getIt.registerLazySingleton(
-      () => MusicRepo(getIt(), ytMusic: getIt(), ytExplode: YoutubeExplode()));
+      () => MusicRepo(getIt(), ytExplode: YoutubeExplode()));
 
   // async singletons
   getIt.registerSingletonAsync<AuthServices>(AuthServices.instance.init);

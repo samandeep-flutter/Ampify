@@ -42,7 +42,7 @@ class LibraryModel extends Equatable {
           videoId: result.videoId,
           artist: MyArtistBasic.fromYT(result.artist),
           album: result.album != null ? Album.fromYtBasic(result.album!) : null,
-          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+          thumbnail: result.thumbnails.toThumbnail(),
           duration: result.duration?.toDuration(),
         );
 
@@ -54,7 +54,7 @@ class LibraryModel extends Equatable {
           type: type,
           videoId: result.videoId,
           artist: MyArtistBasic.fromYT(result.artist),
-          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+          thumbnail: result.thumbnails.toThumbnail(),
           duration: result.duration?.toDuration(),
         );
 
@@ -65,7 +65,7 @@ class LibraryModel extends Equatable {
           title: result.name,
           type: type,
           artist: MyArtistBasic.fromYT(result.artist),
-          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+          thumbnail: result.thumbnails.toThumbnail(),
         );
 
       case LibItemType.album:
@@ -76,7 +76,7 @@ class LibraryModel extends Equatable {
           type: type,
           // vidID: result.playlistId,
           artist: MyArtistBasic.fromYT(result.artist),
-          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+          thumbnail: result.thumbnails.toThumbnail(),
         );
 
       case LibItemType.artist:
@@ -85,12 +85,30 @@ class LibraryModel extends Equatable {
           id: result.artistId,
           title: result.name,
           type: type,
-          thumbnail: result.thumbnails.firstOrNull?.toThumbnail(),
+          thumbnail: result.thumbnails.toThumbnail(),
         );
 
       case LibItemType.unknown:
         throw UnimplementedError('Unknown type: ${result.type}');
     }
+  }
+
+  factory LibraryModel.fromJson(Map<String, dynamic> json) {
+    return LibraryModel(
+      id: json['id'],
+      type: LibItemType.values.firstWhere((e) => e.id == json['type']),
+      videoId: json['videoId'],
+      title: json['title'],
+      thumbnail: json['thumbnail'] != null
+          ? Thumbnail.fromJson(json['thumbnail'])
+          : null,
+      album: json['album'] != null ? Album.fromJson(json['album']) : null,
+      artist: json['artist'] != null
+          ? MyArtistBasic.fromJson(json['artist'])
+          : null,
+      duration:
+          json['duration'] != null ? Duration(seconds: json['duration']) : null,
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -101,7 +119,7 @@ class LibraryModel extends Equatable {
         'thumbnail': thumbnail?.toJson(),
         'album': album?.toJson(),
         'artist': artist?.toJson(),
-        'duration': duration?.inSeconds
+        'duration': duration?.inSeconds,
       };
 
   @override
@@ -122,10 +140,11 @@ enum LibItemType {
 }
 
 class Thumbnail extends Equatable {
-  final String? url;
-  final int? width;
-  final int? height;
-  const Thumbnail({this.url, this.width, this.height});
+  final String url;
+  final int width;
+  final int height;
+  const Thumbnail(
+      {required this.url, required this.width, required this.height});
 
   factory Thumbnail.fromYT(ThumbnailFull thumbnail) {
     return Thumbnail(

@@ -1,9 +1,5 @@
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/utils/exports.dart';
-import '../../../buisness_logic/player_bloc/player_bloc.dart';
 import 'package:ampify/presentation/root_view/player_screens/player_screen.dart';
-import '../../../buisness_logic/player_bloc/player_slider_bloc.dart';
-import '../../../buisness_logic/player_bloc/player_state.dart';
 
 class PlayerCompact extends StatelessWidget {
   const PlayerCompact({super.key});

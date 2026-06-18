@@ -12,7 +12,20 @@
           "package_name": "com.samtech.ampify"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "962828708485-ta4ulc1jdrkcl45itd55dij1ifijvuuu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.samtech.ampify",
+            "certificate_hash": "a9b5ee55a1b1399c440b4a0bb7ecb4ea241f99c4"
+          }
+        },
+        {
+          "client_id": "962828708485-c6lu7bcdc27f0k3c2oh1s21q34cgnvfs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBdssOYzAwW_t25V0TBgGylH0lOnXyZRnU"
@@ -21,6 +34,10 @@
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
+            {
+              "client_id": "962828708485-c6lu7bcdc27f0k3c2oh1s21q34cgnvfs.apps.googleusercontent.com",
+              "client_type": 3
+            },
             {
               "client_id": "962828708485-pu3uqbhm9r8dm65khtjb2dc92f14a4o0.apps.googleusercontent.com",
               "client_type": 2,

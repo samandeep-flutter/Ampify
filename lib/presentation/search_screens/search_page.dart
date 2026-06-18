@@ -1,7 +1,6 @@
 import 'package:ampify/buisness_logic/search_bloc/search_bloc.dart';
 import 'package:ampify/presentation/music_groups/music_group_tile.dart';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:ampify/presentation/track_widgets/track_tile.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});

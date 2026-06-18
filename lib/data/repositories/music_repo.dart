@@ -4,10 +4,9 @@ import 'package:ampify/data/utils/exports.dart' hide SearchResult;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class MusicRepo {
-  final DioClient dio;
   final YTMusic ytMusic;
   final YoutubeExplode ytExplode;
-  MusicRepo(this.dio, {required this.ytMusic, required this.ytExplode});
+  MusicRepo(this.ytMusic, {required this.ytExplode});
 
   final _ytClients = [YoutubeApiClient.androidVr];
   // Future<SongYtDetails?> getDetailsFromQuery(Track track) async {
@@ -53,15 +52,15 @@ class MusicRepo {
   //   }
   // }
 
-  // Future<Duration?> _getSongDuration(String vidId) async {
-  //   try {
-  //     final song = await ytMusic.getSong(vidId);
-  //     return Duration(seconds: song.duration);
-  //   } catch (e) {
-  //     logPrint(e, 'yt-duration');
-  //     return null;
-  //   }
-  // }
+  Future<Duration?> getSongDuration(String vidId) async {
+    try {
+      final song = await ytMusic.getSong(vidId);
+      return Duration(seconds: song.duration);
+    } catch (e) {
+      logPrint(e, 'yt-duration');
+      return null;
+    }
+  }
 }
 
 extension MyStream on StreamManifest {

@@ -44,10 +44,9 @@ abstract class AppPage {
         name: AppRoutes.createPlaylist,
         path: AppRoutePaths.createPlaylist,
         builder: (_, state) {
-          final id = state.pathParameters['userId'] as String;
+          final id = state.pathParameters['uid'] as String;
           return BlocProvider(
-              create: (_) => PlaylistBloc(),
-              child: CreatePlaylistView(userId: id));
+              create: (_) => PlaylistBloc(), child: CreatePlaylistView(id));
         },
       ),
       GoRoute(

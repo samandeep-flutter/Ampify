@@ -29,7 +29,7 @@ class Track extends Equatable {
       title: track.name,
       artist: MyArtistBasic.fromYT(track.artist),
       album: track.album != null ? Album.fromYtBasic(track.album!) : null,
-      thumbnail: track.thumbnails.firstOrNull?.toThumbnail(),
+      thumbnail: track.thumbnails.toThumbnail(),
       duration: track.duration?.toDuration(),
     );
   }
@@ -41,7 +41,7 @@ class Track extends Equatable {
       title: video.name,
       album: null,
       artist: MyArtistBasic.fromYT(video.artist),
-      thumbnail: video.thumbnails.firstOrNull?.toThumbnail(),
+      thumbnail: video.thumbnails.toThumbnail(),
       duration: video.duration?.toDuration(),
     );
   }
@@ -53,7 +53,7 @@ class Track extends Equatable {
       title: upnxt.title,
       artist: MyArtistBasic.fromYT(upnxt.artists),
       album: upnxt.album != null ? Album.fromYtBasic(upnxt.album!) : null,
-      thumbnail: upnxt.thumbnails.firstOrNull?.toThumbnail(),
+      thumbnail: upnxt.thumbnails.toThumbnail(),
       duration: Duration(seconds: upnxt.duration),
     );
   }

@@ -3,8 +3,8 @@ import '../../buisness_logic/music_group_bloc/playlist_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class CreatePlaylistView extends StatelessWidget {
-  final String userId;
-  const CreatePlaylistView({super.key, required this.userId});
+  final String uid;
+  const CreatePlaylistView(this.uid, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +72,7 @@ class CreatePlaylistView extends StatelessWidget {
                     builder: (context, state) {
                       return LoadingButton(
                         isLoading: state.loading,
-                        onPressed: () => bloc.createPlaylist(userId),
+                        onPressed: () => bloc.createPlaylist(uid),
                         child: const Text(StringRes.submit),
                       );
                     },

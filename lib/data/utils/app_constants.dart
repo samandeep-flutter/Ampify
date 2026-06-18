@@ -8,33 +8,25 @@ import 'package:oktoast/oktoast.dart';
 typedef FirestoreRef = CollectionReference<Map<String, dynamic>>;
 
 sealed class AppConstants {
-  static const String search = 'search';
-  static const String profile = 'me';
-  static const String myAlbums = 'me/albums';
-  static const String myPlaylists = 'me/playlists';
-  static String checkSaved(String ids) => 'me/tracks/contains?ids=$ids';
-  static String userPlaylists(String id) => 'users/$id/playlists';
-  static String addtoPlaylist(String id, {required String uris}) =>
-      'playlists/$id/tracks?uris=$uris';
-  static String removeFromPlaylist(String id) => 'playlists/$id/tracks';
-  static String playlistDetails(String id) => 'playlists/$id';
-  static String albumDetails(String id) => 'albums/$id';
-  static String likedSongs(int offset) => 'me/tracks?offset=$offset';
-  static String savetoLiked(String id) => 'me/tracks?ids=$id';
-  static String saveAlbum(String id) => 'me/albums?ids=$id';
-  static String savePlaylist(String id) => 'playlists/$id/followers';
-  static String changePlaylistCover(String id) => 'playlists/$id/images';
-  static String isFollowAlbum(String id) => 'me/albums/contains?ids=$id';
-  static String isFollowPlaylist(String id) =>
-      'playlists/$id/followers/contains';
-
   static FirestoreRef get usersCollection =>
       FirebaseFirestore.instance.collection(_FBKeys.users);
+  static FirestoreRef get searchCollection =>
+      FirebaseFirestore.instance.collection(_FBKeys.search);
+  static FirestoreRef get historyCollection =>
+      FirebaseFirestore.instance.collection(_FBKeys.history);
+  static FirestoreRef get libraryCollection =>
+      FirebaseFirestore.instance.collection(_FBKeys.library);
+  static FirestoreRef likedCollection(String uid) =>
+      libraryCollection.doc(uid).collection(_FBKeys.likedTracks);
 }
 
 sealed class _FBKeys {
   // static const String about = 'about';
   static const String users = 'users';
+  static const String search = 'search';
+  static const String history = 'history';
+  static const String library = 'library';
+  static const String likedTracks = 'liked-tracks';
 }
 
 sealed class BoxKeys {
@@ -51,16 +43,6 @@ sealed class BoxKeys {
       [theme, themeMode, log, logger, deviceInfo].contains(key);
   static String get boxName =>
       StringRes.appName.toLowerCase().replaceAll(' ', '-');
-}
-
-sealed class EnvKeys {
-  static const String id = 'CLIENT_ID';
-  static const String secret = 'CLIENT_SECRET';
-  static const String redirect = 'REDIRECT';
-  static const String bundleID = 'BUNDLE_ID';
-
-  static const String baseURL = 'BASE_URL';
-  static const String token = 'TOKEN';
 }
 
 sealed class UniqueIds {

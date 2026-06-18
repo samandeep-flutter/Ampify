@@ -24,43 +24,47 @@ class AlbumShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: context.height * .25,
-      child: GridView.builder(
-          padding: Utils.insetsHoriz(Dimens.sizeDefault),
-          scrollDirection: Axis.horizontal,
-          gridDelegate: Utils.fixedCrossAxis(1,
-              aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
-          itemCount: Dimens.sizeExtraSmall.toInt(),
-          itemBuilder: (_, index) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(Dimens.borderSmall),
-                  child: AspectRatio(aspectRatio: 1, child: Shimmer.box),
-                ),
-                const SizedBox(height: Dimens.sizeSmall),
-                SizedBox(
-                    height: Dimens.sizeMedSmall,
-                    child: FractionallySizedBox(
-                      heightFactor: 1,
-                      widthFactor: .5,
-                      child: Shimmer.box,
-                    )),
-                const SizedBox(height: Dimens.sizeSmall),
-                SizedBox(
-                    height: Dimens.sizeMedSmall,
-                    child: FractionallySizedBox(
-                      heightFactor: 1,
-                      widthFactor: .8,
-                      child: Shimmer.box,
-                    )),
-              ],
-            );
-          }),
-    );
+    return Column(
+        children: List.generate(2, (_) {
+      return Container(
+        margin: Utils.insetsVert(Dimens.sizeDefault),
+        height: context.height * .25,
+        child: GridView.builder(
+            padding: Utils.insetsHoriz(Dimens.sizeDefault),
+            scrollDirection: Axis.horizontal,
+            gridDelegate: Utils.fixedCrossAxis(1,
+                aspectRatio: 1.3, spacing: Dimens.sizeMedSmall),
+            itemCount: Dimens.sizeExtraSmall.toInt(),
+            itemBuilder: (_, index) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(Dimens.borderSmall),
+                    child: AspectRatio(aspectRatio: 1, child: Shimmer.box),
+                  ),
+                  const SizedBox(height: Dimens.sizeSmall),
+                  SizedBox(
+                      height: Dimens.sizeMedSmall,
+                      child: FractionallySizedBox(
+                        heightFactor: 1,
+                        widthFactor: .5,
+                        child: Shimmer.box,
+                      )),
+                  const SizedBox(height: Dimens.sizeSmall),
+                  SizedBox(
+                      height: Dimens.sizeMedSmall,
+                      child: FractionallySizedBox(
+                        heightFactor: 1,
+                        widthFactor: .8,
+                        child: Shimmer.box,
+                      )),
+                ],
+              );
+            }),
+      );
+    }));
   }
 }
 

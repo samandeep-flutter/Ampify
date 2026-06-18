@@ -1,8 +1,4 @@
-import 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
-import 'package:ampify/buisness_logic/player_bloc/player_events.dart';
 import 'package:ampify/data/utils/exports.dart';
-
-import '../../buisness_logic/player_bloc/player_slider_bloc.dart';
 
 class MusicGroupTile extends StatelessWidget {
   final LibraryModel item;
