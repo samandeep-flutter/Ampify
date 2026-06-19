@@ -153,7 +153,7 @@ class _LikedSongsState extends State<LikedSongs> {
               SliverList.builder(
                   itemCount: state.tracks.length,
                   itemBuilder: (context, index) {
-                    final track = state.tracks[index];
+                    final track = state.tracks[index].item;
                     return TrackTile(track, liked: true);
                   }),
               if (state.moreLoading)

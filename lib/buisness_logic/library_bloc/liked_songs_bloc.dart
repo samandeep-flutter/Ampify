@@ -1,3 +1,4 @@
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class LikedSongsEvent extends Equatable {
@@ -31,7 +32,7 @@ class LikedSongsTitleFade extends LikedSongsEvent {
 
 class LikedSongsState extends Equatable {
   final double titileOpacity;
-  final List<Track> tracks;
+  final List<TrackDbModel> tracks;
   final bool loading;
   final int totalTracks;
   final bool moreLoading;
@@ -52,7 +53,7 @@ class LikedSongsState extends Equatable {
         tracks = const [];
 
   LikedSongsState copyWith({
-    List<Track>? tracks,
+    List<TrackDbModel>? tracks,
     int? totalTracks,
     bool? loading,
     bool? moreLoading,
@@ -81,6 +82,8 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     on<LoadMoreTrigger>(_onLoadTrigger,
         transformer: Utils.debounce(Durations.short4));
   }
+
+  final LibraryRepo _libRepo = getIt();
   String get uid => BoxServices.instance.uid!;
 
   final scrollController = ScrollController();
@@ -88,8 +91,8 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
 
   void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
-    player
-        .add(MusicGroupPlayed(id: UniqueIds.likedSongs, tracks: state.tracks));
+    final _tracks = state.tracks.map((e) => e.item).toList();
+    player.add(MusicGroupPlayed(id: UniqueIds.likedSongs, tracks: _tracks));
   }
 
   void _titleFadeListener() {
@@ -116,8 +119,8 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   void _onRemoved(SongRemoved event, Emitter<LikedSongsState> emit) async {
     // TODO: implement remove song as well
     libRefresh = true;
-    List<Track> tracks = state.tracks;
-    tracks.removeWhere((e) => e.id == event.id);
+    List<TrackDbModel> tracks = state.tracks;
+    tracks.removeWhere((e) => e.item.id == event.id);
     emit(state.copyWith(tracks: tracks, totalTracks: state.totalTracks - 1));
   }
 
@@ -127,14 +130,11 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
     scrollController.addListener(_titleFadeListener);
     scrollController.addListener(_loadMoreSongs);
     libRefresh = false;
-    final _likedRepo = AppConstants.likedCollection(uid);
 
     try {
-      final query = await _likedRepo
-          .limit(100)
-          .orderBy('added_at', descending: true)
-          .get();
-      final tracks = query.docs.map((e) => Track.fromJson(e.data())).toList();
+      // TODO: implement pagination logic
+      final docs = await _libRepo.likedTracks(uid, limit: 100);
+      final tracks = docs.map((e) => TrackDbModel.fromJson(e.data())).toList();
       emit(state.copyWith(tracks: tracks, loading: false));
     } catch (e) {
       logPrint(e, 'liked-songs');

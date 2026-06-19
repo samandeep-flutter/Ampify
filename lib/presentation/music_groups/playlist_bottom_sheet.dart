@@ -1,28 +1,18 @@
 import 'package:ampify/data/utils/exports.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../buisness_logic/music_group_bloc/music_group_bloc.dart';
 
 class PlaylistBottomSheet extends StatefulWidget {
-  final String? id;
-  final Thumbnail? image;
-  final String? title;
-  final String? owner;
-  final String? description;
-  const PlaylistBottomSheet({
-    super.key,
-    required this.id,
-    required this.image,
-    required this.title,
-    required this.owner,
-    required this.description,
-  });
+  final MusicGroupState? state;
+  const PlaylistBottomSheet({super.key, required this.state});
 
   @override
   State<PlaylistBottomSheet> createState() => _PlaylistBottomSheetState();
 }
 
 class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
-  String? get uid => BoxServices.instance.uid;
-  bool get isOwner => widget.owner == uid;
+  bool get isOwner => widget.state?.owner == BoxServices.instance.uid;
+  LibraryModel? get item => widget.state?.item;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +32,7 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
             final double height = _scalar.scale(_dimen);
             final width = _scalar.scale(_dimen + Dimens.sizeMedSmall);
 
-            return MyCachedImage(widget.image?.url,
+            return MyCachedImage(widget.state?.cover,
                 border: Dimens.sizeMini, height: height, width: width);
           }),
           const SizedBox(width: Dimens.sizeDefault),
@@ -52,7 +42,7 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.title ?? '',
+                  item?.title ?? '',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -136,53 +126,28 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
 
   void _toEditDetails(BuildContext context) {
     Navigator.pop(context);
-    final pathParams = {'id': widget.id!};
     final params = {
-      'image': widget.image,
-      'title': widget.title,
-      'desc': widget.description
+      'title': item?.title,
+      'image': item?.thumbnail?.url,
+      'desc': widget.state?.description
     };
     context.pushNamed(AppRoutes.modifyPlaylist,
-        pathParameters: pathParams, queryParameters: params);
+        pathParameters: {'id': widget.state!.id!}, queryParameters: params);
   }
 
-  void _pickCoverImage(BuildContext context) {
+  void _pickCoverImage(BuildContext context) async {
     Navigator.pop(context);
-    context.read<MusicGroupBloc>().pickImage();
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return MyAlertDialog(
-    //         titleText: 'Choose Image',
-    //         actionPadding: EdgeInsets.zero,
-    //         content: Column(
-    //           mainAxisSize: MainAxisSize.min,
-    //           children: [
-    //             ListTile(
-    //               onTap: () {
-    //                 Navigator.pop(context);
-    //                 bloc.pickImage(ImageSource.gallery);
-    //               },
-    //               contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
-    //               leading: Icon(Icons.photo_library_outlined,
-    //                   size: Dimens.iconDefault),
-    //               title: Text(StringRes.gallery,
-    //                   style: TextStyle(fontSize: Dimens.fontXXXLarge)),
-    //             ),
-    //             ListTile(
-    //               onTap: () {
-    //                 Navigator.pop(context);
-    //                 bloc.pickImage(ImageSource.camera);
-    //               },
-    //               contentPadding: Utils.insetsHoriz(Dimens.sizeSmall),
-    //               leading: Icon(Icons.photo_camera_outlined,
-    //                   size: Dimens.iconDefault),
-    //               title: Text(StringRes.camera,
-    //                   style: TextStyle(fontSize: Dimens.fontXXXLarge)),
-    //             ),
-    //           ],
-    //         ),
-    //       );
-    // });
+    final bloc = context.read<MusicGroupBloc>();
+    try {
+      final result = await FilePicker.pickFiles(
+          allowMultiple: false, type: FileType.image);
+      final file = result?.files.firstOrNull;
+      if (file == null) throw FormatException(StringRes.noImage);
+      bloc.add(PlaylistCoverChanged(File(file.path!)));
+    } on FormatException catch (e) {
+      showToast(e.message);
+    } catch (e) {
+      logPrint(e, 'image-picker');
+    }
   }
 }

@@ -168,20 +168,22 @@ sealed class Utils {
     }
   }
 
-  static LibDbModel likedSongs({required int? count}) {
+  static LibDbModel likedSongs(int? count, {required DateTime? updatedAt}) {
     return LibDbModel(
-        item: LibraryModel(
+      createdAt: DateTime(2026),
+      updatedAt: updatedAt ??= DateTime.now(),
+      item: LibraryModel(
+        thumbnail: null,
+        id: UniqueIds.likedSongs,
+        type: LibItemType.playlist,
+        title: StringRes.likedSongs,
+        artist: MyArtistBasic(
+          id: UniqueIds.artistId,
+          name: count != null ? '$count songs' : '',
           thumbnail: null,
-          id: UniqueIds.likedSongs,
-          type: LibItemType.playlist,
-          title: StringRes.likedSongs,
-          artist: MyArtistBasic(
-            id: UniqueIds.artistId,
-            name: count != null ? '$count songs' : '',
-            thumbnail: null,
-          ),
         ),
-        addedAt: DateTime(2026));
+      ),
+    );
   }
 
   static MediaItem toMediaItem(TrackDetails details, {required Uri uri}) {

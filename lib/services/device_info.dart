@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:flutter/foundation.dart';
 import 'package:device_info_plus/device_info_plus.dart';

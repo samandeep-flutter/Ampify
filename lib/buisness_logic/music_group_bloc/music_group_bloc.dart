@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:ampify/data/utils/exports.dart';
-import 'package:file_picker/file_picker.dart';
 
 class MusicGroupEvent extends Equatable {
   const MusicGroupEvent();
@@ -73,26 +71,22 @@ class MusicGroupTitleFade extends MusicGroupEvent {
 class MusicGroupState extends Equatable {
   final String? id;
   final double titileOpacity;
-  final Thumbnail? thumbnail;
   final Color? bgColor;
-  final String? title;
-  final String? subtitle;
   final String? owner;
+  final LibraryModel? item;
+  final String? subtitle;
   final String? description;
   final List<Track> tracks;
-  final LibItemType? type;
   final bool? isFav;
   final bool loading;
 
   const MusicGroupState({
     required this.id,
-    required this.thumbnail,
     required this.bgColor,
-    required this.title,
+    required this.item,
     required this.subtitle,
     required this.owner,
     required this.description,
-    required this.type,
     required this.titileOpacity,
     required this.isFav,
     required this.tracks,
@@ -101,11 +95,9 @@ class MusicGroupState extends Equatable {
 
   const MusicGroupState.init()
       : id = null,
-        thumbnail = null,
         titileOpacity = 0,
-        type = null,
         bgColor = null,
-        title = null,
+        item = null,
         subtitle = null,
         owner = null,
         description = null,
@@ -115,44 +107,41 @@ class MusicGroupState extends Equatable {
 
   MusicGroupState copyWith({
     String? id,
-    Thumbnail? thumbnail,
     Color? bgColor,
-    String? title,
-    String? subtitle,
     String? owner,
+    LibraryModel? item,
+    String? subtitle,
     String? description,
+    double? titileOpacity,
     List<Track>? tracks,
-    LibItemType? type,
     bool? isFav,
     bool? loading,
-    double? titileOpacity,
   }) {
     return MusicGroupState(
       id: id ?? this.id,
-      thumbnail: thumbnail ?? this.thumbnail,
       bgColor: bgColor ?? this.bgColor,
-      title: title ?? this.title,
+      item: item ?? this.item,
       subtitle: subtitle ?? this.subtitle,
       owner: owner ?? this.owner,
-      description: description ?? this.description,
       isFav: isFav,
+      description: description ?? this.description,
       titileOpacity: titileOpacity ?? this.titileOpacity,
-      type: type ?? this.type,
       tracks: tracks ?? this.tracks,
       loading: loading ?? this.loading,
     );
   }
 
+  LibItemType? get type => item?.type;
+  String? get cover => item?.thumbnail?.url;
+
   @override
   List<Object?> get props => [
-        thumbnail,
         bgColor,
-        title,
+        item,
         subtitle,
         owner,
         description,
         tracks,
-        type,
         loading,
         titileOpacity,
         isFav
@@ -186,22 +175,6 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     final player = context.read<PlayerBloc>();
     if (player.state.musicGroupId == state.id) return player.onPlayPause();
     player.add(MusicGroupPlayed(id: state.id, tracks: state.tracks));
-  }
-
-  Future<bool> pickImage() async {
-    try {
-      final result = await FilePicker.pickFiles(
-          allowMultiple: false, type: FileType.image);
-      final file = result?.files.firstOrNull;
-      if (file == null) throw FormatException(StringRes.noImage);
-      add(PlaylistCoverChanged(File(file.path!)));
-      return true;
-    } on FormatException catch (e) {
-      showToast(e.message);
-    } catch (e) {
-      logPrint(e, 'image-picker');
-    }
-    return false;
   }
 
   void _scrollListener() {
@@ -240,13 +213,18 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
       final color = await Utils.getImageColor(playlist.thumbnail);
       // TODO: implement fav item check
       // final isFav = await _repo.isFavPlaylist(event.id);
+
       emit(state.copyWith(
-        thumbnail: playlist.thumbnail,
+        item: LibraryModel(
+          id: playlist.id,
+          title: playlist.title,
+          thumbnail: playlist.thumbnail,
+          type: LibItemType.playlist,
+        ),
         tracks: tracks,
-        type: LibItemType.playlist,
         bgColor: color,
+        subtitle: '${playlist.videoCount} views',
         // isFav: isFav,
-        title: playlist.title,
         loading: false,
       ));
     } catch (e) {
@@ -267,12 +245,16 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
       emit(state.copyWith(
         loading: false,
         bgColor: color,
-        title: album.title,
+        item: LibraryModel(
+          id: album.id,
+          title: album.title,
+          thumbnail: album.thumbnail,
+          type: LibItemType.album,
+          artist: album.artist,
+        ),
         tracks: album.tracks,
         subtitle: album.year?.toString(),
         // isFav: isFav,
-        thumbnail: album.thumbnail,
-        type: event.type,
       ));
     } catch (e) {
       logPrint(e, 'album-init');
@@ -282,27 +264,18 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
 
   Future<void> _onFav(
       MusicGroupFav event, Emitter<MusicGroupState> emit) async {
-    // TODO: implement add to fav songs
-
-    // libRefresh = true;
-    // try {
-    //   emit(state.copyWith(isFav: !event.liked));
-    //   if (event.liked) {
-    //     final success = event.type.isPlaylist
-    //         ? await _repo.removeSavedPlaylist(event.id)
-    //         : await _repo.removeSavedAlbum(event.id);
-    //     if (!success) throw const FormatException();
-    //   } else {
-    //     final success = event.type.isPlaylist
-    //         ? await _repo.savePlaylist(event.id)
-    //         : await _repo.saveAlbum(event.id);
-    //     if (!success) throw const FormatException();
-    //   }
-    // } on FormatException {
-    //   emit(state.copyWith(isFav: event.liked));
-    // } catch (e) {
-    //   logPrint(e, 'fav');
-    // }
+    libRefresh = true;
+    try {
+      emit(state.copyWith(isFav: !event.liked));
+      // TODO: implement fav item
+      // if (event.liked) {
+      //   _repo.doc(event.id).delete();
+      // } else {
+      //   _repo.doc(event.id).set(data);
+      // }
+    } catch (e) {
+      logPrint(e, 'fav');
+    }
   }
 
   Future<void> _onCoverChanged(

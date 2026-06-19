@@ -2,8 +2,6 @@ import 'package:ampify/data/utils/exports.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
-typedef Dfunc = void Function(dynamic);
-
 class BoxServices {
   static BoxServices? _instance;
   static BoxServices get instance => _instance ??= BoxServices._init();

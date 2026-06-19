@@ -54,7 +54,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                       return AnimatedOpacity(
                         opacity: state.titileOpacity,
                         duration: Durations.long2,
-                        child: Text(state.title ?? ''),
+                        child: Text(state.item?.title ?? ''),
                       );
                     },
                   ),
@@ -66,11 +66,11 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                   background: Align(
                     alignment: Alignment.bottomCenter,
                     child: BlocBuilder<MusicGroupBloc, MusicGroupState>(
-                      buildWhen: (pr, cr) => pr.thumbnail != cr.thumbnail,
+                      buildWhen: (pr, cr) => pr.item != cr.item,
                       builder: (context, state) {
                         return MyCachedImage(
-                          state.thumbnail?.url,
-                          loading: state.thumbnail?.url.isEmpty ?? true,
+                          state.item?.thumbnail?.url,
+                          loading: state.cover?.isEmpty ?? true,
                           height: context.height * .3,
                           width: context.height * .3,
                           border: Dimens.sizeExtraSmall,
@@ -97,7 +97,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: Dimens.sizeSmall),
-                      Text(state.title ?? '',
+                      Text(state.item?.title ?? '',
                           style: Utils.titleStyleLarge(context)),
                       if (state.description?.isNotEmpty ?? false) ...[
                         const SizedBox(height: Dimens.sizeExtraSmall),
@@ -359,15 +359,7 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return BlocProvider.value(
-          value: bloc,
-          child: PlaylistBottomSheet(
-            id: state.id,
-            image: state.thumbnail,
-            title: state.title,
-            owner: state.owner,
-            description: state.description,
-          ),
-        );
+            value: bloc, child: PlaylistBottomSheet(state: state));
       },
     );
   }

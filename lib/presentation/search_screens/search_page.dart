@@ -42,52 +42,43 @@ class SearchPage extends StatelessWidget {
           ),
         ),
       ),
-      child: Column(
-        children: [
-          BlocBuilder<SearchBloc, SearchState>(
-            builder: (context, state) {
-              if (state.isLoading) {
-                return Expanded(
-                  child: ListView.builder(
-                    itemCount: 12,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.only(top: Dimens.sizeDefault),
-                    itemBuilder: (_, __) => const SongTileShimmer(),
-                  ),
-                );
-              } else if (state.results == null) {
-                return ToolTipWidget.placeHolder(
-                  scrolable: true,
-                  icon: ImageRes.music,
-                  title: StringRes.searchBarSubtitle,
-                );
-              } else if (state.results!.isEmpty) {
-                return ToolTipWidget.placeHolder(
-                  scrolable: true,
-                  icon: ImageRes.search,
-                  title: StringRes.emptySearchResults,
-                );
+      child: BlocBuilder<SearchBloc, SearchState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return ListView.builder(
+              itemCount: 12,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(top: Dimens.sizeDefault),
+              itemBuilder: (_, __) => const SongTileShimmer(),
+            );
+          } else if (state.results == null) {
+            return ToolTipWidget.placeHolder(
+              scrolable: true,
+              icon: ImageRes.music,
+              title: StringRes.searchBarSubtitle,
+            );
+          } else if (state.results!.isEmpty) {
+            return ToolTipWidget.placeHolder(
+              scrolable: true,
+              icon: ImageRes.search,
+              title: StringRes.emptySearchResults,
+            );
+          }
+
+          return ListView.builder(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.only(bottom: context.height * .18),
+            itemCount: state.results?.length ?? 0,
+            itemBuilder: (context, index) {
+              final item = state.results![index];
+
+              if (item.type.isTrack) {
+                return TrackTile.search(Track.fromJson(item.toJson()));
               }
-
-              return Expanded(
-                child: ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  padding: EdgeInsets.only(bottom: context.height * .18),
-                  itemCount: state.results?.length ?? 0,
-                  itemBuilder: (context, index) {
-                    final item = state.results![index];
-
-                    if (item.type.isTrack) {
-                      return TrackTile.search(Track.fromJson(item.toJson()));
-                    }
-                    return MusicGroupTile(item,
-                        imageHeight: Dimens.iconUltraLarge);
-                  },
-                ),
-              );
+              return MusicGroupTile(item, imageHeight: Dimens.iconUltraLarge);
             },
-          ),
-        ],
+          );
+        },
       ),
     );
   }

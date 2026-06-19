@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ampify/data/repositories/auth_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -61,6 +62,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthGoogleLogin>(_onGoogleLogin);
     on<AuthFinished>(_onFinish);
   }
+  final _authRepo = AuthRepo();
   final AuthServices auth = getIt();
   final _fbAuth = FirebaseAuth.instance;
   final _google = GoogleSignIn.instance;
@@ -113,17 +115,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onFinish(AuthFinished event, Emitter<AuthState> emit) async {
     if (event.user == null) return;
-    final userRepo = AppConstants.usersCollection;
     final _box = BoxServices.instance;
 
     try {
       final uid = event.user!.uid;
-      final json = await userRepo.doc(uid).get();
-      if (!json.exists) throw Exception();
-      final user = UserModel.fromJson(json.data()!);
-      userRepo.doc(uid).update({'login': true});
+      final user = await _authRepo.getUser(uid);
+      if (user == null) throw Exception();
+      _authRepo.updateLogin(uid, true);
       if (user.deviceToken != event.token) {
-        userRepo.doc(uid).update({'device_token': event.token});
+        _authRepo.updateToken(uid, event.token);
       }
       _box.write(BoxKeys.profile,
           user.copyWith(login: true, deviceToken: event.token).toJson());
@@ -139,7 +139,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         deviceToken: event.token,
         login: true,
       );
-      await userRepo.doc(details.id).set(details.toJson());
+      await _authRepo.addUser(details);
       _box.write(BoxKeys.profile, details.toJson());
     } finally {
       _box.write(BoxKeys.uid, event.user!.uid);

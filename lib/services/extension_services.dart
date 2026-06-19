@@ -1,5 +1,6 @@
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -100,6 +101,13 @@ extension DurationHelper on List<Track> {
       _duration += element.duration ?? Duration.zero;
     }
     return _duration;
+  }
+}
+
+extension MyQuery<T> on Query<T> {
+  Query<T> afterDoc(DocumentSnapshot? snapshot) {
+    if (snapshot == null) return this;
+    return startAfterDocument(snapshot);
   }
 }
 

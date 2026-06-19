@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class LibraryEvent extends Equatable {
@@ -86,14 +87,22 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<LibraryFiltered>(_onFiltered);
     on<LibrarySorted>(_onSorted);
   }
-  final _libRepo = AppConstants.libraryCollection;
+  final LibraryRepo _libRepo = getIt();
   String get uid => BoxServices.instance.uid!;
 
   final scrollController = ScrollController();
-  List<LibDbModel> _libItems = [];
+  List<LibDbModel> _library = [];
+  DateTime? likedUpdatedAt;
 
-  void _onInit(LibraryInitial event, Emitter<LibraryState> emit) {
-    add(LibraryRefresh());
+  void _onInit(LibraryInitial event, Emitter<LibraryState> emit) async {
+    try {
+      add(LibraryRefresh());
+      final lib = await _libRepo.libDetails(uid);
+      emit(state.copyWith(sortby: lib?.sortby, filterSel: lib?.filterSel));
+      likedUpdatedAt = lib?.updatedAt;
+    } catch (e) {
+      logPrint(e, 'lib-init');
+    }
   }
 
   void _onSorted(LibrarySorted event, Emitter<LibraryState> emit) {
@@ -111,49 +120,41 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         break;
       case SortOrder.custom:
         final items = state.items
-          ..sort((a, b) => a.addedAt.compareTo(b.addedAt));
+          ..sort((a, b) =>
+              a.updatedAt?.compareTo(b.updatedAt ?? a.updatedAt!) ?? 0);
         emit(state.copyWith(items: items, sortby: event.order));
         break;
     }
-    _libRepo.doc(uid).update({'sort_order': event.order.name});
+    _libRepo.updateOrder(uid, event.order);
   }
 
   void _onFiltered(LibraryFiltered event, Emitter<LibraryState> emit) {
-    if (state.filterSel == null) _libItems = state.items;
+    if (state.filterSel == null) _library = state.items;
     if (state.filterSel == event.type) {
-      emit(state.copyWith(filterSel: null, items: _libItems));
+      emit(state.copyWith(filterSel: null, items: _library));
       return;
     }
 
-    final items = _libItems.where((e) => e.item.type == event.type).toList();
+    final items = _library.where((e) => e.item.type == event.type).toList();
     emit(state.copyWith(items: items, filterSel: event.type));
-    _libRepo.doc(uid).update({'filter_order': event.type.id});
+    _libRepo.updateFilter(uid, event.type);
   }
 
   Future<void> _onRefresh(
       LibraryRefresh event, Emitter<LibraryState> emit) async {
     try {
       final likedCount = Completer<int?>();
-      final _likedRepo = AppConstants.likedCollection(uid);
-      _likedRepo.count().get().then((e) {
-        likedCount.complete(e.count);
+      _libRepo.likedSnapshot(uid).then((e) {
+        likedCount.complete(e?.count);
       });
 
-      final _json = await _libRepo.doc(uid).get();
-      final lib = LibResponseModel.fromJson(_json.data());
+      final library = await _libRepo.libraryItems(uid);
+      _library = library;
 
-      _libItems = lib.items;
-      final items = List<LibDbModel>.from(lib.items);
-      items.sort((a, b) => a.item.id.compareTo(b.item.id));
-
+      library.sort((a, b) => a.item.id.compareTo(b.item.id));
       final liked = await likedCount.future;
-      items.insert(0, Utils.likedSongs(count: liked));
-      emit(state.copyWith(
-        items: items,
-        sortby: lib.sortby,
-        filterSel: lib.filterSel,
-        totalLiked: liked,
-      ));
+      library.insert(0, Utils.likedSongs(liked, updatedAt: likedUpdatedAt));
+      emit(state.copyWith(items: library, totalLiked: liked));
     } catch (e) {
       logPrint(e, 'refresh');
     } finally {

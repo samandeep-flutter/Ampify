@@ -5,27 +5,17 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:oktoast/oktoast.dart';
 
-typedef FirestoreRef = CollectionReference<Map<String, dynamic>>;
+// typedef FirestoreRef = CollectionReference<Map<String, dynamic>>;
+typedef FirestoreSnapshot = QueryDocumentSnapshot<Map<String, dynamic>>;
+typedef Dfunc = void Function(dynamic);
 
-sealed class AppConstants {
-  static FirestoreRef get usersCollection =>
-      FirebaseFirestore.instance.collection(_FBKeys.users);
-  static FirestoreRef get searchCollection =>
-      FirebaseFirestore.instance.collection(_FBKeys.search);
-  static FirestoreRef get historyCollection =>
-      FirebaseFirestore.instance.collection(_FBKeys.history);
-  static FirestoreRef get libraryCollection =>
-      FirebaseFirestore.instance.collection(_FBKeys.library);
-  static FirestoreRef likedCollection(String uid) =>
-      libraryCollection.doc(uid).collection(_FBKeys.likedTracks);
-}
-
-sealed class _FBKeys {
+sealed class FBKeys {
   // static const String about = 'about';
   static const String users = 'users';
   static const String search = 'search';
   static const String history = 'history';
   static const String library = 'library';
+  static const String musicGroup = 'music-group';
   static const String likedTracks = 'liked-tracks';
 }
 
