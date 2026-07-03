@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:ampify/buisness_logic/home_bloc/home_bloc.dart';
 import 'package:ampify/data/utils/exports.dart';
 
@@ -63,7 +62,6 @@ class HomeScreen extends StatelessWidget {
                 } else if (state.albums.isEmpty) {
                   return SliverToBoxAdapter(
                     child: ToolTipWidget(
-                      alignment: Alignment.center,
                       margin: Utils.insetsHoriz(Dimens.sizeXLarge),
                       title: StringRes.noNewTracks,
                     ),

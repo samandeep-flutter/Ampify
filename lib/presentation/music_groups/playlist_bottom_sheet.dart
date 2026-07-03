@@ -57,9 +57,9 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
                       fontSize: Dimens.fontDefault),
                   child: Row(
                     children: [
-                      // TODO: implement owner name
                       Flexible(
-                          child: Text('widget.details?.owner?.name',
+                          // TODO: implement artist check for internal playlists
+                          child: Text(item?.artist?.name ?? '',
                               maxLines: 1, overflow: TextOverflow.ellipsis)),
                       PaginationDots(
                         current: true,
@@ -139,11 +139,9 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet> {
     Navigator.pop(context);
     final bloc = context.read<MusicGroupBloc>();
     try {
-      final result = await FilePicker.pickFiles(
-          allowMultiple: false, type: FileType.image);
-      final file = result?.files.firstOrNull;
-      if (file == null) throw FormatException(StringRes.noImage);
-      bloc.add(PlaylistCoverChanged(File(file.path!)));
+      final result = await FilePicker.pickFile(type: FileType.image);
+      if (result == null) throw FormatException(StringRes.noImage);
+      bloc.add(PlaylistCoverChanged(File(result.path!)));
     } on FormatException catch (e) {
       showToast(e.message);
     } catch (e) {

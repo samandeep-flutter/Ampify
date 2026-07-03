@@ -12,7 +12,9 @@ class LikedSongs extends StatefulWidget {
 class _LikedSongsState extends State<LikedSongs> {
   @override
   void initState() {
-    context.read<LikedSongsBloc>().add(LikedSongsInitial());
+    final lib = context.read<LibraryBloc>();
+    final bloc = context.read<LikedSongsBloc>();
+    bloc.add(LikedSongsInitial(lib.state.totalLiked));
     super.initState();
   }
 
@@ -49,6 +51,7 @@ class _LikedSongsState extends State<LikedSongs> {
                 centerTitle: false,
                 title: PopScope(
                   onPopInvokedWithResult: (didPop, _) {
+                    bloc.onDispose();
                     if (!bloc.libRefresh) return;
                     context.read<LibraryBloc>().add(LibraryRefresh());
                   },

@@ -44,7 +44,7 @@ class PlaylistBloc extends Bloc<PlaylistEvents, PlaylistState> {
 
   final titleController = TextEditingController();
   final titleKey = GlobalKey<FormFieldState>();
-  // final MusicGroupRepo _repo = getIt();
+  final MusicGroupRepo _repo = getIt();
 
   void createPlaylist(String id) {
     if (!(titleKey.currentState?.validate() ?? false)) return;
@@ -53,12 +53,10 @@ class PlaylistBloc extends Bloc<PlaylistEvents, PlaylistState> {
 
   Future<void> _onCreate(
       CreatePlaylist event, Emitter<PlaylistState> emit) async {
-    // TODO: implement create playlist
-    // emit(state.copyWith(loading: true));
-    // await _repo.createPlaylist(event.title, uid: event.uid,
-    //     onSuccess: (json) {
-    //   emit(state.copyWith(success: true, loading: false));
-    //   titleController.clear();
-    // });
+    emit(state.copyWith(loading: true));
+    final id = BoxServices.instance.uid!;
+    await _repo.createPlaylist(id, event.title);
+    emit(state.copyWith(success: true, loading: false));
+    titleController.clear();
   }
 }

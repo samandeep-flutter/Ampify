@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:ampify/buisness_logic/library_bloc/liked_songs_bloc.dart';
 import 'package:ampify/presentation/track_widgets/addto_playlist.dart';
 import 'package:ampify/data/utils/exports.dart';
@@ -24,7 +23,7 @@ class TrackBottomSheet extends StatelessWidget {
             final _scalar = MediaQuery.textScalerOf(context);
             final height = _scalar.scale(_height);
             final width = _scalar.scale(_height + Dimens.sizeMedSmall);
-            return MyCachedImage(track.album?.thumbnail?.url,
+            return MyCachedImage(track.thumbnail?.url,
                 border: Dimens.sizeMini, height: height, width: width);
           }),
           const SizedBox(width: Dimens.sizeDefault),
@@ -60,7 +59,7 @@ class TrackBottomSheet extends StatelessWidget {
         children: [
           const SizedBox(height: Dimens.sizeSmall),
           BottomSheetListTile(
-            onTap: () => _onTrackLiked(context),
+            onTap: () => _onTrackLiked(context, bloc),
             leading: LikedSongsCover(
                 size: Dimens.iconXLarge, iconSize: Dimens.iconSmall),
             title:
@@ -114,9 +113,8 @@ class TrackBottomSheet extends StatelessWidget {
         pathParameters: {'id': track.id}, extra: jsonEncode(track.toJson()));
   }
 
-  void _onTrackLiked(BuildContext context) {
-    final _player = context.read<PlayerBloc>();
-    _player.onTrackLiked(track.id, liked);
+  void _onTrackLiked(BuildContext context, PlayerBloc player) {
+    player.onTrackLiked(track, liked);
     if (liked ?? false) {
       try {
         final bloc = context.read<LikedSongsBloc>();

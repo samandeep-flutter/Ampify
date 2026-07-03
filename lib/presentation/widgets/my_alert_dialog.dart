@@ -110,13 +110,11 @@ class _MyBottomSheetState extends State<MyBottomSheet>
           builder: (context, scrollController) {
             return GestureDetector(
               onTap: () {},
-              child: Container(
-                decoration: BoxDecoration(
-                  color: context.scheme.surface,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(Dimens.borderDefault),
-                    topRight: Radius.circular(Dimens.borderDefault),
-                  ),
+              child: Material(
+                color: context.scheme.surface,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(Dimens.borderDefault),
+                  topRight: Radius.circular(Dimens.borderDefault),
                 ),
                 child: ListView(
                   physics: const ClampingScrollPhysics(),

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:ampify/buisness_logic/auth_bloc/auth_bloc.dart';
 import 'package:ampify/buisness_logic/music_group_bloc/edit_playlist_bloc.dart';
 import 'package:ampify/buisness_logic/music_group_bloc/music_group_bloc.dart';
@@ -13,7 +11,6 @@ import 'package:ampify/buisness_logic/player_bloc/track_radio_bloc.dart';
 import 'package:ampify/presentation/root_view/track_radio.dart';
 import 'package:ampify/presentation/search_screens/search_page.dart';
 import 'package:ampify/presentation/auth_screens/auth_screen.dart';
-import 'package:flutter/foundation.dart';
 import 'package:ampify/data/utils/exports.dart';
 import '../../buisness_logic/home_bloc/listn_history_bloc.dart';
 import '../../buisness_logic/music_group_bloc/playlist_bloc.dart';
@@ -76,7 +73,7 @@ abstract class AppPage {
                 routes: [
                   GoRoute(
                       name: AppRoutes.listnHistory,
-                      path: AppRoutes.listnHistory,
+                      path: AppRoutePaths.listnHistory,
                       builder: (_, state) {
                         return BlocProvider(
                             create: (_) => ListnHistoryBloc(),
@@ -122,11 +119,11 @@ abstract class AppPage {
                 routes: [
                   GoRoute(
                       name: AppRoutes.likedSongs,
-                      path: AppRoutes.likedSongs,
+                      path: AppRoutePaths.likedSongs,
                       builder: (_, state) => const LikedSongs()),
                   GoRoute(
                       name: AppRoutes.profile,
-                      path: AppRoutes.profile,
+                      path: AppRoutePaths.profile,
                       builder: (_, state) => const ProfileView()),
                 ]),
           ]),

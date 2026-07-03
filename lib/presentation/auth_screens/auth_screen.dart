@@ -50,6 +50,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   const SizedBox(height: Dimens.sizeLarge),
                   MyTextField(
                     isPass: true,
+                    obscureText: true,
                     title: 'Password',
                     controller: bloc.passwordContr,
                     backgroundColor: scheme.backgroundDark,

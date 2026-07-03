@@ -7,7 +7,10 @@ class LibraryModel extends Equatable {
   final LibItemType type;
 
   /// in case of video or track
-  final String? videoId;
+  final String libId;
+
+  /// in case of playlist or album created with the app
+  final String? docId;
 
   /// only in case of track
   final Album? album;
@@ -20,7 +23,8 @@ class LibraryModel extends Equatable {
 
   const LibraryModel({
     required this.id,
-    this.videoId,
+    required this.libId,
+    this.docId,
     required this.title,
     required this.thumbnail,
     required this.type,
@@ -28,6 +32,16 @@ class LibraryModel extends Equatable {
     this.artist,
     this.duration,
   });
+  const LibraryModel.fb({
+    required this.id,
+    required this.title,
+    required this.docId,
+    this.type = LibItemType.playlist,
+  })  : libId = id,
+        thumbnail = null,
+        album = null,
+        artist = null,
+        duration = null;
 
   factory LibraryModel.fromYT(SearchResult result) {
     final type = LibItemType.values.firstWhere((e) => e.id == result.type);
@@ -39,7 +53,7 @@ class LibraryModel extends Equatable {
           id: result.videoId,
           title: result.name,
           type: type,
-          videoId: result.videoId,
+          libId: result.videoId,
           artist: MyArtistBasic.fromYT(result.artist),
           album: result.album != null ? Album.fromYtBasic(result.album!) : null,
           thumbnail: result.thumbnails.toThumbnail(),
@@ -52,7 +66,7 @@ class LibraryModel extends Equatable {
           id: result.videoId,
           title: result.name,
           type: type,
-          videoId: result.videoId,
+          libId: result.videoId,
           artist: MyArtistBasic.fromYT(result.artist),
           thumbnail: result.thumbnails.toThumbnail(),
           duration: result.duration?.toDuration(),
@@ -64,6 +78,7 @@ class LibraryModel extends Equatable {
           id: result.playlistId,
           title: result.name,
           type: type,
+          libId: result.playlistId,
           artist: MyArtistBasic.fromYT(result.artist),
           thumbnail: result.thumbnails.toThumbnail(),
         );
@@ -74,7 +89,7 @@ class LibraryModel extends Equatable {
           id: result.albumId,
           title: result.name,
           type: type,
-          // vidID: result.playlistId,
+          libId: result.albumId,
           artist: MyArtistBasic.fromYT(result.artist),
           thumbnail: result.thumbnails.toThumbnail(),
         );
@@ -85,6 +100,7 @@ class LibraryModel extends Equatable {
           id: result.artistId,
           title: result.name,
           type: type,
+          libId: result.artistId,
           thumbnail: result.thumbnails.toThumbnail(),
         );
 
@@ -97,7 +113,7 @@ class LibraryModel extends Equatable {
     return LibraryModel(
       id: json['id'],
       type: LibItemType.values.firstWhere((e) => e.id == json['type']),
-      videoId: json['videoId'],
+      libId: json['video_id'],
       title: json['title'],
       thumbnail: json['thumbnail'] != null
           ? Thumbnail.fromJson(json['thumbnail'])
@@ -114,7 +130,7 @@ class LibraryModel extends Equatable {
   Map<String, dynamic> toJson() => {
         'id': id,
         'type': type.id,
-        'videoId': videoId,
+        'video_id': libId,
         'title': title,
         'thumbnail': thumbnail?.toJson(),
         'album': album?.toJson(),
@@ -124,7 +140,7 @@ class LibraryModel extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, videoId, title, thumbnail, album, artist, type, duration];
+      [id, libId, title, thumbnail, album, artist, type, duration];
 }
 
 enum LibItemType {

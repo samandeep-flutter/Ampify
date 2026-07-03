@@ -60,7 +60,7 @@ class MusicGroupTile extends StatelessWidget {
     );
   }
 
-  bool get isLikedSongs => item.id == UniqueIds.likedSongs;
+  bool get isLikedSongs => item.libId == UniqueIds.likedSongs;
 
   void _onTap(BuildContext context) {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -77,9 +77,10 @@ class MusicGroupTile extends StatelessWidget {
 
       case LibItemType.playlist:
       case LibItemType.album:
+        final params = {'id': item.libId, 'type': item.type.id};
         context.pushNamed(
             isLikedSongs ? AppRoutes.likedSongs : AppRoutes.musicGroup,
-            pathParameters: {'id': item.id, 'type': item.type.id});
+            pathParameters: isLikedSongs ? {} : params);
         break;
       default:
         break;

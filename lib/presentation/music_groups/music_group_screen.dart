@@ -209,7 +209,6 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                                   iconSize: Dimens.iconSmall,
                                   onPressed: () {
                                     bloc.add(MusicGroupFav(state.id!,
-                                        type: state.type!,
                                         liked: state.isFav ?? false));
                                   },
                                   isSelected: state.isFav ?? false,

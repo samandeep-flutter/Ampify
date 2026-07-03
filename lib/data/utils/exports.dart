@@ -2,11 +2,13 @@ library;
 
 // core
 export 'dart:io';
+export 'dart:convert';
 export 'package:flutter/material.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:equatable/equatable.dart';
 export 'package:flutter/cupertino.dart' hide RefreshCallback;
 export 'package:flutter/services.dart';
+export 'package:flutter/foundation.dart';
 
 // routes & configs
 export 'package:go_router/go_router.dart';
@@ -16,6 +18,12 @@ export 'package:ampify/config/firebase_options.dart';
 export 'package:ampify/config/getit_instance.dart';
 export 'package:ampify/config/responsive_font.dart';
 export 'package:ampify/config/theme_services.dart';
+
+// repositories
+export 'package:ampify/data/repositories/auth_repo.dart';
+export 'package:ampify/data/repositories/library_repo.dart';
+export 'package:ampify/data/repositories/music_group_repo.dart';
+export 'package:ampify/data/repositories/music_repo.dart';
 
 // utils
 export 'package:ampify/data/utils/app_constants.dart';
@@ -55,7 +63,6 @@ export 'package:ampify/services/notification_services.dart';
 // extras
 export 'package:dart_ytmusic_api/types.dart';
 export 'package:dart_ytmusic_api/yt_music.dart';
-export 'package:ampify/data/repositories/music_repo.dart';
 export 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 export 'package:ampify/buisness_logic/player_bloc/player_bloc.dart';
 export 'package:ampify/buisness_logic/player_bloc/player_slider_bloc.dart';

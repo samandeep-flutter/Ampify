@@ -84,7 +84,7 @@ class Track extends Equatable {
     return Track(
       id: json['id'],
       type: json['type'],
-      videoId: json['videoId'],
+      videoId: json['video_id'],
       title: json['title'],
       artist: MyArtistBasic.fromJson(json['artist']),
       album: json['album'] != null ? Album.fromJson(json['album']) : null,
@@ -99,7 +99,7 @@ class Track extends Equatable {
   Map<String, dynamic> toJson() => {
         'id': id,
         'type': type,
-        'videoId': videoId,
+        'video_id': videoId,
         'title': title,
         'artist': artist.toJson(),
         if (album != null) 'album': album?.toJson(),
@@ -142,16 +142,16 @@ class TrackDetails extends Equatable {
   factory TrackDetails.fromJson(Map<String, dynamic> json) {
     return TrackDetails(
       track: json['track'] != null ? Track.fromJson(json['track']) : null,
-      bgColor: json['bgColor'] != null ? Color(json['bgColor']) : null,
+      bgColor: json['bg_color'] != null ? Color(json['bg_color']) : null,
       darkBgColor:
-          json['darkBgColor'] != null ? Color(json['darkBgColor']) : null,
+          json['dark_bg_color'] != null ? Color(json['dark_bg_color']) : null,
     );
   }
 
   Map<String, dynamic> toJson() => {
         if (track != null) 'track': track?.toJson(),
-        if (bgColor != null) 'bgColor': bgColor?.toARGB32(),
-        if (darkBgColor != null) 'darkBgColor': darkBgColor?.toARGB32(),
+        if (bgColor != null) 'bg_color': bgColor?.toARGB32(),
+        if (darkBgColor != null) 'dark_bg_color': darkBgColor?.toARGB32(),
       };
 
   @override

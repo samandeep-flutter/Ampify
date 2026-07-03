@@ -114,7 +114,7 @@ class QueueView extends StatelessWidget {
                               trailing: Icon(Icons.menu_outlined, color: color),
                             );
                           },
-                          onReorder: bloc.onQueueReorder,
+                          onReorderItem: bloc.onQueueReorder,
                         ),
                         const SliverSizedBox(height: Dimens.sizeSmall),
                       ],
@@ -130,7 +130,7 @@ class QueueView extends StatelessWidget {
                               trailing: Icon(Icons.menu_outlined, color: color),
                             );
                           },
-                          onReorder: bloc.onUpNextReorder,
+                          onReorderItem: bloc.onUpNextReorder,
                         )
                       ],
                       SliverSizedBox(height: context.height * .05)

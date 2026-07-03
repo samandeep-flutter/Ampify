@@ -12,12 +12,12 @@ class PlayerEvent extends Equatable {
 class PlayerInitial extends PlayerEvent {}
 
 class PlayerTrackLiked extends PlayerEvent {
-  final String id;
+  final Track track;
   final bool? liked;
-  const PlayerTrackLiked(this.id, {this.liked});
+  const PlayerTrackLiked(this.track, {this.liked});
 
   @override
-  List<Object?> get props => [id, liked, super.props];
+  List<Object?> get props => [track, liked, super.props];
 }
 
 class PlayerMediaStream extends PlayerEvent {

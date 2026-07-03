@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 
 class LibraryEvent extends Equatable {
@@ -132,12 +131,11 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     if (state.filterSel == null) _library = state.items;
     if (state.filterSel == event.type) {
       emit(state.copyWith(filterSel: null, items: _library));
-      return;
+    } else {
+      final items = _library.where((e) => e.item.type == event.type).toList();
+      emit(state.copyWith(items: items, filterSel: event.type));
+      _libRepo.updateFilter(uid, event.type);
     }
-
-    final items = _library.where((e) => e.item.type == event.type).toList();
-    emit(state.copyWith(items: items, filterSel: event.type));
-    _libRepo.updateFilter(uid, event.type);
   }
 
   Future<void> _onRefresh(
@@ -151,9 +149,16 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       final library = await _libRepo.libraryItems(uid);
       _library = library;
 
-      library.sort((a, b) => a.item.id.compareTo(b.item.id));
+      library.sort((a, b) => a.item.libId.compareTo(b.item.libId));
       final liked = await likedCount.future;
-      library.insert(0, Utils.likedSongs(liked, updatedAt: likedUpdatedAt));
+
+      if (library.any((e) => e.id == UniqueIds.likedSongs)) {
+        final index = library.indexWhere((e) => e.id == UniqueIds.likedSongs);
+        library[index] = Utils.likedSongs(liked, updatedAt: likedUpdatedAt);
+      } else {
+        library.insert(0, Utils.likedSongs(liked, updatedAt: likedUpdatedAt));
+      }
+
       emit(state.copyWith(items: library, totalLiked: liked));
     } catch (e) {
       logPrint(e, 'refresh');

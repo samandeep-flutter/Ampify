@@ -51,9 +51,10 @@ class MusicRepo {
   //   }
   // }
 
-  Future<Duration?> getSongDuration(String vidId) async {
+  Future<Duration?> getSongDuration(Track item) async {
     try {
-      final song = await ytMusic.getSong(vidId);
+      if (item.duration != null) return item.duration;
+      final song = await ytMusic.getSong(item.videoId);
       return Duration(seconds: song.duration);
     } catch (e) {
       logPrint(e, 'yt-duration');

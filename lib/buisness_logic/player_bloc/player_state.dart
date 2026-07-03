@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:ampify/data/utils/exports.dart';
 
 class PlayerState extends Equatable {

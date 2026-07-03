@@ -64,7 +64,7 @@ class PaginationDots extends StatelessWidget {
 class ToolTipWidget extends StatefulWidget {
   final EdgeInsets? margin;
   final dynamic _icon;
-  final bool? _scrolable;
+  final bool? scrolable;
   final Alignment? alignment;
   final String? title;
   final bool _placeHolder;
@@ -76,19 +76,18 @@ class ToolTipWidget extends StatefulWidget {
     this.title,
     this.alignment,
   })  : _icon = icon,
-        _scrolable = null,
+        scrolable = null,
         _placeHolder = false;
 
   const ToolTipWidget.placeHolder({
     super.key,
     String? icon,
-    bool? scrolable,
+    this.margin,
+    this.scrolable,
+    this.alignment,
     required this.title,
   })  : _icon = icon,
-        _scrolable = scrolable,
-        _placeHolder = true,
-        margin = null,
-        alignment = null;
+        _placeHolder = true;
 
   @override
   State<ToolTipWidget> createState() => _ToolTipWidgetState();
@@ -100,11 +99,7 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
     return Container(
       alignment: widget.alignment ?? Alignment.center,
       margin: widget.margin ??
-          EdgeInsets.only(
-            top: widget.alignment == null ? context.height * .15 : 0,
-            left: Dimens.sizeDefault,
-            right: Dimens.sizeDefault,
-          ),
+          Utils.insetsOnly(Dimens.sizeLarge, top: context.height * .15),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -129,7 +124,7 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (!(widget._scrolable ?? false)) return _builder();
+    if (!(widget.scrolable ?? false)) return _builder();
     return Expanded(
         child: SingleChildScrollView(
       physics: const NeverScrollableScrollPhysics(),

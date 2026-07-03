@@ -92,10 +92,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     if (state.query == event.query) return;
     if (searchContr.text.isEmpty) {
       emit(state.copyWith(isLoading: false, results: null, query: ''));
-      return;
+    } else {
+      emit(state.copyWith(query: event.query, isLoading: true));
+      add(SearchTrigerred());
     }
-    emit(state.copyWith(query: event.query, isLoading: true));
-    add(SearchTrigerred());
   }
 
   Future<void> _onSearchTrigerred(

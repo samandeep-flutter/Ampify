@@ -31,18 +31,18 @@ class DeviceInfoModel extends Equatable {
 
   factory DeviceInfoModel.fromJson(Map<String, dynamic> json) {
     return DeviceInfoModel(
-      deviceId: json['deviceId'],
-      deviceType: json['deviceType'],
-      fcmToken: json['fcmToken'],
-      appVersion: json['appVersion'],
-      appType: json['appType'],
-      deviceModel: json['deviceModel'],
-      deviceName: json['deviceName'],
-      osVersion: json['osVersion'],
+      deviceId: json['device_id'],
+      deviceType: json['device_type'],
+      fcmToken: json['fcm_token'],
+      appVersion: json['app_version'],
+      appType: json['app_type'],
+      deviceModel: json['device_model'],
+      deviceName: json['device_name'],
+      osVersion: json['os_version'],
       manufacturer: json['manufacturer'],
-      lastUpdated: DateTime.tryParse(json['lastUpdated'] ?? ''),
-      packageName: json['packageName'],
-      buildNumber: json['buildNumber'],
+      lastUpdated: DateTime.tryParse(json['last_updated'] ?? ''),
+      packageName: json['package_name'],
+      buildNumber: json['build_number'],
     );
   }
 
@@ -64,26 +64,18 @@ class DeviceInfoModel extends Equatable {
   }
 
   Map<String, dynamic> toJson() => {
-        'deviceId': deviceId,
-        'deviceType': deviceType,
-        'fcmToken': fcmToken,
-        'appVersion': appVersion,
-        'appType': appType,
-        'deviceModel': deviceModel,
-        'deviceName': deviceName,
-        'osVersion': osVersion,
+        'device_id': deviceId,
+        'device_type': deviceType,
+        'fcm_token': fcmToken,
+        'app_version': appVersion,
+        'app_type': appType,
+        'device_model': deviceModel,
+        'device_name': deviceName,
+        'os_version': osVersion,
         'manufacturer': manufacturer,
-        'lastUpdated': lastUpdated?.toIso8601String(),
-        'packageName': packageName,
-        'buildNumber': buildNumber,
-      };
-  Map<String, dynamic> deviceInfoJson() => {
-        'deviceType': deviceType,
-        'deviceModel': deviceModel,
-        'deviceName': deviceName,
-        'manufacturer': manufacturer,
-        'appVersion': appVersion,
-        'buildNumber': buildNumber,
+        'last_updated': lastUpdated?.toIso8601String(),
+        'package_name': packageName,
+        'build_number': buildNumber,
       };
 
   @override

@@ -1,5 +1,5 @@
-import 'package:ampify/data/repositories/library_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LikedSongsEvent extends Equatable {
   const LikedSongsEvent();
@@ -8,7 +8,13 @@ class LikedSongsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LikedSongsInitial extends LikedSongsEvent {}
+class LikedSongsInitial extends LikedSongsEvent {
+  final int? totalTracks;
+  const LikedSongsInitial(this.totalTracks);
+
+  @override
+  List<Object?> get props => [totalTracks, super.props];
+}
 
 class SongRemoved extends LikedSongsEvent {
   final String id;
@@ -89,23 +95,33 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   final scrollController = ScrollController();
   bool libRefresh = false;
 
+  bool _hasMore = false;
+  DocumentSnapshot? _snapshotId;
+
   void onPlay(BuildContext context) {
     final player = context.read<PlayerBloc>();
     final _tracks = state.tracks.map((e) => e.item).toList();
     player.add(MusicGroupPlayed(id: UniqueIds.likedSongs, tracks: _tracks));
   }
 
-  void _titleFadeListener() {
-    if (!scrollController.hasClients) return;
-    final appbarHeight = scrollController.position.extentInside * .15;
-    if (scrollController.offset > (appbarHeight - kToolbarHeight)) {
-      add(const LikedSongsTitleFade(1));
-      return;
-    }
-    add(const LikedSongsTitleFade(0));
+  Future<void> _onInit(
+      LikedSongsInitial event, Emitter<LikedSongsState> emit) async {
+    add(LoadMoreTrigger());
+    emit(state.copyWith(
+        loading: true, titileOpacity: 0, totalTracks: event.totalTracks));
+    scrollController.addListener(_titleFadeListener);
+    scrollController.addListener(_loadMoreSongs);
+    libRefresh = false;
+  }
+
+  void onDispose() {
+    scrollController.removeListener(_titleFadeListener);
+    scrollController.removeListener(_loadMoreSongs);
+    _snapshotId = null;
   }
 
   void _loadMoreSongs() {
+    if (!_hasMore) return;
     if (!scrollController.hasClients || state.moreLoading) return;
     if (state.tracks.length >= state.totalTracks) return;
     final pos = scrollController.position;
@@ -117,29 +133,11 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
   void songRemoved(String id) => add(SongRemoved(id));
 
   void _onRemoved(SongRemoved event, Emitter<LikedSongsState> emit) async {
-    // TODO: implement remove song as well
     libRefresh = true;
     List<TrackDbModel> tracks = state.tracks;
-    tracks.removeWhere((e) => e.item.id == event.id);
+    tracks.removeWhere((e) => e.trackId == event.id);
     emit(state.copyWith(tracks: tracks, totalTracks: state.totalTracks - 1));
-  }
-
-  Future<void> _onInit(
-      LikedSongsInitial event, Emitter<LikedSongsState> emit) async {
-    emit(state.copyWith(loading: true, titileOpacity: 0));
-    scrollController.addListener(_titleFadeListener);
-    scrollController.addListener(_loadMoreSongs);
-    libRefresh = false;
-
-    try {
-      // TODO: implement pagination logic
-      final docs = await _libRepo.likedTracks(uid, limit: 100);
-      final tracks = docs.map((e) => TrackDbModel.fromJson(e.data())).toList();
-      emit(state.copyWith(tracks: tracks, loading: false));
-    } catch (e) {
-      logPrint(e, 'liked-songs');
-      emit(state.copyWith(loading: false));
-    }
+    _libRepo.removefromLikedSongs(uid, event.id);
   }
 
   void _onLoadMore(LoadMoreSongs event, Emitter<LikedSongsState> emit) {
@@ -149,19 +147,26 @@ class LikedSongsBloc extends Bloc<LikedSongsEvent, LikedSongsState> {
 
   Future<void> _onLoadTrigger(
       LoadMoreTrigger event, Emitter<LikedSongsState> emit) async {
-    // final _likedRepo = AppConstants.likedCollection(uid);
-
     try {
-      // TODO: refactor load more tracks
-      // final query = await _likedRepo
-      //     .limit(100)
-      //     .orderBy('added_at', descending: true)
-      //     .get();
-      // final tracks = query.docs.map((e) => Track.fromJson(e.data())).toList();
-      // emit(state.copyWith(tracks: tracks, moreLoading: false));
+      final _docs =
+          await _libRepo.likedTracks(uid, limit: 100, snapshot: _snapshotId);
+      final tracks = _docs.map((e) => TrackDbModel.fromJson(e.data())).toList();
+      emit(state.copyWith(tracks: tracks, moreLoading: false, loading: false));
+      if (_docs.lastOrNull != null) _snapshotId = _docs.lastOrNull;
+      _hasMore = _docs.length == 100;
     } catch (e) {
       logPrint(e, 'liked-songs');
-      emit(state.copyWith(moreLoading: false));
+      emit(state.copyWith(moreLoading: false, loading: false));
+    }
+  }
+
+  void _titleFadeListener() {
+    if (!scrollController.hasClients) return;
+    final appbarHeight = scrollController.position.extentInside * .15;
+    if (scrollController.offset > (appbarHeight - kToolbarHeight)) {
+      add(const LikedSongsTitleFade(1));
+    } else {
+      add(const LikedSongsTitleFade(0));
     }
   }
 

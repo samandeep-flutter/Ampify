@@ -42,6 +42,9 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   final AudioHandler _audioHandler = getIt();
   final MusicRepo _musicRepo = getIt();
+  final LibraryRepo _libRepo = getIt();
+
+  String get uid => BoxServices.instance.uid!;
 
   Future<void> _onInit(PlayerInitial event, Emitter<PlayerState> emit) async {
     try {
@@ -72,8 +75,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
 
   void onPlayPause() => _audioHandler.click();
 
-  void onTrackLiked(String id, [bool? liked]) {
-    add(PlayerTrackLiked(id, liked: liked));
+  void onTrackLiked(Track track, [bool? liked]) {
+    add(PlayerTrackLiked(track, liked: liked));
   }
 
   void onTrackShare(String id) {}
@@ -108,20 +111,15 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     add(PlayerUpNextReordered(previous: pr, current: cr));
   }
 
-  void _onMediaStream(
-      PlayerMediaStream event, Emitter<PlayerState> emit) async {
+  void _onMediaStream(PlayerMediaStream event, Emitter<PlayerState> emit) {
     try {
       final item = event.mediaItem;
       if (item.id == UniqueIds.emptyTrack) throw FormatException();
       final details = TrackDetails.fromJson(item.extras!);
       emit(state.copyWith(details: details, isLiked: false));
-      try {
-        // TODO: implement check isLiked
-        // final isLiked = await _libRepo.isLiked([track.id!]);
-        // emit(state.copyWith(isLiked: isLiked.firstOrNull));
-      } catch (e) {
-        logPrint(e, 'liked');
-      }
+      _libRepo.isLiked(uid, details.track!.id).then((result) {
+        emit(state.copyWith(isLiked: result));
+      });
     } on FormatException {
       emit(PlayerState.init());
     } catch (e) {
@@ -204,19 +202,18 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   Future<void> _onTrackLiked(
       PlayerTrackLiked event, Emitter<PlayerState> emit) async {
     try {
-      // TODO: implement liked songs mechanism
-      // final shouldEmit = state.track.id == event.id;
+      final shouldEmit = state.track?.id == event.track.id;
       if (event.liked ?? false) {
-        // if (shouldEmit) emit(state.copyWith(isLiked: false));
-        // final result = await _libRepo.removefromLikedSongs(event.id);
-        // if (!result) throw FormatException();
+        if (shouldEmit) emit(state.copyWith(isLiked: false));
+        final result = await _libRepo.removefromLikedSongs(uid, event.track.id);
+        if (!result) throw FormatException();
       } else {
-        // if (shouldEmit) emit(state.copyWith(isLiked: true));
-        // final result = await _libRepo.addtoLikedSongs(event.id);
-        // if (!result) throw FormatException();
+        if (shouldEmit) emit(state.copyWith(isLiked: true));
+        final result = await _libRepo.addtoLikedSongs(uid, event.track);
+        if (!result) throw FormatException();
       }
     } on FormatException {
-      if (state.track!.id != event.id) return;
+      if (state.track!.id != event.track.id) return;
       emit(state.copyWith(isLiked: !(event.liked ?? false)));
     } catch (e) {
       logPrint(e, 'liked');

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
@@ -129,13 +128,12 @@ sealed class Utils {
 
   static Future<TrackDetails> getTrackDetails(Track track) async {
     final completer = Completer<Duration?>();
+    _repo.getSongDuration(track).then((e) {
+      completer.complete(e);
+    });
+
     PaletteGenerator? palete;
     try {
-      if (track.duration == null) {
-        _repo.getSongDuration(track.videoId).then((e) {
-          completer.complete(e);
-        });
-      }
       if (track.thumbnail?.url.isEmpty ?? true) throw Exception();
       // await ColorScheme.fromImageProvider(
       //     provider: NetworkImage(track.album?.thumbnail?.url ?? ''));
@@ -144,11 +142,8 @@ sealed class Utils {
           size: const Size.square(200));
     } catch (_) {}
     final defColor = palete?.dominantColor?.color;
+    final duration = await completer.future;
 
-    Duration? duration;
-    if (track.duration == null) {
-      duration = await completer.future;
-    }
     return TrackDetails(
       track: track.copyWith(duration: duration),
       bgColor: palete?.vibrantColor?.color ?? defColor,
@@ -170,11 +165,14 @@ sealed class Utils {
 
   static LibDbModel likedSongs(int? count, {required DateTime? updatedAt}) {
     return LibDbModel(
+      owner: null,
+      id: UniqueIds.likedSongs,
       createdAt: DateTime(2026),
       updatedAt: updatedAt ??= DateTime.now(),
       item: LibraryModel(
         thumbnail: null,
         id: UniqueIds.likedSongs,
+        libId: UniqueIds.likedSongs,
         type: LibItemType.playlist,
         title: StringRes.likedSongs,
         artist: MyArtistBasic(

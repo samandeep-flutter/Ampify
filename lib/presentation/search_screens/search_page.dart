@@ -53,15 +53,15 @@ class SearchPage extends StatelessWidget {
             );
           } else if (state.results == null) {
             return ToolTipWidget.placeHolder(
-              scrolable: true,
               icon: ImageRes.music,
               title: StringRes.searchBarSubtitle,
+              alignment: Alignment.topCenter,
             );
           } else if (state.results!.isEmpty) {
             return ToolTipWidget.placeHolder(
-              scrolable: true,
               icon: ImageRes.search,
               title: StringRes.emptySearchResults,
+              alignment: Alignment.topCenter,
             );
           }
 

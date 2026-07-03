@@ -102,10 +102,7 @@ class DottedBoxBorder extends BoxBorder {
       {TextDirection? textDirection,
       BoxShape shape = BoxShape.rectangle,
       BorderRadius? borderRadius}) {
-    if (shape == BoxShape.circle) {
-      return;
-    }
-
+    if (shape == BoxShape.circle) return;
     _paintSide(canvas, rect.topLeft, rect.topRight, topSide);
     _paintSide(canvas, rect.topRight, rect.bottomRight, rightSide);
     _paintSide(canvas, rect.bottomRight, rect.bottomLeft, bottomSide);

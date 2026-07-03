@@ -9,6 +9,11 @@ class LibraryRepo {
     try {
       final repo = _firestore.collection(FBKeys.library);
       final json = await repo.doc(uid).get();
+      if (json.data() == null) {
+        repo.doc(uid).set({'sort_order': SortOrder.custom.name});
+        return null;
+      }
+
       return LibResponseModel.fromJson(json.data()!);
     } catch (e) {
       logPrint(e, 'lib-details');
@@ -45,13 +50,52 @@ class LibraryRepo {
     }
   }
 
+  Future<bool> removefromLikedSongs(String uid, String id) async {
+    try {
+      final _lib = _firestore.collection(FBKeys.library);
+      final repo = _lib.doc(uid).collection(FBKeys.likedTracks);
+      final query = await repo.where('track_id', isEqualTo: id).limit(1).get();
+      query.docs.firstOrNull?.reference.delete();
+      return query.docs.firstOrNull != null;
+    } catch (e) {
+      logPrint(e, 'remove-liked');
+      return false;
+    }
+  }
+
+  Future<bool> addtoLikedSongs(String uid, Track track) async {
+    try {
+      final _lib = _firestore.collection(FBKeys.library);
+      final repo = _lib.doc(uid).collection(FBKeys.likedTracks);
+      final doc = repo.doc();
+      final _track = TrackDbModel.fromTrack(track, docId: doc.id);
+      await repo.doc(doc.id).set(_track.toJson());
+      return true;
+    } catch (e) {
+      logPrint(e, 'add-liked');
+      return false;
+    }
+  }
+
+  Future<bool> isLiked(String uid, String id) async {
+    try {
+      final _lib = _firestore.collection(FBKeys.library);
+      final repo = _lib.doc(uid).collection(FBKeys.likedTracks);
+      final query = await repo.where('track_id', isEqualTo: id).limit(1).get();
+      return query.docs.firstOrNull != null;
+    } catch (e) {
+      logPrint(e, 'add-liked');
+      return false;
+    }
+  }
+
   Future<List<FirestoreSnapshot>> likedTracks(String uid,
       {required int limit, DocumentSnapshot? snapshot}) async {
     try {
       final _lib = _firestore.collection(FBKeys.library);
       final repo = _lib.doc(uid).collection(FBKeys.likedTracks);
-      final query = repo.limit(limit).afterDoc(snapshot);
-      final ref = await query.orderBy('added_at', descending: true).get();
+      final query = repo.orderBy('added_at', descending: true);
+      final ref = await query.limit(limit).afterDoc(snapshot).get();
       return ref.docs;
     } catch (e) {
       logPrint(e, 'liked-count');

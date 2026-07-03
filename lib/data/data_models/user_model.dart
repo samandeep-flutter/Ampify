@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:ampify/services/extension_services.dart';
 import 'package:equatable/equatable.dart';
 
@@ -109,4 +112,45 @@ class LogModel extends Equatable {
 
   @override
   List<Object?> get props => [title, content, extra, time, type];
+}
+
+class MyXFile {
+  final String id;
+  final Uint8List data;
+  final String? name;
+  final String? format;
+  final int size;
+  const MyXFile(
+    this.data, {
+    required this.id,
+    required this.format,
+    required this.name,
+    required this.size,
+  });
+
+  factory MyXFile.fromJson(Map<String, dynamic> json) {
+    return MyXFile(
+      base64Decode(json['image']),
+      id: json['id'],
+      format: json['format'],
+      name: json['name'],
+      size: json['size'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'image': base64Encode(data),
+        'format': format,
+        'name': name,
+        'size': size,
+      };
+
+  // MultipartFile toMultipart() {
+  //   return MultipartFile.fromBytes(
+  //     data,
+  //     filename: name,
+  //     contentType: format != null ? DioMediaType.parse(format!) : null,
+  //   );
+  // }
 }

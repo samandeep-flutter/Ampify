@@ -1,5 +1,3 @@
-import 'package:ampify/data/repositories/library_repo.dart';
-import 'package:ampify/data/repositories/music_group_repo.dart';
 import 'package:ampify/data/utils/exports.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -10,7 +8,7 @@ GetIt getIt = GetIt.instance;
 Future<void> initGetIt() async {
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<LibraryRepo>(() => LibraryRepo());
-  getIt.registerLazySingleton<MusicGroupRepo>(() => MusicGroupRepo());
+  getIt.registerLazySingleton<MusicGroupRepo>(() => MusicGroupRepo(getIt()));
   getIt.registerLazySingleton(
       () => MusicRepo(getIt(), ytExplode: YoutubeExplode()));
 

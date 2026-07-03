@@ -33,57 +33,92 @@ class LibResponseModel extends Equatable {
 }
 
 class LibDbModel extends Equatable {
+  final String id;
   final LibraryModel item;
+  final String? owner;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
   const LibDbModel({
+    required this.id,
     required this.item,
+    required this.owner,
     required this.createdAt,
     required this.updatedAt,
   });
 
+  LibDbModel.fromLibrary(
+    this.item, {
+    this.owner,
+    required this.id,
+  })  : createdAt = DateTime.timestamp(),
+        updatedAt = DateTime.timestamp();
+
   factory LibDbModel.fromJson(Map<String, dynamic> json) {
     return LibDbModel(
+      id: json['id'],
+      owner: json['owner'],
       item: LibraryModel.fromJson(json['item']),
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
     );
   }
 
-  // TODO: add id, updated_at, and created at checks
-  // Map<String, dynamic> toJson() => {
-  //       'item': item.toJson(),
-  //       'created_at': createdAt,
-  //       'updated_at': updatedAt ?? createdAt,
-  //     };
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'owner': owner,
+        'item': item.toJson(),
+        'created_at': createdAt.toString(),
+        'updated_at': updatedAt.toString(),
+      };
 
   @override
-  List<Object?> get props => [item, createdAt, updatedAt];
+  List<Object?> get props => [id, item, owner, createdAt, updatedAt];
 }
 
 class TrackDbModel extends Equatable {
-  final String id;
+  final String docId;
+  final String trackId;
   final DateTime? addedAt;
   final Track item;
 
   const TrackDbModel({
-    required this.id,
+    required this.docId,
+    required this.trackId,
     required this.addedAt,
     required this.item,
   });
 
+  TrackDbModel.fromTrack(
+    this.item, {
+    required this.docId,
+  })  : addedAt = DateTime.timestamp(),
+        trackId = item.id;
+
   factory TrackDbModel.fromJson(Map<String, dynamic> json) {
     return TrackDbModel(
-      id: json['id'],
+      docId: json['doc_id'],
+      trackId: json['track_id'],
       item: Track.fromJson(json['track']),
-      addedAt: json['added_at'],
+      addedAt: DateTime.parse(json['added_at']),
     );
   }
 
-  Map<String, dynamic> toJson() =>
-      {'id': id, 'track': item.toJson(), 'added_at': addedAt};
+  Map<String, dynamic> toJson() => {
+        'doc_id': docId,
+        'track_id': trackId,
+        'track': item.toJson(),
+        'added_at': addedAt.toString()
+      };
 
   @override
-  List<Object?> get props => [item, addedAt];
+  List<Object?> get props => [docId, trackId, item, addedAt];
+
+  @override
+  bool operator ==(Object other) {
+    return other is TrackDbModel && docId == other.docId;
+  }
+
+  @override
+  int get hashCode => docId.hashCode;
 }

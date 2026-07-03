@@ -113,8 +113,8 @@ class PlayerScreen extends StatelessWidget {
                             builder: (context, state) {
                               return IconButton(
                                 onPressed: () {
-                                  final id = state.track!.id;
-                                  bloc.onTrackLiked(id, state.isLiked);
+                                  bloc.onTrackLiked(
+                                      state.track!, state.isLiked);
                                 },
                                 isSelected: state.isLiked,
                                 selectedIcon: const Icon(Icons.favorite),

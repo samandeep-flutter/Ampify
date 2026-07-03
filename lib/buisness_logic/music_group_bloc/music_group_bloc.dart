@@ -25,14 +25,6 @@ class PlaylistInitial extends MusicGroupEvent {
   List<Object?> get props => [id, super.props];
 }
 
-// class PlaylistVisibility extends MusicGroupEvent {
-//   final bool public;
-//   const PlaylistVisibility(this.public);
-
-//   @override
-//   List<Object?> get props => [public, super.props];
-// }
-
 class PlaylistCoverChanged extends MusicGroupEvent {
   final File file;
   const PlaylistCoverChanged(this.file);
@@ -44,20 +36,18 @@ class PlaylistCoverChanged extends MusicGroupEvent {
 class MusicGroupFav extends MusicGroupEvent {
   final String id;
   final bool liked;
-  final LibItemType type;
-  const MusicGroupFav(this.id, {required this.type, required this.liked});
+  const MusicGroupFav(this.id, {required this.liked});
 
   @override
-  List<Object?> get props => [id, type, liked, super.props];
+  List<Object?> get props => [id, liked, super.props];
 }
 
 class AlbumInitial extends MusicGroupEvent {
   final String id;
-  final LibItemType type;
-  const AlbumInitial({required this.id, required this.type});
+  const AlbumInitial({required this.id});
 
   @override
-  List<Object?> get props => [id, type, super.props];
+  List<Object?> get props => [id, super.props];
 }
 
 class MusicGroupTitleFade extends MusicGroupEvent {
@@ -72,6 +62,7 @@ class MusicGroupState extends Equatable {
   final String? id;
   final double titileOpacity;
   final Color? bgColor;
+  // TODO: implement owner logic
   final String? owner;
   final LibraryModel? item;
   final String? subtitle;
@@ -155,15 +146,14 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     on<MusicGroupFav>(_onFav);
     on<PlaylistInitial>(_onPlaylist);
     on<MusicGroupTitleFade>(_titleFade);
-    // on<PlaylistVisibility>(_onVisibility);
     on<PlaylistCoverChanged>(_onCoverChanged);
   }
 
-  final YTMusic _ytMusic = getIt();
   final scrollController = ScrollController();
   bool libRefresh = false;
 
-  String? get uid => BoxServices.instance.uid;
+  final MusicGroupRepo _repo = getIt();
+  String get uid => BoxServices.instance.uid!;
 
   // @override
   // void add(MusicGroupEvent event) {
@@ -190,33 +180,30 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     emit(state.copyWith(id: event.id, loading: true, titileOpacity: 0));
     scrollController.addListener(_scrollListener);
     libRefresh = false;
-
     if (event.type.isPlaylist) {
       add(PlaylistInitial(event.id));
     } else {
-      add(AlbumInitial(id: event.id, type: event.type));
+      add(AlbumInitial(id: event.id));
     }
   }
 
   Future<void> _onPlaylist(
       PlaylistInitial event, Emitter<MusicGroupState> emit) async {
     try {
-      final _playlist = Completer<PlaylistFull>();
-      _ytMusic.getPlaylist(event.id).then((playlist) {
+      final _playlist = Completer<Playlist>();
+      _repo.playlistDetails(event.id).then((playlist) {
         _playlist.complete(playlist);
       }, onError: (e) => _playlist.completeError(e));
-      final list = await _ytMusic.getPlaylistVideos(event.id);
-      final tracks = List<Track>.from(list.map((e) => Track.fromVid(e)));
+      final tracks = await _repo.playlistTracks(event.id);
 
-      final _pl = await _playlist.future;
-      final playlist = Playlist.fromYT(_pl);
+      final playlist = await _playlist.future.timeout(Duration(seconds: 30));
       final color = await Utils.getImageColor(playlist.thumbnail);
-      // TODO: implement fav item check
-      // final isFav = await _repo.isFavPlaylist(event.id);
+      final isFav = await _repo.isInLibrary(uid, event.id);
 
       emit(state.copyWith(
         item: LibraryModel(
           id: playlist.id,
+          libId: playlist.id,
           title: playlist.title,
           thumbnail: playlist.thumbnail,
           type: LibItemType.playlist,
@@ -224,7 +211,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         tracks: tracks,
         bgColor: color,
         subtitle: '${playlist.videoCount} views',
-        // isFav: isFav,
+        isFav: isFav,
         loading: false,
       ));
     } catch (e) {
@@ -236,17 +223,15 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   Future<void> _onAlbum(
       AlbumInitial event, Emitter<MusicGroupState> emit) async {
     try {
-      final list = await _ytMusic.getAlbum(event.id);
-      final album = Album.fromYtFull(list);
-
+      final album = await _repo.albumDetails(event.id);
       final color = await Utils.getImageColor(album.thumbnail);
-      // TODO: implement fav item check
-      //   final isFav = await _repo.isFavAlbum(event.id);
+      final isFav = await _repo.isInLibrary(uid, event.id);
       emit(state.copyWith(
         loading: false,
         bgColor: color,
         item: LibraryModel(
           id: album.id,
+          libId: album.id,
           title: album.title,
           thumbnail: album.thumbnail,
           type: LibItemType.album,
@@ -254,7 +239,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
         ),
         tracks: album.tracks,
         subtitle: album.year?.toString(),
-        // isFav: isFav,
+        isFav: isFav,
       ));
     } catch (e) {
       logPrint(e, 'album-init');
@@ -267,13 +252,15 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
     libRefresh = true;
     try {
       emit(state.copyWith(isFav: !event.liked));
-      // TODO: implement fav item
-      // if (event.liked) {
-      //   _repo.doc(event.id).delete();
-      // } else {
-      //   _repo.doc(event.id).set(data);
-      // }
+      if (event.liked) {
+        final result = await _repo.removeFromLibrary(uid, event.id);
+        if (!result) throw FormatException();
+      } else {
+        final result = await _repo.addToLibrary(uid, state.item!);
+        if (!result) throw FormatException();
+      }
     } catch (e) {
+      emit(state.copyWith(isFav: event.liked));
       logPrint(e, 'fav');
     }
   }
@@ -281,7 +268,6 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   Future<void> _onCoverChanged(
       PlaylistCoverChanged event, Emitter<MusicGroupState> emit) async {
     // TODO: implement change cover image
-
     // showToast(StringRes.uploading);
     // emit(state.copyWith(image: ''));
     // final image = await event.file.readAsBytes();
