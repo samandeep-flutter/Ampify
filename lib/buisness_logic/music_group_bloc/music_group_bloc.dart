@@ -153,6 +153,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   bool libRefresh = false;
 
   final MusicGroupRepo _repo = getIt();
+  final YtMusicRepo _musicRepo = getIt();
   String get uid => BoxServices.instance.uid!;
 
   // @override
@@ -191,10 +192,10 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
       PlaylistInitial event, Emitter<MusicGroupState> emit) async {
     try {
       final _playlist = Completer<Playlist>();
-      _repo.playlistDetails(event.id).then((playlist) {
+      _musicRepo.playlistDetails(event.id).then((playlist) {
         _playlist.complete(playlist);
       }, onError: (e) => _playlist.completeError(e));
-      final tracks = await _repo.playlistTracks(event.id);
+      final tracks = await _musicRepo.playlistTracks(event.id);
 
       final playlist = await _playlist.future.timeout(Duration(seconds: 30));
       final color = await Utils.getImageColor(playlist.thumbnail);
@@ -223,7 +224,7 @@ class MusicGroupBloc extends Bloc<MusicGroupEvent, MusicGroupState> {
   Future<void> _onAlbum(
       AlbumInitial event, Emitter<MusicGroupState> emit) async {
     try {
-      final album = await _repo.albumDetails(event.id);
+      final album = await _musicRepo.albumDetails(event.id);
       final color = await Utils.getImageColor(album.thumbnail);
       final isFav = await _repo.isInLibrary(uid, event.id);
       emit(state.copyWith(

@@ -2,29 +2,7 @@ import 'package:ampify/data/utils/exports.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MusicGroupRepo {
-  final YTMusic _ytMusic;
-  MusicGroupRepo(this._ytMusic);
   final _firestore = FirebaseFirestore.instance;
-
-  Future<Playlist> playlistDetails(String id) async {
-    final playlist = await _ytMusic.getPlaylist(id);
-    return Playlist.fromYT(playlist);
-  }
-
-  Future<Album> albumDetails(String id) async {
-    final album = await _ytMusic.getAlbum(id);
-    return Album.fromYtFull(album);
-  }
-
-  Future<List<Track>> playlistTracks(String id) async {
-    try {
-      final list = await _ytMusic.getPlaylistVideos(id);
-      return List<Track>.from(list.map((e) => Track.fromVid(e)));
-    } catch (e) {
-      logPrint(e, 'playlist-tracks');
-      return [];
-    }
-  }
 
   Future<bool> addToLibrary(String uid, LibraryModel model) async {
     try {

@@ -68,10 +68,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<SearchInitial>(_onInit);
     on<SearchCleared>(_onSearchClear);
   }
+
+  final YtMusicRepo _repo = getIt();
   final focusNode = FocusNode();
   final searchContr = TextEditingController();
-
-  final YTMusic _ytMusic = getIt();
 
   void _onInit(SearchInitial event, Emitter<SearchState> emit) {
     searchContr.addListener(_onSearchTextChanged);
@@ -102,11 +102,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       SearchTrigerred event, Emitter<SearchState> emit) async {
     try {
       if (searchContr.text.isEmpty) throw FormatException();
-
-      final results = await _ytMusic.search(searchContr.text);
-      final musicGroups =
-          List<LibraryModel>.from(results.map((e) => LibraryModel.fromYT(e)));
-
+      final musicGroups = await _repo.search(searchContr.text);
       musicGroups.sort((a, b) {
         final fName = a.title.queryMatch(searchContr.text);
         final fArtist = a.artist?.name.queryMatch(searchContr.text) ?? 0;

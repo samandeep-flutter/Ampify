@@ -76,8 +76,7 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
     on<TrackRadioInitial>(_onInit);
     on<RadioTitleFade>(_titleFade);
   }
-
-  final YTMusic _ytMusic = getIt();
+  final YtMusicRepo _repo = getIt();
   final scrollController = ScrollController();
 
   void onPlay(BuildContext context) {
@@ -101,12 +100,8 @@ class TrackRadioBloc extends Bloc<TrackRadioEvents, TrackRadioState> {
     try {
       if (event.track == null) throw Exception('track is null');
       emit(state.copyWith(title: event.track!.title));
-      final _list = await _ytMusic.getUpNexts(event.track!.id);
-      if (_list.isEmpty) throw FormatException();
-      final tracks = _list.map((e) => Track.fromUpNext(e)).toList();
+      final tracks = await _repo.getUpNexts(event.track!.id);
       emit(state.copyWith(tracks: tracks));
-    } on FormatException {
-      emit(state.copyWith(tracks: []));
     } catch (e) {
       emit(state.copyWith(error: true));
       logPrint(e, 'radio-init');

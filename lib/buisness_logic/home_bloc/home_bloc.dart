@@ -52,12 +52,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeInitial>(_onInIt);
   }
 
-  final YTMusic _provider = getIt();
-
+  final YtMusicRepo _repo = getIt();
   Future<void> _onInIt(HomeInitial event, Emitter<HomeState> emit) async {
     try {
-      final _list = await _provider.getHomeSections();
-      final list = _list.map((e) => MyHomeSection.fromYT(e)).toList();
+      final list = await _repo.homeSection();
       emit(state.copyWith(
           albums: list, albumLoading: false, recentLoading: false));
     } catch (e) {

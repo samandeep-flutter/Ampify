@@ -188,61 +188,72 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                           BlocBuilder<MusicGroupBloc, MusicGroupState>(
                             buildWhen: (pr, cr) => pr.isFav != cr.isFav,
                             builder: (context, state) {
-                              return SizedBox(
-                                height: Dimens.iconDefault,
-                                child: IconButton(
-                                  tooltip: StringRes.addtoLiked,
-                                  style: IconButton.styleFrom(
-                                    visualDensity: VisualDensity.compact,
-                                    shape: CircleBorder(
-                                      side: BorderSide(
-                                        width: Dimens.sizeMini,
-                                        color: state.isFav ?? false
-                                            ? scheme.primary
-                                            : scheme.textColorLight,
+                              return DisabledWidget(
+                                disabled: state.tracks.isEmpty,
+                                child: SizedBox(
+                                  height: Dimens.iconDefault,
+                                  child: IconButton(
+                                    tooltip: StringRes.addtoLiked,
+                                    style: IconButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                      shape: CircleBorder(
+                                        side: BorderSide(
+                                          width: Dimens.sizeMini,
+                                          color: state.isFav ?? false
+                                              ? scheme.primary
+                                              : scheme.textColorLight,
+                                        ),
                                       ),
+                                      backgroundColor: state.isFav ?? false
+                                          ? scheme.primary
+                                          : null,
                                     ),
-                                    backgroundColor: state.isFav ?? false
-                                        ? scheme.primary
-                                        : null,
+                                    iconSize: Dimens.iconSmall,
+                                    onPressed: () {
+                                      bloc.add(MusicGroupFav(state.id!,
+                                          liked: state.isFav ?? false));
+                                    },
+                                    isSelected: state.isFav ?? false,
+                                    selectedIcon: Icon(Icons.check,
+                                        color: scheme.onPrimary),
+                                    icon: Icon(Icons.add,
+                                        color: scheme.textColorLight),
                                   ),
-                                  iconSize: Dimens.iconSmall,
-                                  onPressed: () {
-                                    bloc.add(MusicGroupFav(state.id!,
-                                        liked: state.isFav ?? false));
-                                  },
-                                  isSelected: state.isFav ?? false,
-                                  selectedIcon: Icon(Icons.check,
-                                      color: scheme.onPrimary),
-                                  icon: Icon(Icons.add,
-                                      color: scheme.textColorLight),
                                 ),
                               );
                             },
                           ),
                           const SizedBox(width: Dimens.sizeSmall),
-                          ElevatedButton.icon(
-                              onPressed: () => _appendTracks(state),
-                              style: ElevatedButton.styleFrom(
-                                padding: Utils.insetsHoriz(Dimens.sizeDefault),
-                                visualDensity: VisualDensity.compact,
-                                backgroundColor: scheme.textColor,
-                                foregroundColor: scheme.background,
-                              ),
-                              iconAlignment: IconAlignment.end,
-                              label: Text(StringRes.append),
-                              icon: Icon(Icons.library_music_outlined)),
+                          DisabledWidget(
+                            disabled: state.tracks.isEmpty,
+                            child: ElevatedButton.icon(
+                                onPressed: () => _appendTracks(state),
+                                style: ElevatedButton.styleFrom(
+                                  padding:
+                                      Utils.insetsHoriz(Dimens.sizeDefault),
+                                  visualDensity: VisualDensity.compact,
+                                  backgroundColor: scheme.textColor,
+                                  foregroundColor: scheme.background,
+                                ),
+                                iconAlignment: IconAlignment.end,
+                                label: Text(StringRes.append),
+                                icon: Icon(Icons.library_music_outlined)),
+                          ),
                           const SizedBox(width: Dimens.sizeSmall),
-                          IconButton(
-                            onPressed: () => _toMoreDetails(bloc, state),
-                            style: IconButton.styleFrom(
-                              visualDensity: VisualDensity.compact,
+                          DisabledWidget(
+                            disabled: state.tracks.isEmpty,
+                            child: IconButton(
+                              onPressed: () => _toMoreDetails(bloc, state),
+                              style: IconButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              iconSize: Dimens.iconDefault,
+                              icon: const Icon(Icons.more_vert),
                             ),
-                            iconSize: Dimens.iconDefault,
-                            icon: const Icon(Icons.more_vert),
                           ),
                           const Spacer(),
                           DisabledWidget(
+                            disabled: state.tracks.isEmpty,
                             child: BlocBuilder<PlayerBloc, PlayerState>(
                                 buildWhen: (pr, cr) => pr.shuffle != cr.shuffle,
                                 builder: (context, state) {
@@ -269,17 +280,20 @@ class _MusicGroupScreenState extends State<MusicGroupScreen> {
                             return pr.playerState != cr.playerState;
                           }, builder: (context, pl) {
                             final group = pl.musicGroupId == state.id;
-                            return IconButton(
-                              onPressed: () => bloc.onPlay(context),
-                              iconSize: Dimens.iconXLarge,
-                              isSelected: group && pl.playerState.isPlaying,
-                              selectedIcon: const Icon(Icons.pause),
-                              style: IconButton.styleFrom(
-                                backgroundColor: scheme.textColor,
-                                foregroundColor: scheme.surface,
-                                splashFactory: NoSplash.splashFactory,
+                            return DisabledWidget(
+                              disabled: state.tracks.isEmpty,
+                              child: IconButton(
+                                onPressed: () => bloc.onPlay(context),
+                                iconSize: Dimens.iconXLarge,
+                                isSelected: group && pl.playerState.isPlaying,
+                                selectedIcon: const Icon(Icons.pause),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: scheme.textColor,
+                                  foregroundColor: scheme.surface,
+                                  splashFactory: NoSplash.splashFactory,
+                                ),
+                                icon: const Icon(Icons.play_arrow),
                               ),
-                              icon: const Icon(Icons.play_arrow),
                             );
                           }),
                         ],

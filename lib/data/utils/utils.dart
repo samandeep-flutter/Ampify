@@ -8,7 +8,6 @@ import 'package:palette_generator/palette_generator.dart';
 import 'package:rxdart/rxdart.dart';
 
 sealed class Utils {
-  static final MusicRepo _repo = getIt();
   static final _random = Random();
 
   static TextStyle defTitleStyle([Color? color]) {
@@ -126,9 +125,10 @@ sealed class Utils {
   //   }
   // }
 
-  static Future<TrackDetails> getTrackDetails(Track track) async {
+  static Future<TrackDetails> getTrackDetails(
+      YtMusicRepo repo, Track track) async {
     final completer = Completer<Duration?>();
-    _repo.getSongDuration(track).then((e) {
+    repo.getSongDuration(track).then((e) {
       completer.complete(e);
     });
 

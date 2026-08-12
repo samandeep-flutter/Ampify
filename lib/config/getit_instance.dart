@@ -8,9 +8,9 @@ GetIt getIt = GetIt.instance;
 Future<void> initGetIt() async {
   getIt.registerLazySingleton<YTMusic>(() => YTMusic());
   getIt.registerLazySingleton<LibraryRepo>(() => LibraryRepo());
-  getIt.registerLazySingleton<MusicGroupRepo>(() => MusicGroupRepo(getIt()));
+  getIt.registerLazySingleton<MusicGroupRepo>(() => MusicGroupRepo());
   getIt.registerLazySingleton(
-      () => MusicRepo(getIt(), ytExplode: YoutubeExplode()));
+      () => YtMusicRepo(getIt(), ytExplode: YoutubeExplode()));
 
   // async singletons
   getIt.registerSingletonAsync<AuthServices>(AuthServices.instance.init);

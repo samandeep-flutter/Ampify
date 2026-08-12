@@ -41,7 +41,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
   // }
 
   final AudioHandler _audioHandler = getIt();
-  final MusicRepo _musicRepo = getIt();
+  final YtMusicRepo _musicRepo = getIt();
   final LibraryRepo _libRepo = getIt();
 
   String get uid => BoxServices.instance.uid!;
@@ -235,7 +235,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     try {
       if (state.playerState.isHidden) throw FormatException();
       showToast(StringRes.queueAdded);
-      final track = await Utils.getTrackDetails(event.track);
+      final track = await Utils.getTrackDetails(_musicRepo, event.track);
       emit(state.copyWith(queue: [...state.queue, track]));
       if (state.upNext.isNotEmpty) {
         await _audioHandler.customAction(PlayerActions.removeUpcomming);
@@ -286,7 +286,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
         }
       } else if (state.upNext.isNotEmpty) {
         try {
-          final details = await Utils.getTrackDetails(state.upNext.first);
+          final details =
+              await Utils.getTrackDetails(_musicRepo, state.upNext.first);
           final uri = await _musicRepo.fromVideoId(details.track!.videoId);
           if (uri == null) throw FormatException();
           final _media = Utils.toMediaItem(details, uri: uri);
@@ -320,7 +321,8 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     await _audioHandler.customAction(PlayerActions.clearQueue);
     try {
       emit(state.withMusicGroup(event.id!, tracks: event.tracks));
-      final details = await Utils.getTrackDetails(event.tracks.first);
+      final details =
+          await Utils.getTrackDetails(_musicRepo, event.tracks.first);
       final uri = await _musicRepo.fromVideoId(details.track!.videoId);
       if (uri == null) throw FormatException();
       final _media = Utils.toMediaItem(details, uri: uri);
@@ -342,7 +344,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     final upnext = state.upNext.skip(1).toList();
     emit(state.copyWith(details: TrackDetails.track(track), upNext: upnext));
     try {
-      final _details = await Utils.getTrackDetails(track);
+      final _details = await Utils.getTrackDetails(_musicRepo, track);
       final uri = await _musicRepo.fromVideoId(_details.track!.videoId);
       if (uri == null) throw FormatException();
       final _media = Utils.toMediaItem(_details, uri: uri);
@@ -374,7 +376,7 @@ class PlayerBloc extends Bloc<PlayerEvent, PlayerState> {
     _audioHandler.pause();
     await _audioHandler.customAction(PlayerActions.clearQueue);
     emit(state.withTrack(TrackDetails.track(event.track)));
-    final details = await Utils.getTrackDetails(event.track);
+    final details = await Utils.getTrackDetails(_musicRepo, event.track);
     emit(state.copyWith(details: details, isLiked: event.liked));
     try {
       _audioHandler.customAction(PlayerActions.clearQueue);

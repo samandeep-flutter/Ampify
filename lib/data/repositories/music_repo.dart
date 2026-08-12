@@ -1,55 +1,63 @@
 import 'dart:async';
 import 'package:ampify/data/utils/exports.dart' hide SearchResult;
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' hide Playlist;
 
-class MusicRepo {
+class YtMusicRepo {
   final YTMusic ytMusic;
   final YoutubeExplode ytExplode;
-  MusicRepo(this.ytMusic, {required this.ytExplode});
+  YtMusicRepo(this.ytMusic, {required this.ytExplode});
 
-  final _ytClients = [YoutubeApiClient.androidVr];
-  // Future<SongYtDetails?> getDetailsFromQuery(Track track) async {
-  //   try {
-  //     final artist =
-  //         track.artists?.map((e) => e.name?.toLowerCase() ?? '') ?? [];
-  //     final song = await _search(QuerySong(track.name!, artist));
-  //     final duration = await _getSongDuration(song!.videoId);
-  //     return SongYtDetails(song.videoId, duration: duration!);
-  //   } catch (e) {
-  //     logPrint(e, 'yt-query');
-  //     return null;
-  //   }
-  // }
+  Future<List<MyHomeSection>> homeSection() async {
+    try {
+      final _list = await ytMusic.getHomeSections();
+      return _list.map((e) => MyHomeSection.fromYT(e)).toList();
+    } catch (e) {
+      logPrint(e, 'yt-home');
+      return [];
+    }
+  }
+
+  Future<List<LibraryModel>> search(String query) async {
+    try {
+      final list = await ytMusic.search(query.trim().toLowerCase());
+      return List<LibraryModel>.from(list.map((e) => LibraryModel.fromYT(e)));
+    } catch (e) {
+      logPrint(e, 'yt-search');
+      return [];
+    }
+  }
+
+  Future<Playlist> playlistDetails(String id) async {
+    final playlist = await ytMusic.getPlaylist(id);
+    return Playlist.fromYT(playlist);
+  }
+
+  Future<Album> albumDetails(String id) async {
+    final album = await ytMusic.getAlbum(id);
+    return Album.fromYtFull(album);
+  }
+
+  Future<List<Track>> playlistTracks(String id) async {
+    try {
+      final list = await ytMusic.getPlaylistVideos(id);
+      return List<Track>.from(list.map((e) => Track.fromVid(e)));
+    } catch (e) {
+      logPrint(e, 'playlist-tracks');
+      return [];
+    }
+  }
 
   Future<Uri?> fromVideoId(String? videoId) async {
     try {
       if (videoId == null) return null;
       final manifest = await ytExplode.videos.streams
-          .getManifest(videoId, ytClients: _ytClients);
+          .getManifest(videoId, ytClients: [YoutubeApiClient.androidVr]);
       return manifest.adaptiveUri;
     } catch (e) {
       logPrint(e, 'ytExplode');
       return null;
     }
   }
-
-  // Future<SongDetailed?> _search(QuerySong query) async {
-  //   final songs = await ytMusic.searchSongs(query.text);
-  //   try {
-  //     return songs.firstWhere((e) {
-  //       final _name = e.name.toLowerCase();
-  //       final _artist = e.artist.name.toLowerCase();
-  //       final isSame = _artist.contains(_name);
-  //       return (_name.contains(query.title.toLowerCase())) &&
-  //           (query.artists.any((f) => _artist.contains(f)) || isSame);
-  //     }, orElse: () => throw FormatException());
-  //   } on FormatException {
-  //     return songs.firstOrNull;
-  //   } catch (e) {
-  //     logPrint(e, 'yt-search');
-  //     return null;
-  //   }
-  // }
 
   Future<Duration?> getSongDuration(Track item) async {
     try {
@@ -59,6 +67,16 @@ class MusicRepo {
     } catch (e) {
       logPrint(e, 'yt-duration');
       return null;
+    }
+  }
+
+  Future<List<Track>> getUpNexts(String videoId) async {
+    try {
+      final list = await ytMusic.getUpNexts(videoId);
+      return list.map((e) => Track.fromUpNext(e)).toList();
+    } catch (e) {
+      logPrint(e, 'up-next');
+      return [];
     }
   }
 }
